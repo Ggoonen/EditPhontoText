@@ -17,36 +17,44 @@
 <link href="https://fonts.googleapis.com/css2?family=Marhey&display=swap" rel="stylesheet">
 
 <style>
-  /* لوحة ألوان داكنة ومريحة للعين */
+  /*
+  ** لوحة ألوان جديدة: حيوية ومشرقة
+  */
   :root {
-    --dark-bg: #1A1A2E; /* أزرق داكن جدًا */
-    --card-bg: #2B2B4A; /* أزرق بنفسجي داكن */
-    --accent-color: #E94560; /* أحمر داكن/وردي جذاب - هذا اللون الأساسي للشريط الأحمر */
-    --light-text: #E0E0E0;
-    --muted-text: #A0A0B0;
-    --border-color: #4A4A6A;
-    --shadow-color: rgba(0, 0, 0, 0.4);
-    --input-bg: #3B3B5B;
-    --input-border-focus: var(--accent-color);
-    --placeholder-color: #808090;
-    --button-bg: #5B5B8A; /* أزرق بنفسجي متوسط */
-    --button-hover-bg: #7C7CA0;
-    --button-active-bg: #2A2A40;
-    --toggle-off-bg: #6A6A8A;
-    --toggle-on-bg: var(--accent-color);
-    --tab-inactive-bg: var(--card-bg);
-    --tab-active-bg: var(--dark-bg);
-    --tab-border: var(--border-color);
-    --store-item-bg: #3A3A5A;
-    --store-locked-bg: #2A2A3A;
-    --notification-bg: #4A4A6A;
-    --notification-success: #28a745;
-    --notification-error: #dc3545;
+    --primary-color: #5E35B1; /* بنفسجي غامق جذاب */
+    --secondary-color: #FFC107; /* أصفر ذهبي ساطع */
+    --accent-color: #F44336; /* أحمر نابض بالحياة */
+    --background-dark: #121212; /* أسود حالك للخلفية */
+    --card-background: #1E1E1E; /* رمادي داكن للبطاقات */
+    --text-light: #E0E0E0; /* أبيض ساطع للنص */
+    --text-muted: #B0B0B0; /* رمادي فاتح للنص الثانوي */
+    --border-color: #333333; /* حدود داكنة */
+    --input-background: #282828; /* خلفية حقول الإدخال */
+    --button-primary: #4CAF50; /* أخضر للأزرار الرئيسية */
+    --button-hover: #43A047; /* أخضر أغمق عند التحويم */
+    --button-active: #388E3C; /* أخضر أغمق عند النقر */
+    --shadow-light: rgba(0, 0, 0, 0.6); /* ظل خفيف */
+    --shadow-dark: rgba(0, 0, 0, 0.8); /* ظل أغمق */
+
+    /* ألوان التبديل (Toggle) */
+    --toggle-off-bg: #555;
+    --toggle-on-bg: var(--button-primary);
+
+    /* ألوان التنبيهات */
+    --notification-success: #4CAF50;
+    --notification-error: #F44336;
+    --notification-info: #2196F3;
   }
 
   /*
-  ** تحديثات لتحسين السلاسة والتمرير
+  ** تحديثات لتحسين السلاسة والتمرير والصورة
   */
+
+  /* تطبيق box-sizing على كل العناصر */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
   html {
     height: 100%; /* تأكد أن html يغطي الارتفاع بالكامل */
     scroll-behavior: smooth; /* تمرير سلس */
@@ -54,16 +62,15 @@
 
   body {
     margin: 0;
-    padding: 20px; /* تقليل البادينغ لزيادة المساحة المتاحة للمحتوى */
+    padding: 20px;
     height: 100%; /* تأكد أن body يغطي الارتفاع بالكامل */
-    width: 100vw; /* التأكد من عرض 100% من عرض النافذة */
+    width: 100vw;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: linear-gradient(135deg, var(--dark-bg), #121220);
-    box-sizing: border-box; /* للتأكد من أن البادينغ لا يزيد العرض الإجمالي */
-    color: var(--light-text);
+    background: linear-gradient(135deg, var(--background-dark), #000000); /* تدرج خلفية داكن */
+    color: var(--text-light);
     overflow-y: auto; /* السماح بالتمرير العمودي فقط عند الحاجة */
     -webkit-overflow-scrolling: touch; /* لتحسين التمرير على iOS */
   }
@@ -71,61 +78,68 @@
   .container {
     width: 100%;
     max-width: 380px;
-    background-color: var(--card-bg);
-    border-radius: 12px; /* حواف دائرية بسيطة للمظهر العصري */
+    background-color: var(--card-background);
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 8px 25px var(--shadow-color); /* ظل أكثر نعومة */
-    margin-bottom: 30px; /* مسافة أقل بين الصورة وعناصر التحكم */
+    box-shadow: 0 8px 25px var(--shadow-dark); /* ظل أغمق وجذاب */
+    margin-bottom: 30px;
     border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     position: relative;
+    flex-shrink: 0; /* مهم: منع الانكماش عند توفر مساحة أقل */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* انيميشن عند التفاعل */
+  }
+  .container:hover {
+      transform: translateY(-5px); /* رفع خفيف عند التحويم */
+      box-shadow: 0 12px 30px var(--shadow-dark);
   }
 
   .image-area {
     width: 100%;
-    aspect-ratio: 1 / 1;
-    background-color: #333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    box-sizing: border-box;
-    border-radius: 12px 12px 0 0; /* حواف دائرية علوية */
-    overflow: hidden;
+    padding-bottom: 100%; /* نسبة 1:1 لجعلها مربعة */
+    position: relative; /* لتمكين وضع الصورة المطلق */
+    background-color: var(--input-background); /* لون خلفية يظهر إذا لم يتم تحميل صورة */
+    border-radius: 12px 12px 0 0;
+    overflow: hidden; /* للحفاظ على الصورة داخل الحواف الدائرية وقص الزوائد */
   }
 
   .editable-image {
-    max-width: 100%;
-    max-height: 100%;
-    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
+    height: 100%;
     display: block;
-    object-fit: cover;
-    border-radius: 0;
+    object-fit: cover; /* مهم: يجعل الصورة تملأ الحاوية وتقص الزوائد للحفاظ على المربع */
+    transition: transform 0.3s ease;
   }
+  .editable-image:hover {
+      transform: scale(1.05); /* تكبير خفيف للصورة عند التحويم */
+  }
+
 
   .red-fixed-area {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    color: var(--light-text);
+    color: var(--text-light);
     direction: rtl;
     font-size: 1.1em;
     font-weight: 700;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    text-shadow: 1px 1px 3px var(--shadow-light);
     z-index: 1;
-    border-radius: 0 0 12px 12px; /* حواف دائرية سفلية */
-
+    border-radius: 0 0 12px 12px;
     display: flex;
-    justify-content: center; /* الافتراضي في المنتصف */
+    justify-content: center;
     align-items: center;
-    padding: 18px 25px; /* سيتم تعديله بواسطة JS */
-    min-height: 75px; /* سيتم تعديله بواسطة JS */
-    box-sizing: border-box;
+    padding: 18px 25px;
+    min-height: 75px;
     transform: translateY(0.5px);
-    gap: 10px; /* مسافة بين الأيقونة والنص */
+    gap: 10px;
+    background: linear-gradient(to right, var(--accent-color), #D32F2F); /* تدرج جذاب للشريط */
+    transition: background 0.3s ease, min-height 0.3s ease, padding 0.3s ease; /* انيميشن للتغييرات */
   }
 
   /* أشكال حواف الشريط */
@@ -136,10 +150,10 @@
 
 
   #channelIconsContainer {
-    display: flex; /* لجعل الأيقونات جنبًا إلى جنب إذا كانت متعددة */
+    display: flex;
     align-items: center;
     gap: 5px;
-    order: 1; /* لجعل الأيقونات على اليمين (في اتجاه RTL) */
+    order: 1;
   }
   #channelIconsContainer img {
       max-width: 100%;
@@ -147,11 +161,9 @@
       height: auto;
       display: block;
       object-fit: contain;
-      /* سيتحدد الحجم بواسطة JS بالبكسل */
   }
   #channelIconsContainer span {
-      line-height: 1; /* لضبط محاذاة الأيقونات النصية */
-      /* سيتحدد الحجم بواسطة JS بالبكسل */
+      line-height: 1;
   }
 
   .editable-text {
@@ -159,77 +171,81 @@
     margin: 0;
     line-height: 1.4;
     text-align: center;
-    width: 100%; /* سيتم تعديل هذا بواسطة JS إذا كانت هناك أيقونات */
+    width: 100%;
     word-wrap: break-word;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    order: 2; /* لجعل النص على اليسار (في اتجاه RTL) */
+    order: 2;
   }
 
-  /* تصميم التبويبات */
   .controls {
     width: 100%;
     max-width: 450px;
-    background-color: var(--card-bg);
-    border-radius: 12px; /* حواف دائرية أكثر تناسقًا */
-    box-shadow: 0 8px 25px var(--shadow-color); /* ظل أكثر نعومة */
+    background-color: var(--card-background);
+    border-radius: 12px;
+    box-shadow: 0 8px 25px var(--shadow-dark); /* ظل أغمق وجذاب */
     border: 1px solid var(--border-color);
     overflow: hidden;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    margin-top: auto; /* تدفع نفسها للأسفل في الفليكس بوكس */
-    margin-bottom: 20px; /* مسافة قبل التنبيه */
-    flex-shrink: 0; /* لمنع الانكماش في المساحات الضيقة */
+    margin-top: auto;
+    margin-bottom: 20px;
+    flex-shrink: 0; /* مهم: لمنع انكماش هذا العنصر */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* انيميشن عند التفاعل */
+  }
+  .controls:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px var(--shadow-dark);
   }
 
   .tab-buttons {
     display: flex;
     width: 100%;
-    background-color: var(--tab-inactive-bg);
-    border-bottom: 1px solid var(--tab-border);
+    background-color: var(--input-background); /* لون خلفية أغمق للتابات */
+    border-bottom: 1px solid var(--border-color);
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
-    overflow-x: auto; /* للسماح بالتمرير الأفقي إذا كثرت التبويبات */
-    white-space: nowrap; /* لمنع التفاف الأزرار */
-    -webkit-overflow-scrolling: touch; /* لتحسين التمرير على iOS */
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
   }
 
   .tab-button {
-    flex-shrink: 0; /* لمنع الأزرار من الانكماش */
-    padding: 16px 10px; /* تقليل البادينغ قليلاً */
+    flex-shrink: 0;
+    padding: 16px 10px;
     text-align: center;
     cursor: pointer;
-    background-color: var(--tab-inactive-bg);
-    color: var(--muted-text);
+    background-color: var(--input-background); /* لون خلفية أغمق للتابات */
+    color: var(--text-muted);
     font-weight: 700;
-    font-size: 0.95em; /* أصغر قليلاً لاستيعاب المزيد من التبويبات */
+    font-size: 0.95em;
     border: none;
-    border-left: 1px solid var(--tab-border);
-    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease; /* إضافة انتقال للظل */
+    border-left: 1px solid var(--border-color);
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px; /* مسافة أقل بين الأيقونة والنص */
+    gap: 8px;
   }
   .tab-button:first-child {
       border-left: none;
   }
 
   .tab-button:hover {
-    background-color: #4A4A7A;
-    color: var(--light-text);
+    background-color: #383838; /* لون أغمق عند التحويم */
+    color: var(--text-light);
   }
 
   .tab-button.active {
-    background-color: var(--tab-active-bg);
+    background-color: var(--card-background); /* لون خلفية البطاقة للتاب النشط */
     color: var(--accent-color);
-    box-shadow: inset 0 3px 0 0 var(--accent-color); /* ظل داخلي أنعم */
-    border-bottom-color: var(--tab-active-bg);
+    box-shadow: inset 0 3px 0 0 var(--accent-color);
+    border-bottom-color: var(--card-background);
   }
 
   .tab-content {
-    padding: 25px; /* تقليل البادينغ لزيادة المحتوى المرئي */
+    padding: 25px;
     display: none;
     flex-direction: column;
-    gap: 20px; /* تقليل المسافة بين المجموعات */
+    gap: 20px;
   }
 
   .tab-content.active {
@@ -239,7 +255,7 @@
   .control-group {
     display: flex;
     flex-direction: column;
-    gap: 10px; /* تقليل المسافة بين العناصر في المجموعة */
+    gap: 10px;
   }
 
   .control-group label {
@@ -247,14 +263,14 @@
     align-items: center;
     margin-bottom: 5px;
     font-weight: 400;
-    color: var(--muted-text);
-    font-size: 1em; /* حجم خط عادي */
+    color: var(--text-muted);
+    font-size: 1em;
   }
 
   .control-group label .icon {
-    margin-left: 8px; /* مسافة أقل للأيقونة */
-    font-size: 1.3em; /* حجم أيقونة أصغر قليلاً */
-    color: var(--accent-color);
+    margin-left: 8px;
+    font-size: 1.3em;
+    color: var(--secondary-color); /* أيقونات التحكم بلون أصفر */
   }
 
   /* تصميم عام لحقول الإدخال */
@@ -263,14 +279,13 @@
   .controls select,
   .controls input[type="color"],
   .controls input[type="range"] {
-    width: calc(100% - 20px); /* ضبط العرض ليتناسب مع البادينغ الجديد */
-    padding: 12px; /* تقليل البادينغ */
+    width: 100%; /* استخدام 100% ثم البادينغ الداخلي */
+    padding: 12px;
     border: 1px solid var(--border-color);
-    border-radius: 8px; /* حواف دائرية أنعم */
-    font-size: 0.95em; /* حجم خط أصغر قليلاً */
-    box-sizing: border-box;
-    background-color: var(--input-bg);
-    color: var(--light-text);
+    border-radius: 8px;
+    font-size: 0.95em;
+    background-color: var(--input-background);
+    color: var(--text-light);
     transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   }
 
@@ -281,23 +296,24 @@
     appearance: none;
     background-image: url('data:image/svg+xml;utf8,<svg fill="%23E0E0E0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
     background-repeat: no-repeat;
-    background-position: left 12px center; /* ضبط موضع الأيقونة */
-    padding-left: 40px; /* ضبط البادينغ */
+    background-position: left 12px center;
+    padding-left: 40px;
   }
 
   /* تخصيص Color Picker */
   .controls input[type="color"] {
-    padding: 5px; /* تقليل البادينغ */
-    height: 48px; /* ارتفاع أصغر قليلاً */
-    width: 60px; /* عرض أصغر قليلاً */
+    padding: 5px;
+    height: 48px;
+    width: 60px;
     border-radius: 8px;
     cursor: pointer;
+    border: none; /* إزالة الحدود الافتراضية لـ color picker */
   }
 
   /* Placeholder color */
   .controls input::placeholder,
   .controls textarea::placeholder {
-    color: var(--placeholder-color);
+    color: var(--text-muted);
     opacity: 0.8;
   }
 
@@ -306,16 +322,16 @@
   .controls select:focus,
   .controls input[type="color"]:focus,
   .controls input[type="range"]:focus {
-    border-color: var(--input-border-focus);
-    box-shadow: 0 0 0 4px rgba(233, 69, 96, 0.2); /* ظل ألطف */
+    border-color: var(--secondary-color); /* لون التركيز الجديد */
+    box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.2); /* ظل التركيز الجديد */
     outline: none;
-    background-color: #4A4A7A;
+    background-color: #383838;
   }
 
   /* تحسينات خاصة بـ textarea - جعلها أكبر */
   .controls textarea {
     resize: vertical;
-    min-height: 120px; /* ارتفاع أقل قليلاً */
+    min-height: 120px;
     line-height: 1.5;
   }
 
@@ -327,13 +343,13 @@
   }
 
   .file-input-button {
-    background-color: var(--accent-color);
+    background-color: var(--button-primary); /* لون زر أساسي */
     color: white;
-    padding: 12px 20px; /* بادينغ أقل */
+    padding: 12px 20px;
     border: none;
-    border-radius: 8px; /* حواف دائرية أنعم */
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 1em; /* حجم خط أصغر قليلاً */
+    font-size: 1em;
     font-weight: 700;
     width: 100%;
     box-sizing: border-box;
@@ -342,22 +358,22 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.25); /* ظل ألطف */
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3); /* ظل معزز */
   }
 
   .file-input-button .icon {
-    font-size: 1.2em; /* حجم أيقونة أصغر قليلاً */
+    font-size: 1.2em;
   }
 
   .file-input-button:hover {
-    background-color: #C83B52;
-    transform: translateY(-2px); /* حركة أقل */
-    box-shadow: 0 5px 12px rgba(0,0,0,0.35); /* ظل أنعم عند التحويم */
+    background-color: var(--button-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.45);
   }
   .file-input-button:active {
     transform: translateY(0);
-    background-color: #A32E40;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15); /* ظل أقل عند الضغط */
+    background-color: var(--button-active);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   }
 
   /* إخفاء زر إدخال الملف الافتراضي */
@@ -376,17 +392,17 @@
   .text-info {
     display: flex;
     justify-content: space-between;
-    font-size: 0.85em; /* حجم خط أصغر */
-    color: var(--muted-text);
-    margin-top: 5px; /* مسافة أقل */
+    font-size: 0.85em;
+    color: var(--text-muted);
+    margin-top: 5px;
     direction: rtl;
     width: 100%;
   }
   .char-count.warning, .word-count.warning {
-    color: #FFD700;
+    color: var(--secondary-color); /* تحذير باللون الأصفر */
   }
   .char-count.danger, .word-count.danger {
-    color: var(--accent-color);
+    color: var(--accent-color); /* خطر باللون الأحمر */
   }
 
   /* إضافة أزرار التبديل (Toggle Switch) لظل النص */
@@ -394,15 +410,15 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 15px; /* مسافة أقل */
+    gap: 15px;
     width: 100%;
   }
 
   .toggle-switch {
     position: relative;
     display: inline-block;
-    width: 60px; /* عرض أقل */
-    height: 34px; /* ارتفاع أقل */
+    width: 60px;
+    height: 34px;
   }
 
   .toggle-switch input {
@@ -420,14 +436,14 @@
     bottom: 0;
     background-color: var(--toggle-off-bg);
     transition: .4s;
-    border-radius: 34px; /* مطابقة للارتفاع */
+    border-radius: 34px;
   }
 
   .slider:before {
     position: absolute;
     content: "";
-    height: 26px; /* حجم أصغر */
-    width: 26px; /* حجم أصغر */
+    height: 26px;
+    width: 26px;
     left: 4px;
     bottom: 4px;
     background-color: white;
@@ -444,22 +460,22 @@
   }
 
   input:checked + .slider:before {
-    transform: translateX(26px); /* مسافة أقل */
+    transform: translateX(26px);
   }
 
   /* أزرار عرض لقطة الشاشة */
   .screenshot-buttons {
     display: flex;
-    gap: 15px; /* مسافة أقل */
-    margin-top: 25px; /* مسافة أقل */
+    gap: 15px;
+    margin-top: 25px;
   }
   .screenshot-buttons button {
     flex: 1;
-    padding: 15px 25px; /* بادينغ أقل */
+    padding: 15px 25px;
     border: none;
-    border-radius: 8px; /* حواف دائرية أنعم */
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 1.1em; /* حجم خط أصغر قليلاً */
+    font-size: 1.1em;
     font-weight: 700;
     box-sizing: border-box;
     transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
@@ -467,35 +483,35 @@
     align-items: center;
     justify-content: center;
     gap: 10px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
   }
 
   #viewScreenshotBtn {
-    background-color: #007bff; /* لون أزرق مناسب للعرض */
+    background-color: var(--primary-color); /* لون بنفسجي جذاب */
     color: white;
   }
   #viewScreenshotBtn:hover {
-    background-color: #0056b3;
+    background-color: #673AB7; /* بنفسجي أغمق */
     transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.35);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.45);
   }
   #viewScreenshotBtn:active {
     transform: translateY(0);
-    background-color: #004085;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    background-color: #512DA8;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
   }
 
 
   .info-note {
-    font-size: 0.9em; /* حجم خط أصغر */
+    font-size: 0.9em;
     text-align: center;
-    margin-top: 20px; /* مسافة أقل */
-    border-radius: 10px; /* حواف دائرية أنعم */
-    padding: 15px; /* بادينغ أقل */
+    margin-top: 20px;
+    border-radius: 10px;
+    padding: 15px;
     line-height: 1.5;
     border: 1px solid var(--border-color);
-    background-color: rgba(74, 74, 106, 0.15);
-    color: var(--muted-text);
+    background-color: rgba(74, 74, 106, 0.15); /* لون شفاف */
+    color: var(--text-muted);
   }
 
   /* تصميم النقاط والمستوى */
@@ -503,13 +519,13 @@
     display: flex;
     justify-content: space-around;
     padding: 15px;
-    background-color: var(--dark-bg);
+    background-color: var(--background-dark); /* لون داكن لقسم الإحصائيات */
     border-bottom: 1px solid var(--border-color);
     border-top-left-radius: 12px;
     border-top-right-radius: 12px;
     font-weight: 700;
-    font-size: 1em; /* حجم خط أصغر قليلاً */
-    color: var(--accent-color);
+    font-size: 1em;
+    color: var(--secondary-color); /* لون أصفر للنقاط الرئيسية */
   }
   .player-stats div {
     display: flex;
@@ -518,83 +534,83 @@
     text-align: center;
   }
   .player-stats div span {
-      color: var(--light-text);
-      margin-top: 3px; /* مسافة أقل */
-      font-size: 0.8em; /* حجم خط أصغر */
+      color: var(--text-light);
+      margin-top: 3px;
+      font-size: 0.8em;
   }
   .player-stats .main-value {
-    font-size: 1.3em; /* حجم أصغر قليلاً */
-    color: var(--accent-color);
+    font-size: 1.3em;
+    color: var(--secondary-color);
   }
   .player-stats .secondary-value {
-    font-size: 0.7em; /* حجم أصغر */
-    color: var(--muted-text);
-    margin-top: 2px; /* مسافة أقل */
+    font-size: 0.7em;
+    color: var(--text-muted);
+    margin-top: 2px;
   }
 
 
   /* تصميم المتجر */
   .store-section {
-    margin-bottom: 25px; /* مسافة أقل */
+    margin-bottom: 25px;
   }
   .store-section h3 {
-    color: var(--accent-color);
-    margin-bottom: 12px; /* مسافة أقل */
-    border-bottom: 1px solid var(--border-color); /* خط أرق */
+    color: var(--secondary-color); /* لون أصفر لعناوين الأقسام */
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 5px;
     text-align: right;
-    font-size: 1.2em; /* حجم خط أصغر قليلاً */
+    font-size: 1.2em;
   }
   .store-items-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* حجم أصغر للعناصر */
-    gap: 15px; /* مسافة أقل بين العناصر */
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 15px;
     direction: rtl;
   }
   .store-item {
-    background-color: var(--store-item-bg);
+    background-color: var(--input-background); /* لون خلفية عناصر المتجر */
     border: 1px solid var(--border-color);
-    border-radius: 8px; /* حواف دائرية أنعم */
-    padding: 12px; /* بادينغ أقل */
+    border-radius: 8px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.2); /* ظل ألطف */
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     position: relative;
     overflow: hidden;
   }
   .store-item.locked {
-    background-color: var(--store-locked-bg);
+    background-color: #222; /* لون أغمق للعناصر المقفلة */
     filter: grayscale(80%) brightness(50%);
     cursor: not-allowed;
   }
   .store-item.unlocked .buy-button {
-      background-color: var(--button-bg); /* لون زر مختلف للعناصر المشتراة */
+      background-color: var(--button-hover); /* لون مختلف لزر "تم الشراء" */
       cursor: default;
   }
   .store-item.unlocked .buy-button:hover {
-      background-color: var(--button-bg);
+      background-color: var(--button-hover);
       transform: none;
       box-shadow: none;
   }
 
 
   .store-item:not(.locked):hover {
-    transform: translateY(-3px); /* حركة أقل */
-    box-shadow: 0 5px 12px rgba(0,0,0,0.3); /* ظل ألطف */
+    transform: translateY(-3px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
   }
   .store-item-name {
     font-weight: 700;
-    margin-bottom: 8px; /* مسافة أقل */
-    font-size: 1em; /* حجم خط أصغر قليلاً */
-    color: var(--light-text);
+    margin-bottom: 8px;
+    font-size: 1em;
+    color: var(--text-light);
   }
   .store-item-preview {
-    margin-bottom: 12px; /* مسافة أقل */
-    font-size: 2em; /* حجم معاينة أصغر قليلاً */
-    height: 40px; /* ارتفاع أقل */
+    margin-bottom: 12px;
+    font-size: 2em;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -603,19 +619,19 @@
   }
   /* معاينة الألوان والتدرجات */
   .store-item-preview.color-preview {
-      height: 25px; /* ارتفاع أقل */
-      border-radius: 4px; /* حواف دائرية أنعم */
+      height: 25px;
+      border-radius: 4px;
       border: 1px solid var(--border-color);
   }
   .store-item-preview.banner-preview {
-      height: 40px; /* ارتفاع أقل */
+      height: 40px;
       width: 100%;
       border-radius: 4px;
       border: 1px solid var(--border-color);
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 0.8em; /* حجم خط أصغر */
+      font-size: 0.8em;
       color: white;
   }
   .store-item-preview.banner-preview.rounded-bottom-banner-preview {
@@ -623,28 +639,28 @@
       border-bottom-right-radius: 12px;
   }
   .store-item-preview.text-effect-preview {
-    font-size: 1.2em; /* حجم خط أصغر */
-    color: var(--light-text);
+    font-size: 1.2em;
+    color: var(--text-light);
     text-shadow: none;
     -webkit-text-stroke: none;
   }
 
 
   .store-item-details {
-    font-size: 0.8em; /* حجم خط أصغر */
-    color: var(--muted-text);
-    margin-bottom: 12px; /* مسافة أقل */
+    font-size: 0.8em;
+    color: var(--text-muted);
+    margin-bottom: 12px;
     line-height: 1.3;
   }
   .store-item-details span {
     display: block;
   }
   .buy-button {
-    background-color: var(--accent-color);
+    background-color: var(--button-primary); /* لون زر الشراء الأساسي */
     color: white;
-    padding: 8px 12px; /* بادينغ أقل */
+    padding: 8px 12px;
     border: none;
-    border-radius: 6px; /* حواف دائرية أنعم */
+    border-radius: 6px;
     cursor: pointer;
     font-weight: 700;
     transition: background-color 0.2s ease;
@@ -655,11 +671,11 @@
     gap: 6px;
   }
   .buy-button:hover:not(:disabled) {
-    background-color: #C83B52;
+    background-color: var(--button-hover);
   }
   .buy-button:disabled {
-    background-color: var(--button-bg);
-    color: var(--muted-text);
+    background-color: var(--toggle-off-bg); /* لون زر معطل */
+    color: var(--text-muted);
     cursor: not-allowed;
   }
   .locked-overlay {
@@ -674,43 +690,43 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      font-size: 1em; /* حجم خط أصغر */
+      font-size: 1em;
       font-weight: 700;
-      pointer-events: none; /* للسماح بالنقرات على العنصر الأساسي */
+      pointer-events: none;
       z-index: 10;
-      border-radius: 8px; /* مطابقة للعنصر الأب */
+      border-radius: 8px;
   }
   .locked-overlay span {
-      margin-top: 8px; /* مسافة أقل */
-      font-size: 0.7em; /* حجم خط أصغر */
+      margin-top: 8px;
+      font-size: 0.7em;
       font-weight: 400;
-      color: var(--muted-text);
+      color: var(--text-muted);
   }
 
   /* نظام التنبيهات الداخلية */
   #notificationArea {
     position: fixed;
-    top: 15px; /* مسافة أقل */
+    top: 15px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
     display: flex;
     flex-direction: column;
-    gap: 8px; /* مسافة أقل */
+    gap: 8px;
     width: 90%;
-    max-width: 320px; /* عرض أقل */
+    max-width: 320px;
   }
   .notification {
-    background-color: var(--notification-bg);
-    color: var(--light-text);
-    padding: 12px 15px; /* بادينغ أقل */
-    border-radius: 8px; /* حواف دائرية أنعم */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25); /* ظل ألطف */
+    background-color: var(--notification-info);
+    color: var(--text-light);
+    padding: 12px 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
     text-align: center;
-    font-size: 0.9em; /* حجم خط أصغر */
+    font-size: 0.9em;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-    transform: translateY(-15px); /* حركة أقل */
+    transform: translateY(-15px);
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; /* انيميشن للظهور */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -727,23 +743,23 @@
     background-color: var(--notification-error);
   }
   .notification .icon {
-      font-size: 1.1em; /* حجم أيقونة أصغر قليلاً */
+      font-size: 1.1em;
   }
 
   /* التنبيه الجديد "تحديث قادم قريبا" */
   #updateNotification {
-    position: sticky; /* لتثبيته في أسفل العرض الحالي أثناء التمرير */
-    bottom: 10px; /* مسافة من الأسفل */
-    margin-top: auto; /* ليدفع نفسه للأسفل في حالة الفليكس بوكس */
+    position: sticky;
+    bottom: 10px;
+    margin-top: auto;
     left: 50%;
-    transform: translateX(-50%); /* لضمان التمركز الفعلي */
-    background-color: rgba(0, 0, 0, 0.7); /* خلفية داكنة شفافة */
-    color: white; /* لون النص */
-    padding: 8px 15px; /* مساحة داخلية */
-    border-radius: 8px; /* حواف دائرية */
-    font-size: 0.85em; /* حجم الخط */
-    z-index: 1000; /* لضمان ظهوره فوق العناصر الأخرى */
-    white-space: nowrap; /* لمنع التفاف النص */
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    z-index: 1000;
+    white-space: nowrap;
   }
 
   /* Media Queries لتحسين الاستجابة على الشاشات الصغيرة والكبيرة */
@@ -752,7 +768,7 @@
       padding: 15px;
     }
     .controls {
-      border-radius: 0; /* لا حواف دائرية على الحواف القصوى للشاشة */
+      border-radius: 0;
     }
     .tab-buttons {
       border-top-left-radius: 0;
@@ -858,7 +874,7 @@
           <span class="icon">📂</span> اختر صورة
         </button>
       </div>
-      <small style="color: var(--muted-text);">سيتم قص الصورة لتناسب الشكل المربع</small>
+      <small style="color: var(--text-muted);">ستأتي الصورة مربعة مع القص تلقائيًا.</small>
     </div>
   </div>
 
@@ -887,7 +903,7 @@
           <span class="icon">📏</span> حجم الخط:
       </label>
       <input type="range" id="fontSize" min="0.8" max="1.8" step="0.1" value="1.1">
-      <span id="fontSizeValue" style="color: var(--muted-text); text-align: left;">1.1em</span>
+      <span id="fontSizeValue" style="color: var(--text-muted); text-align: left;">1.1em</span>
     </div>
 
     <div class="control-group">
@@ -930,14 +946,14 @@
         <label for="redBannerColor">
             <span class="icon">🌈</span> لون الشريط الأحمر (تعديل):
         </label>
-        <input type="color" id="redBannerColor" value="#FF0000">
+        <input type="color" id="redBannerColor" value="#F44336">
     </div>
     <div class="control-group">
       <label for="bannerHeight">
           <span class="icon">📐</span> ارتفاع الشريط:
       </label>
       <input type="range" id="bannerHeight" min="60" max="120" step="5" value="75">
-      <span id="bannerHeightValue" style="color: var(--muted-text); text-align: left;">75px</span>
+      <span id="bannerHeightValue" style="color: var(--text-muted); text-align: left;">75px</span>
     </div>
 
     <div class="control-group">
@@ -945,7 +961,7 @@
           <span class="icon">↔️</span> المسافة البادئة للنص:
       </label>
       <input type="range" id="textPadding" min="10" max="40" step="1" value="25">
-      <span id="textPaddingValue" style="color: var(--muted-text); text-align: left;">25px</span>
+      <span id="textPaddingValue" style="color: var(--text-muted); text-align: left;">25px</span>
     </div>
   </div>
 
@@ -969,8 +985,8 @@
                 <span class="icon">📂</span> اختر أيقونة
             </button>
         </div>
-        <small style="color: var(--muted-text);">يفضل أيقونة مربعة وشفافة</small>
-        <button type="button" class="file-input-button" id="removeCustomIconButton" style="background-color: #dc3545; margin-top: 10px;">
+        <small style="color: var(--text-muted);">يفضل أيقونة مربعة وشفافة</small>
+        <button type="button" class="file-input-button" id="removeCustomIconButton" style="background-color: var(--accent-color); margin-top: 10px;">
             <span class="icon">🗑️</span> إزالة الأيقونة المخصصة
         </button>
     </div>
@@ -987,7 +1003,7 @@
             <span class="icon">🔍</span> حجم الأيقونة:
         </label>
         <input type="range" id="iconSize" min="1" max="2.5" step="0.1" value="1.5">
-        <span id="iconSizeValue" style="color: var(--muted-text); text-align: left;">1.5em</span>
+        <span id="iconSizeValue" style="color: var(--text-muted); text-align: left;">1.5em</span>
     </div>
 
     <div class="control-group">
@@ -1150,13 +1166,13 @@
     { id: 'banner-style-blue-solid', type: 'banner_style', name: 'أزرق سماوي', cost: 800, levelRequired: 2, value: '#007bff', preview: 'background-color: #007bff;', class: '' },
     { id: 'banner-style-purple-gradient', type: 'banner_style', name: 'تدرج بنفسجي', cost: 1200, levelRequired: 3, value: 'linear-gradient(to top, #6A11CB 50%, rgba(106,17,203,0.7) 75%, rgba(106,17,203,0.0) 100%)', preview: 'background: linear-gradient(to top, #6A11CB, #4A0F8A);', class: '' },
     { id: 'banner-style-green-wave', type: 'banner_style', name: 'موجة خضراء', cost: 1800, levelRequired: 4, value: 'linear-gradient(to top, #28a745 50%, rgba(40,167,69,0.7) 75%, rgba(40,167,69,0.0) 100%)', preview: 'background: linear-gradient(to top, #28a745, #1E7E34);', class: '' },
-    { id: 'banner-style-rounded-bottom', type: 'banner_style', name: 'حواف سفلية دائرية', cost: 1000, levelRequired: 3, value: null, preview: 'background-color: #E94560; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;', class: 'rounded-bottom-banner' },
+    { id: 'banner-style-rounded-bottom', type: 'banner_style', name: 'حواف سفلية دائرية', cost: 1000, levelRequired: 3, value: null, preview: 'background-color: #F44336; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;', class: 'rounded-bottom-banner' },
     { id: 'banner-style-dark-blue-gradient', type: 'banner_style', name: 'تدرج أزرق داكن', cost: 1500, levelRequired: 4, value: 'linear-gradient(to top, #153243 50%, rgba(21,50,67,0.7) 75%, rgba(21,50,67,0.0) 100%)', preview: 'background: linear-gradient(to top, #153243, #0A1C2C);', class: '' },
 
     // تأثيرات النص
     { id: 'text-effect-outline-white', type: 'text_effect', name: 'إطار أبيض', cost: 700, levelRequired: 2, value: '-webkit-text-stroke: 1.5px white; text-stroke: 1.5px white;', preview: 'font-size: 1.5em; -webkit-text-stroke: 1.5px white; text-stroke: 1.5px white; color: black; background-color: #eee; border-radius: 5px;' },
     { id: 'text-effect-outline-black', type: 'text_effect', name: 'إطار أسود', cost: 700, levelRequired: 2, value: '-webkit-text-stroke: 1.5px black; text-stroke: 1.5px black;', preview: 'font-size: 1.5em; -webkit-text-stroke: 1.5px black; text-stroke: 1.5px black; color: white; background-color: #222; border-radius: 5px;' },
-    { id: 'text-effect-glow', type: 'text_effect', name: 'توهج', cost: 900, levelRequired: 3, value: 'text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #E94560;', preview: 'font-size: 1.5em; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #E94560; background-color: #3A3A5A; border-radius: 5px;' },
+    { id: 'text-effect-glow', type: 'text_effect', name: 'توهج', cost: 900, levelRequired: 3, value: 'text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #FFC107;', preview: 'font-size: 1.5em; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #FFC107; background-color: #3A3A5A; border-radius: 5px;' },
     { id: 'text-effect-neon', type: 'text_effect', name: 'نيون', cost: 1500, levelRequired: 4, value: 'text-shadow: 0 0 7px #0ff, 0 0 10px #0ff, 0 0 21px #0ff, 0 0 42px #0fa, 0 0 82px #0fa, 0 0 92px #0fa, 0 0 102px #0fa, 0 0 151px #0fa;', preview: 'font-size: 1.5em; text-shadow: 0 0 7px #0ff; background-color: #3A3A5A; border-radius: 5px;' },
 
 
@@ -1171,9 +1187,9 @@
     { id: 'icon-triangle', type: 'icon', name: 'مثلث ▲', cost: 300, levelRequired: 2, value: 'triangle' },
     { id: 'icon-star', type: 'icon', name: 'نجمة ★', cost: 400, levelRequired: 3, value: 'star' },
     { id: 'icon-broadcast', type: 'icon', name: 'بث 📡', cost: 500, levelRequired: 3, value: 'broadcast' },
-    { id: 'icon-check', type: 'icon', name: 'أيقونة صح', cost: 600, levelRequired: 4, value: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwbi9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9MTA5IDE2LjE3TDQgMTEuMTcgMi41OCAxMi41OCA5IDE5LjkyIDE5LjQyIDkuNTEgMTggOC4wOUw5IDE2LjE3eiIvPjwvc3ZnPg==' },
+    { id: 'icon-check', type: 'icon', name: 'أيقونة صح', cost: 600, levelRequired: 4, value: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9MTA5IDE2LjE3TDQgMTEuMTcgMi41OCAxMi41OCA5IDE5LjkyIDE5LjQyIDkuNTEgMTggOC4wOUw5IDE2LjE3eiIvPjwvc3ZnPg==' },
     { id: 'icon-message', type: 'icon', name: 'أيقونة رسالة', cost: 900, levelRequired: 4, value: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9TTIwIDJINEMyLjkgMiAyIDIuOSAyIDR2MTZjMCAxLjEuOSAyIDIgMi4wMUwyMiAyMC4wMVY0YzAtMS4xLS45LTItMi0yem0wIDE4SDhMNC4wMSAxNlY0aDE1Ljk5VjIzeiIvPjwvc3ZnPg==' },
-    { id: 'icon-youtube', type: 'icon', name: 'أيقونة يوتيوب', cost: 700, levelRequired: 5, value: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0ZGRiI+PHBhdGggZD0yMCAySDQuMUMzLjUxIDIgMyAyLjUxIDMgNGgzVjJoLTJWOWg0VjIuODhMMjAuMyAyLjU3QzIwLjYyIDIuNDYgMjEgMi44MiAyMSAzLjMxdjguMzhjMCAuNTEtLjQgLjc1LS42NC41OWwtMy4zMy0yLjQydi0xLjY3aC00VjE3aDcuMTZsLTIuMDYgMS40NGMtLjQyLjMxLS43NC43NS0uNzQgMS4zMnYyLjc5Yy40Ni0uMTYuOC0uNjIuODMtLjk1bDMuNDUtMi40MWExLjQ4MiAxLjQ4MiAwIDAgMCAuNzYtMS4zMlY1LjcyYzAtMS4yMy0uOTctMi4xNi0yLjMtMi4wNmwuMDUtLjg5eiIvPjwvc3ZnPg==' }
+    { id: 'icon-youtube', type: 'icon', name: 'أيقونة يوتيوب', cost: 700, levelRequired: 5, value: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0ZGRiI+PHBhdGggZD0yMCAySDQuMUMzLjUxIDIgMyAyLjUxIDMgNGgzVjJoLTJWOWg0VjIuODhMMjAuMyAyLjU3QzIwLjYyIDIuNDYgMjEgMi44MiAyMSAzLjMxdjguMzhjMCAuNTEtLjQgLjc1LS42NC41OWwtMy4zMy0yLjQydi0xLjY3aC00VjE3hDcuMTZsLTIuMDYgMS40NGMtLjQyLjMxLS43NC43NS0uNzQgMS4zMnYyLjc5Yy40Ni0wLjE2LjgtLjYyLjgzLS45NWwzLjQ1LTIuNDFhMS40ODIgMS40ODIgMCAwIDAgLjc2LTEuMzJWMi43MmMwLTEuMjMtLjkuLTIuMTYtMi4zLTIuMDZsLjA1LS44OXoiLz48L3N2Zz4=' }
   ];
 
   // --- دوال اللعبة ونظام الحفظ ---
@@ -1318,7 +1334,7 @@
                   case 'star': iconChar = '★'; break;
                   case 'broadcast': iconChar = '📡'; break;
               }
-              previewContent = `<span style="font-size: 1.5em; color: var(--light-text);">${iconChar}</span>`;
+              previewContent = `<span style="font-size: 1.5em; color: var(--text-light);">${iconChar}</span>`;
           }
       } else if (item.type === 'size_boost') {
           previewContent = `<span class="icon">⬆️</span>`;
@@ -1571,14 +1587,14 @@
         if (bannerStyleItem.value) { // إذا كان النمط هو لون أو تدرج
             redBanner.style.background = bannerStyleItem.value;
         } else { // إذا كان النمط يتعلق بشكل (مثل حواف دائرية)
-            redBanner.style.background = `linear-gradient(to top, var(--accent-color) 50%, rgba(233,69,96,0.7) 75%, rgba(233,69,96,0.0) 100%)`; // لون افتراضي إذا لم يتم تحديد قيمة
+            redBanner.style.background = `linear-gradient(to top, var(--accent-color) 50%, rgba(244,67,54,0.7) 75%, rgba(244,67,54,0.0) 100%)`; // لون افتراضي إذا لم يتم تحديد قيمة
         }
         if (bannerStyleItem.class) {
             redBanner.classList.add(bannerStyleItem.class);
         }
     } else { // حالة لم يتم شراء النمط أو لا يمكن الوصول إليه
         redBannerColorInputGroup.style.display = 'flex';
-        redBannerColorInput.value = "#FF0000"; // العودة للون الأحمر الافتراضي
+        redBannerColorInput.value = "#F44336"; // العودة للون الأحمر الافتراضي الجديد
         const hexToRgb = hex => {
             const r = parseInt(hex.slice(1, 3), 16);
             const g = parseInt(hex.slice(3, 5), 16);
@@ -1963,7 +1979,7 @@
     textColorInput.value = localStorage.getItem('textColorValue') || "#ffffff";
     mainText.style.color = textColorInput.value;
 
-    redBannerColorInput.value = localStorage.getItem('redBannerColorValue') || "#FF0000";
+    redBannerColorInput.value = localStorage.getItem('redBannerColorValue') || "#F44336"; // لون أحمر جديد
     bannerHeightInput.value = localStorage.getItem('bannerHeightValue') || "75";
     textPaddingInput.value = localStorage.getItem('textPaddingValue') || "25";
     textShadowToggle.checked = (localStorage.getItem('textShadowToggleChecked') === 'true');
