@@ -1,2024 +1,2487 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
-<title>محرر الأخبار الاحترافي - عرض لقطة الشاشة</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة البلورات</title>
+    <style>
+        /* General Styles for Mobile First & Modern Design */
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap');
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Changa:wght@400;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Lateef&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi+Ink&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Katibeh&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Marhey&display=swap" rel="stylesheet">
+        body {
+            background-color: #1a2a2a; /* Dark Teal */
+            color: #ecf0f1; /* Light Grey/White */
+            font-family: 'Cairo', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Prevent body scroll */
+            flex-direction: column;
+            font-size: 16px; /* Base font size for better mobile scaling */
+        }
 
-<style>
-  /*
-  ** لوحة ألوان جديدة: حيوية ومشرقة
-  */
-  :root {
-    --primary-color: #5E35B1; /* بنفسجي غامق جذاب */
-    --secondary-color: #FFC107; /* أصفر ذهبي ساطع */
-    --accent-color: #F44336; /* أحمر نابض بالحياة */
-    --background-dark: #121212; /* أسود حالك للخلفية */
-    --card-background: #1E1E1E; /* رمادي داكن للبطاقات */
-    --text-light: #E0E0E0; /* أبيض ساطع للنص */
-    --text-muted: #B0B0B0; /* رمادي فاتح للنص الثانوي */
-    --border-color: #333333; /* حدود داكنة */
-    --input-background: #282828; /* خلفية حقول الإدخال */
-    --button-primary: #4CAF50; /* أخضر للأزرار الرئيسية */
-    --button-hover: #43A047; /* أخضر أغمق عند التحويم */
-    --button-active: #388E3C; /* أخضر أغمق عند النقر */
-    --shadow-light: rgba(0, 0, 0, 0.6); /* ظل خفيف */
-    --shadow-dark: rgba(0, 0, 0, 0.8); /* ظل أغمق */
+        /* App Container - simulates a phone screen */
+        .app-container {
+            width: 100%;
+            height: 100vh;
+            max-width: 450px; /* Reduced max-width for better mobile fit */
+            background-color: #2c3e50; /* Dark Blue Grey */
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            position: relative; /* For stacking screens */
+            overflow: hidden; /* Hide overflowing content during transitions */
+            border-radius: 15px; /* Slightly rounded corners for the app frame */
+        }
 
-    /* ألوان التبديل (Toggle) */
-    --toggle-off-bg: #555;
-    --toggle-on-bg: var(--button-primary);
+        /* Individual Screens - stacked on top of each other */
+        .app-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #2c3e50; /* Same as app container */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 10px; /* Reduced padding-bottom */
+            transition: transform 0.4s ease-out; /* Smooth sliding transition */
+            transform: translateX(100%); /* Hidden to the right by default */
+            overflow-y: auto; /* Allow content to scroll within screen */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            box-sizing: border-box; /* Include padding in element's total width and height */
+        }
 
-    /* ألوان التنبيهات */
-    --notification-success: #4CAF50;
-    --notification-error: #F44336;
-    --notification-info: #2196F3;
-  }
+        .app-screen.active {
+            transform: translateX(0); /* Bring active screen into view */
+        }
 
-  /*
-  ** تحديثات لتحسين السلاسة والتمرير والصورة
-  */
+        /* Headers */
+        h1 {
+            color: #f1c40f; /* Gold */
+            margin-top: 25px; /* Slightly reduced margin */
+            margin-bottom: 20px; /* Slightly reduced margin */
+            text-align: center;
+            font-size: 2em; /* Slightly smaller for mobile */
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            padding: 0 15px; /* Add horizontal padding to prevent text overflow */
+        }
+        h2 {
+            color: #3498db; /* Blue */
+            margin-top: 15px;
+            margin-bottom: 15px;
+            font-size: 1.6em; /* Slightly smaller */
+            font-weight: 700;
+        }
 
-  /* تطبيق box-sizing على كل العناصر */
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
+        /* Welcome Screen */
+        #welcome-screen.app-screen {
+            justify-content: center;
+            padding-bottom: 0;
+        }
+        #welcome-screen p {
+            font-size: 1.0em; /* Slightly smaller */
+            margin-bottom: 20px;
+            color: #bdc3c7;
+            text-align: center;
+            padding: 0 20px;
+        }
+        #welcome-screen input {
+            padding: 12px; /* Slightly smaller padding */
+            border-radius: 8px; /* Slightly smaller border-radius */
+            background-color: #1f3040;
+            color: white;
+            font-size: 1.1em; /* Slightly smaller */
+            text-align: center;
+            width: 85%; /* Wider input field */
+            max-width: 280px; /* Reduced max-width */
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+            outline: none;
+        }
+        #welcome-screen input::placeholder {
+            color: #7f8c8d;
+        }
+        #welcome-screen button {
+            background: linear-gradient(180deg, #2ecc71, #27ae60);
+            color: white;
+            padding: 15px 30px; /* Slightly smaller padding */
+            font-size: 1.2em; /* Slightly smaller */
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #1e8449;
+            width: 85%; /* Wider button */
+            max-width: 280px; /* Reduced max-width */
+            transition: all 0.2s ease;
+        }
+        #welcome-screen button:hover { background: linear-gradient(180deg, #34d17e, #2ecc71); }
+        #welcome-screen button:active { transform: translateY(3px); box-shadow: 0 2px 0 #1e8449; }
 
-  html {
-    height: 100%; /* تأكد أن html يغطي الارتفاع بالكامل */
-    scroll-behavior: smooth; /* تمرير سلس */
-  }
+        /* Main Menu Screen (Tabs Overview) */
+        #main-menu-screen.app-screen {
+            justify-content: flex-start;
+            padding-top: 25px; /* Slightly reduced padding */
+            padding-bottom: 15px;
+            transform: translateX(0);
+        }
 
-  body {
-    margin: 0;
-    padding: 20px;
-    height: 100%; /* تأكد أن body يغطي الارتفاع بالكامل */
-    width: 100vw;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: linear-gradient(135deg, var(--background-dark), #000000); /* تدرج خلفية داكن */
-    color: var(--text-light);
-    overflow-y: auto; /* السماح بالتمرير العمودي فقط عند الحاجة */
-    -webkit-overflow-scrolling: touch; /* لتحسين التمرير على iOS */
-  }
+        .menu-button-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px; /* Reduced gap */
+            padding: 15px; /* Reduced padding */
+            width: 90%;
+            max-width: 380px; /* Reduced max-width */
+        }
 
-  .container {
-    width: 100%;
-    max-width: 380px;
-    background-color: var(--card-background);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 25px var(--shadow-dark); /* ظل أغمق وجذاب */
-    margin-bottom: 30px;
-    border: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    flex-shrink: 0; /* مهم: منع الانكماش عند توفر مساحة أقل */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* انيميشن عند التفاعل */
-  }
-  .container:hover {
-      transform: translateY(-5px); /* رفع خفيف عند التحويم */
-      box-shadow: 0 12px 30px var(--shadow-dark);
-  }
+        .menu-button {
+            background-color: #34495e;
+            color: #ecf0f1;
+            padding: 20px; /* Reduced padding */
+            border-radius: 12px; /* Slightly smaller border-radius */
+            border: 2px solid #3b526d;
+            font-size: 1.6em; /* Slightly smaller */
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Reduced gap */
+            cursor: pointer;
+            box-shadow: 0 6px 0 rgba(0,0,0,0.4); /* Reduced shadow */
+            transition: all 0.2s ease;
+        }
+        .menu-button:hover {
+            background-color: #3b526d;
+            transform: translateY(-1px); /* Reduced hover effect */
+            box-shadow: 0 7px 0 rgba(0,0,0,0.4);
+        }
+        .menu-button:active {
+            transform: translateY(3px); /* Reduced active effect */
+            box-shadow: 0 3px 0 rgba(0,0,0,0.4);
+        }
+        .menu-button i {
+            font-size: 1.3em; /* Slightly smaller icon */
+            color: #f1c40f;
+        }
 
-  .image-area {
-    width: 100%;
-    padding-bottom: 100%; /* نسبة 1:1 لجعلها مربعة */
-    position: relative; /* لتمكين وضع الصورة المطلق */
-    background-color: var(--input-background); /* لون خلفية يظهر إذا لم يتم تحميل صورة */
-    border-radius: 12px 12px 0 0;
-    overflow: hidden; /* للحفاظ على الصورة داخل الحواف الدائرية وقص الزوائد */
-  }
+        /* Back Button on Sub-Screens */
+        .back-button {
+            position: absolute;
+            top: 15px; /* Adjusted position */
+            right: 15px; /* Adjusted position */
+            background-color: #e74c3c; /* Red */
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px; /* Increased size for clarity */
+            height: 50px; /* Increased size for clarity */
+            font-size: 1.8em; /* Increased icon size */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #c0392b;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+        .back-button:hover:not(.disabled-back) {
+            background-color: #c0392b;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 0 #a92c20;
+        }
+        .back-button:active:not(.disabled-back) {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #a92c20;
+        }
+        .back-button.disabled-back {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .back-button i { /* Ensure icon fills button */
+            font-size: 1em; /* Relative to button font-size */
+        }
 
-  .editable-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover; /* مهم: يجعل الصورة تملأ الحاوية وتقص الزوائد للحفاظ على المربع */
-    transition: transform 0.3s ease;
-  }
-  .editable-image:hover {
-      transform: scale(1.05); /* تكبير خفيف للصورة عند التحويم */
-  }
+        /* Game Screen Specifics */
+        #game-screen {
+            padding-top: 70px; /* Space for header and back button */
+            padding-left: 15px; /* Reduced padding */
+            padding-right: 15px;
+        }
+        .info-bar {
+            display: flex; /* Ensure flexbox for layout */
+            justify-content: space-around;
+            background-color: #1f3040;
+            padding: 8px; /* Reduced padding */
+            border-radius: 8px;
+            margin-bottom: 15px; /* Reduced margin */
+            width: 98%; /* Wider for better fit */
+            max-width: 400px; /* Reduced max-width */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .info-box {
+            font-size: 1.1em; /* Slightly smaller */
+        }
+        #game-grid {
+            display: grid; /* Ensure grid for layout */
+            grid-template-columns: repeat(7, minmax(35px, 1fr)); /* Smaller grid cells */
+            grid-template-rows: repeat(7, minmax(35px, 1fr));
+            gap: 4px; /* Reduced gap */
+            background-color: rgba(0,0,0,0.2);
+            padding: 8px; /* Reduced padding */
+            border-radius: 10px;
+            margin-bottom: 15px; /* Reduced margin */
+            width: calc(100% - 16px); /* Adjust for padding */
+            max-width: 320px; /* Reduced max-width */
+            aspect-ratio: 1 / 1;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        /* OLD Gem Styles - Restored */
+        .gem {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%; /* Circular shape */
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-sizing: border-box;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
 
+        /* OLD Gem Colors - Restored */
+        .gem-0 { background-color: #e74c3c; } /* Red */
+        .gem-1 { background-color: #3498db; } /* Blue */
+        .gem-2 { background-color: #2ecc71; } /* Green */
+        .gem-3 { background-color: #f1c40f; } /* Yellow */
+        .gem-4 { background-color: #9b59b6; } /* Purple */
+        .gem-5 { background-color: #e67e22; } /* Orange */
 
-  .red-fixed-area {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    color: var(--text-light);
-    direction: rtl;
-    font-size: 1.1em;
-    font-weight: 700;
-    text-shadow: 1px 1px 3px var(--shadow-light);
-    z-index: 1;
-    border-radius: 0 0 12px 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 18px 25px;
-    min-height: 75px;
-    transform: translateY(0.5px);
-    gap: 10px;
-    background: linear-gradient(to right, var(--accent-color), #D32F2F); /* تدرج جذاب للشريط */
-    transition: background 0.3s ease, min-height 0.3s ease, padding 0.3s ease; /* انيميشن للتغييرات */
-  }
+        .gem.is-cluster { animation: pulse 0.7s infinite; box-shadow: 0 0 15px #fff, 0 0 25px #f1c40f; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-  /* أشكال حواف الشريط */
-  .red-fixed-area.rounded-bottom-banner {
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
-  }
+        /* Betting section styles */
+        .betting-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+            width: 98%;
+            max-width: 400px;
+            background-color: #1f3040;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .betting-section label {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: #bdc3c7;
+        }
+        .betting-section input[type="number"] {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #3b526d;
+            background-color: #2c3e50;
+            color: white;
+            font-size: 1.0em;
+            width: 120px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
 
+        .play-button {
+            background: linear-gradient(180deg, #2ecc71, #27ae60);
+            color: white;
+            padding: 12px 30px; /* Reduced padding */
+            font-size: 1.3em; /* Slightly smaller */
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #1e8449;
+            transition: all 0.2s ease;
+        }
+        .play-button:hover:not(:disabled) { background: linear-gradient(180deg, #34d17e, #2ecc71); }
+        .play-button:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #1e8449; }
+        .play-button:disabled { opacity: 0.6; cursor: not-allowed; }
 
-  #channelIconsContainer {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    order: 1;
-  }
-  #channelIconsContainer img {
-      max-width: 100%;
-      max-height: 100%;
-      height: auto;
-      display: block;
-      object-fit: contain;
-  }
-  #channelIconsContainer span {
-      line-height: 1;
-  }
+        /* Store Screen Specifics */
+        #store-screen, #investment-screen, #code-screen, #find-ball-screen { /* Added #code-screen, #find-ball-screen */
+            padding-top: 70px;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        .store-item, .investment-item {
+            background-color: #34495e; /* Darker Blue */
+            padding: 15px; /* Reduced padding */
+            margin-bottom: 15px; /* Reduced margin */
+            border-radius: 8px; /* Reduced border-radius */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px; /* Reduced gap */
+            border: 1px solid #4a6e8a;
+            width: 98%; /* Wider for better fit */
+            max-width: 380px; /* Reduced max-width */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .store-item h3, .investment-item h3 { color: #f1c40f; margin: 0; font-size: 1.4em; } /* Reduced font size */
+        .store-item p, .investment-item p { margin: 0; font-size: 1.0em; color: #bdc3c7; text-align: center;} /* Reduced font size */
+        .store-item .price, .investment-item .price { font-weight: bold; color: #34d17e; font-size: 1.2em; } /* Reduced font size */
+        .store-item button, .investment-item button, #code-screen button, #find-ball-screen button { /* Added #code-screen button, #find-ball-screen button */
+            background: linear-gradient(180deg, #3498db, #2980b9);
+            color: white;
+            padding: 10px 20px; /* Reduced padding */
+            font-size: 0.9em; /* Reduced font size */
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #206da7;
+            transition: all 0.2s ease;
+        }
+        .store-item button:hover, .investment-item button:hover, #code-screen button:hover, #find-ball-screen button:hover { background: linear-gradient(180deg, #4ea3e2, #3498db); }
+        .store-item button:active, .investment-item button:active, #code-screen button:active, #find-ball-screen button:active { transform: translateY(1px); box-shadow: 0 1px 0 #206da7; }
+        .store-item button:disabled, .investment-item button:disabled, #code-screen button:disabled, #find-ball-screen button:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
 
-  .editable-text {
-    font-size: 1em;
-    margin: 0;
-    line-height: 1.4;
-    text-align: center;
-    width: 100%;
-    word-wrap: break-word;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    order: 2;
-  }
+        /* Exchange Item Specific Styles (from previous step) */
+        #exchange-points-item {
+            background-color: #3e5e4a; /* A greenish tone for exchange */
+            border: 1px solid #6cb67f;
+        }
+        #exchange-points-item h3 { color: #d4e7d4; }
+        #exchange-points-item .price { color: #ffd700; } /* Gold color for exchange rate */
+        #exchange-points-item button {
+            background: linear-gradient(180deg, #4CAF50, #3d8b41); /* Green button */
+            box-shadow: 0 3px 0 #316d35;
+        }
+        #exchange-points-item button:hover { background: linear-gradient(180deg, #5cb85c, #4CAF50); }
+        #exchange-points-item button:active { box-shadow: 0 1px 0 #316d35; }
+        #exchange-cooldown-message {
+            font-size:0.9em;
+            color:#bdc3c7;
+            display:none;
+        }
 
-  .controls {
-    width: 100%;
-    max-width: 450px;
-    background-color: var(--card-background);
-    border-radius: 12px;
-    box-shadow: 0 8px 25px var(--shadow-dark); /* ظل أغمق وجذاب */
-    border: 1px solid var(--border-color);
-    overflow: hidden;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-    margin-top: auto;
-    margin-bottom: 20px;
-    flex-shrink: 0; /* مهم: لمنع انكماش هذا العنصر */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* انيميشن عند التفاعل */
-  }
-  .controls:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 30px var(--shadow-dark);
-  }
+        /* Investment Item Specific Styles (NEW) */
+        .investment-item {
+            background-color: #2b3b4b; /* Slightly different background for investment items */
+            border: 1px solid #3d5a73;
+        }
+        .investment-item h3 { color: #8e44ad; } /* Purple for investments */
+        .investment-item .price { font-weight: bold; color: #f39c12; font-size: 1.2em; } /* Orange for investment price */
+        .investment-item .reward-range {
+            font-size: 0.9em;
+            color: #ecf0f1;
+            margin-top: -5px;
+            margin-bottom: 5px;
+        }
+        .investment-item .cooldown-message {
+            font-size:0.9em;
+            color:#bdc3c7;
+            margin-top: 5px;
+            display: none; 
+        }
+        .investment-item button {
+            background: linear-gradient(180deg, #8e44ad, #7a2d9c); /* Purple button */
+            box-shadow: 0 3px 0 #672685;
+        }
+        .investment-item button:hover { background: linear-gradient(180deg, #9b59b6, #8e44ad); }
+        .investment-item button:active { box-shadow: 0 1px 0 #672685; }
 
-  .tab-buttons {
-    display: flex;
-    width: 100%;
-    background-color: var(--input-background); /* لون خلفية أغمق للتابات */
-    border-bottom: 1px solid var(--border-color);
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .tab-button {
-    flex-shrink: 0;
-    padding: 16px 10px;
-    text-align: center;
-    cursor: pointer;
-    background-color: var(--input-background); /* لون خلفية أغمق للتابات */
-    color: var(--text-muted);
-    font-weight: 700;
-    font-size: 0.95em;
-    border: none;
-    border-left: 1px solid var(--border-color);
-    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .tab-button:first-child {
-      border-left: none;
-  }
-
-  .tab-button:hover {
-    background-color: #383838; /* لون أغمق عند التحويم */
-    color: var(--text-light);
-  }
-
-  .tab-button.active {
-    background-color: var(--card-background); /* لون خلفية البطاقة للتاب النشط */
-    color: var(--accent-color);
-    box-shadow: inset 0 3px 0 0 var(--accent-color);
-    border-bottom-color: var(--card-background);
-  }
-
-  .tab-content {
-    padding: 25px;
-    display: none;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .tab-content.active {
-    display: flex;
-  }
-
-  .control-group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .control-group label {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-    font-weight: 400;
-    color: var(--text-muted);
-    font-size: 1em;
-  }
-
-  .control-group label .icon {
-    margin-left: 8px;
-    font-size: 1.3em;
-    color: var(--secondary-color); /* أيقونات التحكم بلون أصفر */
-  }
-
-  /* تصميم عام لحقول الإدخال */
-  .controls input[type="text"],
-  .controls textarea,
-  .controls select,
-  .controls input[type="color"],
-  .controls input[type="range"] {
-    width: 100%; /* استخدام 100% ثم البادينغ الداخلي */
-    padding: 12px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 0.95em;
-    background-color: var(--input-background);
-    color: var(--text-light);
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-  }
-
-  /* تخصيص Select */
-  .controls select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg fill="%23E0E0E0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
-    background-repeat: no-repeat;
-    background-position: left 12px center;
-    padding-left: 40px;
-  }
-
-  /* تخصيص Color Picker */
-  .controls input[type="color"] {
-    padding: 5px;
-    height: 48px;
-    width: 60px;
-    border-radius: 8px;
-    cursor: pointer;
-    border: none; /* إزالة الحدود الافتراضية لـ color picker */
-  }
-
-  /* Placeholder color */
-  .controls input::placeholder,
-  .controls textarea::placeholder {
-    color: var(--text-muted);
-    opacity: 0.8;
-  }
-
-  .controls input[type="text"]:focus,
-  .controls textarea:focus,
-  .controls select:focus,
-  .controls input[type="color"]:focus,
-  .controls input[type="range"]:focus {
-    border-color: var(--secondary-color); /* لون التركيز الجديد */
-    box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.2); /* ظل التركيز الجديد */
-    outline: none;
-    background-color: #383838;
-  }
-
-  /* تحسينات خاصة بـ textarea - جعلها أكبر */
-  .controls textarea {
-    resize: vertical;
-    min-height: 120px;
-    line-height: 1.5;
-  }
-
-  /* تصميم أفضل لزر اختيار الملف */
-  .file-input-wrapper {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-  }
-
-  .file-input-button {
-    background-color: var(--button-primary); /* لون زر أساسي */
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: 700;
-    width: 100%;
-    box-sizing: border-box;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.3); /* ظل معزز */
-  }
-
-  .file-input-button .icon {
-    font-size: 1.2em;
-  }
-
-  .file-input-button:hover {
-    background-color: var(--button-hover);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.45);
-  }
-  .file-input-button:active {
-    transform: translateY(0);
-    background-color: var(--button-active);
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  }
-
-  /* إخفاء زر إدخال الملف الافتراضي */
-  .controls input[type="file"] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-    z-index: 10;
-  }
-
-  /* عداد الأحرف والكلمات */
-  .text-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85em;
-    color: var(--text-muted);
-    margin-top: 5px;
-    direction: rtl;
-    width: 100%;
-  }
-  .char-count.warning, .word-count.warning {
-    color: var(--secondary-color); /* تحذير باللون الأصفر */
-  }
-  .char-count.danger, .word-count.danger {
-    color: var(--accent-color); /* خطر باللون الأحمر */
-  }
-
-  /* إضافة أزرار التبديل (Toggle Switch) لظل النص */
-  .toggle-switch-group {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    width: 100%;
-  }
-
-  .toggle-switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-  }
-
-  .toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--toggle-off-bg);
-    transition: .4s;
-    border-radius: 34px;
-  }
-
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: .4s;
-    border-radius: 50%;
-  }
-
-  input:checked + .slider {
-    background-color: var(--toggle-on-bg);
-  }
-
-  input:focus + .slider {
-    box-shadow: 0 0 1px var(--toggle-on-bg);
-  }
-
-  input:checked + .slider:before {
-    transform: translateX(26px);
-  }
-
-  /* أزرار عرض لقطة الشاشة */
-  .screenshot-buttons {
-    display: flex;
-    gap: 15px;
-    margin-top: 25px;
-  }
-  .screenshot-buttons button {
-    flex: 1;
-    padding: 15px 25px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.1em;
-    font-weight: 700;
-    box-sizing: border-box;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-  }
-
-  #viewScreenshotBtn {
-    background-color: var(--primary-color); /* لون بنفسجي جذاب */
-    color: white;
-  }
-  #viewScreenshotBtn:hover {
-    background-color: #673AB7; /* بنفسجي أغمق */
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.45);
-  }
-  #viewScreenshotBtn:active {
-    transform: translateY(0);
-    background-color: #512DA8;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  }
+        /* Special styles for "Owned" investment items */
+        .investment-item.owned {
+            background-color: #3f5569; /* Slightly different shade to indicate ownership */
+            border-color: #5d82a1;
+        }
+        .investment-item.owned .price {
+            color: #2ecc71; /* Green for "Owned" status */
+            font-size: 1em;
+            font-weight: normal;
+        }
+        .investment-item.owned button {
+            background: linear-gradient(180deg, #2ecc71, #27ae60); /* Green button */
+            box-shadow: 0 3px 0 #1e8449;
+        }
+        .investment-item.owned button:hover { background: linear-gradient(180deg, #34d17e, #2ecc71); }
+        .investment-item.owned button:active { box-shadow: 0 1px 0 #1e8449; }
 
 
-  .info-note {
-    font-size: 0.9em;
-    text-align: center;
-    margin-top: 20px;
-    border-radius: 10px;
-    padding: 15px;
-    line-height: 1.5;
-    border: 1px solid var(--border-color);
-    background-color: rgba(74, 74, 106, 0.15); /* لون شفاف */
-    color: var(--text-muted);
-  }
-
-  /* تصميم النقاط والمستوى */
-  .player-stats {
-    display: flex;
-    justify-content: space-around;
-    padding: 15px;
-    background-color: var(--background-dark); /* لون داكن لقسم الإحصائيات */
-    border-bottom: 1px solid var(--border-color);
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    font-weight: 700;
-    font-size: 1em;
-    color: var(--secondary-color); /* لون أصفر للنقاط الرئيسية */
-  }
-  .player-stats div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
-  .player-stats div span {
-      color: var(--text-light);
-      margin-top: 3px;
-      font-size: 0.8em;
-  }
-  .player-stats .main-value {
-    font-size: 1.3em;
-    color: var(--secondary-color);
-  }
-  .player-stats .secondary-value {
-    font-size: 0.7em;
-    color: var(--text-muted);
-    margin-top: 2px;
-  }
+        #free-investment-item h3 { color: #2ecc71; } /* Green for free investment */
+        #free-investment-item button {
+             background: linear-gradient(180deg, #2ecc71, #27ae60);
+             box-shadow: 0 3px 0 #1e8449;
+        }
+        #free-investment-item button:hover { background: linear-gradient(180deg, #34d17e, #2ecc71); }
+        #free-investment-item button:active { box-shadow: 0 1px 0 #1e8449; }
 
 
-  /* تصميم المتجر */
-  .store-section {
-    margin-bottom: 25px;
-  }
-  .store-section h3 {
-    color: var(--secondary-color); /* لون أصفر لعناوين الأقسام */
-    margin-bottom: 12px;
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 5px;
-    text-align: right;
-    font-size: 1.2em;
-  }
-  .store-items-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 15px;
-    direction: rtl;
-  }
-  .store-item {
-    background-color: var(--input-background); /* لون خلفية عناصر المتجر */
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  .store-item.locked {
-    background-color: #222; /* لون أغمق للعناصر المقفلة */
-    filter: grayscale(80%) brightness(50%);
-    cursor: not-allowed;
-  }
-  .store-item.unlocked .buy-button {
-      background-color: var(--button-hover); /* لون مختلف لزر "تم الشراء" */
-      cursor: default;
-  }
-  .store-item.unlocked .buy-button:hover {
-      background-color: var(--button-hover);
-      transform: none;
-      box-shadow: none;
-  }
+        /* Profile Screen Specifics - IMPROVED */
+        #profile-screen {
+            padding-top: 70px;
+            padding-left: 15px;
+            padding-right: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px; /* Spacing between info cards */
+        }
+        .profile-info-card {
+            background-color: #34495e; /* Darker Blue */
+            padding: 15px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 380px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+            border: 1px solid #4a6e8a;
+        }
+        .profile-info-card i {
+            font-size: 1.8em;
+            color: #f1c40f; /* Gold for icons */
+            width: 35px; /* Fixed width for alignment */
+            text-align: center;
+        }
+        .profile-info-card .info-text {
+            flex-grow: 1;
+            font-size: 1.1em;
+            color: #ecf0f1;
+        }
+        .profile-info-card .info-value {
+            font-weight: bold;
+            color: #34d17e; /* Green for values */
+            font-size: 1.2em;
+            text-align: left; /* Align value text to left */
+        }
+        /* Style for Delete Account Button */
+        #delete-account-btn {
+            background: linear-gradient(180deg, #e74c3c, #c0392b); /* Red button */
+            color: white;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #a92c20;
+            transition: all 0.2s ease;
+            margin-top: 30px; /* Space from other elements */
+            width: 90%;
+            max-width: 380px;
+        }
+        #delete-account-btn:hover { background: linear-gradient(180deg, #ed6d60, #e74c3c); }
+        #delete-account-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #a92c20; }
 
 
-  .store-item:not(.locked):hover {
-    transform: translateY(-3px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.3);
-  }
-  .store-item-name {
-    font-weight: 700;
-    margin-bottom: 8px;
-    font-size: 1em;
-    color: var(--text-light);
-  }
-  .store-item-preview {
-    margin-bottom: 12px;
-    font-size: 2em;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    overflow: hidden;
-  }
-  /* معاينة الألوان والتدرجات */
-  .store-item-preview.color-preview {
-      height: 25px;
-      border-radius: 4px;
-      border: 1px solid var(--border-color);
-  }
-  .store-item-preview.banner-preview {
-      height: 40px;
-      width: 100%;
-      border-radius: 4px;
-      border: 1px solid var(--border-color);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 0.8em;
-      color: white;
-  }
-  .store-item-preview.banner-preview.rounded-bottom-banner-preview {
-      border-bottom-left-radius: 12px;
-      border-bottom-right-radius: 12px;
-  }
-  .store-item-preview.text-effect-preview {
-    font-size: 1.2em;
-    color: var(--text-light);
-    text-shadow: none;
-    -webkit-text-stroke: none;
-  }
+        /* Modal Styles (Adjusted for mobile fit) - for game results only */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8); /* Darker overlay */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000; /* Higher z-index than app screens */
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s;
+        }
+        .modal-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: #34495e; /* Darker Blue */
+            padding: 25px; /* Reduced padding */
+            border-radius: 12px; /* Reduced border-radius */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+            text-align: center;
+            border: 2px solid #f1c40f;
+            max-width: 300px; /* Reduced max-width for modal */
+            width: 90%;
+        }
+        .modal-content h2 { color: #f1c40f; margin-top: 0; margin-bottom: 15px; font-size: 1.6em; } /* Reduced font size and margin */
+        .modal-content p { font-size: 1.0em; margin-bottom: 8px; color: #bdc3c7; } /* Reduced font size and margin */
+        .modal-content p span { font-weight: bold; color: #34d17e; }
+        .modal-buttons { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; } /* Reduced margin and gap */
+        .modal-buttons button {
+            background: linear-gradient(180deg, #3498db, #2980b9);
+            color: white;
+            padding: 10px 20px; /* Reduced padding */
+            font-size: 1.0em; /* Reduced font size */
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 3px 0 #206da7;
+            transition: all 0.2s ease;
+            width: 100%; /* Full width for stacked buttons */
+        }
+        .modal-buttons button:hover { background: linear-gradient(180deg, #4ea3e2, #3498db); }
+        .modal-buttons button:active { transform: translateY(1px); box-shadow: 0 1px 0 #206da7; }
+        #restart-game-btn { background: linear-gradient(180deg, #2ecc71, #27ae60); box-shadow: 0 3px 0 #1e8449; }
+        #restart-game-btn:hover { background: linear-gradient(180deg, #34d17e, #2ecc71); }
+        #restart-game-btn:active { box-shadow: 0 1px 0 #1e8449; }
+        #return-to-main-menu-btn { background: linear-gradient(180deg, #e74c3c, #c0392b); box-shadow: 0 3px 0 #962f23; }
+        #return-to-main-menu-btn:hover { background: linear-gradient(180deg, #ed6d60, #e74c3c); }
+        #return-to-main-menu-btn:active { box-shadow: 0 1px 0 #962f23; }
 
 
-  .store-item-details {
-    font-size: 0.8em;
-    color: var(--text-muted);
-    margin-bottom: 12px;
-    line-height: 1.3;
-  }
-  .store-item-details span {
-    display: block;
-  }
-  .buy-button {
-    background-color: var(--button-primary); /* لون زر الشراء الأساسي */
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 700;
-    transition: background-color 0.2s ease;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-  .buy-button:hover:not(:disabled) {
-    background-color: var(--button-hover);
-  }
-  .buy-button:disabled {
-    background-color: var(--toggle-off-bg); /* لون زر معطل */
-    color: var(--text-muted);
-    cursor: not-allowed;
-  }
-  .locked-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.6);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      font-size: 1em;
-      font-weight: 700;
-      pointer-events: none;
-      z-index: 10;
-      border-radius: 8px;
-  }
-  .locked-overlay span {
-      margin-top: 8px;
-      font-size: 0.7em;
-      font-weight: 400;
-      color: var(--text-muted);
-  }
+        /* Custom Alert/Toast Styles */
+        #custom-alert-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Slightly lighter overlay than modal */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2100; /* Higher than modal */
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s ease-in-out;
+        }
 
-  /* نظام التنبيهات الداخلية */
-  #notificationArea {
-    position: fixed;
-    top: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 90%;
-    max-width: 320px;
-  }
-  .notification {
-    background-color: var(--notification-info);
-    color: var(--text-light);
-    padding: 12px 15px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
-    text-align: center;
-    font-size: 0.9em;
-    opacity: 0;
-    transform: translateY(-15px);
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; /* انيميشن للظهور */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .notification.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .notification.success {
-    background-color: var(--notification-success);
-  }
-  .notification.error {
-    background-color: var(--notification-error);
-  }
-  .notification .icon {
-      font-size: 1.1em;
-  }
+        #custom-alert-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
 
-  /* التنبيه الجديد "تحديث قادم قريبا" */
-  #updateNotification {
-    position: sticky;
-    bottom: 10px;
-    margin-top: auto;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 8px 15px;
-    border-radius: 8px;
-    font-size: 0.85em;
-    z-index: 1000;
-    white-space: nowrap;
-  }
+        #custom-alert-content {
+            background-color: #34495e; /* Darker Blue */
+            color: #ecf0f1;
+            padding: 20px 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            border: 2px solid #f1c40f; /* Gold border */
+            max-width: 300px;
+            width: 85%;
+            transform: translateY(-20px); /* Slightly move up for effect */
+            transition: transform 0.3s ease-out;
+        }
+        #custom-alert-overlay.show #custom-alert-content {
+            transform: translateY(0);
+        }
 
-  /* Media Queries لتحسين الاستجابة على الشاشات الصغيرة والكبيرة */
-  @media (max-width: 480px) {
-    body {
-      padding: 15px;
-    }
-    .controls {
-      border-radius: 0;
-    }
-    .tab-buttons {
-      border-top-left-radius: 0;
-      border-top-right-radius: 0;
-    }
-    .container {
-      border-radius: 0;
-    }
-    .image-area {
-      border-radius: 0;
-    }
-    .red-fixed-area {
-      border-radius: 0;
-    }
-  }
+        #custom-alert-content p {
+            margin: 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+        #custom-alert-content.success { color: #2ecc71; border-color: #2ecc71; } /* Green for success */
+        #custom-alert-content.error { color: #e74c3c; border-color: #e74c3c; } /* Red for error */
+        #custom-alert-content.info { color: #3498db; border-color: #3498db; } /* Blue for info */
 
-  @media (min-width: 768px) {
-    body {
-      padding: 30px;
-    }
-    .container {
-      max-width: 450px;
-      margin-bottom: 40px;
-    }
-    .controls {
-      max-width: 550px;
-      margin-bottom: 30px;
-    }
-    .tab-button {
-      padding: 18px 15px;
-      font-size: 1em;
-    }
-    .tab-content {
-      padding: 30px;
-      gap: 25px;
-    }
-    .file-input-button,
-    .screenshot-buttons button {
-      padding: 15px 25px;
-      font-size: 1.1em;
-    }
-    .info-note {
-      font-size: 1em;
-      padding: 18px;
-    }
-  }
 
-</style>
+        /* Confirmation Dialog Styles (NEW) */
+        #confirmation-dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); /* Even darker overlay for critical action */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2200; /* Highest z-index */
+            visibility: hidden;
+            opacity: 0;
+            transition: visibility 0s, opacity 0.3s ease-in-out;
+        }
+
+        #confirmation-dialog-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        #confirmation-dialog-content {
+            background-color: #2c3e50; /* Dark Blue Grey */
+            color: #ecf0f1;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+            border: 2px solid #e74c3c; /* Red border for warning */
+            max-width: 320px;
+            width: 90%;
+            transform: scale(0.9); /* Slight scale in for effect */
+            transition: transform 0.3s ease-out;
+        }
+        #confirmation-dialog-overlay.show #confirmation-dialog-content {
+            transform: scale(1);
+        }
+
+        #confirmation-dialog-content h2 {
+            color: #e74c3c; /* Red for warning title */
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        #confirmation-dialog-content p {
+            font-size: 1.1em;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .confirmation-buttons {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+        }
+
+        .confirmation-buttons button {
+            flex: 1; /* Distribute space evenly */
+            padding: 12px 15px;
+            font-size: 1.0em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 0 rgba(0,0,0,0.3);
+        }
+
+        #confirm-delete-btn {
+            background: linear-gradient(180deg, #e74c3c, #c0392b); /* Red for confirm */
+            color: white;
+            box-shadow: 0 3px 0 #a92c20;
+        }
+        #confirm-delete-btn:hover { background: linear-gradient(180deg, #ed6d60, #e74c3c); }
+        #confirm-delete-btn:active { transform: translateY(1px); box-shadow: 0 1px 0 #a92c20; }
+
+
+        #cancel-delete-btn {
+            background: linear-gradient(180deg, #3498db, #2980b9); /* Blue for cancel */
+            color: white;
+            box-shadow: 0 3px 0 #206da7;
+        }
+        #cancel-delete-btn:hover { background: linear-gradient(180deg, #4ea3e2, #3498db); }
+        #cancel-delete-btn:active { transform: translateY(1px); box-shadow: 0 1px 0 #206da7; }
+
+
+        /* Play Hard Screen (NEW) */
+        #play-hard-screen {
+            padding-top: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center; /* Center content vertically */
+            gap: 20px;
+        }
+        #click-circle-container {
+            width: 100%;
+            max-width: 300px; /* Max width for the container */
+            aspect-ratio: 1 / 1; /* Make it square */
+            position: relative;
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            overflow: hidden; /* Hide circle if it moves beyond boundaries */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        #click-circle {
+            position: absolute;
+            width: 80px; /* Size of the circle */
+            height: 80px;
+            background: radial-gradient(circle at 30% 30%, #ffd700, #f1c40f); /* Gold color */
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(241, 196, 15, 0.7), 0 0 25px rgba(241, 196, 15, 0.5);
+            transition: all 0.4s ease-out; /* Smooth movement transition */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+            user-select: none; /* Prevent text selection */
+        }
+        #click-circle.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        #countdown-timer {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #34d17e;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            min-height: 1.8em; /* Prevent layout shift */
+        }
+        #play-hard-info {
+            font-size: 1.1em;
+            color: #bdc3c7;
+            text-align: center;
+            padding: 0 15px;
+            line-height: 1.5;
+        }
+
+        /* Styles for Code Screen */
+        #code-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 70px 15px 10px 15px; /* Adjust padding to match other screens */
+        }
+
+        #code-screen p {
+            font-size: 1.0em;
+            margin-bottom: 20px;
+            color: #bdc3c7;
+            text-align: center;
+            padding: 0 20px;
+        }
+
+        #code-screen input {
+            padding: 12px;
+            border-radius: 8px;
+            background-color: #1f3040;
+            color: white;
+            font-size: 1.1em;
+            text-align: center;
+            width: 85%;
+            max-width: 280px;
+            margin-bottom: 20px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.3);
+            outline: none;
+            border: 1px solid #3b526d;
+        }
+
+        #code-screen button {
+            background: linear-gradient(180deg, #2ecc71, #27ae60);
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #1e8449;
+            width: 85%;
+            max-width: 280px;
+            transition: all 0.2s ease;
+            margin-bottom: 15px; /* Space between buttons */
+        }
+        #code-screen button:hover { background: linear-gradient(180deg, #34d17e, #2ecc71); }
+        #code-screen button:active { transform: translateY(3px); box-shadow: 0 2px 0 #1e8449; }
+
+        /* Find Ball Game Specific Styles */
+        #find-ball-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 70px 15px 10px 15px;
+        }
+
+        #cups-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .cup {
+            width: 100px;
+            height: 120px;
+            background-color: #4a6e8a; /* Blue-grey for cups */
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2em;
+            font-weight: bold;
+            color: #ecf0f1;
+            cursor: pointer;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+            transition: all 0.2s ease;
+            position: relative; /* For ball positioning */
+            border: 2px solid #5d82a1;
+        }
+
+        .cup:hover:not(.disabled) {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.6);
+        }
+
+        .cup.selected {
+            border: 3px solid #f1c40f; /* Gold border for selected cup */
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(241,196,15,0.7);
+        }
+
+        .ball {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #ffe080, #f1c40f); /* Gold ball */
+            border-radius: 50%;
+            position: absolute;
+            bottom: 5px; /* Position at the bottom of the cup */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            display: none; /* Hidden by default */
+            z-index: 1; /* Ensure ball is above cup background */
+        }
+        .cup.revealed .ball {
+            display: block; /* Show ball when cup is revealed */
+        }
+        .cup.win {
+            background-color: #27ae60; /* Green for winning cup */
+            border-color: #2ecc71;
+        }
+        .cup.lose {
+            background-color: #c0392b; /* Red for losing cup */
+            border-color: #e74c3c;
+        }
+        .cup.shaking {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both infinite;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            perspective: 1000px;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+            50% { transform: translate3d(-4px, 0, 0); }
+        }
+        .cup.disabled {
+            pointer-events: none;
+            opacity: 0.8;
+            cursor: default;
+        }
+
+        #find-ball-betting {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 15px;
+            width: 98%;
+            max-width: 400px;
+            background-color: #1f3040;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        #find-ball-betting label {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: #bdc3c7;
+        }
+        #find-ball-betting input[type="number"] {
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #3b526d;
+            background-color: #2c3e50;
+            color: white;
+            font-size: 1.0em;
+            width: 120px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        #find-ball-play-btn {
+            background: linear-gradient(180deg, #2ecc71, #27ae60);
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.3em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #1e8449;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+        }
+        #find-ball-play-btn:hover:not(:disabled) { background: linear-gradient(180deg, #34d17e, #2ecc71); }
+        #find-ball-play-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 #1e8449; }
+        #find-ball-play-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* Change Name Item Specific Styles */
+        #change-name-item {
+            background-color: #5c4a6e; /* Purple-ish for change name */
+            border: 1px solid #7f6d91;
+        }
+        #change-name-item h3 { color: #f1e080; } /* Lighter yellow */
+        #change-name-item .price { color: #8e44ad; } /* Purple */
+        #change-name-item button {
+            background: linear-gradient(180deg, #9b59b6, #8e44ad); /* Purple button */
+            box-shadow: 0 3px 0 #7a2d9c;
+        }
+        #change-name-item button:hover { background: linear-gradient(180deg, #a67bbd, #9b59b6); }
+        #change-name-item button:active { box-shadow: 0 1px 0 #7a2d9c; }
+        #change-name-cooldown-message {
+            font-size:0.9em;
+            color:#bdc3c7;
+            display:none;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
-<div class="container" id="captureArea">
-  <div class="image-area">
-    <img id="mainImage" class="editable-image" src="" alt="صورة الخبر">
-  </div>
-  <div class="red-fixed-area" id="redBanner">
-    <div id="channelIconsContainer"></div>
-    <p id="mainText" class="editable-text">
-      النص هنا (يمكنك تغييره)
-    </p>
-  </div>
-</div>
-
-<div class="controls">
-  <div class="player-stats">
-    <div>
-      <div class="main-value" id="dinarDisplay">0</div>
-      <span>دينار</span>
-    </div>
-    <div>
-      <div class="main-value" id="levelDisplay">1</div>
-      <span>المستوى</span>
-      <div class="secondary-value" id="xpRemainingDisplay">0 / 0 XP</div>
-    </div>
-  </div>
-
-  <div class="tab-buttons" id="tabButtons">
-    <button class="tab-button active" data-tab="image">
-      <span class="icon">🖼️</span> الصورة
-    </button>
-    <button class="tab-button" data-tab="mainText">
-      <span class="icon">📝</span> النص
-    </button>
-    <button class="tab-button" data-tab="redBanner">
-      <span class="icon">🔴</span> الشريط
-    </button>
-    <button class="tab-button" data-tab="channelIcon">
-      <span class="icon">✨</span> الأيقونة
-    </button>
-    <button class="tab-button" data-tab="store">
-      <span class="icon">🛒</span> المتجر
-    </button>
-  </div>
-
-  <div id="imageTabContent" class="tab-content active">
-    <div class="control-group">
-      <label for="imageUpload">
-        <span class="icon">⬆️</span> تحميل صورة:
-      </label>
-      <div class="file-input-wrapper">
-        <input type="file" id="imageUpload" accept="image/*">
-        <button type="button" class="file-input-button">
-          <span class="icon">📂</span> اختر صورة
-        </button>
-      </div>
-      <small style="color: var(--text-muted);">ستأتي الصورة مربعة مع القص تلقائيًا.</small>
-    </div>
-  </div>
-
-  <div id="mainTextTabContent" class="tab-content">
-    <div class="control-group">
-      <label for="newText">
-        <span class="icon">🖊️</span> اكتب النص هنا:
-      </label>
-      <textarea id="newText" placeholder="أدخل نص الخبر هنا..."></textarea>
-      <div class="text-info">
-        <div id="charCount" class="char-count"></div>
-        <div id="wordCount" class="word-count"></div>
-      </div>
-    </div>
-
-    <div class="control-group">
-      <label for="fontSelect">
-          <span class="icon">🅰️</span> اختر الخط:
-      </label>
-      <select id="fontSelect">
-          </select>
-    </div>
-
-    <div class="control-group">
-      <label for="fontSize">
-          <span class="icon">📏</span> حجم الخط:
-      </label>
-      <input type="range" id="fontSize" min="0.8" max="1.8" step="0.1" value="1.1">
-      <span id="fontSizeValue" style="color: var(--text-muted); text-align: left;">1.1em</span>
-    </div>
-
-    <div class="control-group">
-      <label for="textColor">
-          <span class="icon">🎨</span> لون النص:
-      </label>
-      <input type="color" id="textColor" value="#ffffff">
-    </div>
-
-    <div class="control-group">
-        <label for="textEffectSelect">
-            <span class="icon">✨</span> تأثير النص:
-        </label>
-        <select id="textEffectSelect">
-            <option value="none" data-is-free="true">لا شيء</option>
-            </select>
-    </div>
-
-    <div class="control-group toggle-switch-group">
-      <label for="textShadowToggle">
-          <span class="icon">⚫</span> ظل النص:
-      </label>
-      <label class="toggle-switch">
-          <input type="checkbox" id="textShadowToggle" checked>
-          <span class="slider"></span>
-      </label>
-    </div>
-  </div>
-
-  <div id="redBannerTabContent" class="tab-content">
-    <div class="control-group">
-        <label for="bannerStyleSelect">
-            <span class="icon">🎨</span> نمط الشريط:
-        </label>
-        <select id="bannerStyleSelect">
-            <option value="default_red" data-is-free="true">أحمر (افتراضي)</option>
-        </select>
-    </div>
-    <div class="control-group" id="redBannerColorInputGroup">
-        <label for="redBannerColor">
-            <span class="icon">🌈</span> لون الشريط الأحمر (تعديل):
-        </label>
-        <input type="color" id="redBannerColor" value="#F44336">
-    </div>
-    <div class="control-group">
-      <label for="bannerHeight">
-          <span class="icon">📐</span> ارتفاع الشريط:
-      </label>
-      <input type="range" id="bannerHeight" min="60" max="120" step="5" value="75">
-      <span id="bannerHeightValue" style="color: var(--text-muted); text-align: left;">75px</span>
-    </div>
-
-    <div class="control-group">
-      <label for="textPadding">
-          <span class="icon">↔️</span> المسافة البادئة للنص:
-      </label>
-      <input type="range" id="textPadding" min="10" max="40" step="1" value="25">
-      <span id="textPaddingValue" style="color: var(--text-muted); text-align: left;">25px</span>
-    </div>
-  </div>
-
-  <div id="channelIconTabContent" class="tab-content">
-    <div class="control-group">
-        <label>
-            <span class="icon">🖼️</span> نوع الأيقونة:
-        </label>
-        <select id="iconTypeSelect">
-            <option value="none" data-is-free="true">لا شيء</option>
-            </select>
-    </div>
-
-    <div class="control-group" id="customIconUploadGroup" style="display: none;">
-        <label for="customIconUpload">
-            <span class="icon">⬆️</span> تحميل أيقونة مخصصة:
-        </label>
-        <div class="file-input-wrapper">
-            <input type="file" id="customIconUpload" accept="image/*">
-            <button type="button" class="file-input-button">
-                <span class="icon">📂</span> اختر أيقونة
-            </button>
+    <div class="app-container">
+        <div id="welcome-screen" class="app-screen active">
+            <h1>مرحباً بك في لعبة البلورات!</h1>
+            <p>الرجاء إدخال اسمك للبدء:</p>
+            <input type="text" id="player-name-input" placeholder="اسمك هنا" maxlength="20">
+            <button id="start-game-btn">بدء اللعب</button>
         </div>
-        <small style="color: var(--text-muted);">يفضل أيقونة مربعة وشفافة</small>
-        <button type="button" class="file-input-button" id="removeCustomIconButton" style="background-color: var(--accent-color); margin-top: 10px;">
-            <span class="icon">🗑️</span> إزالة الأيقونة المخصصة
-        </button>
-    </div>
 
-    <div class="control-group" id="iconColorAndSizeGroup">
-        <label for="iconColor">
-            <span class="icon">🎨</span> لون الأيقونة:
-        </label>
-        <input type="color" id="iconColor" value="#FFFFFF">
-    </div>
-
-    <div class="control-group" id="iconSizeGroup">
-        <label for="iconSize">
-            <span class="icon">🔍</span> حجم الأيقونة:
-        </label>
-        <input type="range" id="iconSize" min="1" max="2.5" step="0.1" value="1.5">
-        <span id="iconSizeValue" style="color: var(--text-muted); text-align: left;">1.5em</span>
-    </div>
-
-    <div class="control-group">
-        <label for="iconPosition">
-            <span class="icon">↔️</span> موضع الأيقونة:
-        </label>
-        <select id="iconPosition">
-            <option value="flex-start">يمين (RTL)</option>
-            <option value="center">المنتصف</option>
-            <option value="flex-end">يسار (RTL)</option>
-        </select>
-    </div>
-  </div>
-
-  <div id="storeTabContent" class="tab-content">
-    <div class="store-section">
-        <h3>الخطوط</h3>
-        <div class="store-items-grid" id="storeFontsGrid">
+        <div id="main-menu-screen" class="app-screen">
+            <h1>القائمة الرئيسية</h1>
+            <div class="menu-button-grid">
+                <button class="menu-button" data-target-screen="game-screen">
+                    <i class="fas fa-gamepad"></i>
+                    <span>اللعب</span>
+                </button>
+                <button class="menu-button" data-target-screen="play-hard-screen">
+                    <i class="fas fa-fist-raised"></i> <span>اللعب باجتهاد</span>
+                </button>
+                <button class="menu-button" data-target-screen="find-ball-screen"> 
+                    <i class="fas fa-dice"></i> <span>أوجد الكرة</span>
+                </button>
+                <button class="menu-button" data-target-screen="investment-screen">
+                    <i class="fas fa-money-bill-wave"></i> <span>الاستثمار</span>
+                </button>
+                <button class="menu-button" data-target-screen="store-screen">
+                    <i class="fas fa-store"></i>
+                    <span>المتجر</span>
+                </button>
+                <button class="menu-button" data-target-screen="code-screen">
+                    <i class="fas fa-barcode"></i>
+                    <span>رمز النقاط</span>
+                </button>
+                <button class="menu-button" data-target-screen="profile-screen">
+                    <i class="fas fa-user"></i>
+                    <span>الملف الشخصي</span>
+                </button>
             </div>
-    </div>
-    <div class="store-section">
-        <h3>ألوان الشريط وأنماطه</h3>
-        <div class="store-items-grid" id="storeBannerStylesGrid">
+        </div>
+
+        <div id="game-screen" class="app-screen">
+            <button class="back-button" data-target-screen="main-menu-screen"><i class="fas fa-arrow-right"></i></button>
+            <h1>لعبة البلورات</h1>
+            <div class="info-bar">
+                <div class="info-box">النقاط: <span id="score">0</span></div>
+                <div class="info-box">الدينار: <span id="iqd-balance">0</span></div>
             </div>
-    </div>
-    <div class="store-section">
-        <h3>تأثيرات النص</h3>
-        <div class="store-items-grid" id="storeTextEffectsGrid">
+
+            <div class="betting-section">
+                <label for="bet-amount">مقدار الرهان (نقاط):</label>
+                <input type="number" id="bet-amount" value="50" min="50" step="50">
+                <p style="font-size:0.9em; color:#bdc3c7;">الحد الأدنى للرهان: 50 نقطة</p>
+                <p id="free-bets-info" style="font-size:0.9em; color:#34d17e; display:none;">لديك <span id="free-bets-count">0</span> رهان مجاني متبقي!</p>
             </div>
-    </div>
-    <div class="store-section">
-        <h3>أحجام وتعديلات</h3>
-        <div class="store-items-grid" id="storeSizesGrid">
+
+            <div id="game-grid"></div>
+            <button id="play-btn" class="play-button">راهن وإلعب</button>
+        </div>
+
+        <div id="play-hard-screen" class="app-screen">
+            <button class="back-button" data-target-screen="main-menu-screen"><i class="fas fa-arrow-right"></i></button>
+            <h1>اللعب باجتهاد</h1>
+            <p id="play-hard-info">اضغط على الدائرة لكسب نقاط! سيظهر لك عداد قبل كل نقرة.</p>
+            <div id="countdown-timer">جاهز!</div>
+            <div id="click-circle-container">
+                <div id="click-circle">إضغط!</div>
             </div>
-    </div>
-    <div class="store-section">
-        <h3>أيقونات إضافية</h3>
-        <div class="store-items-grid" id="storeIconsGrid">
+        </div>
+
+        <div id="find-ball-screen" class="app-screen">
+            <button class="back-button" data-target-screen="main-menu-screen"><i class="fas fa-arrow-right"></i></button>
+            <h1>أوجد الكرة</h1>
+            <div class="info-bar">
+                <div class="info-box">النقاط: <span id="find-ball-score">0</span></div>
+                <div class="info-box">الدينار: <span id="find-ball-iqd-balance">0</span></div>
             </div>
+            <div id="find-ball-betting" class="betting-section">
+                <label for="find-ball-bet-amount">مقدار الرهان (نقاط):</label>
+                <input type="number" id="find-ball-bet-amount" value="50" min="50" step="50">
+                <p style="font-size:0.9em; color:#bdc3c7;">الحد الأدنى للرهان: 50 نقطة</p>
+            </div>
+            <div id="cups-container">
+                <div class="cup" data-cup-index="0"><div class="ball"></div></div>
+                <div class="cup" data-cup-index="1"><div class="ball"></div></div>
+                <div class="cup" data-cup-index="2"><div class="ball"></div></div>
+            </div>
+            <button id="find-ball-play-btn" class="play-button">راهن وإلعب</button>
+        </div>
+        <div id="investment-screen" class="app-screen">
+            <button class="back-button" data-target-screen="main-menu-screen"><i class="fas fa-arrow-right"></i></button>
+            <h1>الاستثمار</h1>
+
+            <div class="investment-item" id="free-investment-item">
+                <h3>استثمار مجاني</h3>
+                <p>مكافأة: <span class="reward-range">10 - 250 نقطة</span></p>
+                <p class="price">السعر: مجاني</p>
+                <button data-investment-type="free">استلم المكافأة</button>
+                <p class="cooldown-message">متاح بعد: <span class="cooldown-timer"></span></p>
+            </div>
+
+            <div class="investment-item" data-investment-cost-iqd="10">
+                <h3>استثمار مبتدئ</h3>
+                <p>مكافأة: <span class="reward-range">50 - 300 نقطة</span></p>
+                <p class="price">السعر: 10 دينار</p>
+                <button data-investment-type="beginner">استثمر الآن</button>
+                <p class="cooldown-message">متاح بعد: <span class="cooldown-timer"></span></p>
+            </div>
+
+            <div class="investment-item" data-investment-cost-iqd="15">
+                <h3>استثمار متوسط</h3>
+                <p>مكافأة: <span class="reward-range">100 - 500 نقطة</span></p>
+                <p class="price">السعر: 15 دينار</p>
+                <button data-investment-type="intermediate">استثمر الآن</button>
+                <p class="cooldown-message">متاح بعد: <span class="cooldown-timer"></span></p>
+            </div>
+
+            <div class="investment-item" data-investment-cost-iqd="20">
+                <h3>استثمار عالي</h3>
+                <p>مكافأة: <span class="reward-range">200 - 700 نقطة + 1-4 دينار</span></p>
+                <p class="price">السعر: 20 دينار</p>
+                <button data-investment-type="high">استثمر الآن</button>
+                <p class="cooldown-message">متاح بعد: <span class="cooldown-timer"></span></p>
+            </div>
+
+            <div class="investment-item" data-investment-cost-iqd="50">
+                <h3>استثمار كريستالي</h3>
+                <p>مكافأة: <span class="reward-range">400 - 1000 نقطة + 4-10 دينار</span></p>
+                <p class="price">السعر: 50 دينار</p>
+                <button data-investment-type="crystal">استثمر الآن</button>
+                <p class="cooldown-message">متاح بعد: <span class="cooldown-timer"></span></p>
+            </div>
+        </div>
+        <div id="store-screen" class="app-screen">
+            <button class="back-button" data-target-screen="main-menu-screen"><i class="fas fa-arrow-right"></i></button>
+            <h1>المتجر</h1>
+            <div class="store-item" id="exchange-points-item">
+                <h3>تبديل النقاط بالدينار</h3>
+                <p>استبدل 100 نقطة بـ 5 دينار عراقي.</p>
+                <p class="price">الحد: مرة واحدة كل ساعة</p>
+                <button id="exchange-points-btn">تبديل الآن</button>
+                <p id="exchange-cooldown-message" style="display:none;">متاح بعد: <span id="exchange-cooldown-timer"></span></p>
+            </div>
+            <div class="store-item" id="change-name-item">
+                <h3>تغيير الاسم</h3>
+                <p>قم بتغيير اسمك في اللعبة.</p>
+                <p class="price">السعر: مجاني!</p>
+                <button id="buy-change-name">تغيير الاسم</button>
+                <p id="change-name-cooldown-message" style="display:none;">متاح بعد: <span id="change-name-cooldown-timer"></span></p>
+            </div>
+            <div class="store-item">
+                <h3>ثلاث رهانات مجانية</h3>
+                <p>احصل على 3 رهانات مجانية في لعبة البلورات!</p>
+                <p class="price">السعر: مجاني!</p>
+                <button id="buy-free-bets">احصل عليها</button>
+                <p id="free-bets-cooldown" style="font-size:0.9em; color:#bdc3c7; display:none;">متاح بعد: <span id="cooldown-timer"></span></p>
+            </div>
+            <div class="store-item">
+                <h3>رصيد آسيا كارد (5,000 دينار)</h3>
+                <p>احصل على رصيد آسيا كارد بقيمة 5,000 دينار عراقي حقيقي!</p>
+                <p class="price">السعر: 6,000 دينار عراقي</p>
+                <button id="buy-asia-card">شراء</button>
+            </div>
+            <div class="store-item">
+                <h3>صندوق عشوائي</h3>
+                <p>صندوق سري قد يحتوي على دنانير عراقية!</p>
+                <p class="price">السعر: 500 نقطة</p>
+                <button id="buy-random-box">شراء</button>
+            </div>
+        </div>
+
+        <div id="code-screen" class="app-screen">
+            <button class="back-button" data-target-screen="main-menu-screen"><i class="fas fa-arrow-right"></i></button>
+            <h1>رمز النقاط</h1>
+            <p>أدخل الرمز الخاص بك هنا للحصول على مكافأة!</p>
+            <input type="text" id="code-input" placeholder="أدخل الرمز هنا">
+            <button id="activate-code-btn">تفعيل الرمز</button>
+        </div>
+
+        <div id="profile-screen" class="app-screen">
+            <button class="back-button" data-target-screen="main-menu-screen"><i class="fas fa-arrow-right"></i></button>
+            <h1>الملف الشخصي</h1>
+            
+            <div class="profile-info-card">
+                <i class="fas fa-user-circle"></i>
+                <div class="info-text">اسم اللاعب:</div>
+                <div class="info-value" id="profile-player-name"></div>
+            </div>
+
+            <div class="profile-info-card">
+                <i class="fas fa-star"></i>
+                <div class="info-text">النقاط الكلية:</div>
+                <div class="info-value" id="profile-total-score">0</div>
+            </div>
+
+            <div class="profile-info-card">
+                <i class="fas fa-coins"></i>
+                <div class="info-text">الرصيد الكلي للدينار العراقي:</div>
+                <div class="info-value" id="profile-total-iqd">0 دينار</div>
+            </div>
+
+            <div class="profile-info-card">
+                <i class="fas fa-ticket-alt"></i>
+                <div class="info-text">الرهانات المجانية المتبقية:</div>
+                <div class="info-value" id="profile-free-bets-count">0</div>
+            </div>
+
+            <button id="delete-account-btn">حذف الحساب</button>
+        </div>
+        </div>
+
+    <div id="result-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 id="modal-title"></h2>
+            <p>نقاط الجولة: <span id="round-points">0</span></p>
+            <p>الدينار العراقي المكتسب: <span id="round-iqd">0</span> دينار</p>
+            <p id="bet-outcome-message" style="font-weight: bold; display: none;"></p> <hr>
+            <p>النقاط الكلية: <span id="total-score-modal">0</span></p>
+            <p>الرصيد الكلي للدينار العراقي: <span id="total-iqd-modal">0</span> دينار</p>
+            <div class="modal-buttons">
+                <button id="restart-game-btn">إعادة اللعب</button>
+                <button id="return-to-main-menu-btn">العودة للقائمة الرئيسية</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-
-  <div class="screenshot-buttons">
-    <button id="viewScreenshotBtn">
-      <span class="icon">📸</span> عرض لقطة الشاشة
-    </button>
-  </div>
-
-  <div class="info-note">
-    هذا التطبيق مصمم للعمل بسلاسة في أي متصفح حديث (مثل Chrome، Safari، Firefox) على أي جهاز، بما في ذلك هاتف سامسونج A55.
-  </div>
-</div>
-
-<div id="updateNotification">تحديث قادم قريبا</div>
-
-<div id="notificationArea"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
-<script>
-  const mainImage = document.getElementById('mainImage');
-  const mainText = document.getElementById('mainText');
-  const imageUploadInput = document.getElementById('imageUpload');
-  const newTextInput = document.getElementById('newText');
-  const charCountDisplay = document.getElementById('charCount');
-  const wordCountDisplay = document.getElementById('wordCount');
-  const fontSelect = document.getElementById('fontSelect');
-  const fontSizeInput = document.getElementById('fontSize');
-  const fontSizeValueDisplay = document.getElementById('fontSizeValue');
-  const textColorInput = document.getElementById('textColor');
-  const redBannerColorInput = document.getElementById('redBannerColor');
-  const redBanner = document.getElementById('redBanner');
-  const textShadowToggle = document.getElementById('textShadowToggle');
-  const viewScreenshotBtn = document.getElementById('viewScreenshotBtn');
-  const captureArea = document.getElementById('captureArea');
-  const textEffectSelect = document.getElementById('textEffectSelect'); // جديد لتأثيرات النص
-
-  // عناصر التحكم بالأيقونات
-  const iconTypeSelect = document.getElementById('iconTypeSelect');
-  const customIconUploadGroup = document.getElementById('customIconUploadGroup');
-  const customIconUploadInput = document.getElementById('customIconUpload');
-  const removeCustomIconButton = document.getElementById('removeCustomIconButton');
-  const iconColorAndSizeGroup = document.getElementById('iconColorAndSizeGroup');
-  const iconSizeGroup = document.getElementById('iconSizeGroup');
-  const iconColorInput = document.getElementById('iconColor');
-  const iconSizeInput = document.getElementById('iconSize');
-  const iconSizeValueDisplay = document.getElementById('iconSizeValue');
-  const iconPositionSelect = document.getElementById('iconPosition');
-  const channelIconsContainer = document.getElementById('channelIconsContainer');
-
-  // عناصر التحكم بالشريط الأحمر
-  const bannerHeightInput = document.getElementById('bannerHeight');
-  const bannerHeightValueDisplay = document.getElementById('bannerHeightValue');
-  const textPaddingInput = document.getElementById('textPadding');
-  const textPaddingValueDisplay = document.getElementById('textPaddingValue');
-  const bannerStyleSelect = document.getElementById('bannerStyleSelect'); // جديد لنمط الشريط
-
-  // عناصر نظام النقاط والمستوى
-  const dinarDisplay = document.getElementById('dinarDisplay');
-  const levelDisplay = document.getElementById('levelDisplay');
-  const xpRemainingDisplay = document.getElementById('xpRemainingDisplay');
-
-  let totalDinar = parseInt(localStorage.getItem('totalDinar') || '0');
-  let currentXP = parseInt(localStorage.getItem('currentXP') || '0');
-  let currentLevel = parseInt(localStorage.getItem('currentLevel') || '1');
-  let selectedBannerStyle = localStorage.getItem('selectedBannerStyle') || 'default_red'; // لحفظ نمط الشريط المختار
-  let selectedTextEffect = localStorage.getItem('selectedTextEffect') || 'none'; // لحفظ تأثير النص المختار
-
-
-  const XP_TO_LEVEL_UP_BASE = 5000; // XP المطلوبة لكل مستوى
-
-  // عناصر المتجر
-  const storeFontsGrid = document.getElementById('storeFontsGrid');
-  const storeBannerStylesGrid = document.getElementById('storeBannerStylesGrid'); // شبكة جديدة لأنماط الشريط
-  const storeTextEffectsGrid = document.getElementById('storeTextEffectsGrid'); // شبكة جديدة لتأثيرات النص
-  const storeSizesGrid = document.getElementById('storeSizesGrid');
-  const storeIconsGrid = document.getElementById('storeIconsGrid');
-  let unlockedItems = JSON.parse(localStorage.getItem('unlockedItems') || '[]');
-
-  // عناصر التنبيهات الداخلية
-  const notificationArea = document.getElementById('notificationArea');
-
-
-  let customIconBase64 = localStorage.getItem('customIconBase64') || null; // لتخزين صورة الأيقونة المخصصة
-  if (customIconBase64 && !isItemUnlocked('icon-custom')) { // إذا كانت هناك صورة مخصصة محفوظة لكن العنصر غير مفتوح
-      customIconBase64 = null; // لا تسمح باستخدامها
-      localStorage.removeItem('customIconBase64');
-  }
-
-
-  const tabButtons = document.querySelectorAll('.tab-button');
-  const tabContents = document.querySelectorAll('.tab-content');
-
-  const defaultText = "ترامب: باركت لأردوغان وقلت له لقد سيطرتم على سوريا";
-  const maxCharLength = 150;
-
-  mainText.innerHTML = defaultText;
-  newTextInput.value = defaultText;
-
-  // استخدام صورة افتراضية أو مساحة بيضاء إذا لم يتم تحميل صورة
-  mainImage.src = localStorage.getItem('mainImageSrc') || "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
-
-
-  // --- بيانات المتجر ---
-  const storeItemsData = [
-    // الخطوط (القاهرة مجاني الآن)
-    { id: 'font-changa', type: 'font', name: 'شانجا (Changa)', cost: 400, levelRequired: 2, value: 'Changa', style: 'font-family: \'Changa\', sans-serif;' },
-    { id: 'font-almarai', type: 'font', name: 'المراعي (Almarai)', cost: 500, levelRequired: 3, value: 'Almarai', style: 'font-family: \'Almarai\', sans-serif;' },
-    { id: 'font-notosansarabic', type: 'font', name: 'نوتو سانس عربي (Noto Sans Arabic)', cost: 600, levelRequired: 3, value: 'Noto Sans Arabic', style: 'font-family: \'Noto Sans Arabic\', sans-serif;' },
-    { id: 'font-tajawal', type: 'font', name: 'تجوال (Tajawal)', cost: 700, levelRequired: 4, value: 'Tajawal', style: 'font-family: \'Tajawal\', sans-serif;' },
-    { id: 'font-amiriquiran', type: 'font', name: 'الكوفي (Amiri Quran)', cost: 800, levelRequired: 4, value: 'Amiri Quran', style: 'font-family: \'Amiri Quran\', serif;' },
-    { id: 'font-lateef', type: 'font', name: 'خط لطيف', cost: 900, levelRequired: 5, value: 'Lateef', style: 'font-family: \'Lateef\', serif;' },
-    { id: 'font-reemkufiink', type: 'font', name: 'خط ريم كوفي', cost: 1000, levelRequired: 5, value: 'Reem Kufi Ink', style: 'font-family: \'Reem Kufi Ink\', sans-serif;' },
-    { id: 'font-arefruqaa', type: 'font', name: 'عارف رقعة', cost: 1100, levelRequired: 6, value: 'Aref Ruqaa', style: 'font-family: \'Aref Ruqaa\', serif;' },
-    { id: 'font-katibeh', type: 'font', name: 'كاتبه', cost: 1200, levelRequired: 6, value: 'Katibeh', style: 'font-family: \'Katibeh\', serif;' },
-    { id: 'font-marhey', type: 'font', name: 'مرحي', cost: 1300, levelRequired: 7, value: 'Marhey', style: 'font-family: \'Marhey\', sans-serif;' },
-
-    // أنماط الشريط (ألوان وأشكال)
-    { id: 'banner-style-blue-solid', type: 'banner_style', name: 'أزرق سماوي', cost: 800, levelRequired: 2, value: '#007bff', preview: 'background-color: #007bff;', class: '' },
-    { id: 'banner-style-purple-gradient', type: 'banner_style', name: 'تدرج بنفسجي', cost: 1200, levelRequired: 3, value: 'linear-gradient(to top, #6A11CB 50%, rgba(106,17,203,0.7) 75%, rgba(106,17,203,0.0) 100%)', preview: 'background: linear-gradient(to top, #6A11CB, #4A0F8A);', class: '' },
-    { id: 'banner-style-green-wave', type: 'banner_style', name: 'موجة خضراء', cost: 1800, levelRequired: 4, value: 'linear-gradient(to top, #28a745 50%, rgba(40,167,69,0.7) 75%, rgba(40,167,69,0.0) 100%)', preview: 'background: linear-gradient(to top, #28a745, #1E7E34);', class: '' },
-    { id: 'banner-style-rounded-bottom', type: 'banner_style', name: 'حواف سفلية دائرية', cost: 1000, levelRequired: 3, value: null, preview: 'background-color: #F44336; border-bottom-left-radius: 15px; border-bottom-right-radius: 15px;', class: 'rounded-bottom-banner' },
-    { id: 'banner-style-dark-blue-gradient', type: 'banner_style', name: 'تدرج أزرق داكن', cost: 1500, levelRequired: 4, value: 'linear-gradient(to top, #153243 50%, rgba(21,50,67,0.7) 75%, rgba(21,50,67,0.0) 100%)', preview: 'background: linear-gradient(to top, #153243, #0A1C2C);', class: '' },
-
-    // تأثيرات النص
-    { id: 'text-effect-outline-white', type: 'text_effect', name: 'إطار أبيض', cost: 700, levelRequired: 2, value: '-webkit-text-stroke: 1.5px white; text-stroke: 1.5px white;', preview: 'font-size: 1.5em; -webkit-text-stroke: 1.5px white; text-stroke: 1.5px white; color: black; background-color: #eee; border-radius: 5px;' },
-    { id: 'text-effect-outline-black', type: 'text_effect', name: 'إطار أسود', cost: 700, levelRequired: 2, value: '-webkit-text-stroke: 1.5px black; text-stroke: 1.5px black;', preview: 'font-size: 1.5em; -webkit-text-stroke: 1.5px black; text-stroke: 1.5px black; color: white; background-color: #222; border-radius: 5px;' },
-    { id: 'text-effect-glow', type: 'text_effect', name: 'توهج', cost: 900, levelRequired: 3, value: 'text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #FFC107;', preview: 'font-size: 1.5em; text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #FFC107; background-color: #3A3A5A; border-radius: 5px;' },
-    { id: 'text-effect-neon', type: 'text_effect', name: 'نيون', cost: 1500, levelRequired: 4, value: 'text-shadow: 0 0 7px #0ff, 0 0 10px #0ff, 0 0 21px #0ff, 0 0 42px #0fa, 0 0 82px #0fa, 0 0 92px #0fa, 0 0 102px #0fa, 0 0 151px #0fa;', preview: 'font-size: 1.5em; text-shadow: 0 0 7px #0ff; background-color: #3A3A5A; border-radius: 5px;' },
-
-
-    // أحجام وتعديلات
-    { id: 'size-banner-boost', type: 'size_boost', name: 'ارتفاع شريط إضافي', cost: 1500, levelRequired: 4, value: { target: 'bannerHeight', max: 150 }, description: 'يزيد أقصى ارتفاع للشريط إلى 150 بكسل.' },
-    { id: 'size-text-boost', type: 'size_boost', name: 'حجم نص أكبر', cost: 1200, levelRequired: 3, value: { target: 'fontSize', max: 2.5 }, description: 'يزيد أقصى حجم للخط إلى 2.5em.' },
-
-    // أيقونات إضافية (أيقونات SVG بسيطة كـ Data URLs)
-    { id: 'icon-custom', type: 'icon', name: 'صورة مخصصة', cost: 500, levelRequired: 1, value: 'custom', description: 'تتيح لك استخدام صورتك الخاصة كأيقونة.' },
-    { id: 'icon-square', type: 'icon', name: 'مربع ■', cost: 200, levelRequired: 2, value: 'square' },
-    { id: 'icon-circle', type: 'icon', name: 'دائرة ●', cost: 250, levelRequired: 2, value: 'circle' },
-    { id: 'icon-triangle', type: 'icon', name: 'مثلث ▲', cost: 300, levelRequired: 2, value: 'triangle' },
-    { id: 'icon-star', type: 'icon', name: 'نجمة ★', cost: 400, levelRequired: 3, value: 'star' },
-    { id: 'icon-broadcast', type: 'icon', name: 'بث 📡', cost: 500, levelRequired: 3, value: 'broadcast' },
-    { id: 'icon-check', type: 'icon', name: 'أيقونة صح', cost: 600, levelRequired: 4, value: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9MTA5IDE2LjE3TDQgMTEuMTcgMi41OCAxMi41OCA5IDE5LjkyIDE5LjQyIDkuNTEgMTggOC4wOUw5IDE2LjE3eiIvPjwvc3ZnPg==' },
-    { id: 'icon-message', type: 'icon', name: 'أيقونة رسالة', cost: 900, levelRequired: 4, value: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0id2hpdGUiPjxwYXRoIGQ9TTIwIDJINEMyLjkgMiAyIDIuOSAyIDR2MTZjMCAxLjEuOSAyIDIgMi4wMUwyMiAyMC4wMVY0YzAtMS4xLS45LTItMi0yem0wIDE4SDhMNC4wMSAxNlY0aDE1Ljk5VjIzeiIvPjwvc3ZnPg==' },
-    { id: 'icon-youtube', type: 'icon', name: 'أيقونة يوتيوب', cost: 700, levelRequired: 5, value: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iI0ZGRiI+PHBhdGggZD0yMCAySDQuMUMzLjUxIDIgMyAyLjUxIDMgNGgzVjJoLTJWOWg0VjIuODhMMjAuMyAyLjU3QzIwLjYyIDIuNDYgMjEgMi44MiAyMSAzLjMxdjguMzhjMCAuNTEtLjQgLjc1LS42NC41OWwtMy4zMy0yLjQydi0xLjY3aC00VjE3hDcuMTZsLTIuMDYgMS40NGMtLjQyLjMxLS43NC43NS0uNzQgMS4zMnYyLjc5Yy40Ni0wLjE2LjgtLjYyLjgzLS45NWwzLjQ1LTIuNDFhMS40ODIgMS40ODIgMCAwIDAgLjc2LTEuMzJWMi43MmMwLTEuMjMtLjkuLTIuMTYtMi4zLTIuMDZsLjA1LS44OXoiLz48L3N2Zz4=' }
-  ];
-
-  // --- دوال اللعبة ونظام الحفظ ---
-
-  function saveGameProgress() {
-    localStorage.setItem('totalDinar', totalDinar.toString());
-    localStorage.setItem('currentXP', currentXP.toString());
-    localStorage.setItem('currentLevel', currentLevel.toString());
-    localStorage.setItem('unlockedItems', JSON.stringify(unlockedItems));
-    localStorage.setItem('selectedBannerStyle', selectedBannerStyle);
-    localStorage.setItem('selectedTextEffect', selectedTextEffect);
-    localStorage.setItem('customIconBase64', customIconBase64); // حفظ الأيقونة المخصصة
-
-    // حفظ حالة العناصر التي يمكن تعديلها مباشرة
-    localStorage.setItem('mainImageSrc', mainImage.src);
-    localStorage.setItem('newText', newTextInput.value);
-    localStorage.setItem('fontSelectValue', fontSelect.value);
-    localStorage.setItem('fontSizeValue', fontSizeInput.value);
-    localStorage.setItem('textColorValue', textColorInput.value);
-    localStorage.setItem('redBannerColorValue', redBannerColorInput.value);
-    localStorage.setItem('bannerHeightValue', bannerHeightInput.value);
-    localStorage.setItem('textPaddingValue', textPaddingInput.value);
-    localStorage.setItem('textShadowToggleChecked', textShadowToggle.checked);
-    localStorage.setItem('iconTypeSelectValue', iconTypeSelect.value);
-    localStorage.setItem('iconColorValue', iconColorInput.value);
-    localStorage.setItem('iconSizeValue', iconSizeInput.value);
-    localStorage.setItem('iconPositionValue', iconPositionSelect.value);
-
-
-    updatePlayerStatsDisplay();
-  }
-
-  function loadGameProgress() {
-    totalDinar = parseInt(localStorage.getItem('totalDinar') || '0');
-    currentXP = parseInt(localStorage.getItem('currentXP') || '0');
-    currentLevel = parseInt(localStorage.getItem('currentLevel') || '1');
-    unlockedItems = JSON.parse(localStorage.getItem('unlockedItems') || '[]');
-    selectedBannerStyle = localStorage.getItem('selectedBannerStyle') || 'default_red';
-    selectedTextEffect = localStorage.getItem('selectedTextEffect') || 'none';
-    customIconBase64 = localStorage.getItem('customIconBase64') || null;
-
-    // استعادة حالة العناصر
-    if (localStorage.getItem('mainImageSrc')) mainImage.src = localStorage.getItem('mainImageSrc');
-    if (localStorage.getItem('newText')) newTextInput.value = localStorage.getItem('newText');
-    if (localStorage.getItem('fontSelectValue')) fontSelect.value = localStorage.getItem('fontSelectValue');
-    if (localStorage.getItem('fontSizeValue')) fontSizeInput.value = localStorage.getItem('fontSizeValue');
-    if (localStorage.getItem('textColorValue')) textColorInput.value = localStorage.getItem('textColorValue');
-    if (localStorage.getItem('redBannerColorValue')) redBannerColorInput.value = localStorage.getItem('redBannerColorValue');
-    if (localStorage.getItem('bannerHeightValue')) bannerHeightInput.value = localStorage.getItem('bannerHeightValue');
-    if (localStorage.getItem('textPaddingValue')) textPaddingInput.value = localStorage.getItem('textPaddingValue');
-    if (localStorage.getItem('textShadowToggleChecked')) textShadowToggle.checked = (localStorage.getItem('textShadowToggleChecked') === 'true');
-    if (localStorage.getItem('iconTypeSelectValue')) iconTypeSelect.value = localStorage.getItem('iconTypeSelectValue');
-    if (localStorage.getItem('iconColorValue')) iconColorInput.value = localStorage.getItem('iconColorValue');
-    if (localStorage.getItem('iconSizeValue')) iconSizeInput.value = localStorage.getItem('iconSizeValue');
-    if (localStorage.getItem('iconPositionValue')) iconPositionSelect.value = localStorage.getItem('iconPositionValue');
-  }
-
-
-  function updatePlayerStatsDisplay() {
-    dinarDisplay.textContent = totalDinar;
-    levelDisplay.textContent = currentLevel;
-
-    const xpForNextLevel = currentLevel * XP_TO_LEVEL_UP_BASE;
-    xpRemainingDisplay.textContent = `${currentXP} / ${xpForNextLevel} XP`;
-  }
-
-  function checkLevelUp() {
-    const xpForNextLevel = currentLevel * XP_TO_LEVEL_UP_BASE;
-    if (currentXP >= xpForNextLevel) {
-      currentLevel++;
-      // لا يتم إعادة تعيين XP، بل تستمر في التراكم (تصاعدي)
-      showNotification(`🎉 لقد ارتفعت إلى المستوى ${currentLevel}!`, 'success');
-      checkLevelUp(); // Recursive call for multiple level ups
-    }
-    saveGameProgress();
-    renderStore(); // إعادة عرض المتجر لتحديث حالة العناصر المفتوحة
-    updateAvailableOptions(); // تحديث القوائم المنسدلة
-  }
-
-  function addRandomCurrencyAndXP() {
-    const dinarToAdd = Math.floor(Math.random() * 5) + 1; // دينار عشوائي بين 1 و 5
-    const xpToAdd = Math.floor(Math.random() * 7) + 1; // XP عشوائي بين 1 و 7
-
-    totalDinar += dinarToAdd;
-    currentXP += xpToAdd;
-
-    checkLevelUp(); // تحقق من الارتقاء بالمستوى بعد إضافة الخبرة
-    updatePlayerStatsDisplay(); // تحديث فوري للعرض
-  }
-
-  // بدء إضافة العملة والخبرة كل 5 ثوانٍ
-  setInterval(addRandomCurrencyAndXP, 5000);
-
-  // --- دوال المتجر ---
-
-  function isItemUnlocked(itemId) {
-    return unlockedItems.includes(itemId);
-  }
-
-  function renderStore() {
-    storeFontsGrid.innerHTML = '';
-    storeBannerStylesGrid.innerHTML = '';
-    storeTextEffectsGrid.innerHTML = '';
-    storeSizesGrid.innerHTML = '';
-    storeIconsGrid.innerHTML = '';
-
-    storeItemsData.forEach(item => {
-      const itemElement = document.createElement('div');
-      itemElement.classList.add('store-item');
-      itemElement.dataset.itemId = item.id;
-
-      const unlocked = isItemUnlocked(item.id);
-      const canAfford = totalDinar >= item.cost;
-      const levelMet = currentLevel >= item.levelRequired;
-      const isLockedByLevel = !levelMet;
-
-      if (unlocked) {
-          itemElement.classList.add('unlocked');
-      } else if (isLockedByLevel) {
-          itemElement.classList.add('locked');
-      }
-
-      let previewContent = '';
-      if (item.type === 'font') {
-          previewContent = `<span style="${item.style}">نموذج</span>`;
-      } else if (item.type === 'banner_style') {
-          previewContent = `<div class="store-item-preview banner-preview ${item.class || ''}" style="${item.preview}">شريط</div>`;
-      } else if (item.type === 'text_effect') {
-          previewContent = `<span class="store-item-preview text-effect-preview" style="${item.preview}">نص</span>`;
-      } else if (item.type === 'icon') {
-          if (item.value.startsWith('data:image/svg+xml')) {
-              previewContent = `<img src="${item.value}" alt="أيقونة" style="height: 40px; width: auto; filter: invert(100%);">`;
-          } else if (item.value === 'custom') {
-              previewContent = `<span class="icon">🖼️</span>`;
-          }
-          else {
-              let iconChar = '';
-              switch (item.value) {
-                  case 'square': iconChar = '■'; break;
-                  case 'circle': iconChar = '●'; break;
-                  case 'triangle': iconChar = '▲'; break;
-                  case 'star': iconChar = '★'; break;
-                  case 'broadcast': iconChar = '📡'; break;
-              }
-              previewContent = `<span style="font-size: 1.5em; color: var(--text-light);">${iconChar}</span>`;
-          }
-      } else if (item.type === 'size_boost') {
-          previewContent = `<span class="icon">⬆️</span>`;
-      }
-
-
-      itemElement.innerHTML = `
-          ${isLockedByLevel ? `<div class="locked-overlay">🔒<br><span>المستوى ${item.levelRequired} مطلوب</span></div>` : ''}
-          <div class="store-item-name">${item.name}</div>
-          <div class="store-item-preview">${previewContent}</div>
-          <div class="store-item-details">
-              <span>التكلفة: ${item.cost} دينار</span>
-              <span>المستوى المطلوب: ${item.levelRequired}</span>
-              ${item.description ? `<span>${item.description}</span>` : ''}
-          </div>
-          <button class="buy-button" ${unlocked || !canAfford || isLockedByLevel ? 'disabled' : ''}>
-              ${unlocked ? 'تم الشراء' : `شراء (${item.cost})`}
-          </button>
-      `;
-
-      if (!unlocked) {
-        const buyButton = itemElement.querySelector('.buy-button');
-        buyButton.addEventListener('click', () => buyItem(item.id));
-      }
-
-
-      // إضافة العنصر إلى الشبكة الصحيحة
-      if (item.type === 'font') {
-        storeFontsGrid.appendChild(itemElement);
-      } else if (item.type === 'banner_style') {
-        storeBannerStylesGrid.appendChild(itemElement);
-      } else if (item.type === 'text_effect') {
-        storeTextEffectsGrid.appendChild(itemElement);
-      } else if (item.type === 'size_boost') {
-        storeSizesGrid.appendChild(itemElement);
-      } else if (item.type === 'icon') {
-        storeIconsGrid.appendChild(itemElement);
-      }
-    });
-  }
-
-  function buyItem(itemId) {
-    const item = storeItemsData.find(i => i.id === itemId);
-
-    if (!item) {
-      showNotification('العنصر غير موجود.', 'error');
-      return;
-    }
-
-    if (isItemUnlocked(itemId)) {
-      showNotification('لقد اشتريت هذا العنصر بالفعل!', 'info');
-      return;
-    }
-
-    if (currentLevel < item.levelRequired) {
-      showNotification(`تحتاج إلى المستوى ${item.levelRequired} لشراء هذا العنصر.`, 'error');
-      return;
-    }
-
-    if (totalDinar < item.cost) {
-      showNotification('ليس لديك دينار كافية لشراء هذا العنصر.', 'error');
-      return;
-    }
-
-    // خصم الدينار وإضافة العنصر إلى العناصر المفتوحة
-    totalDinar -= item.cost;
-    unlockedItems.push(itemId);
-    saveGameProgress();
-    showNotification(`لقد اشتريت ${item.name} بنجاح!`, 'success');
-
-    // تطبيق العنصر المشتراة
-    applyUnlockedItem(item);
-    renderStore(); // إعادة عرض المتجر لتحديث حالة العناصر
-    updateAvailableOptions(); // تحديث القوائم المنسدلة بناءً على المشتريات
-  }
-
-  function applyUnlockedItem(item) {
-    if (item.type === 'size_boost') {
-        if (item.value.target === 'bannerHeight') {
-            bannerHeightInput.max = item.value.max;
-            showNotification(`تم زيادة الحد الأقصى لارتفاع الشريط إلى ${item.value.max}px.`, 'info');
-        } else if (item.value.target === 'fontSize') {
-            fontSizeInput.max = item.value.max;
-            showNotification(`تم زيادة الحد الأقصى لحجم الخط إلى ${item.value.max}em.`, 'info');
-        }
-    }
-  }
-
-  function updateAvailableOptions() {
-    // تحديث خيارات الخطوط
-    const currentFontValue = fontSelect.value;
-    fontSelect.innerHTML = ''; // مسح جميع الخيارات
-
-    // إضافة الخيار الافتراضي المجاني (خط النظام)
-    const defaultFontOption = document.createElement('option');
-    defaultFontOption.value = 'system-ui';
-    defaultFontOption.textContent = 'افتراضي (System UI)';
-    defaultFontOption.style.fontFamily = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif';
-    defaultFontOption.dataset.isFree = 'true';
-    fontSelect.appendChild(defaultFontOption);
-
-    // إضافة خط القاهرة مجانيًا
-    const cairoFontOption = document.createElement('option');
-    cairoFontOption.value = 'Cairo';
-    cairoFontOption.textContent = 'القاهرة (Cairo)';
-    cairoFontOption.style.fontFamily = 'Cairo, sans-serif';
-    cairoFontOption.dataset.isFree = 'true';
-    fontSelect.appendChild(cairoFontOption);
-
-    // إضافة الخطوط المشتراة
-    storeItemsData.filter(item => item.type === 'font' && isItemUnlocked(item.id)).forEach(item => {
-        const option = document.createElement('option');
-        option.value = item.value;
-        option.textContent = item.name;
-        option.style = item.style;
-        fontSelect.appendChild(option);
-    });
-    fontSelect.value = currentFontValue; // محاولة استعادة القيمة المختارة
-
-    // تحديث خيارات الأيقونات
-    const currentIconValue = iconTypeSelect.value;
-    iconTypeSelect.innerHTML = ''; // مسح جميع الخيارات
-
-    const noneIconOption = document.createElement('option');
-    noneIconOption.value = 'none';
-    noneIconOption.textContent = 'لا شيء';
-    noneIconOption.dataset.isFree = 'true';
-    iconTypeSelect.appendChild(noneIconOption);
-
-    storeItemsData.filter(item => item.type === 'icon' && isItemUnlocked(item.id)).forEach(item => {
-        const option = document.createElement('option');
-        option.value = item.id;
-        option.textContent = item.name;
-        iconTypeSelect.appendChild(option);
-    });
-    iconTypeSelect.value = currentIconValue;
-
-
-    // تحديث خيارات أنماط الشريط
-    const currentBannerStyleValue = bannerStyleSelect.value;
-    bannerStyleSelect.innerHTML = '';
-
-    const defaultRedOption = document.createElement('option');
-    defaultRedOption.value = 'default_red';
-    defaultRedOption.textContent = 'أحمر (افتراضي)';
-    defaultRedOption.dataset.isFree = 'true';
-    bannerStyleSelect.appendChild(defaultRedOption);
-
-    storeItemsData.filter(item => item.type === 'banner_style' && isItemUnlocked(item.id)).forEach(item => {
-        const option = document.createElement('option');
-        option.value = item.id;
-        option.textContent = item.name;
-        bannerStyleSelect.appendChild(option);
-    });
-    bannerStyleSelect.value = currentBannerStyleValue;
-
-
-    // تحديث خيارات تأثيرات النص
-    const currentTextEffectValue = textEffectSelect.value;
-    textEffectSelect.innerHTML = '';
-
-    const noneTextEffectOption = document.createElement('option');
-    noneTextEffectOption.value = 'none';
-    noneTextEffectOption.textContent = 'لا شيء';
-    noneTextEffectOption.dataset.isFree = 'true';
-    textEffectSelect.appendChild(noneTextEffectOption);
-
-    storeItemsData.filter(item => item.type === 'text_effect' && isItemUnlocked(item.id)).forEach(item => {
-        const option = document.createElement('option');
-        option.value = item.id;
-        option.textContent = item.name;
-        textEffectSelect.appendChild(option);
-    });
-    textEffectSelect.value = currentTextEffectValue;
-
-    // تطبيق تعديلات الأحجام المفتوحة (تغيير الـ max للـ sliders)
-    storeItemsData.filter(item => item.type === 'size_boost' && isItemUnlocked(item.id)).forEach(item => {
-        applyUnlockedItem(item); // Re-apply to set max values correctly
-    });
-
-    // تأكد من تطبيق النمط الحالي بعد تحديث الخيارات
-    applyCurrentFont();
-    applyCurrentBannerStyle();
-    applyCurrentTextEffect();
-    updateIcons();
-  }
-
-
-  // --- دوال التنبيهات الداخلية ---
-  function showNotification(message, type = 'info', duration = 3000) {
-    const notificationDiv = document.createElement('div');
-    notificationDiv.classList.add('notification', type);
-    notificationDiv.innerHTML = `<span class="icon">${getNotificationIcon(type)}</span> ${message}`;
-    notificationArea.appendChild(notificationDiv);
-
-    setTimeout(() => {
-      notificationDiv.classList.add('show');
-    }, 10);
-
-    setTimeout(() => {
-      notificationDiv.classList.remove('show');
-      notificationDiv.addEventListener('transitionend', () => notificationDiv.remove());
-    }, duration);
-  }
-
-  function getNotificationIcon(type) {
-    switch (type) {
-      case 'success': return '✅';
-      case 'error': return '❌';
-      case 'info': return 'ℹ️';
-      default: return '';
-    }
-  }
-
-
-  // --- دوال رئيسية للتطبيق ---
-
-  function applyCurrentFont() {
-      const selectedFontValue = fontSelect.value;
-      if(selectedFontValue === 'system-ui') {
-          mainText.style.fontFamily = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif';
-      } else if (selectedFontValue === 'Cairo') {
-          mainText.style.fontFamily = 'Cairo, sans-serif';
-      } else {
-          const selectedFontItem = storeItemsData.find(item => item.type === 'font' && item.value === selectedFontValue);
-          if (selectedFontItem && isItemUnlocked(selectedFontItem.id)) {
-            mainText.style.fontFamily = selectedFontItem.style.replace('font-family: ', '').replace(';', '');
-          }
-      }
-  }
-
-  function applyCurrentBannerStyle() {
-    const bannerStyleId = bannerStyleSelect.value;
-    const bannerStyleItem = storeItemsData.find(item => item.type === 'banner_style' && item.id === bannerStyleId);
-
-    redBanner.classList.remove('rounded-bottom-banner'); // إزالة أي فئات سابقة
-
-    if (bannerStyleId === 'default_red') {
-        redBannerColorInputGroup.style.display = 'flex'; // إظهار مدخل اللون الأحمر
-        const hexToRgb = hex => {
-            const r = parseInt(hex.slice(1, 3), 16);
-            const g = parseInt(hex.slice(3, 5), 16);
-            const b = parseInt(hex.slice(5, 7), 16);
-            return `${r},${g},${b}`;
-        };
-        const rgbColor = hexToRgb(redBannerColorInput.value);
-        redBanner.style.background = `linear-gradient(to top, ${redBannerColorInput.value} 50%, rgba(${rgbColor}, 0.7) 75%, rgba(${rgbColor}, 0.0) 100%)`;
-    } else if (bannerStyleItem && isItemUnlocked(bannerStyleItem.id)) {
-        redBannerColorInputGroup.style.display = 'none'; // إخفاء مدخل اللون الأحمر
-        if (bannerStyleItem.value) { // إذا كان النمط هو لون أو تدرج
-            redBanner.style.background = bannerStyleItem.value;
-        } else { // إذا كان النمط يتعلق بشكل (مثل حواف دائرية)
-            redBanner.style.background = `linear-gradient(to top, var(--accent-color) 50%, rgba(244,67,54,0.7) 75%, rgba(244,67,54,0.0) 100%)`; // لون افتراضي إذا لم يتم تحديد قيمة
-        }
-        if (bannerStyleItem.class) {
-            redBanner.classList.add(bannerStyleItem.class);
-        }
-    } else { // حالة لم يتم شراء النمط أو لا يمكن الوصول إليه
-        redBannerColorInputGroup.style.display = 'flex';
-        redBannerColorInput.value = "#F44336"; // العودة للون الأحمر الافتراضي الجديد
-        const hexToRgb = hex => {
-            const r = parseInt(hex.slice(1, 3), 16);
-            const g = parseInt(hex.slice(3, 5), 16);
-            const b = parseInt(hex.slice(5, 7), 16);
-            return `${r},${g},${b}`;
-        };
-        const rgbColor = hexToRgb(redBannerColorInput.value);
-        redBanner.style.background = `linear-gradient(to top, ${redBannerColorInput.value} 50%, rgba(${rgbColor}, 0.7) 75%, rgba(${rgbColor}, 0.0) 100%)`;
-        bannerStyleSelect.value = 'default_red'; // إعادة تحديد الخيار الافتراضي
-    }
-    saveGameProgress(); // Save the selected style
-  }
-
-  function applyCurrentTextEffect() {
-    const textEffectId = textEffectSelect.value;
-    const textEffectItem = storeItemsData.find(item => item.type === 'text_effect' && item.id === textEffectId);
-
-    mainText.style.textShadow = textShadowToggle.checked ? '1px 1px 3px rgba(0,0,0,0.5)' : 'none';
-    mainText.style.webkitTextStroke = 'none';
-    mainText.style.textStroke = 'none';
-
-    if (textEffectId === 'none') {
-        // Shadow is handled by the toggle directly
-    } else if (textEffectItem && isItemUnlocked(textEffectItem.id)) {
-        // Apply the effect. Handle text-shadow and text-stroke separately
-        if (textEffectItem.value.includes('text-shadow')) {
-            mainText.style.textShadow = textEffectItem.value.split('text-shadow: ')[1].split(';')[0];
-        }
-        if (textEffectItem.value.includes('-webkit-text-stroke')) {
-            mainText.style.webkitTextStroke = textEffectItem.value.split('-webkit-text-stroke: ')[1].split(';')[0];
-            mainText.style.textStroke = mainText.style.webkitTextStroke; // Fallback for standard
-        }
-    }
-    saveGameProgress(); // Save the selected effect
-  }
-
-
-  // دالة لتحديث الأيقونات (تم تحسينها للحجم الطبيعي)
-  function updateIcons() {
-      const iconType = iconTypeSelect.value;
-      const iconColor = iconColorInput.value;
-      const iconSizeMultiplier = parseFloat(iconSizeInput.value);
-
-      const mainTextComputedStyle = window.getComputedStyle(mainText);
-      const mainTextFontSizePx = parseFloat(mainTextComputedStyle.fontSize);
-      const baseIconFactorOfText = 1.2;
-      const currentIconPxHeight = iconSizeMultiplier * mainTextFontSizePx * baseIconFactorOfText;
-
-      channelIconsContainer.innerHTML = '';
-
-      const storeIcon = storeItemsData.find(item => item.id === iconType && item.type === 'icon');
-
-      const isCustomIconSelected = (iconType === 'icon-custom' && isItemUnlocked('icon-custom'));
-
-      customIconUploadGroup.style.display = isCustomIconSelected ? 'flex' : 'none';
-      iconColorAndSizeGroup.style.display = (iconType !== 'none' && !isCustomIconSelected) ? 'flex' : 'none';
-      iconSizeGroup.style.display = (iconType !== 'none') ? 'flex' : 'none';
-
-
-      if (isCustomIconSelected) {
-          if (customIconBase64) {
-              const img = document.createElement('img');
-              img.src = customIconBase64;
-              img.style.height = `${currentIconPxHeight}px`;
-              img.style.width = 'auto';
-              channelIconsContainer.appendChild(img);
-          }
-      } else if (storeIcon && isItemUnlocked(storeIcon.id)) {
-          if (storeIcon.value.startsWith('data:image/svg+xml')) {
-              const img = document.createElement('img');
-              img.src = storeIcon.value;
-              img.style.height = `${currentIconPxHeight}px`;
-              img.style.width = 'auto';
-              img.style.filter = `invert(100%) saturate(100%) hue-rotate(90deg) brightness(1.5) contrast(1.5)`;
-              channelIconsContainer.appendChild(img);
-          } else {
-              let iconChar = '';
-              switch (storeIcon.value) {
-                  case 'square': iconChar = '■'; break;
-                  case 'circle': iconChar = '●'; break;
-                  case 'triangle': iconChar = '▲'; break;
-                  case 'star': iconChar = '★'; break;
-                  case 'broadcast': iconChar = '📡'; break;
-              }
-              const span = document.createElement('span');
-              span.style.color = iconColor;
-              span.style.fontSize = `${currentIconPxHeight}px`;
-              span.textContent = iconChar;
-              channelIconsContainer.appendChild(span);
-          }
-      }
-
-      iconSizeValueDisplay.textContent = `${currentIconPxHeight.toFixed(0)}px`;
-
-      redBanner.style.justifyContent = iconPositionSelect.value;
-      if (iconPositionSelect.value === 'flex-start') {
-          channelIconsContainer.style.order = 1;
-          mainText.style.order = 2;
-      } else if (iconPositionSelect.value === 'flex-end') {
-          channelIconsContainer.style.order = 2;
-          mainText.style.order = 1;
-      } else {
-          channelIconsContainer.style.order = 1;
-          mainText.style.order = 2;
-      }
-
-      if (channelIconsContainer.children.length > 0) {
-          mainText.style.width = 'auto';
-          mainText.style.flexShrink = '1';
-          mainText.style.flexGrow = '1';
-      } else {
-          mainText.style.width = '100%';
-          mainText.style.flexShrink = '0';
-          mainText.style.flexGrow = '0';
-      }
-      saveGameProgress(); // Save icon settings
-  }
-
-
-  function updateText() {
-    let currentRawText = newTextInput.value;
-
-    const currentChars = currentRawText.length;
-    const currentWords = currentRawText.split(/\s+/).filter(word => word.length > 0).length;
-
-    if (currentChars > maxCharLength) {
-        currentRawText = currentRawText.substring(0, maxCharLength);
-        newTextInput.value = currentRawText;
-    }
-
-    const remainingChars = maxCharLength - currentRawText.length;
-    charCountDisplay.textContent = `الأحرف: ${currentRawText.length} / ${maxCharLength}`;
-    wordCountDisplay.textContent = `الكلمات: ${currentWords}`;
-
-    charCountDisplay.classList.remove('warning', 'danger');
-    if (remainingChars <= 15 && remainingChars > 0) {
-        charCountDisplay.classList.add('warning');
-    } else if (remainingChars <= 0) {
-        charCountDisplay.classList.add('danger');
-        charCountDisplay.textContent = `لقد تجاوزت الحد الأقصى للأحرف!`;
-    }
-
-    mainText.innerHTML = currentRawText;
-    updateIcons();
-    saveGameProgress();
-  }
-
-
-  // --- معالجات الأحداث (Event Listeners) ---
-
-  fontSelect.addEventListener('change', function() {
-      applyCurrentFont();
-      updateIcons(); // استدعاء تحديث الأيقونات عند تغيير الخط
-      saveGameProgress();
-  });
-
-  fontSizeInput.addEventListener('input', function() {
-      mainText.style.fontSize = this.value + 'em';
-      fontSizeValueDisplay.textContent = this.value + 'em';
-      updateIcons(); // استدعاء تحديث الأيقونات عند تغيير حجم الخط
-      saveGameProgress();
-  });
-
-  textColorInput.addEventListener('input', function() {
-      mainText.style.color = this.value;
-      saveGameProgress();
-  });
-
-  redBannerColorInput.addEventListener('input', function() {
-      applyCurrentBannerStyle(); // ستقوم هذه الدالة بتطبيق اللون الأحمر إذا كان النمط الافتراضي هو المحدد
-      saveGameProgress();
-  });
-
-  textShadowToggle.addEventListener('change', function() {
-      applyCurrentTextEffect(); // سيتم تطبيق الظل أو إزالته كجزء من تأثيرات النص
-      saveGameProgress();
-  });
-
-  // مستمعات الأحداث للأيقونات
-  iconTypeSelect.addEventListener('change', updateIcons);
-  iconColorInput.addEventListener('input', updateIcons);
-  iconSizeInput.addEventListener('input', updateIcons);
-  iconPositionSelect.addEventListener('change', updateIcons);
-
-  // معالج تحميل الأيقونة المخصصة
-  customIconUploadInput.addEventListener('change', function(event) {
-      const file = event.target.files && event.target.files.length > 0 ? event.target.files[0] : null;
-      if (file) {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-              customIconBase64 = e.target.result;
-              updateIcons();
-              saveGameProgress();
-          };
-          reader.readAsDataURL(file);
-      } else {
-          customIconBase64 = null;
-          updateIcons();
-          saveGameProgress();
-      }
-  });
-
-  // معالج زر إزالة الأيقونة المخصصة
-  removeCustomIconButton.addEventListener('click', function() {
-      customIconBase64 = null;
-      customIconUploadInput.value = '';
-      iconTypeSelect.value = 'none';
-      updateIcons();
-      saveGameProgress();
-  });
-
-
-  imageUploadInput.addEventListener('change', function(event) {
-    const file = event.target.files && event.target.files.length > 0 ? event.target.files [0] : null;
-
-    if (file) {
-      const reader = new FileReader();
-
-      reader.onload = function(e) {
-        mainImage.src = e.target.result;
-        saveGameProgress();
-      };
-
-      reader.readAsDataURL(file);
-    } else {
-      mainImage.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
-      saveGameProgress();
-    }
-  });
-
-  newTextInput.addEventListener('input', updateText);
-
-  // مستمعات الأحداث (الخاصة بالشريط الأحمر)
-  bannerHeightInput.addEventListener('input', function() {
-      redBanner.style.minHeight = `${this.value}px`;
-      bannerHeightValueDisplay.textContent = `${this.value}px`;
-      saveGameProgress();
-  });
-
-  textPaddingInput.addEventListener('input', function() {
-      redBanner.style.padding = `${this.value}px 25px`;
-      textPaddingValueDisplay.textContent = `${this.value}px`;
-      saveGameProgress();
-  });
-
-  bannerStyleSelect.addEventListener('change', function() {
-      selectedBannerStyle = this.value;
-      applyCurrentBannerStyle();
-      saveGameProgress();
-  });
-
-  textEffectSelect.addEventListener('change', function() {
-      selectedTextEffect = this.value;
-      applyCurrentTextEffect();
-      saveGameProgress();
-  });
-
-
-  // تحديث معالجات أزرار تحميل الملف لتشمل الأيقونة المخصصة
-  document.querySelectorAll('.file-input-wrapper .file-input-button').forEach(button => {
-    button.addEventListener('click', function() {
-      this.parentNode.querySelector('input[type="file"]').click();
-    });
-  });
-
-
-  tabButtons.forEach(button => {
-      button.addEventListener('click', () => {
-          tabButtons.forEach(btn => btn.classList.remove('active'));
-          tabContents.forEach(content => content.classList.remove('active'));
-
-          const targetTab = button.dataset.tab;
-          document.getElementById(`${targetTab}TabContent`).classList.add('active');
-          button.classList.add('active');
-
-          if (targetTab === 'store') {
-            renderStore(); // إعادة عرض المتجر عند التبديل إليه
-          }
-      });
-  });
-
-  // دالة لالتقاط وعرض الصورة وتحميلها
-  function captureAndProcessImage() {
-    const container = document.querySelector('.container');
-
-    if (typeof html2canvas === 'undefined') {
-      showNotification('تعذر عرض الصورة. مكتبة العرض غير متوفرة.', 'error');
-      return;
-    }
-
-    viewScreenshotBtn.disabled = true;
-    viewScreenshotBtn.textContent = 'جاري التحضير...';
-
-    html2canvas(container, {
-      allowTaint: true,
-      useCORS: true,
-      backgroundColor: null,
-      scale: 3
-    }).then(canvas => {
-      const imgData = canvas.toDataURL('image/png');
-      const newWindow = window.open();
-      newWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <title>صورة الخبر جاهزة للقطة الشاشة</title>
-          <style>
-            body {
-              margin: 0;
-              display: flex;
-              flex-direction: column;
-              justify-content: center;
-              align-items: center;
-              min-height: 100vh;
-              background-color: #1A1A2E;
-              padding: 20px;
-              box-sizing: border-box;
-              overflow: auto;
-              color: white;
-              font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+    <div id="custom-alert-overlay">
+        <div id="custom-alert-content">
+            <p id="custom-alert-message"></p>
+        </div>
+    </div>
+
+    <div id="confirmation-dialog-overlay">
+        <div id="confirmation-dialog-content">
+            <h2>تأكيد الحذف</h2>
+            <p>سيتم حذف حسابك وجميع بياناتك إلى الأبد. هل أنت متأكد من المتابعة؟</p>
+            <div class="confirmation-buttons">
+                <button id="confirm-delete-btn">تأكيد</button>
+                <button id="cancel-delete-btn">إلغاء</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const welcomeScreen = document.getElementById('welcome-screen');
+            const playerNameInput = document.getElementById('player-name-input');
+            const startGameBtn = document.getElementById('start-game-btn');
+            const appContainer = document.querySelector('.app-container');
+            const allScreens = document.querySelectorAll('.app-screen');
+
+            const mainMenuScreen = document.getElementById('main-menu-screen');
+            const menuButtons = document.querySelectorAll('.menu-button');
+
+            const gameScreen = document.getElementById('game-screen');
+            const storeScreen = document.getElementById('store-screen');
+            const profileScreen = document.getElementById('profile-screen');
+            const playHardScreen = document.getElementById('play-hard-screen');
+            const investmentScreen = document.getElementById('investment-screen');
+            const codeScreen = document.getElementById('code-screen');
+            const findBallScreen = document.getElementById('find-ball-screen'); 
+            const backButtons = document.querySelectorAll('.back-button');
+
+            const scoreDisplay = document.getElementById('score');
+            const iqdBalanceDisplay = document.getElementById('iqd-balance');
+            
+            // Game Screen Elements
+            const grid = document.getElementById('game-grid');
+            const betAmountInput = document.getElementById('bet-amount');
+            const playButton = document.getElementById('play-btn');
+            const freeBetsInfo = document.getElementById('free-bets-info');
+            const freeBetsCountDisplay = document.getElementById('free-bets-count');
+
+            const resultModal = document.getElementById('result-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const roundPointsDisplay = document.getElementById('round-points');
+            const roundIqdDisplay = document.getElementById('round-iqd');
+            const betOutcomeMessage = document.getElementById('bet-outcome-message');
+            const totalScoreModalDisplay = document.getElementById('total-score-modal');
+            const totalIqdModalDisplay = document.getElementById('total-iqd-modal');
+            const restartGameBtn = document.getElementById('restart-game-btn');
+            const returnToMainMenuBtnModal = document.getElementById('return-to-main-menu-btn');
+
+            // Store Elements
+            const buyAsiaCardBtn = document.getElementById('buy-asia-card');
+            const buyRandomBoxBtn = document.getElementById('buy-random-box');
+            const buyFreeBetsBtn = document.getElementById('buy-free-bets');
+            const freeBetsCooldownDisplay = document.getElementById('free-bets-cooldown');
+            const cooldownTimerSpan = document.getElementById('cooldown-timer');
+
+            // Exchange Points Elements
+            const exchangePointsBtn = document.getElementById('exchange-points-btn');
+            const exchangeCooldownMessage = document.getElementById('exchange-cooldown-message');
+            const exchangeCooldownTimerSpan = document.getElementById('exchange-cooldown-timer');
+
+            // Change Name Elements
+            const buyChangeNameBtn = document.getElementById('buy-change-name');
+            const changeNameCooldownMessage = document.getElementById('change-name-cooldown-message');
+            const changeNameCooldownTimerSpan = document.getElementById('change-name-cooldown-timer');
+
+            // Investment Elements
+            const investmentButtons = investmentScreen.querySelectorAll('.investment-item button');
+            const investmentItemDivs = investmentScreen.querySelectorAll('.investment-item');
+            // Store references to their parent item and cooldown message elements
+            const investmentItems = {}; 
+
+            investmentItemDivs.forEach(itemDiv => {
+                const button = itemDiv.querySelector('button');
+                if (button) {
+                    const type = button.dataset.investmentType;
+                    const cooldownSpan = itemDiv.querySelector('.cooldown-timer');
+                    const cooldownMsgDiv = itemDiv.querySelector('.cooldown-message');
+                    const priceSpan = itemDiv.querySelector('.price'); // To update price display
+                    
+                    investmentItems[type] = {
+                        itemDiv: itemDiv, // Store the div itself
+                        button: button,
+                        cooldownSpan: cooldownSpan,
+                        cooldownMsgDiv: cooldownMsgDiv,
+                        priceSpan: priceSpan
+                    };
+                }
+            });
+
+            // Code Screen Elements
+            const codeInput = document.getElementById('code-input');
+            const activateCodeBtn = document.getElementById('activate-code-btn');
+
+            // Profile Elements (Updated)
+            const profilePlayerName = document.getElementById('profile-player-name');
+            const profileTotalScore = document.getElementById('profile-total-score');
+            const profileTotalIqd = document.getElementById('profile-total-iqd');
+            const profileFreeBetsCount = document.getElementById('profile-free-bets-count');
+            const deleteAccountBtn = document.getElementById('delete-account-btn'); // New delete button
+
+            // Custom Alert Elements
+            const customAlertOverlay = document.getElementById('custom-alert-overlay');
+            const customAlertContent = document.getElementById('custom-alert-content');
+            const customAlertMessage = document.getElementById('custom-alert-message');
+
+            // Play Hard Elements
+            const clickCircle = document.getElementById('click-circle');
+            const clickCircleContainer = document.getElementById('click-circle-container');
+            const countdownTimerDisplay = document.getElementById('countdown-timer');
+            const playHardBackButton = playHardScreen.querySelector('.back-button');
+
+            // Find Ball Game Elements
+            const findBallScoreDisplay = document.getElementById('find-ball-score');
+            const findBallIqdBalanceDisplay = document.getElementById('find-ball-iqd-balance');
+            const findBallBetAmountInput = document.getElementById('find-ball-bet-amount');
+            const findBallPlayBtn = document.getElementById('find-ball-play-btn');
+            const cupsContainer = document.getElementById('cups-container');
+            const cups = document.querySelectorAll('#cups-container .cup');
+
+            // Confirmation Dialog Elements (NEW)
+            const confirmationDialogOverlay = document.getElementById('confirmation-dialog-overlay');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+
+
+            // --- Game Variables (Loaded from localStorage) ---
+            const gridSize = 7;
+            // Original gemTypes and their bonus factors
+            const gemTypesData = [
+                { type: 0, class: 'gem-0', bonus: 0.1 }, // Red
+                { type: 1, class: 'gem-1', bonus: 0.2 }, // Blue
+                { type: 2, class: 'gem-2', bonus: 0.3 }, // Green
+                { type: 3, class: 'gem-3', bonus: 0.4 }, // Yellow
+                { type: 4, class: 'gem-4', bonus: 0.5 }, // Purple
+                { type: 5, class: 'gem-5', bonus: 0.6 }  // Orange
+            ];
+            const gemTypesCount = gemTypesData.length; // Number of different gem types
+            const minClusterSize = 5;
+            let playerName = localStorage.getItem('playerName') || '';
+            let totalScore = parseInt(localStorage.getItem('totalScore')) || 0;
+            let totalIqd = parseInt(localStorage.getItem('totalIqd')) || 0;
+            let freeBets = parseInt(localStorage.getItem('freeBets')) || 0;
+            let freeBetsCooldownTime = parseInt(localStorage.getItem('freeBetsCooldownTime')) || 0;
+            let exchangeCooldownTime = parseInt(localStorage.getItem('exchangeCooldownTime')) || 0;
+            let changeNameCooldownTime = parseInt(localStorage.getItem('changeNameCooldownTime')) || 0; 
+
+            // Investment cooldowns and ownership object
+            let investmentCooldowns = JSON.parse(localStorage.getItem('investmentCooldowns')) || {
+                free: 0, beginner: 0, intermediate: 0, high: 0, crystal: 0
+            };
+            let ownedInvestments = JSON.parse(localStorage.getItem('ownedInvestments')) || {
+                beginner: false, intermediate: false, high: false, crystal: false
+            };
+
+
+            let board = [];
+
+            // Play Hard variables
+            let canClickPlayHard = true;
+            let playHardCountdown = 0;
+            let playHardTimerInterval = null;
+            let isPlayHardCounting = false;
+
+            // Find Ball Game variables
+            let ballLocation = -1; // Index of the cup with the ball (0, 1, or 2)
+            let isShuffling = false;
+            let canPickCup = false;
+
+            // --- Code Management ---
+            const availableCodes = [
+                "ABC12345", "DEF67890", "GHI11223", "JKL44556", "MNO77889",
+                "PQR00112", "STU33445", "VWX66778", "YZA99001", "BCD22334",
+                "EFG55667", "HIJ88990", "KLM11224", "NOP33446", "QRS55668",
+                "TUV77880", "WXY99002", "ZAB22335", "CDE44557", "FGH66779",
+                "IJK88991", "LMN11225", "OPQ33447", "RST55669", "UVW77881",
+                "XYZ99003", "AAB12346", "BCC45678", "CDD78901", "DEE01234"
+            ];
+            const permanentCode = "ALI@2468"; // The permanent code
+            const codeRewardPoints = 1000;
+            let usedCodes = JSON.parse(localStorage.getItem('usedCodes')) || {}; // { "CODE": true, "ANOTHER_CODE": true }
+
+            // --- Initial App State Logic ---
+            // Event listener for the start game button on the welcome screen
+            startGameBtn.addEventListener('click', () => {
+                const enteredName = playerNameInput.value.trim();
+                if (enteredName) {
+                    playerName = enteredName;
+                    localStorage.setItem('playerName', playerName);
+                    showScreen('main-menu-screen'); // Transition to main menu
+                    initializeGame();
+                } else {
+                    showAlert('الرجاء إدخال اسم اللاعب.', 'error');
+                }
+            });
+
+            if (playerName) {
+                // If name exists, go straight to main menu
+                welcomeScreen.classList.remove('active');
+                mainMenuScreen.classList.add('active'); // Activate main menu
+                initializeGame();
+            } else {
+                // If no name, show welcome screen
+                welcomeScreen.classList.add('active');
             }
-            img {
-              display: block;
-              max-width: 95vw;
-              max-height: 80vh; /* مساحة لزر التحميل */
-              object-fit: contain;
-              box-shadow: 0 0 15px rgba(0,0,0,0.5);
-              border-radius: 0;
-              margin-bottom: 20px;
+
+            // --- Core Game Initialization ---
+            function initializeGame() {
+                updateBalancesUI();
+                createBoard(); // Initial board creation for crystal game
+                updateProfileTab();
+                betAmountInput.value = Math.max(50, Math.min(totalScore, 50));
+                updateFreeBetsUI();
+                checkFreeBetsCooldown();
+                checkExchangeCooldown();
+                checkChangeNameCooldown(); 
+                initializeInvestmentCooldowns(); // Ensure this is called here
+                updateFindBallUI(); 
+                resetFindBallGame(); 
             }
-            .download-btn {
-              background-color: #28a745;
-              color: white;
-              padding: 15px 30px;
-              border: none;
-              border-radius: 10px;
-              cursor: pointer;
-              font-size: 1.1em;
-              font-weight: bold;
-              text-decoration: none;
-              display: inline-flex;
-              align-items: center;
-              gap: 10px;
+
+            // --- Screen Switching Logic ---
+            function showScreen(targetScreenId) {
+                const currentActiveScreen = document.querySelector('.app-screen.active');
+                const targetScreen = document.getElementById(targetScreenId);
+
+                // Prevent going back from Play Hard during countdown
+                if (currentActiveScreen === playHardScreen && isPlayHardCounting) {
+                    showAlert('لا يمكنك الرجوع أثناء العد التنازلي!', 'info');
+                    return; // Block the transition
+                }
+                 // Prevent going back from Find Ball during shuffle
+                 if (currentActiveScreen === findBallScreen && isShuffling) {
+                    showAlert('الرجاء الانتظار حتى تنتهي اللعبة!', 'info');
+                    return;
+                }
+
+                if (currentActiveScreen === targetScreen) return;
+
+                // Stop play hard timer if leaving that screen
+                if (currentActiveScreen === playHardScreen) {
+                    clearInterval(playHardTimerInterval);
+                    playHardTimerInterval = null;
+                    countdownTimerDisplay.textContent = "جاهز!";
+                    clickCircle.classList.remove('disabled');
+                    clickCircle.textContent = "إضغط!";
+                    canClickPlayHard = true;
+                    isPlayHardCounting = false;
+                    playHardBackButton.classList.remove('disabled-back');
+                }
+
+                let currentScreenTransform = 'translateX(-100%)';
+                let targetScreenTransform = 'translateX(0)';
+
+                // Determine slide direction
+                if (targetScreenId === 'main-menu-screen') {
+                    currentScreenTransform = 'translateX(100%)';
+                    // No need to set targetScreen.style.transform here, it's already off-screen by default in CSS
+                }
+                else if (currentActiveScreen === mainMenuScreen) {
+                    currentScreenTransform = 'translateX(-100%)';
+                    targetScreen.style.transform = 'translateX(100%)'; // Prepare target off-right
+                }
+                else {
+                    // For transitions between sub-screens, e.g., Game to Store
+                    // Assume left-to-right swipe for back, right-to-left for forward
+                    // This can be complex to determine dynamically. For simplicity,
+                    // let's assume all sub-screens slide in from right and out to left
+                    // unless going back to main menu.
+                    // To maintain a consistent "back" feel:
+                    // If current is submenu and target is main menu, slide current to right, target from left.
+                    // Else, slide current to left, target from right.
+                    
+                    // Simple logic: if going *to* main menu, current slides right. Else, current slides left.
+                    if (targetScreenId === 'main-menu-screen') {
+                        currentScreenTransform = 'translateX(100%)'; // Slide current screen to the right
+                        targetScreen.style.transform = 'translateX(0)'; // Ensure target is ready at 0
+                    } else if (currentActiveScreen === mainMenuScreen) {
+                        currentScreenTransform = 'translateX(-100%)'; // Slide main menu to the left
+                        targetScreen.style.transform = 'translateX(100%)'; // Target comes from right
+                    } else { // Between two sub-screens
+                        // If you want a consistent forward/back direction for sub-screens,
+                        // you need a stack. For now, let's just make them slide from the right
+                        // and current slide to the left.
+                        currentScreenTransform = 'translateX(-100%)';
+                        targetScreen.style.transform = 'translateX(100%)';
+                    }
+                }
+                
+                targetScreen.classList.add('active');
+                
+                requestAnimationFrame(() => {
+                    currentActiveScreen.style.transform = currentScreenTransform;
+                    targetScreen.style.transform = 'translateX(0)'; // Always bring target screen to center
+                });
+
+                setTimeout(() => {
+                    currentActiveScreen.classList.remove('active');
+                    // Reset transform of the old screen so it's ready for next activation
+                    currentActiveScreen.style.transform = 'translateX(100%)'; 
+                }, 400);
+
+                if (targetScreenId === 'profile-screen') {
+                    updateProfileTab();
+                }
+                if (targetScreenId === 'game-screen') {
+                    createBoard(); // Recreate board when entering game screen
+                    playButton.disabled = false;
+                    betAmountInput.value = Math.max(50, Math.min(totalScore, 50));
+                    updateFreeBetsUI();
+                }
+                if (targetScreenId === 'store-screen') {
+                    checkFreeBetsCooldown();
+                    checkExchangeCooldown();
+                    checkChangeNameCooldown(); 
+                }
+                if (targetScreenId === 'investment-screen') {
+                    initializeInvestmentCooldowns(); // Re-initialize to update cooldown states and ownership display
+                }
+                if (targetScreenId === 'code-screen') { 
+                    codeInput.value = '';
+                }
+                if (targetScreenId === 'find-ball-screen') { 
+                    updateFindBallUI();
+                    resetFindBallGame();
+                }
             }
-            .download-btn:hover {
-              background-color: #218838;
+
+            // Attach event listeners to main menu buttons
+            menuButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    showScreen(button.dataset.targetScreen);
+                });
+            });
+
+            // Attach event listeners to back buttons
+            backButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    showScreen(button.dataset.targetScreen);
+                });
+            });
+
+            // --- Game Logic (Crystal Game) ---
+            function createBoard() {
+                board = [];
+                grid.innerHTML = '';
+                for (let r = 0; r < gridSize; r++) {
+                    const row = [];
+                    for (let c = 0; c < gridSize; c++) {
+                        const gemTypeIndex = Math.floor(Math.random() * gemTypesCount);
+                        row.push(gemTypeIndex);
+                        createGemElement(r, c, gemTypeIndex);
+                    }
+                    board.push(row);
+                }
             }
-          </style>
-        </head>
-        <body>
-          <img src="${imgData}" alt="صورة الخبر">
-          <a href="${imgData}" download="news_banner_${new Date().getTime()}.png" class="download-btn">
-            ⬇️ تحميل الصورة
-          </a>
-        </body>
-        </html>
-      `);
-      newWindow.document.close();
-      showNotification('تم عرض الصورة في نافذة جديدة (مع خيار التحميل).', 'info');
-      
-      viewScreenshotBtn.disabled = false;
-      viewScreenshotBtn.innerHTML = '<span class="icon">📸</span> عرض لقطة الشاشة';
 
-    }).catch(error => {
-      console.error('حدث خطأ أثناء إنشاء الصورة في Canvas:', error);
-      showNotification('تعذر عرض الصورة. يرجى التأكد من تحميل صورة من جهازك وعدم وجود مشاكل.', 'error');
-      viewScreenshotBtn.disabled = false;
-      viewScreenshotBtn.innerHTML = '<span class="icon">📸</span> عرض لقطة الشاشة';
-    });
-  }
+            function createGemElement(row, col, typeIndex) {
+                const gem = document.createElement('div');
+                gem.classList.add('gem', gemTypesData[typeIndex].class); // Use the class from gemTypesData
+                gem.dataset.row = row;
+                gem.dataset.col = col;
+                gem.dataset.typeIndex = typeIndex; // Store type index for bonus calculation
+                grid.appendChild(gem);
+            }
+            
+            function getGemElement(row, col) {
+                return document.querySelector(`.gem[data-row='${row}'][data-col='${col}']`);
+            }
 
-  viewScreenshotBtn.addEventListener('click', () => captureAndProcessImage());
+            playButton.addEventListener('click', handlePlay);
+
+            // Modal button actions
+            restartGameBtn.addEventListener('click', () => {
+                resultModal.classList.remove('show');
+                createBoard(); // Create new board on restart
+                playButton.disabled = false;
+                betAmountInput.value = Math.max(50, Math.min(totalScore, 50));
+                updateBalancesUI();
+                updateProfileTab();
+                updateFreeBetsUI();
+            });
+            returnToMainMenuBtnModal.addEventListener('click', () => {
+                resultModal.classList.remove('show');
+                playButton.disabled = false;
+                betAmountInput.value = Math.max(50, Math.min(totalScore, 50));
+                showScreen('main-menu-screen');
+            });
+
+            async function handlePlay() {
+                let betAmount = parseInt(betAmountInput.value);
+                let isFreeBet = false;
+                betOutcomeMessage.style.display = 'none';
+
+                if (freeBets > 0) {
+                    isFreeBet = true;
+                    betAmount = 100; // Free bet value
+                    freeBets--;
+                    localStorage.setItem('freeBets', freeBets);
+                    showAlert(`تستخدم رهانًا مجانيًا! متبقي: ${freeBets}`, 'info');
+                } else {
+                    if (isNaN(betAmount) || betAmount < 50) {
+                        showAlert('الرجاء إدخال رهان صحيح (50 نقطة كحد أدنى).', 'error');
+                        return;
+                    }
+                    if (totalScore < betAmount) {
+                        showAlert(`ليس لديك نقاط كافية. رصيدك الحالي: ${totalScore} نقطة.`, 'error');
+                        return;
+                    }
+                    totalScore -= betAmount;
+                }
+                
+                playButton.disabled = true;
+                updateBalancesUI();
+                updateFreeBetsUI();
+                
+                // --- CRITICAL FIX: Recreate board after bet, before checking for clusters ---
+                createBoard(); // Regenerate board *after* the bet is placed
+                await sleep(200); // Small delay for visual update if desired
+
+                let totalGemsRemovedThisTurn = 0;
+                let roundIqdEarned = 0;
+                let pointsEarnedThisRound = 0;
+                let totalBonusMultiplier = 0; // To accumulate bonus from removed gems
+
+                let clusters = findAllClusters();
+
+                if (clusters.length > 0) {
+                    modalTitle.textContent = "تهانينا! لقد فزت!";
+                    while (clusters.length > 0) {
+                        for (const cluster of clusters) {
+                            totalGemsRemovedThisTurn += cluster.length;
+                            for (const { row, col } of cluster) {
+                                // Add bonus multiplier of the gem that was removed
+                                const gemTypeIndex = board[row][col]; // Get type index before it's set to -1
+                                if (gemTypeIndex !== -1) { // Ensure it's a valid gem
+                                    totalBonusMultiplier += gemTypesData[gemTypeIndex].bonus;
+                                }
+                                getGemElement(row, col)?.classList.add('is-cluster');
+                            }
+                        }
+                        
+                        await sleep(1000);
+
+                        removeClusters(clusters);
+                        await sleep(300);
+                        
+                        await applyGravityAndRefill();
+                        await sleep(300);
+
+                        clusters = findAllClusters();
+                    }
+
+                    // Calculate points based on accumulated bonus multiplier
+                    // Average bonus per gem removed if all gems had a bonus
+                    const averageBonusPerGem = totalGemsRemovedThisTurn > 0 ? totalBonusMultiplier / totalGemsRemovedThisTurn : 0;
+                    // Apply this average bonus to the bet amount
+                    pointsEarnedThisRound = Math.ceil(betAmount * (1 + averageBonusPerGem)); // 1 + bonus for total points including bet
+
+                    totalScore += pointsEarnedThisRound;
+
+                    betOutcomeMessage.textContent = `لقد ربحت ${pointsEarnedThisRound} نقطة! (معدل ربح ${averageBonusPerGem.toFixed(2)}x)`;
+                    betOutcomeMessage.style.color = '#34d17e';
+                    betOutcomeMessage.style.display = 'block';
+
+                    if (Math.random() < 0.10) { // 10% chance to earn IQD
+                        roundIqdEarned = Math.floor(Math.random() * 21); // 0-20 IQD
+                        totalIqd += roundIqdEarned;
+                    }
+
+                } else {
+                    modalTitle.textContent = "للأسف! لم تفز هذه الجولة.";
+                    pointsEarnedThisRound = 0;
+
+                    if (!isFreeBet) {
+                        betOutcomeMessage.textContent = `لقد خسرت رهانك البالغ ${betAmount} نقطة.`;
+                        betOutcomeMessage.style.color = '#e74c3c';
+                        betOutcomeMessage.style.display = 'block';
+                    } else {
+                        betOutcomeMessage.textContent = `لم تربح شيئًا في رهانك المجاني.`;
+                        betOutcomeMessage.style.color = '#bdc3c7';
+                        betOutcomeMessage.style.display = 'block';
+                    }
+                }
+                
+                localStorage.setItem('totalScore', totalScore);
+                localStorage.setItem('totalIqd', totalIqd);
+                updateBalancesUI();
+                updateProfileTab();
+
+                roundPointsDisplay.textContent = pointsEarnedThisRound;
+                roundIqdDisplay.textContent = roundIqdEarned;
+                totalScoreModalDisplay.textContent = totalScore;
+                totalIqdModalDisplay.textContent = totalIqd;
+                resultModal.classList.add('show');
+            }
+
+            function findAllClusters() {
+                const clusters = [];
+                const visited = Array(gridSize).fill(null).map(() => Array(gridSize).fill(false));
+
+                for (let r = 0; r < gridSize; r++) {
+                    for (let c = 0; c < gridSize; c++) {
+                        if (visited[r][c] || board[r][c] === -1) continue;
+                        
+                        const currentType = board[r][c];
+                        const currentCluster = [];
+                        const queue = [{ row: r, col: c }];
+                        visited[r][c] = true;
+
+                        while (queue.length > 0) {
+                            const { row: qRow, col: qCol } = queue.shift(); 
+                            currentCluster.push({ row: qRow, col: qCol });
+
+                            const neighbors = [
+                                { row: qRow - 1, col: qCol }, { row: qRow + 1, col: qCol },
+                                { row: qRow, col: qCol - 1 }, { row: qRow, col: qCol + 1 }
+                            ];
+
+                            for (const neighbor of neighbors) {
+                                const { row: nr, col: nc } = neighbor;
+                                if (nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize && !visited[nr][nc] && board[nr][nc] === currentType) {
+                                    visited[nr][nc] = true;
+                                    queue.push({ row: nr, col: nc });
+                                }
+                            }
+                        }
+
+                        if (currentCluster.length >= minClusterSize) {
+                            clusters.push(currentCluster);
+                        }
+                    }
+                }
+                return clusters;
+            }
+
+            function removeClusters(clusters) {
+                for (const cluster of clusters) {
+                    for (const { row, col } of cluster) {
+                        board[row][col] = -1;
+                        const gemEl = getGemElement(row, col);
+                        if (gemEl) {
+                           gemEl.className = 'gem'; // Reset classes
+                           gemEl.style.background = 'transparent'; // Hide background
+                           gemEl.style.boxShadow = 'none'; // Remove shadow
+                           gemEl.style.animation = 'none'; // Stop any animations
+                           gemEl.style.clipPath = 'none'; // Remove clip-path - no longer needed with circular gems
+                        }
+                    }
+                }
+            }
+            
+            async function applyGravityAndRefill() {
+                for (let c = 0; c < gridSize; c++) {
+                    let emptyRow = gridSize - 1;
+                    for (let r = gridSize - 1; r >= 0; r--) {
+                        if (board[r][c] !== -1) {
+                            if (emptyRow !== r) {
+                                board[emptyRow][c] = board[r][c];
+                                board[r][c] = -1;
+                            }
+                            emptyRow--;
+                        }
+                    }
+                }
+
+                for (let r = 0; r < gridSize; r++) {
+                    for (let c = 0; c < gridSize; c++) {
+                        if (board[r][c] === -1) {
+                            board[r][c] = Math.floor(Math.random() * gemTypesCount);
+                        }
+                    }
+                }
+
+                grid.innerHTML = '';
+                for (let r = 0; r < gridSize; r++) {
+                    for (let c = 0; c < gridSize; c++) {
+                        createGemElement(r, c, board[r][c]);
+                    }
+                }
+            }
+            
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            // --- UI Update Functions ---
+            function updateBalancesUI() {
+                scoreDisplay.textContent = totalScore;
+                iqdBalanceDisplay.textContent = totalIqd;
+                // Also update for find ball screen
+                findBallScoreDisplay.textContent = totalScore;
+                findBallIqdBalanceDisplay.textContent = totalIqd;
+            }
+
+            // UPDATED: updateProfileTab function
+            function updateProfileTab() {
+                profilePlayerName.textContent = playerName;
+                profileTotalScore.textContent = totalScore;
+                profileTotalIqd.textContent = `${totalIqd} دينار`;
+                profileFreeBetsCount.textContent = freeBets;
+            }
+
+            function updateFreeBetsUI() {
+                if (freeBets > 0) {
+                    freeBetsInfo.style.display = 'block';
+                    freeBetsCountDisplay.textContent = freeBets;
+                    betAmountInput.disabled = true;
+                    playButton.textContent = `إلعب رهان مجاني (${freeBets} متبقي)`;
+                } else {
+                    freeBetsInfo.style.display = 'none';
+                    betAmountInput.disabled = false;
+                    playButton.textContent = `راهن وإلعب`;
+                }
+            }
+
+            function updateFindBallUI() {
+                findBallBetAmountInput.value = Math.max(50, Math.min(totalScore, 50));
+                findBallPlayBtn.disabled = false;
+                cups.forEach(cup => {
+                    cup.classList.remove('revealed', 'win', 'lose', 'selected', 'shaking', 'disabled');
+                    // Ensure the ball element is hidden by default and removed from previous states
+                    const ball = cup.querySelector('.ball');
+                    if (ball) ball.style.display = 'none';
+                });
+            }
+
+            // --- Custom Alert Function ---
+            function showAlert(message, type = 'info', duration = 2500) {
+                customAlertMessage.textContent = message;
+                customAlertContent.className = '';
+                customAlertContent.classList.add('custom-alert-content', type);
+                customAlertOverlay.classList.add('show');
+
+                setTimeout(() => {
+                    customAlertOverlay.classList.remove('show');
+                }, duration);
+            }
+
+            // --- Store Logic ---
+            buyAsiaCardBtn.addEventListener('click', () => {
+                const price = 6000;
+                if (totalIqd >= price) {
+                    totalIqd -= price;
+                    localStorage.setItem('totalIqd', totalIqd);
+                    updateBalancesUI();
+                    updateProfileTab();
+                    showAlert('تهانينا! تم شراء رصيد آسيا كارد بقيمة 5,000 دينار بنجاح!', 'success');
+                } else {
+                    showAlert('لا يوجد لديك ما يكفي من الدينار العراقي لشراء هذا العنصر.', 'error');
+                }
+            });
+
+            buyRandomBoxBtn.addEventListener('click', () => {
+                const price = 500;
+                if (totalScore >= price) {
+                    totalScore -= price;
+                    let gainedIqd = Math.floor(Math.random() * 21); // 0-20 IQD
+                    totalIqd += gainedIqd;
+                    localStorage.setItem('totalScore', totalScore);
+                    localStorage.setItem('totalIqd', totalIqd);
+                    updateBalancesUI();
+                    updateProfileTab();
+                    showAlert(`تهانينا! لقد حصلت على ${gainedIqd} دينار عراقي من الصندوق العشوائي!`, 'success');
+                } else {
+                    showAlert('لا يوجد لديك ما يكفي من النقاط لشراء الصندوق العشوائي.', 'error');
+                }
+            });
+
+            // Buy Free Bets Logic
+            buyFreeBetsBtn.addEventListener('click', () => {
+                if (freeBetsCooldownTime > Date.now()) {
+                    showAlert('هذا العنصر غير متاح بعد، الرجاء الانتظار.', 'info');
+                    return;
+                }
+
+                freeBets += 3;
+                freeBetsCooldownTime = Date.now() + (24 * 60 * 60 * 1000); // 24 hours cooldown
+                
+                localStorage.setItem('freeBets', freeBets);
+                localStorage.setItem('freeBetsCooldownTime', freeBetsCooldownTime);
+
+                updateBalancesUI();
+                updateProfileTab();
+                updateFreeBetsUI();
+                checkFreeBetsCooldown();
+                showAlert('لقد حصلت على 3 رهانات مجانية!', 'success');
+            });
+
+            // Cooldown timer logic for Free Bets
+            let freeBetsCooldownInterval = null;
+            function checkFreeBetsCooldown() {
+                const now = Date.now();
+                if (freeBetsCooldownTime > now) {
+                    buyFreeBetsBtn.disabled = true;
+                    freeBetsCooldownDisplay.style.display = 'block';
+
+                    if (freeBetsCooldownInterval) clearInterval(freeBetsCooldownInterval);
+
+                    freeBetsCooldownInterval = setInterval(() => {
+                        const remaining = freeBetsCooldownTime - Date.now();
+                        if (remaining <= 0) {
+                            clearInterval(freeBetsCooldownInterval);
+                            freeBetsCooldownInterval = null;
+                            buyFreeBetsBtn.disabled = false;
+                            freeBetsCooldownDisplay.style.display = 'none';
+                            cooldownTimerSpan.textContent = '';
+                            showAlert('الرهانات المجانية متاحة الآن!', 'success');
+                        } else {
+                            const hours = Math.floor(remaining / (1000 * 60 * 60));
+                            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                            cooldownTimerSpan.textContent = `${hours}س ${minutes}د ${seconds}ث`;
+                        }
+                    }, 1000);
+                } else {
+                    buyFreeBetsBtn.disabled = false;
+                    freeBetsCooldownDisplay.style.display = 'none';
+                    cooldownTimerSpan.textContent = '';
+                }
+            }
+
+            // Exchange Points Logic
+            exchangePointsBtn.addEventListener('click', () => {
+                const pointsRequired = 100;
+                const dinarGained = 5;
+                const oneHourInMs = 60 * 60 * 1000; // 1 hour cooldown
+
+                const now = Date.now();
+                const timeSinceLastExchange = now - exchangeCooldownTime;
+
+                if (totalScore >= pointsRequired) {
+                    if (timeSinceLastExchange >= oneHourInMs) {
+                        totalScore -= pointsRequired;
+                        totalIqd += dinarGained;
+                        exchangeCooldownTime = now; // Update last exchange time
+
+                        localStorage.setItem('totalScore', totalScore);
+                        localStorage.setItem('totalIqd', totalIqd);
+                        localStorage.setItem('exchangeCooldownTime', exchangeCooldownTime);
+
+                        updateBalancesUI();
+                        updateProfileTab();
+                        checkExchangeCooldown(); // Update cooldown UI immediately
+                        showAlert(`تم تبديل ${pointsRequired} نقطة بـ ${dinarGained} دينار بنجاح!`, 'success');
+                    } else {
+                        const remaining = oneHourInMs - timeSinceLastExchange;
+                        const hours = Math.floor(remaining / (1000 * 60 * 60));
+                        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                        showAlert(`هذا الخيار متاح بعد: ${hours}س ${minutes}د ${seconds}ث`, 'info');
+                    }
+                } else {
+                    showAlert(`ليس لديك ما يكفي من النقاط. تحتاج ${pointsRequired} نقطة للتبديل.`, 'error');
+                }
+            });
+
+            // Cooldown timer logic for Exchange Points
+            let exchangeInterval = null;
+            function checkExchangeCooldown() {
+                const now = Date.now();
+                if (exchangeCooldownTime + (60 * 60 * 1000) > now) { // Check if still in cooldown
+                    exchangePointsBtn.disabled = true;
+                    exchangeCooldownMessage.style.display = 'block';
+
+                    if (exchangeInterval) clearInterval(exchangeInterval);
+
+                    exchangeInterval = setInterval(() => {
+                        const remaining = (exchangeCooldownTime + (60 * 60 * 1000)) - Date.now();
+                        if (remaining <= 0) {
+                            clearInterval(exchangeInterval);
+                            exchangeInterval = null;
+                            exchangePointsBtn.disabled = false;
+                            exchangeCooldownMessage.style.display = 'none';
+                            exchangeCooldownTimerSpan.textContent = '';
+                            showAlert('خيار تبديل النقاط متاح الآن!', 'success');
+                        } else {
+                            const hours = Math.floor(remaining / (1000 * 60 * 60));
+                            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                            exchangeCooldownTimerSpan.textContent = `${hours}س ${minutes}د ${seconds}ث`;
+                        }
+                    }, 1000);
+                } else {
+                    exchangePointsBtn.disabled = false;
+                    exchangeCooldownMessage.style.display = 'none';
+                    exchangeCooldownTimerSpan.textContent = '';
+                }
+            }
+
+            // NEW: Change Name Logic
+            buyChangeNameBtn.addEventListener('click', () => {
+                const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
+                const now = Date.now();
+                const timeSinceLastChange = now - changeNameCooldownTime;
+
+                if (timeSinceLastChange >= threeDaysInMs) {
+                    const newName = prompt('أدخل اسمًا جديدًا:');
+                    if (newName && newName.trim() !== '') {
+                        if (newName.trim().length > 20) {
+                            showAlert('الاسم طويل جداً. الحد الأقصى 20 حرفًا.', 'error');
+                            return;
+                        }
+                        playerName = newName.trim();
+                        localStorage.setItem('playerName', playerName);
+                        changeNameCooldownTime = now; // Update last change time
+                        localStorage.setItem('changeNameCooldownTime', changeNameCooldownTime);
+                        updateProfileTab();
+                        checkChangeNameCooldown();
+                        showAlert(`تم تغيير اسمك إلى "${playerName}" بنجاح!`, 'success');
+                    } else {
+                        showAlert('لم يتم إدخال اسم جديد.', 'info');
+                    }
+                } else {
+                    const remaining = threeDaysInMs - timeSinceLastChange;
+                    const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                    showAlert(`تغيير الاسم متاح بعد: ${days}ي ${hours}س ${minutes}د ${seconds}ث`, 'info');
+                }
+            });
+
+            let changeNameInterval = null;
+            function checkChangeNameCooldown() {
+                const threeDaysInMs = 3 * 24 * 60 * 60 * 1000;
+                const now = Date.now();
+                if (changeNameCooldownTime + threeDaysInMs > now) {
+                    buyChangeNameBtn.disabled = true;
+                    changeNameCooldownMessage.style.display = 'block';
+
+                    if (changeNameInterval) clearInterval(changeNameInterval);
+
+                    changeNameInterval = setInterval(() => {
+                        const remaining = (changeNameCooldownTime + threeDaysInMs) - Date.now();
+                        if (remaining <= 0) {
+                            clearInterval(changeNameInterval);
+                            changeNameInterval = null;
+                            buyChangeNameBtn.disabled = false;
+                            changeNameCooldownMessage.style.display = 'none';
+                            changeNameCooldownTimerSpan.textContent = '';
+                            showAlert('خيار تغيير الاسم متاح الآن!', 'success');
+                        } else {
+                            const days = Math.floor(remaining / (1000 * 60 * 60 * 24));
+                            const hours = Math.floor((remaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                            const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                            changeNameCooldownTimerSpan.textContent = `${days}ي ${hours}س ${minutes}د ${seconds}ث`;
+                        }
+                    }, 1000);
+                } else {
+                    buyChangeNameBtn.disabled = false;
+                    changeNameCooldownMessage.style.display = 'none';
+                    changeNameCooldownTimerSpan.textContent = '';
+                }
+            }
 
 
-  // --- التهيئة عند تحميل الصفحة ---
-  function initializeApp() {
-    loadGameProgress(); // تحميل حالة اللعبة المحفوظة
+            // --- Investment Logic ---
+            const investmentTypes = {
+                free: {
+                    points: { min: 10, max: 250 },
+                    iqd: { min: 0, max: 0 },
+                    cost: { points: 0, iqd: 0 },
+                    cooldown: 5 * 60 * 60 * 1000 // 5 hours
+                },
+                beginner: {
+                    points: { min: 50, max: 300 },
+                    iqd: { min: 0, max: 0 },
+                    cost: { points: 0, iqd: 10 }, 
+                    cooldown: 5 * 60 * 60 * 1000 // 5 hours
+                },
+                intermediate: {
+                    points: { min: 100, max: 500 },
+                    iqd: { min: 0, max: 0 },
+                    cost: { points: 0, iqd: 15 }, 
+                    cooldown: 4 * 60 * 60 * 1000 // 4 hours
+                },
+                high: {
+                    points: { min: 200, max: 700 },
+                    iqd: { min: 1, max: 4 },
+                    cost: { points: 0, iqd: 20 }, 
+                    cooldown: 5 * 60 * 60 * 1000 // 5 hours
+                },
+                crystal: {
+                    points: { min: 400, max: 1000 },
+                    iqd: { min: 4, max: 10 },
+                    cost: { points: 0, iqd: 50 }, 
+                    cooldown: 3 * 60 * 60 * 1000 // 3 hours
+                }
+            };
 
-    newTextInput.value = localStorage.getItem('newText') || defaultText;
-    mainText.innerHTML = newTextInput.value;
+            investmentButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const type = event.target.dataset.investmentType;
+                    handleInvestment(type);
+                });
+            });
 
-    textColorInput.value = localStorage.getItem('textColorValue') || "#ffffff";
-    mainText.style.color = textColorInput.value;
+            function handleInvestment(type) {
+                const config = investmentTypes[type];
+                const now = Date.now();
+                const isFreeInvestment = (type === 'free');
 
-    redBannerColorInput.value = localStorage.getItem('redBannerColorValue') || "#F44336"; // لون أحمر جديد
-    bannerHeightInput.value = localStorage.getItem('bannerHeightValue') || "75";
-    textPaddingInput.value = localStorage.getItem('textPaddingValue') || "25";
-    textShadowToggle.checked = (localStorage.getItem('textShadowToggleChecked') === 'true');
+                // Check if already on cooldown
+                if (investmentCooldowns[type] && (now < investmentCooldowns[type])) {
+                    const remaining = investmentCooldowns[type] - now;
+                    const hours = Math.floor(remaining / (1000 * 60 * 60));
+                    const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                    showAlert(`هذا الاستثمار متاح بعد: ${hours}س ${minutes}د ${seconds}ث`, 'info');
+                    return;
+                }
+
+                // If not owned yet (and not free investment), process purchase
+                if (!isFreeInvestment && !ownedInvestments[type]) {
+                    // Check costs for initial purchase
+                    if (config.cost.points > 0 && totalScore < config.cost.points) {
+                        showAlert(`ليس لديك نقاط كافية. تحتاج ${config.cost.points} نقطة لشراء هذا الاستثمار.`, 'error');
+                        return;
+                    }
+                    if (config.cost.iqd > 0 && totalIqd < config.cost.iqd) {
+                        showAlert(`ليس لديك دينار كافٍ. تحتاج ${config.cost.iqd} دينار لشراء هذا الاستثمار.`, 'error');
+                        return;
+                    }
+
+                    // Deduct cost for initial purchase
+                    totalScore -= config.cost.points;
+                    totalIqd -= config.cost.iqd;
+                    ownedInvestments[type] = true; // Mark as owned
+                    localStorage.setItem('ownedInvestments', JSON.stringify(ownedInvestments));
+                    showAlert(`تم شراء استثمار ${type} بنجاح! أصبح ملكك للأبد.`, 'success');
+                } else if (!isFreeInvestment && ownedInvestments[type]) {
+                    // If owned, and it's not the free investment, it's a free re-use.
+                    // No cost deduction here.
+                }
+
+                // Calculate rewards for *every* use (initial purchase or re-use)
+                const gainedPoints = Math.floor(Math.random() * (config.points.max - config.points.min + 1)) + config.points.min;
+                totalScore += gainedPoints;
+
+                let gainedIqd = 0;
+                if (config.iqd.max > 0) {
+                    gainedIqd = Math.floor(Math.random() * (config.iqd.max - config.iqd.min + 1)) + config.iqd.min;
+                    totalIqd += gainedIqd;
+                }
+
+                // Set new cooldown end time
+                investmentCooldowns[type] = now + config.cooldown;
+                localStorage.setItem('investmentCooldowns', JSON.stringify(investmentCooldowns));
+
+                updateBalancesUI();
+                updateProfileTab();
+                // Call startInvestmentCooldownTimer directly after successful investment
+                startInvestmentCooldownTimer(type, investmentCooldowns[type]); 
+
+                let message = `لقد حصلت على ${gainedPoints} نقطة`;
+                if (gainedIqd > 0) {
+                    message += ` و ${gainedIqd} دينار`;
+                }
+                message += ` من استثمار ${type === 'free' ? 'المجاني' : type}!`;
+                showAlert(message, 'success');
+            }
+
+            // Function to manage individual investment cooldown timers
+            const investmentIntervals = {};
+
+            function initializeInvestmentCooldowns() {
+                const now = Date.now();
+                for (const type in investmentTypes) {
+                    const config = investmentTypes[type];
+                    const itemData = investmentItems[type]; 
+                    const isFreeInvestment = (type === 'free');
+
+                    if (!itemData) continue; // Skip if DOM elements are not found
+
+                    const cooldownEndTime = investmentCooldowns[type] || 0; 
+                    
+                    if (!isFreeInvestment) { // For paid investments
+                        if (ownedInvestments[type]) {
+                            itemData.itemDiv.classList.add('owned');
+                            itemData.priceSpan.textContent = 'مُمتلك!';
+                        } else {
+                            itemData.itemDiv.classList.remove('owned');
+                            itemData.priceSpan.textContent = `السعر: ${config.cost.iqd} دينار`;
+                        }
+                    }
+
+                    if (cooldownEndTime > now) {
+                        // If still on cooldown, start/update timer
+                        startInvestmentCooldownTimer(type, cooldownEndTime);
+                    } else {
+                        // If cooldown is over, ensure button is enabled and timer hidden
+                        itemData.button.disabled = false;
+                        itemData.button.textContent = (isFreeInvestment || ownedInvestments[type]) ? 'استلم المكافأة' : 'استثمر الآن';
+                        if (!isFreeInvestment && !ownedInvestments[type]) { // If not owned, still show original purchase text
+                            itemData.button.textContent = 'اشترِ واستثمر';
+                        } else if (isFreeInvestment || ownedInvestments[type]) {
+                             itemData.button.textContent = 'استلم المكافأة';
+                        }
+                        
+                        itemData.cooldownMsgDiv.style.display = 'none'; 
+                        if (investmentIntervals[type]) clearInterval(investmentIntervals[type]);
+                    }
+                }
+            }
+
+            function startInvestmentCooldownTimer(type, endTime) {
+                const itemData = investmentItems[type]; 
+                const isFreeInvestment = (type === 'free');
+
+                if (!itemData || !itemData.button || !itemData.cooldownSpan || !itemData.cooldownMsgDiv) {
+                    console.error(`Missing DOM elements for investment type: ${type}`);
+                    return;
+                }
+
+                if (investmentIntervals[type]) clearInterval(investmentIntervals[type]);
+                
+                itemData.button.disabled = true;
+                itemData.cooldownMsgDiv.style.display = 'block'; 
+
+                itemData.button.textContent = 'الاستثمار قيد التبريد';
 
 
-    // تطبيق القيم التي تم تحميلها
-    mainImage.src = localStorage.getItem('mainImageSrc') || "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
-    mainText.style.fontSize = fontSizeInput.value + 'em';
-    fontSizeValueDisplay.textContent = fontSizeInput.value + 'em';
-    redBanner.style.minHeight = `${bannerHeightInput.value}px`;
-    bannerHeightValueDisplay.textContent = `${bannerHeightInput.value}px`;
-    redBanner.style.padding = `${textPaddingInput.value}px 25px`;
-    textPaddingValueDisplay.textContent = `${textPaddingInput.value}px`;
-
-    // تأكد من أن خيارات القوائم المنسدلة موجودة أولاً
-    updateAvailableOptions();
-
-    // تطبيق القيم المختارة من القوائم المنسدلة بعد تحديث الخيارات
-    fontSelect.value = localStorage.getItem('fontSelectValue') || 'system-ui';
-    iconTypeSelect.value = localStorage.getItem('iconTypeSelectValue') || 'none';
-    bannerStyleSelect.value = localStorage.getItem('selectedBannerStyle') || 'default_red';
-    textEffectSelect.value = localStorage.getItem('selectedTextEffect') || 'none';
-    iconPositionSelect.value = localStorage.getItem('iconPositionValue') || 'center';
+                // Update immediately before starting interval to avoid 1-second delay
+                const remainingInitial = endTime - Date.now();
+                if (remainingInitial > 0) {
+                    const hours = Math.floor(remainingInitial / (1000 * 60 * 60));
+                    const minutes = Math.floor((remainingInitial % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((remainingInitial % (1000 * 60)) / 1000);
+                    itemData.cooldownSpan.textContent = `${hours}س ${minutes}د ${seconds}ث`;
+                }
 
 
-    // تطبيق الأنماط الفعلية بناءً على القيم المحملة
-    applyCurrentFont();
-    applyCurrentBannerStyle();
-    applyCurrentTextEffect();
-    updateIcons(); // هذا سيقوم أيضًا بتحديث أحجام الأيقونات وموضعها
+                investmentIntervals[type] = setInterval(() => {
+                    const remaining = endTime - Date.now();
+                    if (remaining <= 0) {
+                        clearInterval(investmentIntervals[type]);
+                        investmentIntervals[type] = null;
+                        itemData.button.disabled = false;
+                        itemData.cooldownMsgDiv.style.display = 'none'; 
+                        itemData.cooldownSpan.textContent = '';
+                        itemData.button.textContent = (isFreeInvestment || ownedInvestments[type]) ? 'استلم المكافأة' : 'استثمر الآن';
+                        showAlert(`استثمار ${type === 'free' ? 'المجاني' : type} متاح الآن!`, 'success');
+                    } else {
+                        const hours = Math.floor(remaining / (1000 * 60 * 60));
+                        const minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+                        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+                        itemData.cooldownSpan.textContent = `${hours}س ${minutes}د ${seconds}ث`;
+                    }
+                }, 1000);
+            }
 
-    updateText(); // تهيئة عدادات النص
-    updatePlayerStatsDisplay(); // تحديث عرض النقاط والمستوى
-    renderStore(); // عرض المتجر لأول مرة
-  }
+            // --- Code Activation Logic ---
+            activateCodeBtn.addEventListener('click', () => {
+                const enteredCode = codeInput.value.trim().toUpperCase(); 
+                
+                if (enteredCode === permanentCode) {
+                    totalScore += codeRewardPoints;
+                    localStorage.setItem('totalScore', totalScore);
+                    updateBalancesUI();
+                    updateProfileTab();
+                    showAlert(`تهانينا! لقد حصلت على ${codeRewardPoints} نقطة! (رمز دائمي)`, 'success');
+                    codeInput.value = ''; 
+                } else if (availableCodes.includes(enteredCode)) {
+                    if (usedCodes[enteredCode]) {
+                        showAlert('تم استخدام هذا الرمز لمرة واحدة بالفعل!', 'error');
+                    } else {
+                        totalScore += codeRewardPoints;
+                        usedCodes[enteredCode] = true; 
+                        localStorage.setItem('totalScore', totalScore);
+                        localStorage.setItem('usedCodes', JSON.stringify(usedCodes)); 
+                        updateBalancesUI();
+                        updateProfileTab();
+                        showAlert(`تهانينا! لقد حصلت على ${codeRewardPoints} نقطة!`, 'success');
+                        codeInput.value = ''; 
+                    }
+                } else {
+                    showAlert('الرمز الذي أدخلته غير صحيح. الرجاء المحاولة مرة أخرى.', 'error');
+                }
+            });
 
-  initializeApp();
+            // --- Play Hard Game Logic ---
+            clickCircle.addEventListener('click', handleCircleClick);
 
-</script>
+            function handleCircleClick() {
+                if (!canClickPlayHard) {
+                    return;
+                }
+
+                canClickPlayHard = false;
+                clickCircle.classList.add('disabled'); 
+                clickCircle.textContent = ''; 
+                playHardBackButton.classList.add('disabled-back'); 
+
+                let clicksGained = 0;
+                
+                clicksGained = Math.floor(Math.random() * 5) + 1;
+                totalScore += clicksGained;
+                localStorage.setItem('totalScore', totalScore);
+                updateBalancesUI();
+                updateProfileTab();
+                showAlert(`لقد ربحت ${clicksGained} نقطة!`, 'success', 1000);
+
+                playHardCountdown = Math.floor(Math.random() * 3) + 2; 
+                startPlayHardCountdown();
+                moveClickCircleRandomly(); 
+            }
+
+            function startPlayHardCountdown() {
+                if (isPlayHardCounting) return;
+                isPlayHardCounting = true;
+                playHardTimerInterval = setInterval(() => {
+                    playHardCountdown--;
+                    if (playHardCountdown <= 0) {
+                        clearInterval(playHardTimerInterval);
+                        playHardTimerInterval = null;
+                        canClickPlayHard = true;
+                        isPlayHardCounting = false;
+                        countdownTimerDisplay.textContent = "جاهز!";
+                        clickCircle.classList.remove('disabled');
+                        clickCircle.textContent = "إضغط!";
+                        playHardBackButton.classList.remove('disabled-back');
+                    } else {
+                        countdownTimerDisplay.textContent = `انتظر ${playHardCountdown} ثوانٍ...`;
+                    }
+                }, 1000);
+            }
+
+            function moveClickCircleRandomly() {
+                const containerRect = clickCircleContainer.getBoundingClientRect();
+                const circleRect = clickCircle.getBoundingClientRect();
+
+                const padding = 10;
+                const maxX = containerRect.width - circleRect.width - padding * 2;
+                const maxY = containerRect.height - circleRect.height - padding * 2;
+
+                const randomX = Math.max(padding, Math.floor(Math.random() * maxX) + padding);
+                const randomY = Math.max(padding, Math.floor(Math.random() * maxY) + padding);
+
+                clickCircle.style.left = `${randomX}px`;
+                clickCircle.style.top = `${randomY}px`;
+            }
+
+            // --- Find Ball Game Logic ---
+            findBallPlayBtn.addEventListener('click', handleFindBallPlay);
+            cups.forEach(cup => {
+                cup.addEventListener('click', handleCupClick);
+            });
+
+            function resetFindBallGame() {
+                cups.forEach(cup => {
+                    cup.classList.remove('revealed', 'win', 'lose', 'selected', 'shaking', 'disabled');
+                    const ball = cup.querySelector('.ball');
+                    if (ball) ball.style.display = 'none';
+                });
+                findBallPlayBtn.disabled = false;
+                canPickCup = false;
+                isShuffling = false;
+                ballLocation = -1; 
+            }
+
+            async function handleFindBallPlay() {
+                let betAmount = parseInt(findBallBetAmountInput.value);
+                betOutcomeMessage.style.display = 'none';
+
+                if (isNaN(betAmount) || betAmount < 50) {
+                    showAlert('الرجاء إدخال رهان صحيح (50 نقطة كحد أدنى).', 'error');
+                    return;
+                }
+                if (totalScore < betAmount) {
+                    showAlert(`ليس لديك نقاط كافية. رصيدك الحالي: ${totalScore} نقطة.`, 'error');
+                    return;
+                }
+
+                totalScore -= betAmount; 
+                localStorage.setItem('totalScore', totalScore);
+                updateBalancesUI();
+                updateProfileTab();
+                
+                findBallPlayBtn.disabled = true;
+                isShuffling = true;
+                
+                resetFindBallGame(); 
+                
+                ballLocation = Math.floor(Math.random() * 3);
+
+                showAlert('بدأ الخلط الآن...', 'info', 1000);
+                await sleep(500); 
+
+                const cupElements = Array.from(cups); 
+
+                for (let i = 0; i < 7; i++) { 
+                    let idx1 = Math.floor(Math.random() * 3);
+                    let idx2 = Math.floor(Math.random() * 3);
+                    while (idx1 === idx2) {
+                        idx2 = Math.floor(Math.random() * 3);
+                    }
+
+                    cupElements.forEach(cup => cup.classList.add('shaking'));
+
+                    const cup1 = cupElements[idx1];
+                    const cup2 = cupElements[idx2];
+
+                    const cup1Rect = cup1.getBoundingClientRect();
+                    const cup2Rect = cup2.getBoundingClientRect();
+
+                    cup1.style.transform = `translateX(${cup2Rect.left - cup1Rect.left}px)`;
+                    cup2.style.transform = `translateX(${cup1Rect.left - cup2Rect.left}px)`;
+
+                    await sleep(300); 
+
+                    cupElements.forEach(cup => {
+                        cup.classList.remove('shaking');
+                        cup.style.transform = ''; 
+                    });
+                    await sleep(100); 
+                }
+
+                showAlert('انتهى الخلط! اختر الكأس الذي تعتقد أن الكرة تحته.', 'info');
+                canPickCup = true;
+                isShuffling = false;
+                cups.forEach(cup => cup.classList.remove('disabled')); 
+            }
+
+            async function handleCupClick(event) {
+                if (!canPickCup || isShuffling) return;
+
+                canPickCup = false; 
+                cups.forEach(cup => cup.classList.add('disabled')); 
+
+                const selectedCup = event.currentTarget;
+                const selectedIndex = parseInt(selectedCup.dataset.cupIndex);
+
+                selectedCup.classList.add('selected'); 
+                
+                await sleep(500);
+
+                let roundPoints = 0;
+                let roundIqd = 0;
+                
+                if (selectedIndex === ballLocation) {
+                    selectedCup.classList.add('revealed', 'win');
+                    selectedCup.querySelector('.ball').style.display = 'block';
+                    modalTitle.textContent = "تهانينا! لقد فزت!";
+                    
+                    const betAmount = parseInt(findBallBetAmountInput.value);
+                    const pointsGainedFromWin = Math.ceil(betAmount * 1.5);
+                    roundPoints = pointsGainedFromWin;
+                    totalScore += roundPoints;
+
+                    if (Math.random() < 0.20) {
+                        roundIqd = Math.floor(Math.random() * 5) + 1;
+                        totalIqd += roundIqd;
+                    }
+                    betOutcomeMessage.textContent = `لقد ربحت ${roundPoints} نقطة!`;
+                    if (roundIqd > 0) {
+                        betOutcomeMessage.textContent += ` وحصلت على ${roundIqd} دينار!`;
+                    }
+                    betOutcomeMessage.style.color = '#34d17e';
+                    betOutcomeMessage.style.display = 'block';
+
+                } else {
+                    selectedCup.classList.add('revealed', 'lose');
+                    selectedCup.querySelector('.ball').style.display = 'none'; 
+                    modalTitle.textContent = "للأسف! لم تفز هذه الجولة.";
+                    roundPoints = 0;
+                    roundIqd = 0;
+                    betOutcomeMessage.textContent = `لقد خسرت رهانك البالغ ${findBallBetAmountInput.value} نقطة.`;
+                    betOutcomeMessage.style.color = '#e74c3c';
+                    betOutcomeMessage.style.display = 'block';
+                }
+
+                if (selectedIndex !== ballLocation) {
+                    await sleep(1000); 
+                    cups[ballLocation].classList.add('revealed', 'win');
+                    cups[ballLocation].querySelector('.ball').style.display = 'block'; 
+                }
+
+                localStorage.setItem('totalScore', totalScore);
+                localStorage.setItem('totalIqd', totalIqd);
+                updateBalancesUI();
+                updateProfileTab();
+
+                roundPointsDisplay.textContent = roundPoints;
+                roundIqdDisplay.textContent = roundIqd;
+                totalScoreModalDisplay.textContent = totalScore;
+                totalIqdModalDisplay.textContent = totalIqd;
+                
+                await sleep(1500); 
+                resultModal.classList.add('show');
+            }
+
+            // NEW: Delete Account Logic
+            deleteAccountBtn.addEventListener('click', () => {
+                confirmationDialogOverlay.classList.add('show');
+            });
+
+            confirmDeleteBtn.addEventListener('click', () => {
+                localStorage.clear(); // Clear all data
+                confirmationDialogOverlay.classList.remove('show');
+                location.reload(); // Reload the page to restart the game
+            });
+
+            cancelDeleteBtn.addEventListener('click', () => {
+                confirmationDialogOverlay.classList.remove('show');
+            });
+
+        });
+    </script>
 
 </body>
 </html>
