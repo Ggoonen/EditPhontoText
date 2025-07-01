@@ -188,7 +188,7 @@
         <div id="main-menu" class="hidden flex-col items-center gap-4">
             <h2 class="text-2xl font-bold golden-text mb-4">القائمة الرئيسية</h2>
             <button id="play-again-btn" class="btn-primary w-full">اللعب مرة أخرى</button>
-            <button id="leaderboard-btn" class="btn-primary w-full">لوحة الترتيب</button> <!-- New button -->
+            <button id="leaderboard-btn" class="btn-primary w-full">لوحة الترتيب</button>
             <button id="store-btn" class="btn-secondary w-full">المتجر (قريباً)</button>
             <button id="profile-btn" class="btn-secondary w-full">الملف الشخصي (قريباً)</button>
             <button id="settings-btn" class="btn-secondary w-full">الإعدادات (قريباً)</button>
@@ -238,16 +238,57 @@
 
     <script type="module">
         // Firebase SDK imports
-        // هذه هي المكتبات الأساسية لـ Firebase.
-        // سيتم تهيئة Firebase تلقائيًا بواسطة بيئة Canvas باستخدام المتغيرات العامة.
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global variables provided by the Canvas environment for Firebase
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // ====================================================================================
+        // === هام جداً: إعدادات Firebase الخاصة بك ===
+        // ====================================================================================
+        // عند تشغيل اللعبة على GitHub Pages أو أي خادم ويب آخر، يجب عليك استبدال
+        // المتغيرات __app_id و __firebase_config و __initial_auth_token
+        // بإعدادات مشروع Firebase الخاص بك.
+        // احصل على هذه الإعدادات من وحدة تحكم Firebase (إعدادات المشروع -> تطبيقاتك).
+        //
+        // مثال:
+        // const MY_FIREBASE_CONFIG = {
+        //     apiKey: "YOUR_API_KEY",
+        //     authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        //     projectId: "YOUR_PROJECT_ID",
+        //     storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        //     messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        //     appId: "YOUR_APP_ID"
+        // };
+        //
+        // ثم استخدمها كالتالي:
+        // const firebaseConfig = MY_FIREBASE_CONFIG;
+        // const appId = MY_FIREBASE_CONFIG.projectId; // استخدم projectId كـ appId لمسارات Firestore
+        // const initialAuthToken = null; // لن يكون لديك رمز مصادقة مخصص هنا عادةً
+
+        // ====================================================================================
+        // === استخدام المتغيرات العامة لبيئة Canvas (لا تعدل هذا الجزء إذا كنت في Canvas) ===
+        // ====================================================================================
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // سيتم استبداله بمعرف مشروعك إذا كنت خارج Canvas
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {}; // سيتم استبداله بإعدادات مشروعك
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null; // لن يكون متاحًا خارج Canvas
+
+        // إذا كنت تقوم بالتشغيل خارج بيئة Canvas، قم بإلغاء التعليق على الأسطر التالية
+        // واستبدل "YOUR_..." بقيم مشروعك الفعلية من Firebase Console.
+        /*
+        const MY_FIREBASE_CONFIG = {
+             apiKey: "YOUR_API_KEY",
+             authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+             projectId: "YOUR_PROJECT_ID",
+             storageBucket: "YOUR_PROJECT_ID.appspot.com",
+             messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+             appId: "YOUR_APP_ID" // هذا هو appId الفعلي لتطبيق الويب الخاص بك
+        };
+        const firebaseConfig = MY_FIREBASE_CONFIG;
+        const appId = MY_FIREBASE_CONFIG.projectId; // نستخدم projectId كـ appId في مسارات Firestore
+        const initialAuthToken = null; // لا يوجد رمز مصادقة مخصص عند التشغيل خارج Canvas
+        */
+        // ====================================================================================
+
 
         let app;
         let db;
@@ -258,9 +299,9 @@
         // Initialize Firebase and authenticate
         const initializeFirebase = async () => {
             try {
-                // Initialize Firebase app if not already initialized
-                if (Object.keys(firebaseConfig).length > 0) {
-                    app = initializeApp(firebaseConfig); // Corrected: Removed redundant 'firebase()' call
+                // تحقق مما إذا كانت إعدادات Firebase موجودة
+                if (Object.keys(firebaseConfig).length > 0 && firebaseConfig.projectId) {
+                    app = initializeApp(firebaseConfig);
                     db = getFirestore(app);
                     auth = getAuth(app);
 
@@ -269,6 +310,7 @@
                         await signInWithCustomToken(auth, initialAuthToken);
                         console.log("Firebase: Signed in with custom token.");
                     } else {
+                        // إذا لم يكن هناك رمز مخصص، قم بتسجيل الدخول كمستخدم مجهول
                         await signInAnonymously(auth);
                         console.log("Firebase: Signed in anonymously.");
                     }
@@ -278,18 +320,19 @@
                         if (user) {
                             userId = user.uid;
                             console.log("Firebase: User ID:", userId);
-                            // Here you would typically load user data from Firestore
+                            // هنا يمكنك تحميل بيانات المستخدم من Firestore إذا لزم الأمر
                         } else {
                             userId = null;
                             console.log("Firebase: No user signed in.");
                         }
                     });
                 } else {
-                    console.warn("Firebase: __firebase_config is not defined. Firebase will not be initialized.");
+                    console.warn("Firebase: إعدادات Firebase غير موجودة أو غير كاملة. لن يتم تهيئة Firebase.");
+                    showMessage("إعدادات Firebase غير موجودة. الرجاء التأكد من تهيئة Firebase بشكل صحيح.", "خطأ في التهيئة");
                 }
             } catch (error) {
                 console.error("Firebase initialization error:", error);
-                showMessage("حدث خطأ في تهيئة Firebase. قد لا تعمل ميزات الحفظ السحابي.", "خطأ");
+                showMessage("حدث خطأ في تهيئة Firebase: " + error.message + ". قد لا تعمل ميزات الحفظ السحابي.", "خطأ");
             }
         };
 
@@ -372,7 +415,7 @@
         const waitingRoomScreen = document.getElementById('waiting-room-screen');
         const gameScreen = document.getElementById('game-screen');
         const mainMenu = document.getElementById('main-menu');
-        const leaderboardScreen = document.getElementById('leaderboard-screen'); // New leaderboard screen
+        const leaderboardScreen = document.getElementById('leaderboard-screen');
         const storeScreen = document.getElementById('store-screen');
         const profileScreen = document.getElementById('profile-screen');
         const settingsScreen = document.getElementById('settings-screen');
@@ -400,7 +443,7 @@
         const nextQuestionBtn = document.getElementById('next-question-btn');
 
         const playAgainBtn = document.getElementById('play-again-btn');
-        const leaderboardBtn = document.getElementById('leaderboard-btn'); // New leaderboard button
+        const leaderboardBtn = document.getElementById('leaderboard-btn');
         const storeBtn = document.getElementById('store-btn');
         const profileBtn = document.getElementById('profile-btn');
         const settingsBtn = document.getElementById('settings-btn');
@@ -408,9 +451,9 @@
         const backToMainFromStoreBtn = document.getElementById('back-to-main-from-store');
         const backToMainFromProfileBtn = document.getElementById('back-to-main-from-profile');
         const backToMainFromSettingsBtn = document.getElementById('back-to-main-from-settings');
-        const backToMainFromLeaderboardBtn = document.getElementById('back-to-main-from-leaderboard'); // New leaderboard back button
-        const leaderboardList = document.getElementById('leaderboard-list'); // Element to display leaderboard
-        const leaderboardLoading = document.getElementById('leaderboard-loading'); // Loading message for leaderboard
+        const backToMainFromLeaderboardBtn = document.getElementById('back-to-main-from-leaderboard');
+        const leaderboardList = document.getElementById('leaderboard-list');
+        const leaderboardLoading = document.getElementById('leaderboard-loading');
 
 
         const messageBox = document.getElementById('message-box');
@@ -419,7 +462,6 @@
         const overlay = document.getElementById('overlay');
 
         // --- Utility Functions ---
-        // Function to show custom message box instead of alert()
         function showMessage(message, title = "إشعار") {
             messageText.textContent = message;
             messageBox.style.display = 'block';
@@ -430,23 +472,21 @@
             };
         }
 
-        // Function to hide all screens and show a specific one
         function showScreen(screenId) {
             startScreen.classList.add('hidden');
             roomScreen.classList.add('hidden');
             waitingRoomScreen.classList.add('hidden');
             gameScreen.classList.add('hidden');
             mainMenu.classList.add('hidden');
-            leaderboardScreen.classList.add('hidden'); // Hide leaderboard screen
+            leaderboardScreen.classList.add('hidden');
             storeScreen.classList.add('hidden');
             profileScreen.classList.add('hidden');
             settingsScreen.classList.add('hidden');
 
             document.getElementById(screenId).classList.remove('hidden');
-            document.getElementById(screenId).classList.add('flex'); // Ensure flex display for content
+            document.getElementById(screenId).classList.add('flex');
         }
 
-        // Function to generate a random room ID
         function generateRoomId() {
             return Math.random().toString(36).substring(2, 8).toUpperCase();
         }
@@ -468,30 +508,27 @@
             showScreen('waiting-room-screen');
 
             try {
-                // Save initial room state to Firestore
-                // This is where you'd store the room's initial state
                 await setDoc(doc(db, `artifacts/${appId}/public/data/rooms`, currentRoomId), {
                     hostId: userId,
                     hostName: playerName,
                     player2Id: null,
                     player2Name: null,
-                    status: 'waiting', // 'waiting', 'playing', 'finished'
-                    questions: [], // Shuffled questions for this game
+                    status: 'waiting',
+                    questions: [],
                     playerScores: { [userId]: { score: 0, money: 0 } },
                     currentQuestionIndex: 0,
-                    currentTurnPlayerId: userId, // Host starts
+                    currentTurnPlayerId: userId,
                     lastUpdated: new Date()
                 });
                 console.log("Room created with ID:", currentRoomId);
                 showMessage(`تم إنشاء الغرفة بنجاح! رمز الغرفة: ${currentRoomId}. شاركه مع صديقك.`);
 
-                // Start listening for changes in the room document
                 listenToRoomChanges(currentRoomId);
 
             } catch (error) {
                 console.error("Error creating room:", error);
                 showMessage("فشل في إنشاء الغرفة. الرجاء المحاولة مرة أخرى.");
-                showScreen('room-screen'); // Go back to room selection
+                showScreen('room-screen');
             }
         }
 
@@ -511,10 +548,10 @@
                 return;
             }
 
-            currentRoomId = roomId; // Set current room ID
-            displayRoomId.textContent = currentRoomId; // Display it in waiting screen temporarily
+            currentRoomId = roomId;
+            displayRoomId.textContent = currentRoomId;
             waitingMessage.textContent = "جاري الانضمام للغرفة...";
-            showScreen('waiting-room-screen'); // Show waiting screen while joining
+            showScreen('waiting-room-screen');
 
             try {
                 const roomRef = doc(db, `artifacts/${appId}/public/data/rooms`, roomId);
@@ -523,7 +560,6 @@
                 if (roomSnap.exists()) {
                     const roomData = roomSnap.data();
                     if (roomData.status === 'waiting' && !roomData.player2Id) {
-                        // Update room to add player 2
                         await updateDoc(roomRef, {
                             player2Id: userId,
                             player2Name: playerName,
@@ -537,7 +573,6 @@
                         console.log("Joined room:", roomId);
                         showMessage(`تم الانضمام إلى الغرفة ${roomId} بنجاح!`);
 
-                        // Start listening for changes in the room document
                         listenToRoomChanges(roomId);
 
                     } else if (roomData.status === 'playing') {
@@ -560,17 +595,14 @@
 
         function leaveRoom() {
             if (unsubscribeFromRoom) {
-                unsubscribeFromRoom(); // Stop listening to Firebase updates
+                unsubscribeFromRoom();
                 unsubscribeFromRoom = null;
             }
             currentRoomId = null;
-            // Optionally, update Firestore to mark room as available or delete it if host leaves
-            // (This would require more complex logic, e.g., using Firebase Cloud Functions)
             showMessage("لقد غادرت الغرفة.");
-            showScreen('room-screen'); // Go back to room selection
+            showScreen('room-screen');
         }
 
-        // Listen for real-time updates to the room document
         function listenToRoomChanges(roomId) {
             if (!db) {
                 console.warn("Firestore not initialized, cannot listen to room changes.");
@@ -579,7 +611,6 @@
 
             const roomRef = doc(db, `artifacts/${appId}/public/data/rooms`, roomId);
 
-            // Unsubscribe from any previous listener to avoid multiple listeners
             if (unsubscribeFromRoom) {
                 unsubscribeFromRoom();
             }
@@ -589,37 +620,23 @@
                     const roomData = docSnap.data();
                     console.log("Room data updated:", roomData);
 
-                    // Update local game state based on roomData
-                    // This is the core of real-time multiplayer synchronization
-                    // For a full game, you'd update:
-                    // - players array (names, scores, money)
-                    // - currentQuestionIndex
-                    // - currentTurnPlayerId
-                    // - game status (waiting, playing, finished)
-
-                    // Example: If a second player joins, start the game
                     if (roomData.status === 'playing' && roomData.player2Id && roomData.hostId) {
-                        // Ensure players array is correctly populated
                         players[0] = { id: roomData.hostId, name: roomData.hostName, score: roomData.playerScores[roomData.hostId]?.score || 0, money: roomData.playerScores[roomData.hostId]?.money || 0 };
                         players[1] = { id: roomData.player2Id, name: roomData.player2Name, score: roomData.playerScores[roomData.player2Id]?.score || 0, money: roomData.playerScores[roomData.player2Id]?.money || 0 };
 
-                        // Determine who is player1 and player2 for this client's display
                         player1NameDisplay.textContent = players[0].name;
                         player2NameDisplay.textContent = players[1].name;
 
-                        // If questions are not set yet, set them (only by host or once)
                         if (roomData.questions.length === 0 && userId === roomData.hostId) {
                             const shuffledQuestions = [...questions].sort(() => Math.random() - 0.5).slice(0, maxQuestionsPerGame);
                             updateDoc(roomRef, { questions: shuffledQuestions });
                         }
 
-                        // Start game if questions are loaded
                         if (roomData.questions.length > 0) {
                             currentQuestionIndex = roomData.currentQuestionIndex;
                             currentTurnPlayerId = roomData.currentTurnPlayerId;
-                            // Find local index of current turn player
                             currentPlayerIndex = players.findIndex(p => p.id === currentTurnPlayerId);
-                            if (currentPlayerIndex === -1) currentPlayerIndex = 0; // Fallback
+                            if (currentPlayerIndex === -1) currentPlayerIndex = 0;
 
                             showScreen('game-screen');
                             updatePlayerDisplays();
@@ -628,14 +645,12 @@
                     } else if (roomData.status === 'finished') {
                         endGame(roomData.playerScores);
                     }
-                    // Update waiting message if only one player is in the room
                     if (roomData.status === 'waiting' && !roomData.player2Id && userId === roomData.hostId) {
                          waitingMessage.textContent = "في انتظار لاعب آخر...";
                     }
                 } else {
-                    // Room document no longer exists (e.g., deleted by host)
                     showMessage("الغرفة لم تعد موجودة. الرجاء إنشاء غرفة جديدة أو الانضمام إلى أخرى.");
-                    leaveRoom(); // Clean up local state
+                    leaveRoom();
                     showScreen('room-screen');
                 }
             }, (error) => {
@@ -646,7 +661,6 @@
             });
         }
 
-        // Function to get a random unique question (for initial game setup by host)
         function getRandomQuestion() {
             if (askedQuestions.size === questions.length) {
                 return null;
@@ -670,7 +684,6 @@
             showScreen('room-screen');
         }
 
-        // Load question based on the room state received from Firestore
         function loadQuestionFromRoomState(questionData) {
             if (!questionData) {
                 endGame();
@@ -678,8 +691,8 @@
             }
 
             questionText.textContent = questionData.question;
-            answersContainer.innerHTML = ''; // Clear previous answers
-            nextQuestionBtn.classList.add('hidden'); // Hide next button until answer
+            answersContainer.innerHTML = '';
+            nextQuestionBtn.classList.add('hidden');
 
             const shuffledOptions = [...questionData.options].sort(() => Math.random() - 0.5);
 
@@ -687,7 +700,6 @@
                 const button = document.createElement('button');
                 button.textContent = option;
                 button.classList.add('answer-option', 'w-full');
-                // Only allow current turn player to answer
                 button.disabled = (userId !== currentTurnPlayerId);
                 button.style.cursor = (userId !== currentTurnPlayerId) ? 'not-allowed' : 'pointer';
                 button.onclick = () => checkAnswer(option, questionData.correct, button);
@@ -696,7 +708,6 @@
         }
 
         async function checkAnswer(selectedOption, correctAnswer, clickedButton) {
-            // Disable all answer buttons after selection
             Array.from(answersContainer.children).forEach(btn => {
                 btn.disabled = true;
                 btn.style.cursor = 'default';
@@ -709,7 +720,6 @@
                 showMessage("إجابة صحيحة!");
             } else {
                 clickedButton.classList.add('incorrect');
-                // Highlight the correct answer
                 Array.from(answersContainer.children).forEach(btn => {
                     if (btn.textContent === correctAnswer) {
                         btn.classList.add('correct');
@@ -718,7 +728,6 @@
                 showMessage(`إجابة خاطئة. الإجابة الصحيحة هي: ${correctAnswer}`);
             }
 
-            // Update scores and money locally first
             const currentPlayer = players.find(p => p.id === userId);
             if (currentPlayer) {
                 if (isCorrect) {
@@ -728,7 +737,6 @@
             }
             updatePlayerDisplays();
 
-            // Update Firestore with the new game state
             if (db && currentRoomId) {
                 const roomRef = doc(db, `artifacts/${appId}/public/data/rooms`, currentRoomId);
                 const nextQuestionIdx = currentQuestionIndex + 1;
@@ -750,8 +758,7 @@
                 });
             }
 
-            nextQuestionBtn.classList.remove('hidden'); // Show next button
-            // Only the current player (who just answered) can click "Next Question"
+            nextQuestionBtn.classList.remove('hidden');
             nextQuestionBtn.disabled = (userId !== currentTurnPlayerId);
             nextQuestionBtn.style.cursor = (userId !== currentTurnPlayerId) ? 'not-allowed' : 'pointer';
         }
@@ -774,21 +781,14 @@
 
         async function nextTurn() {
             if (currentQuestionIndex + 1 >= maxQuestionsPerGame) {
-                // If this is the last question for the game, end it
                 endGame();
                 return;
             }
 
-            // Only the player whose turn it is should trigger the next turn
             if (userId !== currentTurnPlayerId) {
                 showMessage("ليس دورك!");
                 return;
             }
-
-            // This logic is mostly handled by the `onSnapshot` listener
-            // The `checkAnswer` function already updates the `currentQuestionIndex` and `currentTurnPlayerId` in Firestore.
-            // When Firestore updates, the `onSnapshot` listener will trigger `loadQuestionFromRoomState`
-            // for all connected clients.
             showMessage("جاري الانتقال للسؤال التالي...");
         }
 
@@ -813,21 +813,13 @@
             }
             showMessage(`انتهت اللعبة!\n${winnerMessage}\nالنتائج النهائية:\n${players[0].name}: ${p1Score} نقطة, ${p1Money} مال\n${players[1].name}: ${p2Score} نقطة, ${p2Money} مال`);
 
-            // Update player profiles with total scores and money
             await updatePlayerProfile(players[0].id, players[0].name, p1Score, p1Money);
             await updatePlayerProfile(players[1].id, players[1].name, p2Score, p2Money);
 
             showScreen('main-menu');
 
-            // --- Firebase Cloud Save for Game Results ---
-            // Firestore Security Rules:
-            // For public data (rooms): /artifacts/{appId}/public/data/{your_collection_name}
-            //   allow read, write: if request.auth != null;
-            // For private data (user game history): /artifacts/{appId}/users/{userId}/{your_collection_name}
-            //   allow read, write: if request.auth != null && request.auth.uid == userId;
             if (db && userId && currentRoomId) {
                 try {
-                    // Save final game results to a user-specific collection
                     const userGameResultRef = doc(collection(db, `artifacts/${appId}/users/${userId}/game_history`));
                     await setDoc(userGameResultRef, {
                         roomId: currentRoomId,
@@ -840,11 +832,10 @@
                         player2Score: p2Score,
                         player2Money: p2Money,
                         timestamp: new Date(),
-                        playedBy: userId // To easily query user's own games
+                        playedBy: userId
                     });
                     console.log("Game results saved to Firestore for user:", userId);
 
-                    // Optionally, update the room status to 'finished' in the public rooms collection
                     await updateDoc(doc(db, `artifacts/${appId}/public/data/rooms`, currentRoomId), {
                         status: 'finished',
                         lastUpdated: new Date()
@@ -857,7 +848,7 @@
             } else {
                 console.warn("Firebase not initialized, userId, or currentRoomId not available. Cannot save to cloud.");
             }
-            currentRoomId = null; // Clear room ID after game ends
+            currentRoomId = null;
         }
 
         // --- Player Profile & Leaderboard Functions ---
@@ -884,8 +875,8 @@
                     totalScore: currentTotalScore + gameScore,
                     totalMoney: currentTotalMoney + gameMoney,
                     lastPlayed: new Date(),
-                    userId: playerId // Store userId in the document for easy querying by owner in security rules
-                }, { merge: true }); // Use merge to update existing fields or create if not exists
+                    userId: playerId
+                }, { merge: true });
                 console.log(`Player profile updated for ${playerName} (${playerId})`);
             } catch (error) {
                 console.error("Error updating player profile:", error);
@@ -899,22 +890,20 @@
                 return;
             }
 
-            leaderboardList.innerHTML = ''; // Clear previous list
-            leaderboardLoading.classList.remove('hidden'); // Show loading message
+            leaderboardList.innerHTML = '';
+            leaderboardLoading.classList.remove('hidden');
 
             try {
                 const profilesCollection = collection(db, `artifacts/${appId}/public/data/player_profiles`);
-                // Note: Firestore orderBy() needs an index. For simplicity, we'll fetch all and sort in JS.
                 const querySnapshot = await getDocs(profilesCollection);
                 const playersData = [];
                 querySnapshot.forEach((doc) => {
                     playersData.push(doc.data());
                 });
 
-                // Sort players by totalScore in descending order
                 playersData.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
 
-                leaderboardLoading.classList.add('hidden'); // Hide loading message
+                leaderboardLoading.classList.add('hidden');
 
                 if (playersData.length === 0) {
                     leaderboardList.innerHTML = '<p class="text-center text-gray-400">لا توجد بيانات في لوحة الترتيب بعد.</p>';
@@ -950,10 +939,9 @@
         backToMainFromStoreBtn.addEventListener('click', () => showScreen('main-menu'));
         backToMainFromProfileBtn.addEventListener('click', () => showScreen('main-menu'));
         backToMainFromSettingsBtn.addEventListener('click', () => showScreen('main-menu'));
-        backToMainFromLeaderboardBtn.addEventListener('click', () => showScreen('main-menu')); // New leaderboard back button
+        backToMainFromLeaderboardBtn.addEventListener('click', () => showScreen('main-menu'));
 
         playAgainBtn.addEventListener('click', () => {
-            // Reset game state for a new game
             players = [
                 { id: '', name: '', score: 0, money: 0 },
                 { id: '', name: '', score: 0, money: 0 }
@@ -962,16 +950,16 @@
             currentQuestionIndex = 0;
             askedQuestions.clear();
             currentRoomId = null;
-            playerNameInput.value = ''; // Clear player name input
-            roomIdInput.value = ''; // Clear room ID input
+            playerNameInput.value = '';
+            roomIdInput.value = '';
             showScreen('start-screen');
         });
         storeBtn.addEventListener('click', () => showScreen('store-screen'));
         profileBtn.addEventListener('click', () => showScreen('profile-screen'));
         settingsBtn.addEventListener('click', () => showScreen('settings-screen'));
-        leaderboardBtn.addEventListener('click', () => { // Event listener for leaderboard button
+        leaderboardBtn.addEventListener('click', () => {
             showScreen('leaderboard-screen');
-            loadLeaderboard(); // Load data when screen is shown
+            loadLeaderboard();
         });
 
         // Initial screen on load
