@@ -73,7 +73,7 @@
             vertical-align: middle;
             fill: currentColor; /* Inherit color from parent */
         }
-        .message-box, .shop-modal, .main-menu-modal, .profile-modal, .my-items-modal, .cannon-game-modal {
+        .message-box, .shop-modal, .main-menu-modal, .profile-modal, .my-items-modal, .cannon-game-modal, .item-preview-modal, .ranking-modal {
             background-color: rgba(10, 25, 47, 0.95); /* Darker, semi-transparent background */
             color: #e0f2f7;
             padding: 1.5rem;
@@ -83,7 +83,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 10;
+            z-index: 10; /* Base z-index for modals */
             /* Smooth transition properties */
             opacity: 0;
             visibility: hidden;
@@ -95,7 +95,7 @@
             max-height: 90vh;
             overflow-y: auto; /* Allow scrolling for content */
         }
-        .message-box.active, .shop-modal.active, .main-menu-modal.active, .profile-modal.active, .my-items-modal.active, .cannon-game-modal.active {
+        .message-box.active, .shop-modal.active, .main-menu-modal.active, .profile-modal.active, .my-items-modal.active, .cannon-game-modal.active, .item-preview-modal.active, .ranking-modal.active {
             opacity: 1;
             visibility: visible;
         }
@@ -128,16 +128,16 @@
         }
 
         /* Shop specific styles */
-        .shop-modal h2, .main-menu-modal h2, .profile-modal h2, .my-items-modal h2, .cannon-game-modal h2 {
+        .shop-modal h2, .main-menu-modal h2, .profile-modal h2, .my-items-modal h2, .cannon-game-modal h2, .item-preview-modal h2, .ranking-modal h2 {
             font-size: 2rem;
             color: #7dd3fc; /* Light blue for headings */
             margin-bottom: 1rem;
         }
-        .shop-section, .profile-section, .my-items-section, .cannon-game-modal .game-info {
+        .shop-section, .profile-section, .my-items-section, .cannon-game-modal .game-info, .ranking-section {
             margin-bottom: 2rem;
             width: 100%;
         }
-        .shop-section h3, .profile-section h3, .my-items-section h3, .cannon-game-modal .game-info h3 {
+        .shop-section h3, .profile-section h3, .my-items-section h3, .cannon-game-modal .game-info h3, .ranking-section h3 {
             font-size: 1.6rem;
             color: #93c5fd; /* Slightly darker blue */
             margin-bottom: 1rem;
@@ -222,7 +222,7 @@
             padding: 10px 20px;
             border-radius: 8px;
             font-size: 1.1rem;
-            z-index: 20;
+            z-index: 1000; /* Ensure it's always on top of modals */
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.5s ease, visibility 0.5s ease;
@@ -303,15 +303,15 @@
                 font-size: 1.1rem;
                 border-radius: 0.75rem;
             }
-            .message-box, .shop-modal, .main-menu-modal, .profile-modal, .my-items-modal, .cannon-game-modal {
+            .message-box, .shop-modal, .main-menu-modal, .profile-modal, .my-items-modal, .cannon-game-modal, .item-preview-modal, .ranking-modal {
                 font-size: 1.3rem;
                 padding: 1rem;
                 border-radius: 0.75rem;
             }
-            .shop-modal h2, .main-menu-modal h2, .profile-modal h2, .my-items-modal h2, .cannon-game-modal h2 {
+            .shop-modal h2, .main-menu-modal h2, .profile-modal h2, .my-items-modal h2, .cannon-game-modal h2, .item-preview-modal h2, .ranking-modal h2 {
                 font-size: 1.6rem;
             }
-            .shop-section h3, .profile-section h3, .my-items-section h3, .cannon-game-modal .game-info h3 {
+            .shop-section h3, .profile-section h3, .my-items-section h3, .cannon-game-modal .game-info h3, .ranking-section h3 {
                 font-size: 1.3rem;
             }
             .skins-grid, .upgrades-grid, .my-items-grid {
@@ -363,8 +363,7 @@
         <canvas id="gameCanvas"></canvas>
         <div class="button-group" id="gameButtons" style="display:none;">
             <button id="startButton" class="game-button">ابدأ اللعبة</button>
-            <button id="resetButton" class="game-button">إعادة اللعب</button>
-            <button id="shopButton" class="game-button">المتجر</button>
+            <!-- Removed Reset and Shop buttons from in-game display as per user request -->
         </div>
 
         <!-- Main Menu Modal -->
@@ -375,6 +374,7 @@
                 <button id="mainMenuShopButton" class="game-button main-menu-item">المتجر</button>
                 <button id="mainMenuProfileButton" class="game-button main-menu-item">الملف الشخصي</button>
                 <button id="mainMenuCannonGameButton" class="game-button main-menu-item">لعبة المدفع</button>
+                <button id="mainMenuRankingButton" class="game-button main-menu-item">ترتيب اللاعبين</button>
             </div>
         </div>
 
@@ -487,6 +487,35 @@
 
             <button id="shopCloseButton" class="game-button mt-4">إغلاق</button>
         </div>
+
+        <!-- Item Preview Modal -->
+        <div id="itemPreviewModal" class="item-preview-modal">
+            <h2 id="previewItemName" class="text-blue-300"></h2>
+            <canvas id="previewCanvas" width="100" height="100" class="skin-preview mx-auto my-4 border-none"></canvas>
+            <p id="previewItemDescription" class="text-gray-300 text-sm mb-4"></p>
+            <div class="flex justify-center gap-4 mb-4">
+                <div id="previewItemCost" class="currency-display text-yellow-400 text-xl font-bold"></div>
+                <div id="previewCurrentGold" class="currency-display text-yellow-400 text-xl font-bold"></div>
+                <div id="previewCurrentDollars" class="currency-display text-green-400 text-xl font-bold"></div>
+            </div>
+            <div class="flex justify-center gap-4 mt-4">
+                <button id="previewActionButton" class="game-button"></button>
+                <button id="previewCloseButton" class="game-button">إغلاق</button>
+            </div>
+        </div>
+
+        <!-- Ranking Modal -->
+        <div id="rankingModal" class="ranking-modal">
+            <h2 class="text-blue-300">ترتيب اللاعبين</h2>
+            <div class="ranking-section">
+                <h3 class="text-blue-200">أفضل اللاعبين</h3>
+                <div id="leaderboardList" class="text-white text-lg text-left px-4">
+                    <!-- Leaderboard items will be injected here -->
+                </div>
+            </div>
+            <button id="rankingCloseButton" class="game-button mt-4">إغلاق</button>
+        </div>
+
     </div>
 
     <script>
@@ -500,7 +529,6 @@
         const highScoreDisplay = document.getElementById('highScore');
         const gameButtons = document.getElementById('gameButtons');
         const startButton = document.getElementById('startButton');
-        const resetButton = document.getElementById('resetButton');
         const messageBox = document.getElementById('messageBox');
         const messageText = document.getElementById('messageText');
         const messageBoxClose = document.getElementById('messageBoxClose');
@@ -511,7 +539,8 @@
         const mainMenuPlayButton = document.getElementById('mainMenuPlayButton');
         const mainMenuShopButton = document.getElementById('mainMenuShopButton');
         const mainMenuProfileButton = document.getElementById('mainMenuProfileButton');
-        const mainMenuCannonGameButton = document.getElementById('mainMenuCannonGameButton'); // New button for Cannon Game
+        const mainMenuCannonGameButton = document.getElementById('mainMenuCannonGameButton');
+        const mainMenuRankingButton = document.getElementById('mainMenuRankingButton'); // New Ranking button
 
         // Profile elements
         const profileModal = document.getElementById('profileModal');
@@ -544,6 +573,18 @@
         const shopCurrentGoldDisplay = document.getElementById('shopCurrentGold');
         const shopCurrentDollarsDisplay = document.getElementById('shopCurrentDollars');
 
+        // Item Preview Modal elements
+        const itemPreviewModal = document.getElementById('itemPreviewModal');
+        const previewItemName = document.getElementById('previewItemName');
+        const previewCanvas = document.getElementById('previewCanvas');
+        const previewCtx = previewCanvas.getContext('2d');
+        const previewItemDescription = document.getElementById('previewItemDescription');
+        const previewItemCost = document.getElementById('previewItemCost');
+        const previewCurrentGold = document.getElementById('previewCurrentGold');
+        const previewCurrentDollars = document.getElementById('previewCurrentDollars');
+        const previewActionButton = document.getElementById('previewActionButton');
+        const previewCloseButton = document.getElementById('previewCloseButton');
+
         // Cannon Game elements
         const cannonGameModal = document.getElementById('cannonGameModal');
         const cannonGameCanvas = document.getElementById('cannonGameCanvas');
@@ -552,6 +593,11 @@
         const cannonGameGoldRewardDisplay = document.getElementById('cannonGameGoldRewardDisplay');
         const cannonGameBackButton = document.getElementById('cannonGameBackButton');
         document.getElementById('cannonGameGoldIcon').insertAdjacentHTML('afterbegin', '<svg class="currency-icon text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v2h-2zm0 4h2v6h-2z"/></svg>');
+
+        // Ranking Modal elements
+        const rankingModal = document.getElementById('rankingModal');
+        const leaderboardList = document.getElementById('leaderboardList');
+        const rankingCloseButton = document.getElementById('rankingCloseButton');
 
 
         // Currency Icons (SVG) - Defined once for reuse
@@ -612,6 +658,12 @@
         let goldMultiplier = 1;
         let obstacleSpeedReduction = 0;
         let luckyCharmChance = 0;
+        let powerupDurationMultiplier = 1;
+        let scoreBonusMultiplier = 1;
+        let startingGoldBonus = 0;
+        let dollarDropChanceBonus = 0;
+        let powerupSpawnRateBonus = 0;
+
 
         // --- Cannon Game Variables ---
         let cannonGameRunning = false;
@@ -640,6 +692,7 @@
         const CANNON_TARGET_SPACING = 10;
         let cannonGameLevel = 1; // For increasing difficulty in cannon game
         let cannonGameScoreToGold = 500; // Score needed for 1 gold
+        let cannonFireIntervalId = null; // For auto-firing in cannon game
 
         // --- Drawing Functions for Skins (Sea King) ---
 
@@ -768,6 +821,133 @@
             ctx.fill();
         }
 
+        /**
+         * Draws a submarine ship shape.
+         */
+        function drawShipSubmarine(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.ellipse(x, y + height / 2, width / 2, height / 3, 0, 0, Math.PI * 2); // Main body
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Periscope
+            ctx.fillStyle = detailsColor;
+            ctx.fillRect(x - 5, y - 20, 10, 30);
+            ctx.fillRect(x - 15, y - 25, 30, 5);
+        }
+
+        /**
+         * Draws a pirate ship shape.
+         */
+        function drawShipPirate(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x - width / 2, y + height);
+            ctx.lineTo(x + width / 2, y + height);
+            ctx.lineTo(x + width * 0.4, y + height * 0.2);
+            ctx.lineTo(x - width * 0.4, y + height * 0.2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Mast
+            ctx.fillStyle = 'brown';
+            ctx.fillRect(x - 2, y - 20, 4, 40);
+            // Sail
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.moveTo(x - 15, y - 10);
+            ctx.lineTo(x + 15, y - 10);
+            ctx.lineTo(x + 10, y + 10);
+            ctx.lineTo(x - 10, y + 10);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        /**
+         * Draws a futuristic ship shape.
+         */
+        function drawShipFuturistic(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + width / 2, y + height * 0.3);
+            ctx.lineTo(x + width / 2, y + height);
+            ctx.lineTo(x - width / 2, y + height);
+            ctx.lineTo(x - width / 2, y + height * 0.3);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Engine glow
+            ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
+            ctx.beginPath();
+            ctx.ellipse(x - width / 4, y + height, width / 8, height / 5, 0, 0, Math.PI * 2);
+            ctx.ellipse(x + width / 4, y + height, width / 8, height / 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        /**
+         * Draws an explorer ship shape.
+         */
+        function drawShipExplorer(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.roundRect(x - width / 2, y + height * 0.2, width, height * 0.8, 10);
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Cabin
+            ctx.fillStyle = detailsColor;
+            ctx.beginPath();
+            ctx.roundRect(x - width * 0.2, y, width * 0.4, height * 0.3, 5);
+            ctx.fill();
+        }
+
+        /**
+         * Draws a majestic dragon ship.
+         */
+        function drawShipDragon(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x - width * 0.5, y + height * 0.8);
+            ctx.quadraticCurveTo(x, y + height * 0.2, x + width * 0.5, y + height * 0.8);
+            ctx.lineTo(x + width * 0.4, y + height);
+            ctx.lineTo(x - width * 0.4, y + height);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Dragon head
+            ctx.fillStyle = 'red';
+            ctx.beginPath();
+            ctx.moveTo(x, y - height * 0.2);
+            ctx.lineTo(x + width * 0.15, y + height * 0.1);
+            ctx.lineTo(x - width * 0.15, y + height * 0.1);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = 'darkred';
+            ctx.stroke();
+
+            // Eyes
+            ctx.fillStyle = 'yellow';
+            ctx.beginPath();
+            ctx.arc(x - 5, y - 5, 2, 0, Math.PI * 2);
+            ctx.arc(x + 5, y - 5, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
 
         /**
          * Draws the default rock shape.
@@ -881,6 +1061,107 @@
             ctx.moveTo(x + width / 2, y + height);
             ctx.quadraticCurveTo(x + width * 0.3, y + height * 1.2, x + width * 0.2, y + height * 0.9);
             ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        /**
+         * Draws an iceberg obstacle.
+         */
+        function drawRockIceberg(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x, y + height * 0.7);
+            ctx.lineTo(x + width * 0.3, y + height * 0.1);
+            ctx.lineTo(x + width * 0.7, y);
+            ctx.lineTo(x + width, y + height * 0.5);
+            ctx.lineTo(x + width * 0.8, y + height);
+            ctx.lineTo(x + width * 0.2, y + height);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            // Ice cracks
+            ctx.beginPath();
+            ctx.moveTo(x + width * 0.4, y + height * 0.4);
+            ctx.lineTo(x + width * 0.6, y + height * 0.6);
+            ctx.moveTo(x + width * 0.2, y + height * 0.8);
+            ctx.lineTo(x + width * 0.5, y + height * 0.7);
+            ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+            ctx.stroke();
+        }
+
+        /**
+         * Draws a coral obstacle.
+         */
+        function drawRockCoral(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.ellipse(x + width / 2, y + height * 0.8, width * 0.4, height * 0.2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Branches
+            ctx.beginPath();
+            ctx.moveTo(x + width / 2, y + height * 0.8);
+            ctx.quadraticCurveTo(x + width * 0.3, y + height * 0.4, x + width * 0.2, y + height * 0.1);
+            ctx.quadraticCurveTo(x + width * 0.5, y + height * 0.3, x + width * 0.8, y + height * 0.1);
+            ctx.quadraticCurveTo(x + width * 0.7, y + height * 0.4, x + width / 2, y + height * 0.8);
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        /**
+         * Draws a robot obstacle.
+         */
+        function drawRockRobot(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y + height * 0.2, width, height * 0.6);
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x, y + height * 0.2, width, height * 0.6);
+
+            // Head
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.roundRect(x + width * 0.2, y, width * 0.6, height * 0.3, 5);
+            ctx.fill();
+            ctx.stroke();
+
+            // Eyes
+            ctx.fillStyle = 'cyan';
+            ctx.beginPath();
+            ctx.arc(x + width * 0.35, y + height * 0.15, 3, 0, Math.PI * 2);
+            ctx.arc(x + width * 0.65, y + height * 0.15, 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        /**
+         * Draws a volcanic rock obstacle.
+         */
+        function drawRockVolcanic(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x + width / 2, y);
+            ctx.lineTo(x + width, y + height * 0.5);
+            ctx.lineTo(x + width * 0.7, y + height);
+            ctx.lineTo(x + width * 0.3, y + height);
+            ctx.lineTo(x, y + height * 0.5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Lava cracks
+            ctx.beginPath();
+            ctx.moveTo(x + width * 0.3, y + height * 0.4);
+            ctx.lineTo(x + width * 0.5, y + height * 0.6);
+            ctx.lineTo(x + width * 0.7, y + height * 0.4);
+            ctx.strokeStyle = 'orange';
             ctx.lineWidth = 2;
             ctx.stroke();
         }
@@ -1117,42 +1398,57 @@
 
         // Skin data - Define available skins and their properties
         const playerSkinsData = [
-            { id: 'ship-default', name: 'السفينة الأساسية', cost: { gold: 0, dollars: 0 }, color: '#ffeb3b', detailsColor: '#fbc02d', isOwned: true, isActive: true, drawFunction: drawShipDefault },
-            { id: 'ship-blue', name: 'السفينة الزرقاء', cost: { gold: 50, dollars: 0 }, color: '#4a90e2', detailsColor: '#2e6bb0', isOwned: false, isActive: false, drawFunction: drawShipDefault },
-            { id: 'ship-green', name: 'السفينة الخضراء', cost: { gold: 100, dollars: 0 }, color: '#8bc34a', detailsColor: '#689f38', isOwned: false, isActive: false, drawFunction: drawShipDefault },
-            { id: 'ship-fast', name: 'السفينة السريعة', cost: { gold: 200, dollars: 0 }, color: '#ff5722', detailsColor: '#e64a19', isOwned: false, isActive: false, drawFunction: drawShipFast },
-            { id: 'ship-tanker', name: 'سفينة الشحن', cost: { gold: 300, dollars: 0 }, color: '#607d8b', detailsColor: '#455a64', isOwned: false, isActive: false, drawFunction: drawShipTanker },
-            { id: 'ship-stealth', name: 'سفينة التخفي', cost: { gold: 0, dollars: 8 }, color: '#37474F', detailsColor: '#263238', isOwned: false, isActive: false, drawFunction: drawShipStealth },
-            { id: 'ship-royal', name: 'السفينة الملكية', cost: { gold: 0, dollars: 15 }, color: '#FFD700', detailsColor: '#DAA520', isOwned: false, isActive: false, drawFunction: drawShipRoyal }
+            { id: 'ship-default', name: 'السفينة الأساسية', cost: { gold: 0, dollars: 0 }, requiredLevel: 0, color: '#ffeb3b', detailsColor: '#fbc02d', isOwned: true, isActive: true, drawFunction: drawShipDefault },
+            { id: 'ship-blue', name: 'السفينة الزرقاء', cost: { gold: 50, dollars: 0 }, requiredLevel: 0, color: '#4a90e2', detailsColor: '#2e6bb0', isOwned: false, isActive: false, drawFunction: drawShipDefault },
+            { id: 'ship-green', name: 'السفينة الخضراء', cost: { gold: 100, dollars: 0 }, requiredLevel: 0, color: '#8bc34a', detailsColor: '#689f38', isOwned: false, isActive: false, drawFunction: drawShipDefault },
+            { id: 'ship-fast', name: 'السفينة السريعة', cost: { gold: 200, dollars: 0 }, requiredLevel: 3, color: '#ff5722', detailsColor: '#e64a19', isOwned: false, isActive: false, drawFunction: drawShipFast },
+            { id: 'ship-tanker', name: 'سفينة الشحن', cost: { gold: 300, dollars: 0 }, requiredLevel: 5, color: '#607d8b', detailsColor: '#455a64', isOwned: false, isActive: false, drawFunction: drawShipTanker },
+            { id: 'ship-stealth', name: 'سفينة التخفي', cost: { gold: 0, dollars: 8 }, requiredLevel: 7, color: '#37474F', detailsColor: '#263238', isOwned: false, isActive: false, drawFunction: drawShipStealth },
+            { id: 'ship-royal', name: 'السفينة الملكية', cost: { gold: 0, dollars: 15 }, requiredLevel: 10, color: '#FFD700', detailsColor: '#DAA520', isOwned: false, isActive: false, drawFunction: drawShipRoyal },
+            { id: 'ship-submarine', name: 'الغواصة', cost: { gold: 400, dollars: 5 }, requiredLevel: 5, color: '#4CAF50', detailsColor: '#388E3C', isOwned: false, isActive: false, drawFunction: drawShipSubmarine },
+            { id: 'ship-pirate', name: 'سفينة القراصنة', cost: { gold: 500, dollars: 0 }, requiredLevel: 0, color: '#8B4513', detailsColor: '#5A2D0C', isOwned: false, isActive: false, drawFunction: drawShipPirate },
+            { id: 'ship-futuristic', name: 'سفينة المستقبل', cost: { gold: 0, dollars: 20 }, requiredLevel: 10, color: '#00BCD4', detailsColor: '#0097A7', isOwned: false, isActive: false, drawFunction: drawShipFuturistic },
+            { id: 'ship-explorer', name: 'سفينة الاستكشاف', cost: { gold: 600, dollars: 2 }, requiredLevel: 7, color: '#FFC107', detailsColor: '#FFA000', isOwned: false, isActive: false, drawFunction: drawShipExplorer },
+            { id: 'ship-dragon', name: 'سفينة التنين', cost: { gold: 0, dollars: 30 }, requiredLevel: 20, color: '#F44336', detailsColor: '#D32F2F', isOwned: false, isActive: false, drawFunction: drawShipDragon }
         ];
 
         const obstacleSkinsData = [
-            { id: 'rock-default', name: 'الصخرة العادية', cost: { gold: 0, dollars: 0 }, color: '#ef5350', detailsColor: '#d32f2f', isOwned: true, isActive: true, drawFunction: drawRockDefault },
-            { id: 'rock-purple', name: 'الصخرة الأرجوانية', cost: { gold: 75, dollars: 0 }, color: '#9c27b0', detailsColor: '#7b1fa2', isOwned: false, isActive: false, drawFunction: drawRockDefault },
-            { id: 'rock-grey', name: 'الصخرة الرمادية', cost: { gold: 120, dollars: 0 }, color: '#757575', detailsColor: '#424242', isOwned: false, isActive: false, drawFunction: drawRockDefault },
-            { id: 'rock-spiky', name: 'الصخرة الشوكية', cost: { gold: 170, dollars: 0 }, color: '#795548', detailsColor: '#5d4037', isOwned: false, isActive: false, drawFunction: drawRockSpiky },
-            { id: 'rock-log', name: 'جذع الشجرة', cost: { gold: 220, dollars: 0 }, color: '#8d6e63', detailsColor: '#6d4c41', isOwned: false, isActive: false, drawFunction: drawRockLog },
-            { id: 'rock-crystal', name: 'الصخرة الكريستالية', cost: { gold: 0, dollars: 7 }, color: '#00BCD4', detailsColor: '#0097A7', isOwned: false, isActive: false, drawFunction: drawRockCrystal },
-            { id: 'rock-alien', name: 'الصخرة الفضائية', cost: { gold: 0, dollars: 12 }, color: '#6A1B9A', detailsColor: '#4A148C', isOwned: false, isActive: false, drawFunction: drawRockAlien }
+            { id: 'rock-default', name: 'الصخرة العادية', cost: { gold: 0, dollars: 0 }, requiredLevel: 0, color: '#ef5350', detailsColor: '#d32f2f', isOwned: true, isActive: true, drawFunction: drawRockDefault },
+            { id: 'rock-purple', name: 'الصخرة الأرجوانية', cost: { gold: 75, dollars: 0 }, requiredLevel: 0, color: '#9c27b0', detailsColor: '#7b1fa2', isOwned: false, isActive: false, drawFunction: drawRockDefault },
+            { id: 'rock-grey', name: 'الصخرة الرمادية', cost: { gold: 120, dollars: 0 }, requiredLevel: 0, color: '#757575', detailsColor: '#424242', isOwned: false, isActive: false, drawFunction: drawRockDefault },
+            { id: 'rock-spiky', name: 'الصخرة الشوكية', cost: { gold: 170, dollars: 0 }, requiredLevel: 4, color: '#795548', detailsColor: '#5d4037', isOwned: false, isActive: false, drawFunction: drawRockSpiky },
+            { id: 'rock-log', name: 'جذع الشجرة', cost: { gold: 220, dollars: 0 }, requiredLevel: 6, color: '#8d6e63', detailsColor: '#6d4c41', isOwned: false, isActive: false, drawFunction: drawRockLog },
+            { id: 'rock-crystal', name: 'الصخرة الكريستالية', cost: { gold: 0, dollars: 7 }, requiredLevel: 9, color: '#00BCD4', detailsColor: '#0097A7', isOwned: false, isActive: false, drawFunction: drawRockCrystal },
+            { id: 'rock-alien', name: 'الصخرة الفضائية', cost: { gold: 0, dollars: 12 }, requiredLevel: 14, color: '#6A1B9A', detailsColor: '#4A148C', isOwned: false, isActive: false, drawFunction: drawRockAlien },
+            { id: 'rock-iceberg', name: 'جبل الجليد', cost: { gold: 450, dollars: 3 }, requiredLevel: 8, color: '#BBDEFB', detailsColor: '#90CAF9', isOwned: false, isActive: false, drawFunction: drawRockIceberg },
+            { id: 'rock-coral', name: 'الشعاب المرجانية', cost: { gold: 380, dollars: 0 }, requiredLevel: 0, color: '#FF8A65', detailsColor: '#FF5722', isOwned: false, isActive: false, drawFunction: drawRockCoral },
+            { id: 'rock-robot', name: 'صخرة الروبوت', cost: { gold: 0, dollars: 18 }, requiredLevel: 12, color: '#9E9E9E', detailsColor: '#616161', isOwned: false, isActive: false, drawFunction: drawRockRobot },
+            { id: 'rock-volcanic', name: 'صخرة بركانية', cost: { gold: 550, dollars: 4 }, requiredLevel: 9, color: '#424242', detailsColor: '#212121', isOwned: false, isActive: false, drawFunction: drawRockVolcanic }
         ];
 
         const powerupData = [
             { id: 'speed-boost', name: 'سرعة إضافية', duration: 5000, drawFunction: drawPowerupSpeed, effect: () => { player.speed *= 2; }, revert: () => { player.speed /= 2; }, icon: '⚡' },
             { id: 'shield', name: 'درع حماية', duration: 7000, drawFunction: drawPowerupShield, effect: () => { player.isInvulnerable = true; }, revert: () => { player.isInvulnerable = false; }, icon: '🛡️' },
             { id: 'gold-magnet', name: 'جاذب الذهب', duration: 6000, drawFunction: drawPowerupMagnet, effect: () => { player.hasMagnet = true; }, revert: () => { player.hasMagnet = false; }, icon: '🧲' },
-            { id: 'magnet-boost', name: 'تعزيز الجاذبية', duration: 4000, drawFunction: drawPowerupMagnetBoost, effect: () => { player.hasMagnet = true; player.magnetRange *= 1.5; player.magnetPullSpeedMultiplier *= 1.5; }, revert: () => { player.hasMagnet = false; player.magnetRange /= 1.5; player.magnetPullSpeedMultiplier /= 1.5; }, icon: '🧲✨' }, // New power-up
+            { id: 'magnet-boost', name: 'تعزيز الجاذبية', duration: 4000, drawFunction: drawPowerupMagnetBoost, effect: () => { player.hasMagnet = true; player.magnetRange *= 1.5; player.magnetPullSpeedMultiplier *= 1.5; }, revert: () => { player.hasMagnet = false; player.magnetRange /= 1.5; player.magnetPullSpeedMultiplier /= 1.5; }, icon: '🧲✨' },
             { id: 'invincible-dash', name: 'اندفاع خارق', duration: 1500, drawFunction: drawPowerupDash, effect: () => { player.isDashing = true; player.isInvulnerable = true; player.speed *= player.dashSpeedMultiplier; }, revert: () => { player.isDashing = false; player.isInvulnerable = false; player.speed /= player.dashSpeedMultiplier; }, icon: '🚀' },
             { id: 'clear-screen', name: 'مسح الشاشة', duration: 0, drawFunction: drawPowerupClearScreen, effect: () => { fallingObjects = fallingObjects.filter(obj => obj.type !== 'obstacle' && obj.type !== 'mine' && obj.type !== 'whirlpool'); showInGameNotification('تم مسح العقبات!'); }, revert: () => {}, icon: '💥' }
         ];
 
         // New: Upgrade data
         const upgradesData = [
-            { id: 'upgrade-speed', name: 'ترقية السرعة', description: 'زيادة سرعة السفينة الأساسية.', levels: [ { cost: 300, value: 1 }, { cost: 700, value: 1 }, { cost: 1500, value: 1 }, { cost: 3000, value: 1 }, { cost: 6000, value: 1 } ], currentLevel: 0, maxLevel: 5 },
-            { id: 'upgrade-magnet', name: 'ترقية جاذب الذهب', description: 'زيادة مدة جاذب الذهب.', levels: [ { cost: 350, value: 1500 }, { cost: 800, value: 1500 }, { cost: 1800, value: 1500 }, { cost: 3800, value: 1500 }, { cost: 7500, value: 1500 } ], currentLevel: 0, maxLevel: 5 },
-            { id: 'upgrade-shield', name: 'ترقية الدرع', description: 'زيادة مدة درع الحماية.', levels: [ { cost: 400, value: 2000 }, { cost: 900, value: 2000 }, { cost: 2000, value: 2000 }, { cost: 4200, value: 2000 }, { cost: 8500, value: 2000 } ], currentLevel: 0, maxLevel: 5 },
-            { id: 'upgrade-gold-multiplier', name: 'مضاعف الذهب', description: 'زيادة الذهب المكتسب.', levels: [ { cost: 500, value: 0.2 }, { cost: 1200, value: 0.3 }, { cost: 2500, value: 0.4 }, { cost: 5500, value: 0.5 }, { cost: 11000, value: 0.6 } ], currentLevel: 0, maxLevel: 5 },
-            { id: 'upgrade-obstacle-slowdown', name: 'إبطاء العقبات', description: 'تقليل سرعة سقوط العقبات.', levels: [ { cost: 480, value: 0.03 }, { cost: 1100, value: 0.04 }, { cost: 2400, value: 0.05 }, { cost: 5200, value: 0.06 }, { cost: 10500, value: 0.07 } ], currentLevel: 0, maxLevel: 5 },
-            { id: 'upgrade-lucky-charm', name: 'التميمة المحظوظة', description: 'فرصة للحصول على دولار عند جمع الذهب.', levels: [ { cost: { gold: 0, dollars: 3 }, value: 0.01 }, { cost: { gold: 0, dollars: 6 }, value: 0.01 }, { cost: { gold: 0, dollars: 10 }, value: 0.01 } ], currentLevel: 0, maxLevel: 3 }
+            { id: 'upgrade-speed', name: 'ترقية السرعة', description: 'زيادة سرعة السفينة الأساسية.', levels: [ { cost: 300, value: 1 }, { cost: 700, value: 1 }, { cost: 1500, value: 1 }, { cost: 3000, value: 1 }, { cost: 6000, value: 1 } ], currentLevel: 0, maxLevel: 5, requiredLevel: 0 },
+            { id: 'upgrade-magnet', name: 'ترقية جاذب الذهب', description: 'زيادة مدة جاذب الذهب.', levels: [ { cost: 350, value: 1500 }, { cost: 800, value: 1500 }, { cost: 1800, value: 1500 }, { cost: 3800, value: 1500 }, { cost: 7500, value: 1500 } ], currentLevel: 0, maxLevel: 5, requiredLevel: 0 },
+            { id: 'upgrade-shield', name: 'ترقية الدرع', description: 'زيادة مدة درع الحماية.', levels: [ { cost: 400, value: 2000 }, { cost: 900, value: 2000 }, { cost: 2000, value: 2000 }, { cost: 4200, value: 2000 }, { cost: 8500, value: 2000 } ], currentLevel: 0, maxLevel: 5, requiredLevel: 0 },
+            { id: 'upgrade-gold-multiplier', name: 'مضاعف الذهب', description: 'زيادة الذهب المكتسب.', levels: [ { cost: 500, value: 0.2 }, { cost: 1200, value: 0.3 }, { cost: 2500, value: 0.4 }, { cost: 5500, value: 0.5 }, { cost: 11000, value: 0.6 } ], currentLevel: 0, maxLevel: 5, requiredLevel: 0 },
+            { id: 'upgrade-obstacle-slowdown', name: 'إبطاء العقبات', description: 'تقليل سرعة سقوط العقبات.', levels: [ { cost: 480, value: 0.03 }, { cost: 1100, value: 0.04 }, { cost: 2400, value: 0.05 }, { cost: 5200, value: 0.06 }, { cost: 10500, value: 0.07 } ], currentLevel: 0, maxLevel: 5, requiredLevel: 0 },
+            { id: 'upgrade-lucky-charm', name: 'التميمة المحظوظة', description: 'فرصة للحصول على دولار عند جمع الذهب.', levels: [ { cost: { gold: 0, dollars: 3 }, value: 0.01 }, { cost: { gold: 0, dollars: 6 }, value: 0.01 }, { cost: { gold: 0, dollars: 10 }, value: 0.01 } ], currentLevel: 0, maxLevel: 3, requiredLevel: 5 },
+            { id: 'upgrade-powerup-duration-all', name: 'مدة قوة شاملة', description: 'زيادة مدة جميع عناصر القوة.', levels: [ { cost: 1000, value: 0.1 }, { cost: 2500, value: 0.15 }, { cost: 5000, value: 0.2 } ], currentLevel: 0, maxLevel: 3, requiredLevel: 8 },
+            { id: 'upgrade-score-bonus', name: 'مكافأة النقاط', description: 'زيادة نقاط اللعبة المكتسبة.', levels: [ { cost: 800, value: 0.05 }, { cost: 1800, value: 0.1 }, { cost: 3500, value: 0.15 } ], currentLevel: 0, maxLevel: 3, requiredLevel: 10 },
+            { id: 'upgrade-starting-gold', name: 'ذهب البداية', description: 'ابدأ كل لعبة بذهب إضافي.', levels: [ { cost: 1000, value: 50 }, { cost: 2500, value: 100 } ], currentLevel: 0, maxLevel: 2, requiredLevel: 12 },
+            { id: 'upgrade-dollar-drop-chance', name: 'فرصة سقوط الدولار', description: 'زيادة فرصة سقوط الدولار.', levels: [ { cost: { gold: 0, dollars: 4 }, value: 0.001 }, { cost: { gold: 0, dollars: 8 }, value: 0.002 }, { cost: { gold: 0, dollars: 15 }, value: 0.003 } ], currentLevel: 0, maxLevel: 3, requiredLevel: 15 },
+            { id: 'upgrade-powerup-spawn-rate', name: 'معدل ظهور القوة', description: 'زيادة فرصة ظهور عناصر القوة.', levels: [ { cost: 900, value: 0.01 }, { cost: 2000, value: 0.015 }, { cost: 4000, value: 0.02 } ], currentLevel: 0, maxLevel: 3, requiredLevel: 7 },
+            { id: 'upgrade-xp-gain', name: 'مكافأة الخبرة', description: 'زيادة نقاط الخبرة المكتسبة.', levels: [ { cost: 1200, value: 0.1 }, { cost: 3000, value: 0.15 }, { cost: 6000, value: 0.2 } ], currentLevel: 0, maxLevel: 3, requiredLevel: 10 }
         ];
 
 
@@ -1181,7 +1477,10 @@
          * @param {number} amount - The amount of XP to add.
          */
         function addXP(amount) {
-            playerXP += amount;
+            const xpGainUpgrade = gameUpgrades.find(u => u.id === 'upgrade-xp-gain');
+            const finalXP = Math.round(amount * (1 + (xpGainUpgrade ? xpGainUpgrade.levels.slice(0, xpGainUpgrade.currentLevel).reduce((sum, level) => sum + level.value, 0) : 0)));
+
+            playerXP += finalXP;
             while (playerLevel < 100 && playerXP >= getXpForLevel(playerLevel)) {
                 playerXP -= getXpForLevel(playerLevel);
                 playerLevel++;
@@ -1333,6 +1632,21 @@
 
             const luckyCharmUpgrade = gameUpgrades.find(u => u.id === 'upgrade-lucky-charm');
             luckyCharmChance = (luckyCharmUpgrade ? luckyCharmUpgrade.levels.slice(0, luckyCharmUpgrade.currentLevel).reduce((sum, level) => sum + level.value, 0) : 0);
+
+            const powerupDurationUpgrade = gameUpgrades.find(u => u.id === 'upgrade-powerup-duration-all');
+            powerupDurationMultiplier = 1 + (powerupDurationUpgrade ? powerupDurationUpgrade.levels.slice(0, powerupDurationUpgrade.currentLevel).reduce((sum, level) => sum + level.value, 0) : 0);
+
+            const scoreBonusUpgrade = gameUpgrades.find(u => u.id === 'upgrade-score-bonus');
+            scoreBonusMultiplier = 1 + (scoreBonusUpgrade ? scoreBonusUpgrade.levels.slice(0, scoreBonusUpgrade.currentLevel).reduce((sum, level) => sum + level.value, 0) : 0);
+
+            const startingGoldUpgrade = gameUpgrades.find(u => u.id === 'upgrade-starting-gold');
+            startingGoldBonus = (startingGoldUpgrade ? startingGoldUpgrade.levels.slice(0, startingGoldUpgrade.currentLevel).reduce((sum, level) => sum + level.value, 0) : 0);
+
+            const dollarDropChanceUpgrade = gameUpgrades.find(u => u.id === 'upgrade-dollar-drop-chance');
+            dollarDropChanceBonus = (dollarDropChanceUpgrade ? dollarDropChanceUpgrade.levels.slice(0, dollarDropChanceUpgrade.currentLevel).reduce((sum, level) => sum + level.value, 0) : 0);
+
+            const powerupSpawnRateUpgrade = gameUpgrades.find(u => u.id === 'upgrade-powerup-spawn-rate');
+            powerupSpawnRateBonus = (powerupSpawnRateUpgrade ? powerupSpawnRateUpgrade.levels.slice(0, powerupSpawnRateUpgrade.currentLevel).reduce((sum, level) => sum + level.value, 0) : 0);
         }
 
         /**
@@ -1393,19 +1707,44 @@
             const rand = Math.random();
             let type;
             // Probabilities: Obstacle (55%), Gold (25%), Power-up (10%), Mine (4.5%), Whirlpool (4%), Dollar (0.9%), Treasure Chest (0.1%)
-            if (rand < 0.55) {
+            // Adjust power-up and dollar probabilities based on upgrades
+            const baseObstacleChance = 0.55;
+            const baseGoldChance = 0.25;
+            const basePowerupChance = 0.10;
+            const baseMineChance = 0.045;
+            const baseWhirlpoolChance = 0.04;
+            const baseDollarChance = 0.009;
+            const baseTreasureChestChance = 0.001;
+
+            let adjustedPowerupChance = basePowerupChance + powerupSpawnRateBonus;
+            let adjustedDollarChance = baseDollarChance + dollarDropChanceBonus;
+
+            // Normalize chances if they exceed 1 or interfere
+            const totalAdjustedChance = baseObstacleChance + baseGoldChance + adjustedPowerupChance + baseMineChance + baseWhirlpoolChance + adjustedDollarChance + baseTreasureChestChance;
+            const scaleFactor = 1 / totalAdjustedChance;
+
+            const pObstacle = baseObstacleChance * scaleFactor;
+            const pGold = baseGoldChance * scaleFactor;
+            const pPowerup = adjustedPowerupChance * scaleFactor;
+            const pMine = baseMineChance * scaleFactor;
+            const pWhirlpool = baseWhirlpoolChance * scaleFactor;
+            const pDollar = adjustedDollarChance * scaleFactor;
+            const pTreasureChest = baseTreasureChestChance * scaleFactor;
+
+
+            if (rand < pObstacle) {
                 type = 'obstacle';
-            } else if (rand < 0.80) { // 0.55 + 0.25 = 0.80
+            } else if (rand < pObstacle + pGold) {
                 type = 'collectible'; // Gold
-            } else if (rand < 0.90) { // 0.80 + 0.10 = 0.90
+            } else if (rand < pObstacle + pGold + pPowerup) {
                 type = 'powerup';
-            } else if (rand < 0.95) { // 0.90 + 0.05 = 0.95
+            } else if (rand < pObstacle + pGold + pPowerup + pMine) {
                 type = 'mine'; // Explosive Mine
-            } else if (rand < 0.99) { // 0.95 + 0.04 = 0.99
+            } else if (rand < pObstacle + pGold + pPowerup + pMine + pWhirlpool) {
                 type = 'whirlpool'; // New Whirlpool obstacle
-            } else if (rand < 0.999) { // 0.99 + 0.009 = 0.999
+            } else if (rand < pObstacle + pGold + pPowerup + pMine + pWhirlpool + pDollar) {
                 type = 'dollar'; // Rare Dollar
-            } else { // 0.999 + 0.001 = 1.0
+            } else {
                 type = 'treasure-chest'; // Very rare Treasure Chest
             }
 
@@ -1469,7 +1808,20 @@
                 } else if (obj.type === 'powerup' && obj.powerup && obj.powerup.drawFunction) {
                     obj.powerup.drawFunction(ctx, obj.x, obj.y, obj.width); // Power-ups draw based on their own function
                 } else if (obj.type === 'dollar') { // Dollar
-                    drawDollar(ctx, obj.x, obj.y, obj.width);
+                    // Custom draw for dollar to add visual flair
+                    ctx.fillStyle = '#4CAF50'; // Green
+                    ctx.beginPath();
+                    ctx.roundRect(obj.x, obj.y + obj.height * 0.2, obj.width, obj.height * 0.6, 5);
+                    ctx.fill();
+                    ctx.strokeStyle = '#388E3C';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    // Dollar sign
+                    ctx.font = `${obj.width * 0.6}px Arial`;
+                    ctx.fillStyle = 'white';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('$', obj.x + obj.width / 2, obj.y + obj.height / 2);
                 } else if (obj.type === 'treasure-chest') { // Treasure Chest
                     drawTreasureChest(ctx, obj.x, obj.y, obj.width);
                 }
@@ -1554,7 +1906,7 @@
                     }
                     else if (obj.type === 'collectible') { // Gold
                         const goldAmount = Math.floor(Math.random() * 4) + 1; // 1 to 4 gold
-                        const finalGold = Math.round(goldAmount * goldMultiplier * 1.15); // Apply multiplier and 15% bonus
+                        const finalGold = Math.round(goldAmount * goldMultiplier * 1.15 * scoreBonusMultiplier); // Apply multiplier and 15% bonus
                         gold += finalGold;
                         totalGoldCollected += finalGold; // Update total collected gold
                         addXP(finalGold); // Add XP for gold collected
@@ -1647,7 +1999,7 @@
             } catch (error) {
                 console.error("Error in Sea King game loop:", error);
                 endGame(); // End game on error to prevent freezing
-                showMessageBox("حدث خطأ في اللعبة! تم إيقاف اللعب.");
+                showMessageBox("حدث خطأ في اللعبة! تم إيقاف اللعب. يرجى المحاولة مرة أخرى.");
             }
 
             if (gameRunning) {
@@ -1679,7 +2031,7 @@
             powerup.effect();
 
             // Apply upgrade duration if available
-            let actualDuration = powerup.duration;
+            let actualDuration = powerup.duration * powerupDurationMultiplier; // Apply global powerup duration multiplier
             // For magnet and shield, value is directly added to duration
             if (powerup.id === 'gold-magnet') {
                 const upgrade = gameUpgrades.find(u => u.id === 'upgrade-magnet');
@@ -1732,6 +2084,8 @@
             profileModal.classList.remove('active');
             myItemsModal.classList.remove('active');
             cannonGameModal.classList.remove('active');
+            itemPreviewModal.classList.remove('active'); // Hide preview modal
+            rankingModal.classList.remove('active'); // Hide ranking modal
 
             // Show Sea King game elements
             canvas.style.display = 'block'; // Ensure canvas is visible
@@ -1762,6 +2116,7 @@
             fallingObjects = []; // Clear all objects
             gold = parseInt(localStorage.getItem('seaKingGold') || '0'); // Load gold on start
             dollars = parseInt(localStorage.getItem('seaKingDollars') || '0'); // Load dollars on start
+            gold += startingGoldBonus; // Add starting gold bonus
             goldScoreDisplay.textContent = `الذهب: ${gold}`;
             dollarScoreDisplay.textContent = `الدولار: ${dollars}`;
 
@@ -1770,8 +2125,8 @@
 
             gameRunning = true; // Start Sea King game loop
             startButton.style.display = 'none';
-            resetButton.style.display = 'inline-block';
-            shopButton.style.display = 'none'; // Hide shop button during game
+            // resetButton.style.display = 'inline-block'; // Removed as per user request
+            // shopButton.style.display = 'none'; // Removed as per user request
             hideMessageBox(); // Hide any existing message box
             lastObjectTime = Date.now(); // Reset object spawn timer
             gameLoop();
@@ -1795,15 +2150,14 @@
             } else {
                 showMessageBox(`انتهت اللعبة! لقد جمعت ${gold} ذهباً.`);
             }
-            resetButton.style.display = 'inline-block';
-            shopButton.style.display = 'inline-block'; // Show shop button after game
-            gameButtons.style.display = 'flex'; // Ensure buttons are visible
+            // resetButton.style.display = 'inline-block'; // Removed as per user request
+            // shopButton.style.display = 'inline-block'; // Removed as per user request
+            gameButtons.style.display = 'none'; // Ensure buttons are hidden
             saveGameData(); // Ensure all data is saved on game end
 
             // Hide game elements and show main menu after a short delay
             setTimeout(() => {
                 canvas.style.display = 'none';
-                gameButtons.style.display = 'none';
                 goldScoreDisplay.style.display = 'none';
                 dollarScoreDisplay.style.display = 'none';
                 highScoreDisplay.style.display = 'none';
@@ -1819,6 +2173,8 @@
             shopModal.classList.remove('active');
             myItemsModal.classList.remove('active');
             cannonGameModal.classList.remove('active');
+            itemPreviewModal.classList.remove('active'); // Hide preview modal
+            rankingModal.classList.remove('active'); // Hide ranking modal
 
             // Hide Sea King game elements
             canvas.style.display = 'none';
@@ -1841,7 +2197,8 @@
             playerXPDisplay.textContent = playerXP;
             xpToNextLevelDisplay.textContent = getXpForLevel(playerLevel);
 
-            const xpPercentage = (playerLevel <= 100) ? (playerXP / getXpForLevel(playerLevel)) * 100 : 100;
+            const xpForCurrentLevel = getXpForLevel(playerLevel);
+            const xpPercentage = (playerLevel <= 100 && xpForCurrentLevel > 0) ? (playerXP / xpForCurrentLevel) * 100 : 100;
             xpBar.style.width = `${xpPercentage}%`;
         }
 
@@ -1859,55 +2216,71 @@
             // Owned Player Skins
             playerSkins.filter(skin => skin.isOwned).forEach(skin => {
                 const skinDiv = document.createElement('div');
-                skinDiv.className = `my-item-card p-3 border rounded-lg flex flex-col items-center gap-2 ${skin.isActive ? 'active border-green-500' : 'border-gray-700'}`;
+                skinDiv.className = `my-item-card p-3 border rounded-lg flex flex-col items-center gap-2 ${skin.isActive ? 'active border-green-500' : 'border-gray-700'} transition-all duration-200`;
+                skinDiv.onclick = () => equipSkin('player', skin.id); // Direct equip from My Items
 
-                const previewCanvas = document.createElement('canvas');
-                previewCanvas.width = 60;
-                previewCanvas.height = 60;
-                previewCanvas.className = 'skin-preview';
-                const previewCtx = previewCanvas.getContext('2d');
-                previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-                previewCtx.save();
+                const previewCanvasItem = document.createElement('canvas'); // Renamed to avoid conflict
+                previewCanvasItem.width = 60;
+                previewCanvasItem.height = 60;
+                previewCanvasItem.className = 'skin-preview';
+                const previewCtxItem = previewCanvasItem.getContext('2d'); // Renamed to avoid conflict
+                previewCtxItem.clearRect(0, 0, previewCanvasItem.width, previewCanvasItem.height);
+                previewCtxItem.save();
                 const scale = 0.8;
-                previewCtx.translate(previewCanvas.width / 2, previewCanvas.height / 2);
-                previewCtx.scale(scale, scale);
-                previewCtx.translate(-previewCanvas.width / 2, -previewCanvas.height / 2);
+                previewCtxItem.translate(previewCanvasItem.width / 2, previewCanvasItem.height / 2);
+                previewCtxItem.scale(scale, scale);
+                previewCtxItem.translate(-previewCanvasItem.width / 2, -previewCanvasItem.height / 2);
                 const previewYOffset = skin.id.startsWith('ship') ? 10 : 0;
-                skin.drawFunction(previewCtx, previewCanvas.width / 2, previewCanvas.height / 2 + previewYOffset, 40, 40, skin.color, skin.detailsColor);
-                previewCtx.restore();
+                skin.drawFunction(previewCtxItem, previewCanvasItem.width / 2, previewCanvasItem.height / 2 + previewYOffset, 40, 40, skin.color, skin.detailsColor);
+                previewCtxItem.restore();
 
-                skinDiv.appendChild(previewCanvas);
+                skinDiv.appendChild(previewCanvasItem);
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'text-white text-sm font-bold';
                 nameSpan.textContent = skin.name;
                 skinDiv.appendChild(nameSpan);
+
+                if (skin.isActive) {
+                    const equippedSpan = document.createElement('span');
+                    equippedSpan.className = 'text-green-400 text-xs mt-1';
+                    equippedSpan.textContent = 'مُجهز حالياً';
+                    skinDiv.appendChild(equippedSpan);
+                }
                 myPlayerSkinsContainer.appendChild(skinDiv);
             });
 
             // Owned Obstacle Skins
             obstacleSkins.filter(skin => skin.isOwned).forEach(skin => {
                 const skinDiv = document.createElement('div');
-                skinDiv.className = `my-item-card p-3 border rounded-lg flex flex-col items-center gap-2 ${skin.isActive ? 'active border-green-500' : 'border-gray-700'}`;
+                skinDiv.className = `my-item-card p-3 border rounded-lg flex flex-col items-center gap-2 ${skin.isActive ? 'active border-green-500' : 'border-gray-700'} transition-all duration-200`;
+                skinDiv.onclick = () => equipSkin('obstacle', skin.id); // Direct equip from My Items
 
-                const previewCanvas = document.createElement('canvas');
-                previewCanvas.width = 60;
-                previewCanvas.height = 60;
-                previewCanvas.className = 'skin-preview';
-                const previewCtx = previewCanvas.getContext('2d');
-                previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-                previewCtx.save();
+                const previewCanvasItem = document.createElement('canvas');
+                previewCanvasItem.width = 60;
+                previewCanvasItem.height = 60;
+                previewCanvasItem.className = 'skin-preview';
+                const previewCtxItem = previewCanvasItem.getContext('2d');
+                previewCtxItem.clearRect(0, 0, previewCanvasItem.width, previewCanvasItem.height);
+                previewCtxItem.save();
                 const scale = 0.8;
-                previewCtx.translate(previewCanvas.width / 2, previewCanvas.height / 2);
-                previewCtx.scale(scale, scale);
-                previewCtx.translate(-previewCanvas.width / 2, -previewCanvas.height / 2);
-                skin.drawFunction(previewCtx, previewCanvas.width / 2, previewCanvas.height / 2, 40, 40, skin.color, skin.detailsColor);
-                previewCtx.restore();
+                previewCtxItem.translate(previewCanvasItem.width / 2, previewCanvasItem.height / 2);
+                previewCtxItem.scale(scale, scale);
+                previewCtxItem.translate(-previewCanvasItem.width / 2, -previewCanvasItem.height / 2);
+                skin.drawFunction(previewCtxItem, previewCanvasItem.width / 2, previewCanvasItem.height / 2, 40, 40, skin.color, skin.detailsColor);
+                previewCtxItem.restore();
 
-                skinDiv.appendChild(previewCanvas);
+                skinDiv.appendChild(previewCanvasItem);
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'text-white text-sm font-bold';
                 nameSpan.textContent = skin.name;
                 skinDiv.appendChild(nameSpan);
+
+                if (skin.isActive) {
+                    const equippedSpan = document.createElement('span');
+                    equippedSpan.className = 'text-green-400 text-xs mt-1';
+                    equippedSpan.textContent = 'مُجهز حالياً';
+                    skinDiv.appendChild(equippedSpan);
+                }
                 myObstacleSkinsContainer.appendChild(skinDiv);
             });
 
@@ -1935,8 +2308,20 @@
         }
 
         function resetGameData() {
-            // Using browser's confirm for critical action
-            if (confirm('هل أنت متأكد أنك تريد إعادة تعيين جميع بيانات اللعبة؟ هذا لا يمكن التراجع عنه!')) {
+            // Using custom modal for critical action
+            showMessageBox(`
+                <p class="mb-4 text-lg">
+                    هل أنت متأكد أنك تريد إعادة تعيين جميع بيانات اللعبة؟
+                    <br>
+                    <span class="text-red-400 font-bold">هذا لا يمكن التراجع عنه!</span>
+                </p>
+                <div class="flex justify-center gap-4 mt-4">
+                    <button id="confirmResetButton" class="game-button bg-red-600 hover:bg-red-700">تأكيد الإعادة</button>
+                    <button id="cancelResetButton" class="game-button">إلغاء</button>
+                </div>
+            `);
+
+            document.getElementById('confirmResetButton').onclick = () => {
                 localStorage.clear(); // Clear all local storage data
                 // Reset in-memory variables
                 gold = 0;
@@ -1957,12 +2342,148 @@
                 dollarScoreDisplay.textContent = `الدولار: ${dollars}`;
                 highScoreDisplay.textContent = `أعلى ذهب: ${highScore}`;
                 showInGameNotification('تمت إعادة تعيين جميع بيانات اللعبة!');
+                hideMessageBox();
                 myItemsModal.classList.remove('active');
                 mainMenuModal.classList.add('active'); // Go back to main menu
-            }
+            };
+
+            document.getElementById('cancelResetButton').onclick = hideMessageBox;
         }
 
         // --- Shop Functions ---
+
+        /**
+         * Handles buying a skin.
+         * @param {string} type - 'player' or 'obstacle'.
+         * @param {string} id - The ID of the skin to buy.
+         */
+        function buySkin(type, id) {
+            const skinArray = type === 'player' ? playerSkins : obstacleSkins;
+            const skin = skinArray.find(s => s.id === id);
+
+            if (!skin) {
+                showMessageBox("خطأ: لم يتم العثور على الشكل.");
+                return;
+            }
+
+            if (playerLevel < skin.requiredLevel) {
+                showMessageBox(`تحتاج إلى المستوى ${skin.requiredLevel} لشراء هذا الشكل.`);
+                return;
+            }
+
+            const costGold = skin.cost.gold || 0;
+            const costDollars = skin.cost.dollars || 0;
+
+            if (gold >= costGold && dollars >= costDollars) {
+                gold -= costGold;
+                dollars -= costDollars;
+                skin.isOwned = true;
+                saveGameData();
+                goldScoreDisplay.textContent = `الذهب: ${gold}`;
+                dollarScoreDisplay.textContent = `الدولار: ${dollars}`;
+                showMessageBox(`تم شراء ${skin.name} بنجاح!`);
+                renderShop(); // Re-render shop to update buttons
+                itemPreviewModal.classList.remove('active'); // Close preview after purchase
+            } else {
+                let message = "لا تمتلك مال كافي.";
+                if (costGold > 0 && gold < costGold) {
+                    message += `<br>تحتاج إلى ${costGold - gold} ذهب إضافي.`;
+                }
+                if (costDollars > 0 && dollars < costDollars) {
+                    message += `<br>تحتاج إلى ${costDollars - dollars} دولار إضافي.`;
+                }
+                showMessageBox(message);
+            }
+        }
+
+        /**
+         * Handles equipping a skin.
+         * @param {string} type - 'player' or 'obstacle'.
+         * @param {string} id - The ID of the skin to equip.
+         */
+        function equipSkin(type, id) {
+            const skinArray = type === 'player' ? playerSkins : obstacleSkins;
+            const skin = skinArray.find(s => s.id === id);
+
+            if (!skin || !skin.isOwned) {
+                showMessageBox("خطأ: لا يمكنك تجهيز شكل غير مملوك.");
+                return;
+            }
+
+            // Deactivate all other skins of the same type
+            skinArray.forEach(s => s.isActive = false);
+            // Activate the selected skin
+            skin.isActive = true;
+
+            if (type === 'player') {
+                currentEquippedPlayerSkinId = id;
+            } else {
+                currentEquippedObstacleSkinId = id;
+            }
+
+            saveGameData();
+            showInGameNotification(`تم تجهيز ${skin.name} بنجاح!`); // Use in-game notification for equip
+            renderShop(); // Re-render shop to update buttons
+            renderMyItems(); // Re-render my items to update equipped status
+            itemPreviewModal.classList.remove('active'); // Close preview after equip
+        }
+
+        /**
+         * Handles buying an upgrade.
+         * @param {string} id - The ID of the upgrade to buy.
+         */
+        function buyUpgrade(id) {
+            const upgrade = gameUpgrades.find(u => u.id === id);
+
+            if (!upgrade) {
+                showMessageBox("خطأ: لم يتم العثور على الترقية.");
+                return;
+            }
+
+            if (upgrade.currentLevel >= upgrade.maxLevel) {
+                showMessageBox("هذه الترقية وصلت لأقصى مستوى!");
+                return;
+            }
+
+            if (playerLevel < upgrade.requiredLevel) {
+                showMessageBox(`تحتاج إلى المستوى ${upgrade.requiredLevel} لترقية هذا العنصر.`);
+                return;
+            }
+
+            const nextLevelCost = upgrade.levels[upgrade.currentLevel].cost;
+            let costGold = 0;
+            let costDollars = 0;
+
+            if (typeof nextLevelCost === 'object') {
+                costGold = nextLevelCost.gold || 0;
+                costDollars = nextLevelCost.dollars || 0;
+            } else {
+                costGold = nextLevelCost; // Assume it's gold if not an object
+            }
+
+            if (gold >= costGold && dollars >= costDollars) {
+                gold -= costGold;
+                dollars -= costDollars;
+                upgrade.currentLevel++;
+                applyPermanentUpgrades(); // Re-apply all permanent upgrades
+                saveGameData();
+                goldScoreDisplay.textContent = `الذهب: ${gold}`;
+                dollarScoreDisplay.textContent = `الدولار: ${dollars}`;
+                showMessageBox(`تمت ترقية ${upgrade.name} إلى المستوى ${upgrade.currentLevel} بنجاح!`);
+                renderShop(); // Re-render shop to update buttons
+                itemPreviewModal.classList.remove('active'); // Close preview after purchase
+            } else {
+                let message = "لا تمتلك مال كافي لترقية هذا العنصر.";
+                if (costGold > 0 && gold < costGold) {
+                    message += `<br>تحتاج إلى ${costGold - gold} ذهب إضافي.`;
+                }
+                if (costDollars > 0 && dollars < costDollars) {
+                    message += `<br>تحتاج إلى ${costDollars - dollars} دولار إضافي.`;
+                }
+                showMessageBox(message);
+            }
+        }
+
 
         /**
          * Renders the shop UI based on current skin and upgrade data.
@@ -1978,46 +2499,48 @@
             playerSkins.forEach(skin => {
                 const skinDiv = document.createElement('div');
                 skinDiv.className = `skin-item p-3 border rounded-lg flex flex-col items-center gap-2 ${skin.isActive ? 'active border-green-500' : 'border-gray-700'} transition-all duration-200`;
+                skinDiv.onclick = () => showItemPreview(skin, 'player'); // Open preview on click
 
-                const previewCanvas = document.createElement('canvas');
-                previewCanvas.width = 60;
-                previewCanvas.height = 60;
-                previewCanvas.className = 'skin-preview';
-                const previewCtx = previewCanvas.getContext('2d');
-                previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-                previewCtx.save();
+                const previewCanvasItem = document.createElement('canvas'); // Renamed to avoid conflict
+                previewCanvasItem.width = 60;
+                previewCanvasItem.height = 60;
+                previewCanvasItem.className = 'skin-preview';
+                const previewCtxItem = previewCanvasItem.getContext('2d'); // Renamed to avoid conflict
+                previewCtxItem.clearRect(0, 0, previewCanvasItem.width, previewCanvasItem.height);
+                previewCtxItem.save();
                 const scale = 0.8;
-                previewCtx.translate(previewCanvas.width / 2, previewCanvas.height / 2);
-                previewCtx.scale(scale, scale);
-                previewCtx.translate(-previewCanvas.width / 2, -previewCanvas.height / 2);
+                previewCtxItem.translate(previewCanvasItem.width / 2, previewCanvasItem.height / 2);
+                previewCtxItem.scale(scale, scale);
+                previewCtxItem.translate(-previewCanvasItem.width / 2, -previewCanvasItem.height / 2);
                 const previewYOffset = skin.id.startsWith('ship') ? 10 : 0;
-                skin.drawFunction(previewCtx, previewCanvas.width / 2, previewCanvas.height / 2 + previewYOffset, 40, 40, skin.color, skin.detailsColor);
-                previewCtx.restore();
+                skin.drawFunction(previewCtxItem, previewCanvasItem.width / 2, previewCanvasItem.height / 2 + previewYOffset, 40, 40, skin.color, skin.detailsColor);
+                previewCtxItem.restore();
 
-                skinDiv.appendChild(previewCanvas);
+                skinDiv.appendChild(previewCanvasItem);
 
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'text-white text-sm font-bold';
                 nameSpan.textContent = skin.name;
                 skinDiv.appendChild(nameSpan);
 
-                const button = document.createElement('button');
-                button.className = `game-button text-xs px-2 py-1 ${skin.isActive ? 'bg-green-600 cursor-default' : ''}`;
-                button.dataset.id = skin.id;
-                button.dataset.type = 'player';
-
+                const statusSpan = document.createElement('span');
+                statusSpan.className = 'text-gray-400 text-xs';
                 if (skin.isOwned) {
-                    button.textContent = skin.isActive ? 'مُجهز' : 'تجهيز';
-                    button.disabled = skin.isActive;
-                    button.classList.add('equip-button');
+                    statusSpan.textContent = skin.isActive ? 'مُجهز' : 'مملوك';
+                    statusSpan.classList.add(skin.isActive ? 'text-green-400' : 'text-blue-300');
                 } else {
                     let costText = '';
                     if (skin.cost.gold > 0) costText += `${skin.cost.gold} ${goldIconSVG}`;
                     if (skin.cost.dollars > 0) costText += `${skin.cost.dollars} ${dollarIconSVG}`;
-                    button.innerHTML = `شراء (${costText.trim()})`;
-                    button.classList.add('buy-button');
+                    statusSpan.innerHTML = `التكلفة: ${costText.trim()}`;
+                    if (playerLevel < skin.requiredLevel) {
+                        statusSpan.textContent = `المستوى ${skin.requiredLevel} مطلوب`;
+                        statusSpan.classList.add('text-red-400');
+                    } else if (gold < (skin.cost.gold || 0) || dollars < (skin.cost.dollars || 0)) {
+                        statusSpan.classList.add('text-red-400');
+                    }
                 }
-                skinDiv.appendChild(button);
+                skinDiv.appendChild(statusSpan);
                 playerSkinsContainer.appendChild(skinDiv);
             });
 
@@ -2025,45 +2548,47 @@
             obstacleSkins.forEach(skin => {
                 const skinDiv = document.createElement('div');
                 skinDiv.className = `skin-item p-3 border rounded-lg flex flex-col items-center gap-2 ${skin.isActive ? 'active border-green-500' : 'border-gray-700'} transition-all duration-200`;
+                skinDiv.onclick = () => showItemPreview(skin, 'obstacle'); // Open preview on click
 
-                const previewCanvas = document.createElement('canvas');
-                previewCanvas.width = 60;
-                previewCanvas.height = 60;
-                previewCanvas.className = 'skin-preview';
-                const previewCtx = previewCanvas.getContext('2d');
-                previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-                previewCtx.save();
+                const previewCanvasItem = document.createElement('canvas');
+                previewCanvasItem.width = 60;
+                previewCanvasItem.height = 60;
+                previewCanvasItem.className = 'skin-preview';
+                const previewCtxItem = previewCanvasItem.getContext('2d');
+                previewCtxItem.clearRect(0, 0, previewCanvasItem.width, previewCanvasItem.height);
+                previewCtxItem.save();
                 const scale = 0.8;
-                previewCtx.translate(previewCanvas.width / 2, previewCanvas.height / 2);
-                previewCtx.scale(scale, scale);
-                previewCtx.translate(-previewCanvas.width / 2, -previewCanvas.height / 2);
-                skin.drawFunction(previewCtx, previewCanvas.width / 2, previewCanvas.height / 2, 40, 40, skin.color, skin.detailsColor);
-                previewCtx.restore();
+                previewCtxItem.translate(previewCanvasItem.width / 2, previewCanvasItem.height / 2);
+                previewCtxItem.scale(scale, scale);
+                previewCtxItem.translate(-previewCanvasItem.width / 2, -previewCanvasItem.height / 2);
+                skin.drawFunction(previewCtxItem, previewCanvasItem.width / 2, previewCanvasItem.height / 2, 40, 40, skin.color, skin.detailsColor);
+                previewCtxItem.restore();
 
-                skinDiv.appendChild(previewCanvas);
+                skinDiv.appendChild(previewCanvasItem);
 
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'text-white text-sm font-bold';
                 nameSpan.textContent = skin.name;
                 skinDiv.appendChild(nameSpan);
 
-                const button = document.createElement('button');
-                button.className = `game-button text-xs px-2 py-1 ${skin.isActive ? 'bg-green-600 cursor-default' : ''}`;
-                button.dataset.id = skin.id;
-                button.dataset.type = 'obstacle';
-
+                const statusSpan = document.createElement('span');
+                statusSpan.className = 'text-gray-400 text-xs';
                 if (skin.isOwned) {
-                    button.textContent = skin.isActive ? 'مُجهز' : 'تجهيز';
-                    button.disabled = skin.isActive;
-                    button.classList.add('equip-button');
+                    statusSpan.textContent = skin.isActive ? 'مُجهز' : 'مملوك';
+                    statusSpan.classList.add(skin.isActive ? 'text-green-400' : 'text-blue-300');
                 } else {
                     let costText = '';
                     if (skin.cost.gold > 0) costText += `${skin.cost.gold} ${goldIconSVG}`;
                     if (skin.cost.dollars > 0) costText += `${skin.cost.dollars} ${dollarIconSVG}`;
-                    button.innerHTML = `شراء (${costText.trim()})`;
-                    button.classList.add('buy-button');
+                    statusSpan.innerHTML = `التكلفة: ${costText.trim()}`;
+                    if (playerLevel < skin.requiredLevel) {
+                        statusSpan.textContent = `المستوى ${skin.requiredLevel} مطلوب`;
+                        statusSpan.classList.add('text-red-400');
+                    } else if (gold < (skin.cost.gold || 0) || dollars < (skin.cost.dollars || 0)) {
+                        statusSpan.classList.add('text-red-400');
+                    }
                 }
-                skinDiv.appendChild(button);
+                skinDiv.appendChild(statusSpan);
                 obstacleSkinsContainer.appendChild(skinDiv);
             });
 
@@ -2071,6 +2596,7 @@
             gameUpgrades.forEach(upgrade => {
                 const upgradeDiv = document.createElement('div');
                 upgradeDiv.className = `upgrade-item p-3 border rounded-lg flex flex-col items-center gap-2 border-gray-700 transition-all duration-200`;
+                upgradeDiv.onclick = () => showItemPreview(upgrade, 'upgrade'); // Open preview on click
 
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'text-white text-sm font-bold';
@@ -2082,54 +2608,148 @@
                 levelSpan.textContent = `المستوى: ${upgrade.currentLevel} / ${upgrade.maxLevel}`;
                 upgradeDiv.appendChild(levelSpan);
 
-                const descSpan = document.createElement('span');
-                descSpan.className = 'text-gray-400 text-xs text-center mt-1';
-                descSpan.textContent = upgrade.description;
-                upgradeDiv.appendChild(descSpan);
-
-                const button = document.createElement('button');
-                button.className = `game-button text-xs px-2 py-1 mt-2`;
-                button.dataset.id = upgrade.id;
-                button.dataset.type = 'upgrade';
-
+                const statusSpan = document.createElement('span');
+                statusSpan.className = 'text-gray-400 text-xs';
                 if (upgrade.currentLevel < upgrade.maxLevel) {
                     const nextLevelCost = upgrade.levels[upgrade.currentLevel].cost;
-                    let costText = '';
-                    if (typeof nextLevelCost === 'object') { // If cost is an object (gold and dollars)
-                        if (nextLevelCost.gold > 0) costText += `${nextLevelCost.gold} ${goldIconSVG}`;
-                        if (nextLevelCost.dollars > 0) costText += `${nextLevelCost.dollars} ${dollarIconSVG}`;
-                    } else { // If cost is just gold (number)
-                        costText += `${nextLevelCost} ${goldIconSVG}`;
+                    let costGold = 0;
+                    let costDollars = 0;
+                    if (typeof nextLevelCost === 'object') {
+                        costGold = nextLevelCost.gold || 0;
+                        costDollars = nextLevelCost.dollars || 0;
+                    } else {
+                        costGold = nextLevelCost;
                     }
-                    button.innerHTML = `ترقية (${costText.trim()})`;
-                    button.classList.add('buy-upgrade-button');
+                    let costText = '';
+                    if (costGold > 0) costText += `${costGold} ${goldIconSVG}`;
+                    if (costDollars > 0) costText += `${costDollars} ${dollarIconSVG}`;
+                    statusSpan.innerHTML = `التكلفة: ${costText.trim()}`;
+
+                    if (playerLevel < upgrade.requiredLevel) {
+                        statusSpan.textContent = `المستوى ${upgrade.requiredLevel} مطلوب`;
+                        statusSpan.classList.add('text-red-400');
+                    } else if (gold < costGold || dollars < costDollars) {
+                        statusSpan.classList.add('text-red-400');
+                    }
                 } else {
-                    button.textContent = 'أقصى مستوى';
-                    button.disabled = true;
-                    button.classList.add('bg-gray-600', 'cursor-default');
+                    statusSpan.textContent = 'أقصى مستوى';
+                    statusSpan.classList.add('text-green-400');
                 }
-                upgradeDiv.appendChild(button);
+                upgradeDiv.appendChild(statusSpan);
                 upgradesContainer.appendChild(upgradeDiv);
-            });
-
-
-            // Add event listeners to newly created buttons (delegation or re-attach)
-            document.querySelectorAll('.buy-button').forEach(button => {
-                button.onclick = (e) => buySkin(e.target.dataset.type, e.target.dataset.id);
-            });
-            document.querySelectorAll('.equip-button').forEach(button => {
-                button.onclick = (e) => equipSkin(e.target.dataset.type, e.target.dataset.id);
-            });
-            document.querySelectorAll('.buy-upgrade-button').forEach(button => {
-                button.onclick = (e) => buyUpgrade(e.target.dataset.id);
             });
         }
 
+        /**
+         * Displays the item preview modal.
+         * @param {object} item - The skin or upgrade object to preview.
+         * @param {string} type - 'player', 'obstacle', or 'upgrade'.
+         */
+        function showItemPreview(item, type) {
+            // Hide all other modals
+            shopModal.classList.remove('active');
+            mainMenuModal.classList.remove('active');
+            profileModal.classList.remove('active');
+            myItemsModal.classList.remove('active');
+            cannonGameModal.classList.remove('active');
+            rankingModal.classList.remove('active');
+
+            previewItemName.textContent = item.name;
+            previewItemDescription.textContent = item.description || ''; // Upgrades have descriptions
+
+            // Draw preview for skins
+            if (type === 'player' || type === 'obstacle') {
+                previewCanvas.style.display = 'block';
+                previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                previewCtx.save();
+                const scale = 1; // Use full scale for preview modal
+                previewCtx.translate(previewCanvas.width / 2, previewCanvas.height / 2);
+                previewCtx.scale(scale, scale);
+                previewCtx.translate(-previewCanvas.width / 2, -previewCanvas.height / 2);
+                const previewYOffset = item.id.startsWith('ship') ? 10 : 0;
+                item.drawFunction(previewCtx, previewCanvas.width / 2, previewCanvas.height / 2 + previewYOffset, 40, 40, item.color, item.detailsColor);
+                previewCtx.restore();
+            } else {
+                previewCanvas.style.display = 'none'; // Hide canvas for upgrades
+            }
+
+            // Display cost and current currency
+            let costGold = 0;
+            let costDollars = 0;
+            let actionText = '';
+            let actionHandler = null;
+            let isDisabled = false;
+
+            if (type === 'upgrade') {
+                if (item.currentLevel < item.maxLevel) {
+                    const nextLevelCost = item.levels[item.currentLevel].cost;
+                    if (typeof nextLevelCost === 'object') {
+                        costGold = nextLevelCost.gold || 0;
+                        costDollars = nextLevelCost.dollars || 0;
+                    } else {
+                        costGold = nextLevelCost;
+                    }
+                    actionText = 'ترقية';
+                    actionHandler = () => buyUpgrade(item.id);
+                    if (playerLevel < item.requiredLevel || gold < costGold || dollars < costDollars) {
+                        isDisabled = true;
+                        if (playerLevel < item.requiredLevel) actionText = `المستوى ${item.requiredLevel} مطلوب`;
+                        else actionText = 'لا يوجد مال كافي';
+                    }
+                } else {
+                    actionText = 'أقصى مستوى';
+                    isDisabled = true;
+                }
+            } else { // It's a skin
+                if (item.isOwned) {
+                    actionText = item.isActive ? 'مُجهز' : 'تجهيز';
+                    actionHandler = () => equipSkin(type, item.id);
+                    isDisabled = item.isActive;
+                } else {
+                    costGold = item.cost.gold || 0;
+                    costDollars = item.cost.dollars || 0;
+                    actionText = 'شراء';
+                    actionHandler = () => buySkin(type, item.id);
+                    if (playerLevel < item.requiredLevel || gold < costGold || dollars < costDollars) {
+                        isDisabled = true;
+                        if (playerLevel < item.requiredLevel) actionText = `المستوى ${item.requiredLevel} مطلوب`;
+                        else actionText = 'لا يوجد مال كافي';
+                    }
+                }
+            }
+
+            let costHtml = '';
+            if (costGold > 0) costHtml += `${costGold} ${goldIconSVG}`;
+            if (costDollars > 0) costHtml += `${costDollars} ${dollarIconSVG}`;
+            previewItemCost.innerHTML = `التكلفة: ${costHtml.trim() || 'مجاني'}`;
+
+            previewCurrentGold.innerHTML = `${goldIconSVG} الحالي: ${gold}`;
+            previewCurrentDollars.innerHTML = `${dollarIconSVG} الحالي: ${dollars}`;
+
+            previewActionButton.textContent = actionText;
+            previewActionButton.onclick = actionHandler;
+            previewActionButton.disabled = isDisabled;
+            previewActionButton.classList.toggle('bg-gray-600', isDisabled);
+            previewActionButton.classList.toggle('cursor-not-allowed', isDisabled);
+            previewActionButton.classList.toggle('bg-green-600', !isDisabled && item.isOwned && item.isActive); // Green for equipped
+
+            itemPreviewModal.classList.add('active');
+        }
+
+        // Close button for preview modal
+        previewCloseButton.addEventListener('click', () => {
+            itemPreviewModal.classList.remove('active');
+            shopModal.classList.add('active'); // Return to shop
+        });
+
+
         // --- Cannon Game Functions ---
+        let cannonAutoFireInterval = null; // Variable to hold the interval ID
 
         function initCannonGame() {
-            cannonGameCanvas.width = cannonGameCanvas.offsetWidth;
-            cannonGameCanvas.height = cannonGameCanvas.offsetHeight;
+            // Ensure cannon game canvas matches main game canvas size
+            cannonGameCanvas.width = canvas.width;
+            cannonGameCanvas.height = canvas.height;
 
             cannonGameScore = 0;
             cannonGoldReward = 0;
@@ -2148,19 +2768,25 @@
 
         function generateCannonTargets() {
             cannonTargets = [];
+            const targetWidth = CANNON_TARGET_SIZE;
+            const targetHeight = CANNON_TARGET_SIZE;
+            const horizontalSpacing = CANNON_TARGET_SPACING;
+            const verticalSpacing = CANNON_TARGET_SPACING;
+
+            const totalWidthOfTargets = (CANNON_TARGET_COLUMNS * targetWidth) + ((CANNON_TARGET_COLUMNS - 1) * horizontalSpacing);
+            const startX = (cannonGameCanvas.width - totalWidthOfTargets) / 2;
             const startY = 50;
-            const startX = (cannonGameCanvas.width - (CANNON_TARGET_COLUMNS * (CANNON_TARGET_SIZE + CANNON_TARGET_SPACING))) / 2;
 
             for (let row = 0; row < CANNON_TARGET_ROWS; row++) {
                 for (let col = 0; col < CANNON_TARGET_COLUMNS; col++) {
-                    const targetX = startX + col * (CANNON_TARGET_SIZE + CANNON_TARGET_SPACING);
-                    const targetY = startY + row * (CANNON_TARGET_SIZE + CANNON_TARGET_SPACING);
+                    const targetX = startX + col * (targetWidth + horizontalSpacing);
+                    const targetY = startY + row * (targetHeight + verticalSpacing);
                     const colorIndex = Math.floor(Math.random() * CANNON_COLORS.length);
                     cannonTargets.push({
                         x: targetX,
                         y: targetY,
-                        width: CANNON_TARGET_SIZE,
-                        height: CANNON_TARGET_SIZE,
+                        width: targetWidth,
+                        height: targetHeight,
                         color: CANNON_COLORS[colorIndex]
                     });
                 }
@@ -2168,8 +2794,16 @@
         }
 
         function chooseNextCannonBallColor() {
-            const randomIndex = Math.floor(Math.random() * CANNON_COLORS.length);
-            currentCannonBallColor = CANNON_COLORS[randomIndex];
+            const availableColors = [...new Set(cannonTargets.map(target => target.color))]; // Get unique colors from existing targets
+            if (availableColors.length > 0) {
+                // Pick a random color from available targets
+                const randomIndex = Math.floor(Math.random() * availableColors.length);
+                currentCannonBallColor = availableColors[randomIndex];
+            } else {
+                // If no targets, pick any random color
+                const randomIndex = Math.floor(Math.random() * CANNON_COLORS.length);
+                currentCannonBallColor = CANNON_COLORS[randomIndex];
+            }
         }
 
         function drawCannonGame() {
@@ -2208,10 +2842,22 @@
             // Draw Cannon Targets
             cannonTargets.forEach(target => {
                 cannonCtx.fillStyle = target.color;
-                cannonCtx.fillRect(target.x, target.y, target.width, target.height);
                 cannonCtx.strokeStyle = 'white';
                 cannonCtx.lineWidth = 2;
-                cannonCtx.strokeRect(target.x, target.y, target.width, target.height);
+                cannonCtx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                cannonCtx.shadowBlur = 5;
+                cannonCtx.shadowOffsetX = 2;
+                cannonCtx.shadowOffsetY = 2;
+
+                cannonCtx.beginPath();
+                cannonCtx.roundRect(target.x, target.y, target.width, target.height, 8); // Rounded corners
+                cannonCtx.fill();
+                cannonCtx.stroke();
+
+                cannonCtx.shadowColor = 'transparent'; // Reset shadow for other drawings
+                cannonCtx.shadowBlur = 0;
+                cannonCtx.shadowOffsetX = 0;
+                cannonCtx.shadowOffsetY = 0;
             });
         }
 
@@ -2231,10 +2877,11 @@
                         ball.y - ball.radius < target.y + target.height
                     ) {
                         if (ball.color === target.color) {
-                            cannonGameScore += 100; // Score for matching
+                            cannonGameScore += 100 * scoreBonusMultiplier; // Score for matching, apply bonus
                             cannonTargets.splice(i, 1); // Remove target
                             addXP(10); // Add XP for cannon game
                             updateCannonGameUI();
+                            chooseNextCannonBallColor(); // Choose new color after a hit
                             return false; // Remove ball
                         }
                     }
@@ -2251,6 +2898,7 @@
                 cannonTargetSpawnInterval = Math.max(500, cannonTargetSpawnInterval - 100); // Make it faster
                 generateCannonTargets();
                 showInGameNotification(`المستوى ${cannonGameLevel} في لعبة المدفع!`);
+                chooseNextCannonBallColor(); // Choose new color when new targets appear
             }
 
             // Award gold for score
@@ -2293,7 +2941,7 @@
             } catch (error) {
                 console.error("Error in Cannon Game loop:", error);
                 endCannonGame(); // End game on error
-                showMessageBox("حدث خطأ في لعبة المدفع! تم إيقاف اللعب.");
+                showMessageBox("حدث خطأ في لعبة المدفع! تم إيقاف اللعب. يرجى المحاولة مرة أخرى.");
             }
 
             if (cannonGameRunning) {
@@ -2307,6 +2955,8 @@
             shopModal.classList.remove('active');
             profileModal.classList.remove('active');
             myItemsModal.classList.remove('active');
+            itemPreviewModal.classList.remove('active'); // Hide preview modal
+            rankingModal.classList.remove('active'); // Hide ranking modal
 
             // Hide Sea King game elements
             canvas.style.display = 'none';
@@ -2323,13 +2973,65 @@
             initCannonGame(); // Initialize cannon game state
             cannonGameRunning = true; // Start cannon game loop
             cannonGameLoop();
+
+            // Start auto-firing
+            if (cannonAutoFireInterval) clearInterval(cannonAutoFireInterval); // Clear any existing interval
+            cannonAutoFireInterval = setInterval(fireCannonBall, 2000); // Fire every 2 seconds
         }
 
         function endCannonGame() {
             cannonGameRunning = false; // Stop cannon game loop
+            if (cannonAutoFireInterval) {
+                clearInterval(cannonAutoFireInterval); // Stop auto-firing
+                cannonAutoFireInterval = null;
+            }
             cannonGameModal.classList.remove('active');
             mainMenuModal.classList.add('active'); // Go back to main menu
             saveGameData(); // Save any earned gold/XP
+        }
+
+        // --- Ranking Functions ---
+        function openRanking() {
+            // Hide all other modals
+            mainMenuModal.classList.remove('active');
+            shopModal.classList.remove('active');
+            profileModal.classList.remove('active');
+            myItemsModal.classList.remove('active');
+            cannonGameModal.classList.remove('active');
+            itemPreviewModal.classList.remove('active'); // Hide preview modal
+
+            // Hide Sea King game elements
+            canvas.style.display = 'none';
+            gameButtons.style.display = 'none';
+            goldScoreDisplay.style.display = 'none';
+            dollarScoreDisplay.style.display = 'none';
+            highScoreDisplay.style.display = 'none';
+            powerupsDisplay.style.display = 'none';
+
+            rankingModal.classList.add('active');
+            updateRankingDisplay();
+        }
+
+        function updateRankingDisplay() {
+            leaderboardList.innerHTML = ''; // Clear existing list
+
+            // Hardcoded top players for demonstration
+            const topPlayers = [
+                { name: 'بطل البحار', score: 50000 },
+                { name: 'القرصان الأسطوري', score: 35000 },
+                { name: 'صائد الكنوز', score: 20000 }
+            ];
+
+            // Add current player's high score to the list and sort
+            const allScores = [...topPlayers, { name: 'أنت', score: highScore }];
+            allScores.sort((a, b) => b.score - a.score); // Sort descending by score
+
+            allScores.forEach((player, index) => {
+                const playerEntry = document.createElement('p');
+                playerEntry.className = `py-1 ${player.name === 'أنت' ? 'text-yellow-300 font-bold' : 'text-white'}`;
+                playerEntry.innerHTML = `${index + 1}. ${player.name}: ${player.score} ${goldIconSVG}`;
+                leaderboardList.appendChild(playerEntry);
+            });
         }
 
 
@@ -2374,7 +3076,7 @@
             }
         });
 
-        // Cannon Game Controls (Mouse/Touch for aiming and firing)
+        // Cannon Game Controls (Mouse/Touch for aiming, no firing)
         let isAiming = false;
         cannonGameCanvas.addEventListener('mousedown', e => {
             if (cannonGameRunning) {
@@ -2400,7 +3102,7 @@
         cannonGameCanvas.addEventListener('mouseup', () => {
             if (cannonGameRunning && isAiming) {
                 isAiming = false;
-                fireCannonBall();
+                // fireCannonBall(); // Removed auto-fire on click
             }
         });
 
@@ -2430,7 +3132,7 @@
         cannonGameCanvas.addEventListener('touchend', () => {
             if (cannonGameRunning && isAiming) {
                 isAiming = false;
-                fireCannonBall();
+                // fireCannonBall(); // Removed auto-fire on touch
             }
         });
 
@@ -2443,16 +3145,17 @@
             renderShop();
         });
         mainMenuProfileButton.addEventListener('click', openProfile);
-        mainMenuCannonGameButton.addEventListener('click', startCannonGame); // New listener for Cannon Game
+        mainMenuCannonGameButton.addEventListener('click', startCannonGame);
+        mainMenuRankingButton.addEventListener('click', openRanking); // New Ranking button listener
 
         // Game Screen Button Listeners (initially hidden)
         startButton.addEventListener('click', startGame);
-        resetButton.addEventListener('click', startGame);
-        shopButton.addEventListener('click', () => {
-            gameButtons.style.display = 'none'; // Hide game buttons
-            shopModal.classList.add('active');
-            renderShop();
-        });
+        // resetButton.addEventListener('click', startGame); // Removed as per user request
+        // shopButton.addEventListener('click', () => { // Removed as per user request
+        //     gameButtons.style.display = 'none';
+        //     shopModal.classList.add('active');
+        //     renderShop();
+        // });
 
         // Modal Close Buttons
         messageBoxClose.addEventListener('click', hideMessageBox);
@@ -2490,6 +3193,12 @@
         // Cannon Game Back Button
         cannonGameBackButton.addEventListener('click', endCannonGame);
 
+        // Ranking Close Button
+        rankingCloseButton.addEventListener('click', () => {
+            rankingModal.classList.remove('active');
+            mainMenuModal.classList.add('active');
+        });
+
 
         // Handle canvas resizing
         window.addEventListener('resize', () => {
@@ -2500,11 +3209,14 @@
             player.x = canvas.width / 2;
             player.y = canvas.height - 60; // Keep at bottom
 
-            // Update Cannon Game canvas dimensions
-            cannonGameCanvas.width = cannonGameCanvas.offsetWidth;
-            cannonGameCanvas.height = cannonGameCanvas.offsetHeight;
+            // Update Cannon Game canvas dimensions (now matches main canvas)
+            cannonGameCanvas.width = canvas.width;
+            cannonGameCanvas.height = canvas.height;
             cannon.x = cannonGameCanvas.width / 2;
             cannon.y = cannonGameCanvas.height - 30;
+            if (cannonGameRunning) {
+                generateCannonTargets(); // Regenerate targets to fit new size
+            }
 
 
             // Redraw immediately if no game is running (e.g., in main menu)
@@ -2521,8 +3233,8 @@
             // Set initial canvas sizes
             canvas.width = canvas.offsetWidth;
             canvas.height = canvas.offsetHeight;
-            cannonGameCanvas.width = cannonGameCanvas.offsetWidth;
-            cannonGameCanvas.height = cannonGameCanvas.offsetHeight;
+            cannonGameCanvas.width = canvas.width; // Match main canvas width
+            cannonGameCanvas.height = canvas.height; // Match main canvas height
 
             draw(); // Draw initial state of Sea King (will be hidden)
             drawCannonGame(); // Draw initial state of Cannon Game (will be hidden)
@@ -2535,6 +3247,8 @@
             highScoreDisplay.style.display = 'none';
             powerupsDisplay.style.display = 'none';
             cannonGameModal.classList.remove('active'); // Ensure cannon game is hidden
+            itemPreviewModal.classList.remove('active'); // Ensure preview modal is hidden
+            rankingModal.classList.remove('active'); // Ensure ranking modal is hidden
 
             // Show the main menu
             mainMenuModal.classList.add('active');
