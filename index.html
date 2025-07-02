@@ -1,969 +1,2245 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة الأسئلة الذهبية</title>
-    <!-- Tailwind CSS CDN for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>ملك البحار</title>
     <!-- Google Fonts - Cairo -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN for basic styling and responsiveness -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Custom CSS for a better game appearance */
         body {
             font-family: 'Cairo', sans-serif; /* Apply Cairo font */
-            background-color: #1a202c; /* Dark background */
-            color: #e2e8f0; /* Light text color */
+            background: linear-gradient(to bottom right, #0a192f, #000d1a); /* Dark blue gradient background */
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            padding: 1rem; /* Padding for mobile view */
-            box-sizing: border-box;
+            overflow: hidden; /* Prevent scrolling */
         }
-        .container {
-            background-color: #2d3748; /* Slightly lighter dark for container */
+        .game-container {
+            background-color: #0b203a; /* Darker blue for game area */
+            border: 4px solid #4a90e2; /* Lighter blue border */
             border-radius: 1.5rem; /* More rounded corners */
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5); /* Darker shadow */
-            padding: 1.5rem;
-            width: 100%;
-            max-width: 400px; /* Max width for mobile-first design */
+            box-shadow: 0 0 30px rgba(74, 144, 226, 0.8), 0 0 15px rgba(74, 144, 226, 0.5) inset; /* Enhanced blue glow */
+            padding: 2rem;
             display: flex;
             flex-direction: column;
+            align-items: center;
             gap: 1.5rem;
-            border: 2px solid #d4af37; /* Golden border */
+            max-width: 90vw; /* Responsive width */
+            width: 550px; /* Slightly wider for better view */
+            position: relative; /* For absolute positioning of notifications */
         }
-        .golden-text {
-            color: #d4af37; /* Golden color */
+        canvas {
+            background-color: #004d7a; /* Deeper blue for the sea */
+            border-radius: 1rem; /* Rounded corners for canvas */
+            display: block;
+            touch-action: none; /* Disable default touch actions like scrolling/zooming */
+            width: 100%; /* Make canvas responsive */
+            height: 450px; /* Slightly taller game area */
+            max-height: 75vh; /* Max height for responsiveness */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5); /* Inner shadow for depth */
+            /* Background animation for canvas */
+            background-image: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: moveBackground 60s linear infinite;
         }
-        .btn-primary {
-            background-color: #d4af37; /* Golden button */
-            color: #1a202c; /* Dark text on golden button */
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem; /* Rounded button */
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-            text-align: center;
-            cursor: pointer;
+        @keyframes moveBackground {
+            from { background-position: 0 0; }
+            to { background-position: 0 1000px; } /* Move vertically */
         }
-        .btn-primary:hover {
-            background-color: #e6b800; /* Lighter golden on hover */
-        }
-        .btn-secondary {
-            background-color: #4a5568; /* Darker grey button */
-            color: #e2e8f0;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-            text-align: center;
-            cursor: pointer;
-        }
-        .btn-secondary:hover {
-            background-color: #6a7588;
-        }
-        .input-field {
-            background-color: #4a5568; /* Darker input field */
-            border: 1px solid #d4af37; /* Golden border for input */
-            color: #e2e8f0;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
             width: 100%;
-            box-sizing: border-box;
+            color: #e0f2f7; /* Light cyan text color */
+            font-size: 1.4rem; /* Slightly larger font */
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Text shadow for readability */
         }
-        .answer-option {
-            background-color: #4a5568;
-            color: #e2e8f0;
-            padding: 0.75rem;
-            border-radius: 0.75rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+        .currency-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .currency-icon {
+            width: 24px; /* Adjust size for better SVG display */
+            height: 24px;
+            vertical-align: middle;
+            fill: currentColor; /* Inherit color from parent */
+        }
+        .message-box, .shop-modal, .main-menu-modal, .profile-modal, .my-items-modal {
+            background-color: rgba(10, 25, 47, 0.95); /* Darker, semi-transparent background */
+            color: #e0f2f7;
+            padding: 1.5rem;
+            border-radius: 1rem;
             text-align: center;
-        }
-        .answer-option:hover {
-            background-color: #6a7588;
-        }
-        .answer-option.correct {
-            background-color: #10b981; /* Green for correct */
-            color: #ffffff;
-        }
-        .answer-option.incorrect {
-            background-color: #ef4444; /* Red for incorrect */
-            color: #ffffff;
-        }
-        .message-box {
-            position: fixed;
+            position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: #2d3748;
-            border: 2px solid #d4af37;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            z-index: 1000;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
-            display: none; /* Hidden by default */
-            max-width: 90%; /* Responsive message box */
+            z-index: 10;
+            /* Smooth transition properties */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            display: flex; /* Always flex, control visibility with opacity/visibility */
+            flex-direction: column; /* For modals */
+            gap: 1rem;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto; /* Allow scrolling for content */
         }
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 999;
-            display: none; /* Hidden by default */
+        .message-box.active, .shop-modal.active, .main-menu-modal.active, .profile-modal.active, .my-items-modal.active {
+            opacity: 1;
+            visibility: visible;
         }
-        .leaderboard-item {
+        .button-group {
             display: flex;
-            justify-content: space-between;
-            padding: 0.75rem;
-            background-color: #4a5568;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
+            gap: 1.5rem;
         }
-        .leaderboard-item span {
+        .game-button {
+            background: linear-gradient(145deg, #4a90e2, #2e6bb0); /* Blue gradient */
+            color: white;
+            padding: 0.9rem 2rem; /* Larger padding */
+            border-radius: 1rem; /* More rounded */
+            font-size: 1.25rem; /* Larger font */
             font-weight: bold;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.5); /* Enhanced shadow */
+            transition: all 0.3s ease;
+            outline: none;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Text shadow on buttons */
+        }
+        .game-button:hover {
+            background: linear-gradient(145deg, #2e6bb0, #4a90e2);
+            box-shadow: 0 10px 25px rgba(74, 144, 226, 0.7);
+            transform: translateY(-3px) scale(1.02); /* Slight lift and scale */
+        }
+        .game-button:active {
+            transform: translateY(1px) scale(0.98);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.4);
+        }
+
+        /* Shop specific styles */
+        .shop-modal h2, .main-menu-modal h2, .profile-modal h2, .my-items-modal h2 {
+            font-size: 2rem;
+            color: #7dd3fc; /* Light blue for headings */
+            margin-bottom: 1rem;
+        }
+        .shop-section, .profile-section, .my-items-section {
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+        .shop-section h3, .profile-section h3, .my-items-section h3 {
+            font-size: 1.6rem;
+            color: #93c5fd; /* Slightly darker blue */
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 0.5rem;
+        }
+        .skins-grid, .upgrades-grid, .main-menu-buttons, .my-items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            justify-items: center;
+        }
+        .main-menu-buttons {
+            grid-template-columns: 1fr; /* Stack buttons vertically in main menu */
+            max-width: 250px; /* Limit width for menu buttons */
+            margin: 0 auto;
+        }
+        .skin-item, .upgrade-item, .main-menu-item, .my-item-card {
+            background-color: #1c2b46; /* Darker background for items */
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease-in-out;
+            text-align: center;
+            cursor: pointer; /* Indicate clickable */
+            padding: 0.75rem; /* Padding for items */
+            width: 100%; /* Ensure items fill grid column */
+        }
+        .skin-item:hover, .upgrade-item:hover, .main-menu-item:hover, .my-item-card:hover {
+            transform: translateY(-5px);
+        }
+        .skin-item.active {
+            border-color: #10b981; /* Green border for active skin */
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.7);
+        }
+        .skin-preview {
+            width: 60px;
+            height: 60px;
+            margin: 0.5rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid;
+            overflow: hidden; /* Hide overflow for custom shapes */
+        }
+
+        /* Power-up display */
+        .powerups-display {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 5;
+        }
+        .powerup-item {
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .powerup-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        /* In-game notification */
+        #inGameNotification {
+            position: absolute;
+            top: 20px; /* Position below game info */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            z-index: 20;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+        #inGameNotification.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Profile specific styles */
+        .profile-stats p {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #e0f2f7;
+            text-align: left;
+        }
+        .profile-stats .currency-display {
+            justify-content: flex-start;
+        }
+        .profile-stats .currency-icon {
+            font-size: 1.5rem;
+            width: 28px;
+            height: 28px;
+        }
+        .xp-bar-container {
+            width: 100%;
+            background-color: #333;
+            border-radius: 5px;
+            height: 15px;
+            margin-top: 5px;
+            overflow: hidden;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+        .xp-bar {
+            height: 100%;
+            background-color: #00BCD4; /* Cyan */
+            width: 0%;
+            border-radius: 5px;
+            transition: width 0.5s ease-out;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .game-container {
+                padding: 1.2rem;
+                width: 95vw;
+                border-radius: 1rem;
+            }
+            canvas {
+                height: 350px; /* Adjust height for smaller screens */
+                border-radius: 0.75rem;
+            }
+            .game-info {
+                font-size: 1.1rem;
+            }
+            .game-button {
+                padding: 0.7rem 1.5rem;
+                font-size: 1.1rem;
+                border-radius: 0.75rem;
+            }
+            .message-box, .shop-modal, .main-menu-modal, .profile-modal, .my-items-modal {
+                font-size: 1.3rem;
+                padding: 1rem;
+                border-radius: 0.75rem;
+            }
+            .shop-modal h2, .main-menu-modal h2, .profile-modal h2, .my-items-modal h2 {
+                font-size: 1.6rem;
+            }
+            .shop-section h3, .profile-section h3, .my-items-section h3 {
+                font-size: 1.3rem;
+            }
+            .skins-grid, .upgrades-grid, .my-items-grid {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            }
+            .skin-preview {
+                width: 50px;
+                height: 50px;
+            }
+            .powerups-display {
+                top: 5px;
+                right: 5px;
+                font-size: 0.8rem;
+            }
+            .powerup-icon {
+                width: 16px;
+                height: 16px;
+            }
+            #inGameNotification {
+                top: 10px;
+                font-size: 0.9rem;
+                padding: 8px 15px;
+            }
+            .profile-stats p {
+                font-size: 1rem;
+            }
+            .profile-stats .currency-icon {
+                font-size: 1.2rem;
+                width: 20px;
+                height: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Start Screen -->
-        <div id="start-screen" class="flex flex-col items-center gap-6">
-            <h1 class="text-3xl font-bold golden-text mb-4">لعبة الأسئلة الذهبية</h1>
-            <p class="text-center text-lg">أدخل اسمك:</p>
-            <input type="text" id="player-name-input" class="input-field" placeholder="اسم اللاعب" maxlength="15">
-            <button id="show-room-screen-btn" class="btn-primary w-full">بدء اللعب</button>
-        </div>
-
-        <!-- Room Screen -->
-        <div id="room-screen" class="hidden flex-col items-center gap-6">
-            <h2 class="text-2xl font-bold golden-text mb-4">الغرف</h2>
-            <button id="create-room-btn" class="btn-primary w-full">إنشاء غرفة جديدة</button>
-            <div class="w-full text-center text-lg">أو</div>
-            <input type="text" id="room-id-input" class="input-field" placeholder="أدخل رمز الغرفة للانضمام" maxlength="10">
-            <button id="join-room-btn" class="btn-secondary w-full">الانضمام إلى غرفة</button>
-            <button id="back-to-start-btn" class="btn-secondary w-full">العودة</button>
-        </div>
-
-        <!-- Waiting Room Screen -->
-        <div id="waiting-room-screen" class="hidden flex-col items-center gap-6">
-            <h2 class="text-2xl font-bold golden-text mb-4">غرفة الانتظار</h2>
-            <p class="text-center text-lg">رمز الغرفة: <span id="display-room-id" class="golden-text font-bold"></span></p>
-            <p class="text-center text-gray-400">شارك هذا الرمز مع صديقك لينضم إليك.</p>
-            <p class="text-center text-xl" id="waiting-message">في انتظار لاعب آخر...</p>
-            <button id="leave-room-btn" class="btn-secondary w-full">مغادرة الغرفة</button>
-        </div>
-
-        <!-- Game Screen -->
-        <div id="game-screen" class="hidden flex-col items-center gap-4">
-            <div class="w-full flex justify-between text-lg mb-4">
-                <span id="current-player-display" class="golden-text font-bold"></span>
-                <span id="turn-display" class="text-gray-400"></span>
+    <div class="game-container">
+        <h1 class="text-4xl font-extrabold text-blue-300 mb-4 drop-shadow-lg">ملك البحار</h1>
+        <div class="game-info">
+            <div id="goldScore" class="currency-display text-yellow-400">
+                <!-- Gold icon will be injected here -->
+                الذهب: 0
             </div>
-            <div class="w-full flex justify-around text-base mb-4">
-                <div class="flex flex-col items-center">
-                    <span id="player1-name-display" class="golden-text font-bold"></span>
-                    <span id="player1-score-display" class="text-xl font-bold">النقاط: 0</span>
-                    <span id="player1-money-display" class="text-lg">المال: 0</span>
+            <div id="dollarScore" class="currency-display text-green-400">
+                <!-- Dollar icon will be injected here -->
+                الدولار: 0
+            </div>
+            <div id="highScore">أعلى ذهب: 0</div>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="button-group" id="gameButtons" style="display:none;">
+            <button id="startButton" class="game-button">ابدأ اللعبة</button>
+            <button id="resetButton" class="game-button">إعادة اللعب</button>
+            <button id="shopButton" class="game-button">المتجر</button>
+        </div>
+
+        <!-- Main Menu Modal -->
+        <div id="mainMenuModal" class="main-menu-modal active">
+            <h2 class="text-blue-300">القائمة الرئيسية</h2>
+            <div class="main-menu-buttons">
+                <button id="mainMenuPlayButton" class="game-button main-menu-item">ابدأ اللعب</button>
+                <button id="mainMenuShopButton" class="game-button main-menu-item">المتجر</button>
+                <button id="mainMenuProfileButton" class="game-button main-menu-item">الملف الشخصي</button>
+            </div>
+        </div>
+
+        <!-- Profile Modal -->
+        <div id="profileModal" class="profile-modal">
+            <h2 class="text-blue-300">الملف الشخصي</h2>
+            <div class="profile-stats flex flex-col items-start w-full px-4">
+                <p class="currency-display text-yellow-400"><span class="currency-icon" id="profileGoldIcon"></span> إجمالي الذهب المجموع: <span id="profileTotalGold">0</span></p>
+                <p class="currency-display text-green-400"><span class="currency-icon" id="profileDollarIcon"></span> إجمالي الدولار المجموع: <span id="profileTotalDollars">0</span></p>
+                <p>أعلى رصيد ذهب: <span id="profileHighScore">0</span></p>
+                <p>عدد الألعاب التي لعبتها: <span id="profileGamesPlayed">0</span></p>
+                <p>المستوى: <span id="playerLevelDisplay">1</span></p>
+                <div class="xp-bar-container">
+                    <div id="xpBar" class="xp-bar"></div>
                 </div>
-                <div class="flex flex-col items-center">
-                    <span id="player2-name-display" class="golden-text font-bold"></span>
-                    <span id="player2-score-display" class="text-xl font-bold">النقاط: 0</span>
-                    <span id="player2-money-display" class="text-lg">المال: 0</span>
+                <p class="text-xs text-gray-400 mt-1">XP: <span id="playerXPDisplay">0</span> / <span id="xpToNextLevelDisplay">100</span></p>
+            </div>
+            <button id="myItemsButton" class="game-button mt-4">عناصري</button>
+            <button id="profileCloseButton" class="game-button mt-4">إغلاق</button>
+        </div>
+
+        <!-- My Items Modal -->
+        <div id="myItemsModal" class="my-items-modal">
+            <h2 class="text-blue-300">عناصري</h2>
+            <div class="my-items-section">
+                <h3 class="text-blue-200">أشكال السفينة المملوكة</h3>
+                <div id="myPlayerSkinsContainer" class="my-items-grid skins-grid">
+                    <!-- Owned player skins will be rendered here -->
+                </div>
+            </div>
+            <div class="my-items-section">
+                <h3 class="text-blue-200">أشكال العدو المملوكة</h3>
+                <div id="myObstacleSkinsContainer" class="my-items-grid skins-grid">
+                    <!-- Owned obstacle skins will be rendered here -->
+                </div>
+            </div>
+            <div class="my-items-section">
+                <h3 class="text-blue-200">ترقياتي</h3>
+                <div id="myUpgradesContainer" class="my-items-grid upgrades-grid">
+                    <!-- Owned upgrades will be rendered here -->
+                </div>
+            </div>
+            <button id="resetGameDataButton" class="game-button mt-4 bg-red-600 hover:bg-red-700">إعادة تعيين جميع البيانات</button>
+            <button id="myItemsCloseButton" class="game-button mt-4">إغلاق</button>
+        </div>
+
+
+        <!-- Power-ups Display -->
+        <div id="powerupsDisplay" class="powerups-display">
+            <!-- Active power-ups will be displayed here -->
+        </div>
+
+        <!-- In-game Notification -->
+        <div id="inGameNotification"></div>
+
+        <!-- Custom Message Box (for game over) -->
+        <div id="messageBox" class="message-box">
+            <p id="messageText"></p>
+            <button id="messageBoxClose" class="game-button mt-4">حسناً</button>
+        </div>
+
+        <!-- Shop Modal -->
+        <div id="shopModal" class="shop-modal">
+            <h2 class="text-blue-300">متجر الأشكال والترقيات</h2>
+            <div class="flex justify-center gap-4 mb-4">
+                <div id="shopCurrentGold" class="currency-display text-yellow-400 text-2xl font-bold">
+                    <span class="currency-icon" id="shopGoldIcon"></span>
+                    الذهب الحالي: 0
+                </div>
+                <div id="shopCurrentDollars" class="currency-display text-green-400 text-2xl font-bold">
+                    <span class="currency-icon" id="shopDollarIcon"></span>
+                    الدولار الحالي: 0
                 </div>
             </div>
 
-            <h2 id="question-text" class="text-xl text-center mb-6"></h2>
-            <div id="answers-container" class="w-full flex flex-col gap-3">
-                <!-- Answer options will be injected here by JavaScript -->
+            <div class="shop-section">
+                <h3 class="text-blue-200">أشكال السفينة</h3>
+                <div id="playerSkinsContainer" class="skins-grid">
+                    <!-- Player skins will be rendered here by JavaScript -->
+                </div>
             </div>
-            <button id="next-question-btn" class="btn-secondary w-full mt-6 hidden">السؤال التالي</button>
-        </div>
 
-        <!-- Main Menu (after game or for navigation) -->
-        <div id="main-menu" class="hidden flex-col items-center gap-4">
-            <h2 class="text-2xl font-bold golden-text mb-4">القائمة الرئيسية</h2>
-            <button id="play-again-btn" class="btn-primary w-full">اللعب مرة أخرى</button>
-            <button id="leaderboard-btn" class="btn-primary w-full">لوحة الترتيب</button>
-            <button id="store-btn" class="btn-secondary w-full">المتجر (قريباً)</button>
-            <button id="profile-btn" class="btn-secondary w-full">الملف الشخصي (قريباً)</button>
-            <button id="settings-btn" class="btn-secondary w-full">الإعدادات (قريباً)</button>
-        </div>
-
-        <!-- Leaderboard Screen -->
-        <div id="leaderboard-screen" class="hidden flex-col items-center gap-4">
-            <h2 class="text-2xl font-bold golden-text mb-4">لوحة الترتيب</h2>
-            <div id="leaderboard-list" class="w-full flex flex-col gap-2">
-                <!-- Leaderboard items will be injected here -->
-                <p class="text-center text-gray-400" id="leaderboard-loading">جاري تحميل الترتيب...</p>
+            <div class="shop-section">
+                <h3 class="text-blue-200">أشكال العدو (الصخور)</h3>
+                <div id="obstacleSkinsContainer" class="skins-grid">
+                    <!-- Obstacle skins will be rendered here by JavaScript -->
+                </div>
             </div>
-            <button class="btn-secondary w-full" id="back-to-main-from-leaderboard">العودة للقائمة الرئيسية</button>
-        </div>
 
-        <!-- Store Screen (Placeholder) -->
-        <div id="store-screen" class="hidden flex-col items-center gap-4">
-            <h2 class="text-2xl font-bold golden-text mb-4">المتجر</h2>
-            <p class="text-center">هنا يمكنك شراء عناصر باستخدام أموالك في اللعبة.</p>
-            <p class="text-center text-gray-400">(هذه الميزة تتطلب تطويرًا إضافيًا)</p>
-            <button class="btn-secondary w-full" id="back-to-main-from-store">العودة للقائمة الرئيسية</button>
-        </div>
+            <div class="shop-section">
+                <h3 class="text-blue-200">الترقيات</h3>
+                <div id="upgradesContainer" class="upgrades-grid">
+                    <!-- Upgrades will be rendered here by JavaScript -->
+                </div>
+            </div>
 
-        <!-- Profile Screen (Placeholder) -->
-        <div id="profile-screen" class="hidden flex-col items-center gap-4">
-            <h2 class="text-2xl font-bold golden-text mb-4">الملف الشخصي</h2>
-            <p class="text-center">هنا ستعرض إحصائياتك وإنجازاتك.</p>
-            <p class="text-center text-gray-400">(هذه الميزة تتطلب تطويرًا إضافيًا)</p>
-            <button class="btn-secondary w-full" id="back-to-main-from-profile">العودة للقائمة الرئيسية</button>
-        </div>
-
-        <!-- Settings Screen (Placeholder) -->
-        <div id="settings-screen" class="hidden flex-col items-center gap-4">
-            <h2 class="text-2xl font-bold golden-text mb-4">الإعدادات</h2>
-            <p class="text-center">هنا يمكنك تعديل إعدادات اللعبة.</p>
-            <p class="text-center text-gray-400">(هذه الميزة تتطلب تطويرًا إضافيًا)</p>
-            <button class="btn-secondary w-full" id="back-to-main-from-settings">العودة للقائمة الرئيسية</button>
+            <button id="shopCloseButton" class="game-button mt-4">إغلاق</button>
         </div>
     </div>
 
-    <!-- Custom Message Box -->
-    <div id="message-box" class="message-box">
-        <p id="message-text" class="text-xl mb-4"></p>
-        <button id="message-ok-btn" class="btn-primary">موافق</button>
-    </div>
-    <div id="overlay" class="overlay"></div>
+    <script>
+        // Get canvas and its context
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-    <script type="module">
-        // Firebase SDK imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, where, addDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // Get score and message elements
+        const goldScoreDisplay = document.getElementById('goldScore');
+        const dollarScoreDisplay = document.getElementById('dollarScore');
+        const highScoreDisplay = document.getElementById('highScore');
+        const gameButtons = document.getElementById('gameButtons'); // Main game buttons container
+        const startButton = document.getElementById('startButton');
+        const resetButton = document.getElementById('resetButton');
+        const messageBox = document.getElementById('messageBox'); // For game over
+        const messageText = document.getElementById('messageText');
+        const messageBoxClose = document.getElementById('messageBoxClose');
+        const inGameNotification = document.getElementById('inGameNotification');
 
-        // ====================================================================================
-        // === هام جداً: إعدادات Firebase الخاصة بك ===
-        // ====================================================================================
-        // عند تشغيل اللعبة على GitHub Pages أو أي خادم ويب آخر، يجب عليك استبدال
-        // المتغيرات __app_id و __firebase_config و __initial_auth_token
-        // بإعدادات مشروع Firebase الخاص بك.
-        // احصل على هذه الإعدادات من وحدة تحكم Firebase (إعدادات المشروع -> تطبيقاتك).
-        //
-        // مثال:
-        // const MY_FIREBASE_CONFIG = {
-        //     apiKey: "YOUR_API_KEY",
-        //     authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-        //     projectId: "YOUR_PROJECT_ID",
-        //     storageBucket: "YOUR_PROJECT_ID.appspot.com",
-        //     messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        //     appId: "YOUR_APP_ID"
-        // };
-        //
-        // ثم استخدمها كالتالي:
-        // const firebaseConfig = MY_FIREBASE_CONFIG;
-        // const appId = MY_FIREBASE_CONFIG.projectId; // استخدم projectId كـ appId لمسارات Firestore
-        // const initialAuthToken = null; // لن يكون لديك رمز مصادقة مخصص هنا عادةً
+        // Main Menu elements
+        const mainMenuModal = document.getElementById('mainMenuModal');
+        const mainMenuPlayButton = document.getElementById('mainMenuPlayButton');
+        const mainMenuShopButton = document.getElementById('mainMenuShopButton');
+        const mainMenuProfileButton = document.getElementById('mainMenuProfileButton');
 
-        // ====================================================================================
-        // === استخدام المتغيرات العامة لبيئة Canvas (لا تعدل هذا الجزء إذا كنت في Canvas) ===
-        // ====================================================================================
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // سيتم استبداله بمعرف مشروعك إذا كنت خارج Canvas
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {}; // سيتم استبداله بإعدادات مشروعك
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null; // لن يكون متاحًا خارج Canvas
+        // Profile elements
+        const profileModal = document.getElementById('profileModal');
+        const profileTotalGold = document.getElementById('profileTotalGold');
+        const profileTotalDollars = document.getElementById('profileTotalDollars');
+        const profileHighScore = document.getElementById('profileHighScore');
+        const profileGamesPlayed = document.getElementById('profileGamesPlayed');
+        const playerLevelDisplay = document.getElementById('playerLevelDisplay'); // New
+        const playerXPDisplay = document.getElementById('playerXPDisplay'); // New
+        const xpToNextLevelDisplay = document.getElementById('xpToNextLevelDisplay'); // New
+        const xpBar = document.getElementById('xpBar'); // New
+        const myItemsButton = document.getElementById('myItemsButton'); // Renamed
+        const profileCloseButton = document.getElementById('profileCloseButton');
 
-        // إذا كنت تقوم بالتشغيل خارج بيئة Canvas، قم بإلغاء التعليق على الأسطر التالية
-        // واستبدل "YOUR_..." بقيم مشروعك الفعلية من Firebase Console.
-        /*
-        const MY_FIREBASE_CONFIG = {
-             apiKey: "YOUR_API_KEY",
-             authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-             projectId: "YOUR_PROJECT_ID",
-             storageBucket: "YOUR_PROJECT_ID.appspot.com",
-             messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-             appId: "YOUR_APP_ID" // هذا هو appId الفعلي لتطبيق الويب الخاص بك
+        // My Items elements
+        const myItemsModal = document.getElementById('myItemsModal'); // New modal
+        const myPlayerSkinsContainer = document.getElementById('myPlayerSkinsContainer'); // New
+        const myObstacleSkinsContainer = document.getElementById('myObstacleSkinsContainer'); // New
+        const myUpgradesContainer = document.getElementById('myUpgradesContainer'); // New
+        const resetGameDataButton = document.getElementById('resetGameDataButton'); // Moved
+        const myItemsCloseButton = document.getElementById('myItemsCloseButton'); // New
+
+        // Shop UI elements
+        const shopButton = document.getElementById('shopButton');
+        const shopModal = document.getElementById('shopModal');
+        const shopCloseButton = document.getElementById('shopCloseButton');
+        const playerSkinsContainer = document.getElementById('playerSkinsContainer');
+        const obstacleSkinsContainer = document.getElementById('obstacleSkinsContainer');
+        const upgradesContainer = document.getElementById('upgradesContainer');
+        const shopCurrentGoldDisplay = document.getElementById('shopCurrentGold');
+        const shopCurrentDollarsDisplay = document.getElementById('shopCurrentDollars');
+
+        // Currency Icons (SVG)
+        const goldIconSVG = '<svg class="currency-icon text-yellow-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v2h-2zm0 4h2v6h-2z"/></svg>';
+        const dollarIconSVG = '<svg class="currency-icon text-green-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v2h-2zm0 4h2v6h-2zM10 9h4v2h-4V9zm0 4h4v2h-4v-2z"/></svg>';
+
+        // Inject icons into HTML
+        goldScoreDisplay.insertAdjacentHTML('afterbegin', goldIconSVG);
+        dollarScoreDisplay.insertAdjacentHTML('afterbegin', dollarIconSVG);
+        document.getElementById('shopGoldIcon').insertAdjacentHTML('afterbegin', goldIconSVG);
+        document.getElementById('shopDollarIcon').insertAdjacentHTML('afterbegin', dollarIconSVG);
+        document.getElementById('profileGoldIcon').insertAdjacentHTML('afterbegin', goldIconSVG);
+        document.getElementById('profileDollarIcon').insertAdjacentHTML('afterbegin', dollarIconSVG);
+
+
+        // Power-ups display element
+        const powerupsDisplay = document.getElementById('powerupsDisplay');
+
+        // Game variables
+        let player = {
+            x: canvas.width / 2,
+            y: canvas.height - 60,
+            width: 40,
+            height: 40,
+            speed: 5, // Base speed, will be modified by upgrades
+            dx: 0,
+            isInvulnerable: false,
+            hasMagnet: false,
+            magnetRange: 200, // Base magnet range
+            magnetPullSpeedMultiplier: 1.5, // Base magnet pull speed
+            isDashing: false,
+            dashSpeedMultiplier: 3
         };
-        const firebaseConfig = MY_FIREBASE_CONFIG;
-        const appId = MY_FIREBASE_CONFIG.projectId; // نستخدم projectId كـ appId في مسارات Firestore
-        const initialAuthToken = null; // لا يوجد رمز مصادقة مخصص عند التشغيل خارج Canvas
-        */
-        // ====================================================================================
+
+        let fallingObjects = [];
+        let gold = 0;
+        let dollars = 0;
+        let highScore = localStorage.getItem('seaKingHighScore') || 0;
+        let totalGoldCollected = parseInt(localStorage.getItem('seaKingTotalGoldCollected') || '0');
+        let totalDollarsCollected = parseInt(localStorage.getItem('seaKingTotalDollarsCollected') || '0');
+        let gamesPlayed = parseInt(localStorage.getItem('seaKingGamesPlayed') || '0');
+
+        let playerLevel = parseInt(localStorage.getItem('seaKingPlayerLevel') || '1'); // New: Player level
+        let playerXP = parseInt(localStorage.getItem('seaKingPlayerXP') || '0'); // New: Player XP
+
+        // XP required for each level (up to level 100)
+        const xpToNextLevel = Array(100).fill(0).map((_, i) => 100 + (i * 50) + (Math.floor(i / 10) * 200)); // Example scaling
+
+        let gameRunning = false;
+        let lastObjectTime = 0;
+        const OBJECT_SPAWN_INTERVAL = 900;
+        const OBJECT_SPEED_INCREMENT = 0.07; // Rate at which object speed increases with gold
+
+        let activePowerups = [];
+
+        // Permanent upgrade effects
+        let goldMultiplier = 1;
+        let obstacleSpeedReduction = 0;
+        let luckyCharmChance = 0;
+
+        // --- Drawing Functions for Skins ---
+
+        /**
+         * Draws the default ship shape.
+         */
+        function drawShipDefault(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.roundRect(x - width / 2, y, width, height, 8);
+            ctx.moveTo(x - width / 2, y);
+            ctx.lineTo(x, y - height / 2);
+            ctx.lineTo(x + width / 2, y);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            ctx.fillStyle = detailsColor;
+            ctx.fillRect(x - 5, y + 10, 10, 15);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x - 5, y + 10, 10, 15);
+        }
+
+        /**
+         * Draws a sleek, fast ship shape.
+         */
+        function drawShipFast(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x - width * 0.4, y + height);
+            ctx.lineTo(x + width * 0.4, y + height);
+            ctx.lineTo(x + width * 0.5, y + height * 0.2);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x - width * 0.5, y + height * 0.2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            // Cockpit
+            ctx.fillStyle = detailsColor;
+            ctx.beginPath();
+            ctx.arc(x, y + height * 0.4, width * 0.15, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        /**
+         * Draws a wide, sturdy tanker ship shape.
+         */
+        function drawShipTanker(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.roundRect(x - width / 2, y, width, height, 10);
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            // Containers
+            ctx.fillStyle = detailsColor;
+            ctx.fillRect(x - width * 0.4, y + height * 0.2, width * 0.8, height * 0.2);
+            ctx.fillRect(x - width * 0.4, y + height * 0.6, width * 0.8, height * 0.2);
+        }
+
+        /**
+         * Draws a stealthy, angular ship.
+         */
+        function drawShipStealth(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x - width * 0.5, y + height * 0.8);
+            ctx.lineTo(x + width * 0.5, y + height * 0.8);
+            ctx.lineTo(x + width * 0.3, y + height * 0.2);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x - width * 0.3, y + height * 0.2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            // Window
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.beginPath();
+            ctx.moveTo(x - width * 0.1, y + height * 0.3);
+            ctx.lineTo(x + width * 0.1, y + height * 0.3);
+            ctx.lineTo(x + width * 0.05, y + height * 0.15);
+            ctx.lineTo(x - width * 0.05, y + height * 0.15);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        /**
+         * Draws a royal, ornate ship.
+         */
+        function drawShipRoyal(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.ellipse(x, y + height * 0.7, width * 0.4, height * 0.2, 0, 0, Math.PI * 2); // Base
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(x - width * 0.3, y + height * 0.7);
+            ctx.lineTo(x - width * 0.1, y + height * 0.1);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x + width * 0.1, y + height * 0.1);
+            ctx.lineTo(x + width * 0.3, y + height * 0.7);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Crown-like top
+            ctx.fillStyle = '#FFD700'; // Gold
+            ctx.beginPath();
+            ctx.moveTo(x - width * 0.15, y - height * 0.1);
+            ctx.lineTo(x - width * 0.05, y - height * 0.2);
+            ctx.lineTo(x, y - height * 0.1);
+            ctx.lineTo(x + width * 0.05, y - height * 0.2);
+            ctx.lineTo(x + width * 0.15, y - height * 0.1);
+            ctx.lineTo(x + width * 0.1, y);
+            ctx.lineTo(x - width * 0.1, y);
+            ctx.closePath();
+            ctx.fill();
+        }
 
 
-        let app;
-        let db;
-        let auth;
-        let userId = null; // User ID for Firestore operations
-        let unsubscribeFromRoom = null; // To unsubscribe from Firestore listener
+        /**
+         * Draws the default rock shape.
+         */
+        function drawRockDefault(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x + width / 2, y);
+            ctx.lineTo(x + width, y + height / 3);
+            ctx.lineTo(x + width * 0.8, y + height);
+            ctx.lineTo(x + width * 0.2, y + height);
+            ctx.lineTo(x, y + height / 3);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
 
-        // Initialize Firebase and authenticate
-        const initializeFirebase = async () => {
-            try {
-                // تحقق مما إذا كانت إعدادات Firebase موجودة
-                if (Object.keys(firebaseConfig).length > 0 && firebaseConfig.projectId) {
-                    app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    auth = getAuth(app);
+        /**
+         * Draws a spiky rock shape.
+         */
+        function drawRockSpiky(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x + width / 2, y);
+            ctx.lineTo(x + width, y + height * 0.2);
+            ctx.lineTo(x + width * 0.8, y + height * 0.5);
+            ctx.lineTo(x + width, y + height * 0.8);
+            ctx.lineTo(x + width / 2, y + height);
+            ctx.lineTo(x, y + height * 0.8);
+            ctx.lineTo(x + width * 0.2, y + height * 0.5);
+            ctx.lineTo(x, y + height * 0.2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+        }
 
-                    // Sign in with custom token if available, otherwise anonymously
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                        console.log("Firebase: Signed in with custom token.");
-                    } else {
-                        // إذا لم يكن هناك رمز مخصص، قم بتسجيل الدخول كمستخدم مجهول
-                        await signInAnonymously(auth);
-                        console.log("Firebase: Signed in anonymously.");
-                    }
+        /**
+         * Draws a log shape.
+         */
+        function drawRockLog(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.roundRect(x, y + height * 0.2, width, height * 0.6, 10);
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            // Add some lines for wood texture
+            ctx.beginPath();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 1;
+            ctx.moveTo(x + width * 0.2, y + height * 0.3);
+            ctx.lineTo(x + width * 0.2, y + height * 0.7);
+            ctx.moveTo(x + width * 0.5, y + height * 0.25);
+            ctx.lineTo(x + width * 0.5, y + height * 0.75);
+            ctx.moveTo(x + width * 0.8, y + height * 0.3);
+            ctx.lineTo(x + width * 0.8, y + height * 0.7);
+            ctx.stroke();
+        }
 
-                    // Listen for auth state changes to get the user ID
-                    onAuthStateChanged(auth, (user) => {
-                        if (user) {
-                            userId = user.uid;
-                            console.log("Firebase: User ID:", userId);
-                            // هنا يمكنك تحميل بيانات المستخدم من Firestore إذا لزم الأمر
-                        } else {
-                            userId = null;
-                            console.log("Firebase: No user signed in.");
-                        }
-                    });
-                } else {
-                    console.warn("Firebase: إعدادات Firebase غير موجودة أو غير كاملة. لن يتم تهيئة Firebase.");
-                    showMessage("إعدادات Firebase غير موجودة. الرجاء التأكد من تهيئة Firebase بشكل صحيح.", "خطأ في التهيئة");
-                }
-            } catch (error) {
-                console.error("Firebase initialization error:", error);
-                showMessage("حدث خطأ في تهيئة Firebase: " + error.message + ". قد لا تعمل ميزات الحفظ السحابي.", "خطأ");
+        /**
+         * Draws a crystal-like rock.
+         */
+        function drawRockCrystal(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(x + width / 2, y);
+            ctx.lineTo(x + width, y + height * 0.2);
+            ctx.lineTo(x + width * 0.7, y + height);
+            ctx.lineTo(x + width * 0.3, y + height);
+            ctx.lineTo(x, y + height * 0.2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            // Inner lines for crystal effect
+            ctx.beginPath();
+            ctx.moveTo(x + width / 2, y);
+            ctx.lineTo(x + width * 0.5, y + height * 0.5);
+            ctx.lineTo(x + width * 0.7, y + height);
+            ctx.moveTo(x + width / 2, y);
+            ctx.lineTo(x + width * 0.5, y + height * 0.5);
+            ctx.lineTo(x + width * 0.3, y + height);
+            ctx.moveTo(x + width / 2, y);
+            ctx.lineTo(x + width * 0.5, y + height * 0.5);
+            ctx.lineTo(x, y + height * 0.2);
+            ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+            ctx.stroke();
+        }
+
+        /**
+         * Draws an alien, organic rock.
+         */
+        function drawRockAlien(ctx, x, y, width, height, color, detailsColor) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.ellipse(x + width / 2, y + height / 2, width / 2, height / 2, 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+            ctx.stroke();
+            // Tentacles/spikes
+            ctx.beginPath();
+            ctx.moveTo(x + width / 2, y);
+            ctx.quadraticCurveTo(x + width * 0.7, y - height * 0.2, x + width * 0.8, y + height * 0.1);
+            ctx.moveTo(x + width / 2, y + height);
+            ctx.quadraticCurveTo(x + width * 0.3, y + height * 1.2, x + width * 0.2, y + height * 0.9);
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        /**
+         * Draws an explosive mine.
+         */
+        function drawMine(ctx, x, y, size, color = '#FF5722', detailsColor = '#E64A19') { // Orange/Red
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Spikes
+            for (let i = 0; i < 8; i++) {
+                const angle = (Math.PI / 4) * i;
+                const startX = x + size / 2 + Math.cos(angle) * (size / 2 - 5);
+                const startY = y + size / 2 + Math.sin(angle) * (size / 2 - 5);
+                const endX = x + size / 2 + Math.cos(angle) * (size / 2 + 10);
+                const endY = y + size / 2 + Math.sin(angle) * (size / 2 + 10);
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.strokeStyle = detailsColor;
+                ctx.lineWidth = 2;
+                ctx.stroke();
             }
-        };
+        }
 
-        // Call Firebase initialization
-        initializeFirebase();
+        /**
+         * Draws a whirlpool.
+         */
+        function drawWhirlpool(ctx, x, y, size, color = '#4FC3F7', detailsColor = '#0288D1') { // Light Blue / Dark Blue
+            ctx.save();
+            ctx.translate(x + size / 2, y + size / 2); // Center for rotation
 
-        // --- Game Variables ---
-        let playerName = '';
-        let currentRoomId = null;
-        let players = [
-            { id: '', name: '', score: 0, money: 0 },
-            { id: '', name: '', score: 0, money: 0 }
+            ctx.strokeStyle = detailsColor;
+            ctx.lineWidth = 3;
+
+            // Spirals
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.arc(0, 0, size * 0.4, 0 + i * Math.PI / 3, Math.PI + i * Math.PI / 3);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(0, 0, size * 0.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+
+        /**
+         * Draws a speed power-up (green arrow).
+         */
+        function drawPowerupSpeed(ctx, x, y, size) {
+            ctx.fillStyle = '#4CAF50'; // Green
+            ctx.beginPath();
+            ctx.moveTo(x + size / 2, y);
+            ctx.lineTo(x + size, y + size / 2);
+            ctx.lineTo(x + size / 2, y + size);
+            ctx.lineTo(x + size / 2, y + size * 0.7);
+            ctx.lineTo(x, y + size * 0.7);
+            ctx.lineTo(x, y + size * 0.3);
+            ctx.lineTo(x + size / 2, y + size * 0.3);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#388E3C';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        /**
+         * Draws a shield power-up (blue shield).
+         */
+        function drawPowerupShield(ctx, x, y, size) {
+            ctx.fillStyle = '#2196F3'; // Blue
+            ctx.beginPath();
+            ctx.moveTo(x, y + size * 0.2);
+            ctx.lineTo(x + size / 2, y);
+            ctx.lineTo(x + size, y + size * 0.2);
+            ctx.lineTo(x + size, y + size * 0.8);
+            ctx.quadraticCurveTo(x + size / 2, y + size, x, y + size * 0.8);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#1976D2';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            // Small star in the middle
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(x + size / 2, y + size / 2, size * 0.15, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        /**
+         * Draws a gold magnet power-up (purple magnet).
+         */
+        function drawPowerupMagnet(ctx, x, y, size) {
+            ctx.fillStyle = '#9C27B0'; // Purple
+            ctx.beginPath();
+            ctx.roundRect(x, y + size * 0.2, size, size * 0.6, 5); // Main body
+            ctx.fill();
+            ctx.strokeStyle = '#7B1FA2';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Magnet arms
+            ctx.beginPath();
+            ctx.arc(x, y + size / 2, size * 0.3, Math.PI / 2, Math.PI * 1.5);
+            ctx.lineTo(x, y + size * 0.2);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(x + size, y + size / 2, size * 0.3, Math.PI * 1.5, Math.PI / 2);
+            ctx.lineTo(x + size, y + size * 0.2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Poles
+            ctx.fillStyle = '#F44336'; // Red pole
+            ctx.fillRect(x, y + size * 0.2, size * 0.1, size * 0.6);
+            ctx.fillStyle = '#2196F3'; // Blue pole
+            ctx.fillRect(x + size * 0.9, y + size * 0.2, size * 0.1, size * 0.6);
+        }
+
+        /**
+         * Draws an invincible dash power-up (rocket).
+         */
+        function drawPowerupDash(ctx, x, y, size) {
+            ctx.fillStyle = '#FF4081'; // Pink/Red
+            ctx.beginPath();
+            ctx.moveTo(x + size / 2, y); // Top point
+            ctx.lineTo(x + size * 0.8, y + size * 0.8);
+            ctx.lineTo(x + size * 0.7, y + size);
+            ctx.lineTo(x + size * 0.3, y + size);
+            ctx.lineTo(x + size * 0.2, y + size * 0.8);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#C51162';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Fins
+            ctx.fillStyle = '#FFAB40'; // Orange
+            ctx.beginPath();
+            ctx.moveTo(x + size * 0.2, y + size * 0.7);
+            ctx.lineTo(x, y + size);
+            ctx.lineTo(x + size * 0.2, y + size);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(x + size * 0.8, y + size * 0.7);
+            ctx.lineTo(x + size, y + size);
+            ctx.lineTo(x + size * 0.8, y + size);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+
+
+        /**
+         * Draws a clear screen power-up (explosion icon).
+         */
+        function drawPowerupClearScreen(ctx, x, y, size) {
+            ctx.fillStyle = '#E91E63'; // Pink
+            ctx.beginPath();
+            ctx.arc(x + size / 2, y + size / 2, size / 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#C2185B';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            // Starburst lines
+            ctx.beginPath();
+            for (let i = 0; i < 8; i++) {
+                const angle = (Math.PI / 4) * i;
+                ctx.moveTo(x + size / 2 + Math.cos(angle) * size * 0.2, y + size / 2 + Math.sin(angle) * size * 0.2);
+                ctx.lineTo(x + size / 2 + Math.cos(angle) * size * 0.4, y + size / 2 + Math.sin(angle) * size * 0.4);
+            }
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        /**
+         * Draws a treasure chest.
+         */
+        function drawTreasureChest(ctx, x, y, size) {
+            ctx.fillStyle = '#8B4513'; // SaddleBrown
+            ctx.beginPath();
+            ctx.roundRect(x, y + size * 0.2, size, size * 0.6, 5); // Body
+            ctx.fill();
+            ctx.strokeStyle = '#5A2D0C'; // Darker brown
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Lid
+            ctx.fillStyle = '#A0522D'; // Sienna
+            ctx.beginPath();
+            ctx.roundRect(x, y, size, size * 0.3, 5);
+            ctx.fill();
+            ctx.strokeStyle = '#5A2D0C';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Gold lock
+            ctx.fillStyle = '#FFD700'; // Gold
+            ctx.fillRect(x + size / 2 - 5, y + size * 0.4, 10, 10);
+            ctx.strokeStyle = '#B8860B';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(x + size / 2 - 5, y + size * 0.4, 10, 10);
+        }
+
+
+        // Skin data - Define available skins and their properties
+        const playerSkinsData = [
+            { id: 'ship-default', name: 'السفينة الأساسية', cost: { gold: 0, dollars: 0 }, color: '#ffeb3b', detailsColor: '#fbc02d', isOwned: true, isActive: true, drawFunction: drawShipDefault },
+            { id: 'ship-blue', name: 'السفينة الزرقاء', cost: { gold: 50, dollars: 0 }, color: '#4a90e2', detailsColor: '#2e6bb0', isOwned: false, isActive: false, drawFunction: drawShipDefault },
+            { id: 'ship-green', name: 'السفينة الخضراء', cost: { gold: 100, dollars: 0 }, color: '#8bc34a', detailsColor: '#689f38', isOwned: false, isActive: false, drawFunction: drawShipDefault },
+            { id: 'ship-fast', name: 'السفينة السريعة', cost: { gold: 200, dollars: 0 }, color: '#ff5722', detailsColor: '#e64a19', isOwned: false, isActive: false, drawFunction: drawShipFast },
+            { id: 'ship-tanker', name: 'سفينة الشحن', cost: { gold: 250, dollars: 0 }, color: '#607d8b', detailsColor: '#455a64', isOwned: false, isActive: false, drawFunction: drawShipTanker },
+            { id: 'ship-stealth', name: 'سفينة التخفي', cost: { gold: 0, dollars: 5 }, color: '#37474F', detailsColor: '#263238', isOwned: false, isActive: false, drawFunction: drawShipStealth },
+            { id: 'ship-royal', name: 'السفينة الملكية', cost: { gold: 0, dollars: 10 }, color: '#FFD700', detailsColor: '#DAA520', isOwned: false, isActive: false, drawFunction: drawShipRoyal }
         ];
-        let currentPlayerIndex = 0; // Index in the `players` array
-        let currentTurnPlayerId = ''; // The actual Firebase user ID of the player whose turn it is
-        let currentQuestionIndex = 0;
-        let askedQuestions = new Set(); // To keep track of asked questions
-        const maxQuestionsPerGame = 50; // Total questions for the game
-        const pointsPerCorrectAnswer = 10;
-        const moneyPerCorrectAnswer = 5;
 
-        // Sample Questions (50 general questions)
-        const questions = [
-            { question: "ما هي عاصمة العراق؟", options: ["بغداد", "الرياض", "القاهرة", "دمشق"], correct: "بغداد" },
-            { question: "كم عدد الكواكب في نظامنا الشمسي؟", options: ["7", "8", "9", "10"], correct: "8" },
-            { question: "ما هو أكبر محيط في العالم؟", options: ["المحيط الأطلسي", "المحيط الهندي", "المحيط الهادئ", "المحيط المتجمد الشمالي"], correct: "المحيط الهادئ" },
-            { question: "من هو مؤلف رواية 'الأمير الصغير'؟", options: ["فيكتور هوغو", "أنتوان دو سانت-إكزوبيري", "تشارلز ديكنز", "ليو تولستوي"], correct: "أنتوان دو سانت-إكزوبيري" },
-            { question: "ما هو العنصر الكيميائي الذي رمزه Au؟", options: ["الفضة", "النحاس", "الذهب", "الحديد"], correct: "الذهب" },
-            { question: "ما هو أطول نهر في العالم؟", options: ["نهر النيل", "نهر الأمازون", "نهر يانغتسي", "نهر المسيسيبي"], correct: "نهر النيل" },
-            { question: "في أي قارة تقع صحراء غوبي؟", options: ["أفريقيا", "آسيا", "أمريكا الشمالية", "أستراليا"], correct: "آسيا" },
-            { question: "ما هو الحيوان المعروف بأنه 'سفينة الصحراء'؟", options: ["الحصان", "الجمل", "الفيل", "الزرافة"], correct: "الجمل" },
-            { question: "ما هو اسم أول رجل سار على سطح القمر؟", options: ["يوري غاغارين", "نيل أرمسترونغ", "باز ألدرين", "مايكل كولينز"], correct: "نيل أرمسترونغ" },
-            { question: "ما هي أكبر دولة في العالم من حيث المساحة؟", options: ["الصين", "كندا", "روسيا", "الولايات المتحدة"], correct: "روسيا" },
-            { question: "ما هو الكوكب الأحمر؟", options: ["المريخ", "المشتري", "الزهرة", "زحل"], correct: "المريخ" },
-            { question: "من بنى الأهرامات في مصر؟", options: ["الرومان", "اليونانيون", "المصريون القدماء", "الفرس"], correct: "المصريون القدماء" },
-            { question: "ما هي العملة الرسمية لليابان؟", options: ["اليورو", "الدولار", "الين", "الجنيه"], correct: "الين" },
-            { question: "ما هو أسرع حيوان على وجه الأرض؟", options: ["الأسد", "الفهد", "الغزال", "الحصان"], correct: "الفهد" },
-            { question: "ما هو أكبر حيوان على وجه الأرض؟", options: ["الفيل", "الحوت الأزرق", "الزرافة", "الدب القطبي"], correct: "الحوت الأزرق" },
-            { question: "ما هي أعلى قمة جبلية في العالم؟", options: ["كي2", "كانغشينجونغا", "إيفرست", "لوتسي"], correct: "إيفرست" },
-            { question: "ما هو الغاز الأكثر وفرة في الغلاف الجوي للأرض؟", options: ["الأكسجين", "ثاني أكسيد الكربون", "النيتروجين", "الأرغون"], correct: "النيتروجين" },
-            { question: "ما هو الاسم الكيميائي للملح؟", options: ["كلوريد البوتاسيوم", "بيكربونات الصوديوم", "كلوريد الصوديوم", "كبريتات المغنيسيوم"], correct: "كلوريد الصوديوم" },
-            { question: "من اخترع المصباح الكهربائي؟", options: ["نيكولا تسلا", "توماس إديسون", "ألكسندر غراهام بيل", "ألبرت أينشتاين"], correct: "توماس إديسون" },
-            { question: "ما هي اللغة الأكثر تحدثًا في العالم (كلغة أم)؟", options: ["الإنجليزية", "الإسبانية", "الماندرين الصينية", "الهندية"], correct: "الماندرين الصينية" },
-            { question: "ما هو الحيوان الذي يمتلك 3 قلوب؟", options: ["الأخطبوط", "التمساح", "الكنغر", "الضفدع"], correct: "الأخطبوط" },
-            { question: "ما هي المدينة التي يقع فيها برج إيفل؟", options: ["لندن", "روما", "باريس", "برلين"], correct: "باريس" },
-            { question: "ما هو لون الزرافة؟", options: ["أصفر وأسود", "بني وأبيض", "بني وأصفر", "أبيض وأسود"], correct: "بني وأصفر" },
-            { question: "ما هي عاصمة إيطاليا؟", options: ["ميلانو", "البندقية", "روما", "فلورنسا"], correct: "روما" },
-            { question: "ما هو أكبر صحراء حارة في العالم؟", options: ["صحراء غوبي", "الصحراء الكبرى", "صحراء أتاكاما", "الصحراء العربية"], correct: "الصحراء الكبرى" },
-            { question: "ما هو اسم الكوكب الذي يعرف بـ 'جوهرة النظام الشمسي'؟", options: ["المشتري", "زحل", "نبتون", "أورانوس"], correct: "زحل" },
-            { question: "ما هو الطائر الذي لا يطير؟", options: ["النسر", "البطريق", "الصقر", "العصفور"], correct: "البطريق" },
-            { question: "ما هو أطول سلسلة جبلية في العالم؟", options: ["جبال روكي", "جبال الأنديز", "جبال الهيمالايا", "جبال الألب"], correct: "جبال الأنديز" },
-            { question: "ما هي الدولة التي تشتهر بالسامبا؟", options: ["إسبانيا", "البرازيل", "الأرجنتين", "كولومبيا"], correct: "البرازيل" },
-            { question: "ما هو عدد ألوان قوس قزح؟", options: ["5", "6", "7", "8"], correct: "7" },
-            { question: "ما هو اسم أكبر جزيرة في العالم؟", options: ["مدغشقر", "بورنيو", "غرينلاند", "نيو غينيا"], correct: "غرينلاند" },
-            { question: "ما هو اسم المحيط الذي يفصل بين أوروبا وأمريكا؟", options: ["المحيط الهادئ", "المحيط الهندي", "المحيط الأطلسي", "المحيط المتجمد الجنوبي"], correct: "المحيط الأطلسي" },
-            { question: "ما هو الحيوان الذي ينام وعيناه مفتوحتان؟", options: ["الضفدع", "السمكة", "الثعبان", "التمساح"], correct: "السمكة" },
-            { question: "ما هو اسم أول رئيس للولايات المتحدة الأمريكية؟", options: ["توماس جيفرسون", "أبراهام لينكون", "جورج واشنطن", "بنجامين فرانكلين"], correct: "جورج واشنطن" },
-            { question: "ما هي الرياضة التي تعرف بـ 'ملكة الرياضات'؟", options: ["كرة القدم", "كرة السلة", "ألعاب القوى", "السباحة"], correct: "ألعاب القوى" },
-            { question: "ما هو اسم الكوكب الأقرب إلى الشمس؟", options: ["الزهرة", "المريخ", "عطارد", "الأرض"], correct: "عطارد" },
-            { question: "ما هو اسم الغاز الذي تستنشقه النباتات؟", options: ["الأكسجين", "النيتروجين", "ثاني أكسيد الكربون", "الهيدروجين"], correct: "ثاني أكسيد الكربون" },
-            { question: "ما هو اسم أكبر حيوان بري على وجه الأرض؟", options: ["وحيد القرن", "الفيل الأفريقي", "الدب القطبي", "الزرافة"], correct: "الفيل الأفريقي" },
-            { question: "ما هي عاصمة أستراليا؟", options: ["سيدني", "ملبورن", "كانبرا", "بريزبان"], correct: "كانبرا" },
-            { question: "ما هو اسم العملية التي تحول فيها النباتات ضوء الشمس إلى طاقة؟", options: ["التنفس", "التمثيل الضوئي", "التبخر", "التكثف"], correct: "التمثيل الضوئي" },
-            { question: "ما هو اسم أصغر قارة في العالم؟", options: ["أفريقيا", "أوروبا", "أستراليا", "أمريكا الجنوبية"], correct: "أستراليا" },
-            { question: "ما هو اسم البحر الذي يفصل بين أفريقيا وأوروبا؟", options: ["البحر الأحمر", "البحر الأسود", "البحر الأبيض المتوسط", "بحر العرب"], correct: "البحر الأبيض المتوسط" },
-            { question: "ما هو اسم الجهاز الذي يقيس درجة الحرارة؟", options: ["البارومتر", "الأنيمومتر", "الترمومتر", "الهايدروميتر"], correct: "الترمومتر" },
-            { question: "ما هو اسم أكبر محيط متجمد؟", options: ["المحيط المتجمد الشمالي", "المحيط المتجمد الجنوبي", "المحيط الهادئ", "المحيط الأطلسي"], correct: "المحيط المتجمد الجنوبي" },
-            { question: "ما هو اسم الفاكهة التي تعرف بـ 'ملك الفواكه'؟", options: ["التفاح", "المانجو", "الموز", "البرتقال"], correct: "المانجو" },
-            { question: "ما هو اسم أطول مبنى في العالم؟", options: ["برج شنغهاي", "أبراج بتروناس", "برج خليفة", "تايبيه 101"], correct: "برج خليفة" },
-            { question: "ما هو اسم الحيوان الذي يمتلك أطول رقبة؟", options: ["الزرافة", "النعامة", "الجمل", "الفيل"], correct: "الزرافة" },
-            { question: "ما هي عاصمة اليونان؟", options: ["أثينا", "سالونيك", "باتراس", "هيراكليون"], correct: "أثينا" },
-            { question: "ما هو اسم العملية التي يتحول فيها الماء من سائل إلى غاز؟", options: ["التكثف", "التجمد", "التبخر", "الانصهار"], correct: "التبخر" },
-            { question: "ما هو اسم أكبر عضو في جسم الإنسان؟", options: ["القلب", "الرئة", "الجلد", "الكبد"], correct: "الجلد" }
+        const obstacleSkinsData = [
+            { id: 'rock-default', name: 'الصخرة العادية', cost: { gold: 0, dollars: 0 }, color: '#ef5350', detailsColor: '#d32f2f', isOwned: true, isActive: true, drawFunction: drawRockDefault },
+            { id: 'rock-purple', name: 'الصخرة الأرجوانية', cost: { gold: 75, dollars: 0 }, color: '#9c27b0', detailsColor: '#7b1fa2', isOwned: false, isActive: false, drawFunction: drawRockDefault },
+            { id: 'rock-grey', name: 'الصخرة الرمادية', cost: { gold: 120, dollars: 0 }, color: '#757575', detailsColor: '#424242', isOwned: false, isActive: false, drawFunction: drawRockDefault },
+            { id: 'rock-spiky', name: 'الصخرة الشوكية', cost: { gold: 170, dollars: 0 }, color: '#795548', detailsColor: '#5d4037', isOwned: false, isActive: false, drawFunction: drawRockSpiky },
+            { id: 'rock-log', name: 'جذع الشجرة', cost: { gold: 220, dollars: 0 }, color: '#8d6e63', detailsColor: '#6d4c41', isOwned: false, isActive: false, drawFunction: drawRockLog },
+            { id: 'rock-crystal', name: 'الصخرة الكريستالية', cost: { gold: 0, dollars: 5 }, color: '#00BCD4', detailsColor: '#0097A7', isOwned: false, isActive: false, drawFunction: drawRockCrystal },
+            { id: 'rock-alien', name: 'الصخرة الفضائية', cost: { gold: 0, dollars: 10 }, color: '#6A1B9A', detailsColor: '#4A148C', isOwned: false, isActive: false, drawFunction: drawRockAlien }
+        ];
+
+        const powerupData = [
+            { id: 'speed-boost', name: 'سرعة إضافية', duration: 5000, drawFunction: drawPowerupSpeed, effect: () => { player.speed *= 2; }, revert: () => { player.speed /= 2; }, icon: '⚡' },
+            { id: 'shield', name: 'درع حماية', duration: 7000, drawFunction: drawPowerupShield, effect: () => { player.isInvulnerable = true; }, revert: () => { player.isInvulnerable = false; }, icon: '🛡️' },
+            { id: 'gold-magnet', name: 'جاذب الذهب', duration: 6000, drawFunction: drawPowerupMagnet, effect: () => { player.hasMagnet = true; }, revert: () => { player.hasMagnet = false; }, icon: '🧲' },
+            { id: 'invincible-dash', name: 'اندفاع خارق', duration: 1500, drawFunction: drawPowerupDash, effect: () => { player.isDashing = true; player.isInvulnerable = true; player.speed *= player.dashSpeedMultiplier; }, revert: () => { player.isDashing = false; player.isInvulnerable = false; player.speed /= player.dashSpeedMultiplier; }, icon: '🚀' },
+            { id: 'clear-screen', name: 'مسح الشاشة', duration: 0, drawFunction: drawPowerupClearScreen, effect: () => { fallingObjects = fallingObjects.filter(obj => obj.type !== 'obstacle' && obj.type !== 'mine' && obj.type !== 'whirlpool'); showInGameNotification('تم مسح العقبات!'); }, revert: () => {}, icon: '💥' }
+        ];
+
+        // New: Upgrade data
+        const upgradesData = [
+            { id: 'upgrade-speed', name: 'ترقية السرعة', description: 'زيادة سرعة السفينة الأساسية.', levels: [ { cost: 200, value: 1 }, { cost: 500, value: 1 }, { cost: 1200, value: 1 }, { cost: 2500, value: 1 }, { cost: 5000, value: 1 } ], currentLevel: 0, maxLevel: 5 },
+            { id: 'upgrade-magnet', name: 'ترقية جاذب الذهب', description: 'زيادة مدة جاذب الذهب.', levels: [ { cost: 250, value: 1500 }, { cost: 600, value: 1500 }, { cost: 1400, value: 1500 }, { cost: 3000, value: 1500 }, { cost: 6000, value: 1500 } ], currentLevel: 0, maxLevel: 5 },
+            { id: 'upgrade-shield', name: 'ترقية الدرع', description: 'زيادة مدة درع الحماية.', levels: [ { cost: 300, value: 2000 }, { cost: 700, value: 2000 }, { cost: 1600, value: 2000 }, { cost: 3500, value: 2000 }, { cost: 7000, value: 2000 } ], currentLevel: 0, maxLevel: 5 },
+            { id: 'upgrade-gold-multiplier', name: 'مضاعف الذهب', description: 'زيادة الذهب المكتسب.', levels: [ { cost: 400, value: 0.2 }, { cost: 900, value: 0.3 }, { cost: 2000, value: 0.4 }, { cost: 4500, value: 0.5 }, { cost: 9000, value: 0.6 } ], currentLevel: 0, maxLevel: 5 },
+            { id: 'upgrade-obstacle-slowdown', name: 'إبطاء العقبات', description: 'تقليل سرعة سقوط العقبات.', levels: [ { cost: 450, value: 0.03 }, { cost: 1000, value: 0.04 }, { cost: 2200, value: 0.05 }, { cost: 4800, value: 0.06 }, { cost: 9500, value: 0.07 } ], currentLevel: 0, maxLevel: 5 },
+            { id: 'upgrade-lucky-charm', name: 'التميمة المحظوظة', description: 'فرصة للحصول على دولار عند جمع الذهب.', levels: [ { cost: { gold: 0, dollars: 3 }, value: 0.01 }, { cost: { gold: 0, dollars: 6 }, value: 0.01 }, { cost: { gold: 0, dollars: 10 }, value: 0.01 } ], currentLevel: 0, maxLevel: 3 }
         ];
 
 
-        // --- DOM Elements ---
-        const startScreen = document.getElementById('start-screen');
-        const roomScreen = document.getElementById('room-screen');
-        const waitingRoomScreen = document.getElementById('waiting-room-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const mainMenu = document.getElementById('main-menu');
-        const leaderboardScreen = document.getElementById('leaderboard-screen');
-        const storeScreen = document.getElementById('store-screen');
-        const profileScreen = document.getElementById('profile-screen');
-        const settingsScreen = document.getElementById('settings-screen');
+        let playerSkins = [];
+        let obstacleSkins = [];
+        let gameUpgrades = [];
 
-        const playerNameInput = document.getElementById('player-name-input');
-        const showRoomScreenBtn = document.getElementById('show-room-screen-btn');
+        let currentEquippedPlayerSkinId = 'ship-default';
+        let currentEquippedObstacleSkinId = 'rock-default';
 
-        const createRoomBtn = document.getElementById('create-room-btn');
-        const roomIdInput = document.getElementById('room-id-input');
-        const joinRoomBtn = document.getElementById('join-room-btn');
-        const displayRoomId = document.getElementById('display-room-id');
-        const waitingMessage = document.getElementById('waiting-message');
-        const leaveRoomBtn = document.getElementById('leave-room-btn');
+        // --- Game Functions ---
 
-        const currentPlayerDisplay = document.getElementById('current-player-display');
-        const turnDisplay = document.getElementById('turn-display');
-        const player1NameDisplay = document.getElementById('player1-name-display');
-        const player1ScoreDisplay = document.getElementById('player1-score-display');
-        const player1MoneyDisplay = document.getElementById('player1-money-display');
-        const player2NameDisplay = document.getElementById('player2-name-display');
-        const player2ScoreDisplay = document.getElementById('player2-score-display');
-        const player2MoneyDisplay = document.getElementById('player2-money-display');
-        const questionText = document.getElementById('question-text');
-        const answersContainer = document.getElementById('answers-container');
-        const nextQuestionBtn = document.getElementById('next-question-btn');
+        /**
+         * Calculates XP needed for a given level.
+         * @param {number} level - The target level.
+         * @returns {number} XP required for that level.
+         */
+        function getXpForLevel(level) {
+            if (level <= 0) return 0;
+            if (level > xpToNextLevel.length) return Infinity; // Max level reached
+            return xpToNextLevel[level - 1];
+        }
 
-        const playAgainBtn = document.getElementById('play-again-btn');
-        const leaderboardBtn = document.getElementById('leaderboard-btn');
-        const storeBtn = document.getElementById('store-btn');
-        const profileBtn = document.getElementById('profile-btn');
-        const settingsBtn = document.getElementById('settings-btn');
-        const backToStartBtn = document.getElementById('back-to-start-btn');
-        const backToMainFromStoreBtn = document.getElementById('back-to-main-from-store');
-        const backToMainFromProfileBtn = document.getElementById('back-to-main-from-profile');
-        const backToMainFromSettingsBtn = document.getElementById('back-to-main-from-settings');
-        const backToMainFromLeaderboardBtn = document.getElementById('back-to-main-from-leaderboard');
-        const leaderboardList = document.getElementById('leaderboard-list');
-        const leaderboardLoading = document.getElementById('leaderboard-loading');
+        /**
+         * Adds XP to the player and handles level ups.
+         * @param {number} amount - The amount of XP to add.
+         */
+        function addXP(amount) {
+            playerXP += amount;
+            while (playerLevel <= 100 && playerXP >= getXpForLevel(playerLevel)) {
+                playerXP -= getXpForLevel(playerLevel);
+                playerLevel++;
+                showInGameNotification(`ارتفع مستواك إلى المستوى ${playerLevel}!`);
+                if (playerLevel > 100) { // Cap level at 100
+                    playerXP = 0;
+                    break;
+                }
+            }
+            saveGameData(); // Save XP and level
+            updateProfileDisplay(); // Update profile UI
+        }
+
+        /**
+         * Loads game data (skins, high score, current gold, dollars, upgrades) from localStorage.
+         */
+        function loadGameData() {
+            gold = parseInt(localStorage.getItem('seaKingGold') || '0');
+            dollars = parseInt(localStorage.getItem('seaKingDollars') || '0');
+            highScore = parseInt(localStorage.getItem('seaKingHighScore') || '0');
+            totalGoldCollected = parseInt(localStorage.getItem('seaKingTotalGoldCollected') || '0');
+            totalDollarsCollected = parseInt(localStorage.getItem('seaKingTotalDollarsCollected') || '0');
+            gamesPlayed = parseInt(localStorage.getItem('seaKingGamesPlayed') || '0');
+            playerLevel = parseInt(localStorage.getItem('seaKingPlayerLevel') || '1');
+            playerXP = parseInt(localStorage.getItem('seaKingPlayerXP') || '0');
 
 
-        const messageBox = document.getElementById('message-box');
-        const messageText = document.getElementById('message-text');
-        const messageOkBtn = document.getElementById('message-ok-btn');
-        const overlay = document.getElementById('overlay');
+            goldScoreDisplay.textContent = `الذهب: ${gold}`;
+            dollarScoreDisplay.textContent = `الدولار: ${dollars}`;
+            highScoreDisplay.textContent = `أعلى ذهب: ${highScore}`;
 
-        // --- Utility Functions ---
-        function showMessage(message, title = "إشعار") {
+            // Always start with fresh copies that include draw functions
+            playerSkins = JSON.parse(JSON.stringify(playerSkinsData));
+            obstacleSkins = JSON.parse(JSON.stringify(obstacleSkinsData));
+            gameUpgrades = JSON.parse(JSON.stringify(upgradesData));
+
+            // Re-attach draw functions to the deep copies for skins
+            playerSkins.forEach((skin, index) => {
+                skin.drawFunction = playerSkinsData[index].drawFunction;
+            });
+            obstacleSkins.forEach((skin, index) => {
+                skin.drawFunction = obstacleSkinsData[index].drawFunction;
+            });
+            // Re-attach powerup functions
+            powerupData.forEach((powerup, index) => {
+                powerup.drawFunction = powerupData[index].drawFunction;
+                powerup.effect = powerupData[index].effect;
+                powerup.revert = powerupData[index].revert;
+            });
+
+
+            const savedPlayerSkins = JSON.parse(localStorage.getItem('playerSkins'));
+            const savedObstacleSkins = JSON.parse(localStorage.getItem('obstacleSkins'));
+            const savedGameUpgrades = JSON.parse(localStorage.getItem('gameUpgrades'));
+            const savedEquippedPlayerSkinId = localStorage.getItem('currentEquippedPlayerSkinId');
+            const savedEquippedObstacleSkinId = localStorage.getItem('currentEquippedObstacleSkinId');
+
+            // Update properties from saved data for skins
+            if (savedPlayerSkins) {
+                savedPlayerSkins.forEach(savedSkin => {
+                    const existingSkin = playerSkins.find(s => s.id === savedSkin.id);
+                    if (existingSkin) {
+                        existingSkin.isOwned = savedSkin.isOwned;
+                    }
+                });
+            }
+
+            if (savedObstacleSkins) {
+                savedObstacleSkins.forEach(savedSkin => {
+                    const existingSkin = obstacleSkins.find(s => s.id === savedSkin.id);
+                    if (existingSkin) {
+                        existingSkin.isOwned = savedSkin.isOwned;
+                    }
+                });
+            }
+
+            // Update properties from saved data for upgrades
+            if (savedGameUpgrades) {
+                savedGameUpgrades.forEach(savedUpgrade => {
+                    const existingUpgrade = gameUpgrades.find(u => u.id === savedUpgrade.id);
+                    if (existingUpgrade) {
+                        existingUpgrade.currentLevel = savedUpgrade.currentLevel;
+                    }
+                });
+            }
+
+
+            // Set active player skin
+            playerSkins.forEach(skin => skin.isActive = false); // Deactivate all first
+            if (savedEquippedPlayerSkinId) {
+                currentEquippedPlayerSkinId = savedEquippedPlayerSkinId;
+                const activeSkin = playerSkins.find(skin => skin.id === currentEquippedPlayerSkinId);
+                if (activeSkin) activeSkin.isActive = true;
+                else playerSkins[0].isActive = true; // Fallback to default if saved skin not found
+            } else {
+                playerSkins[0].isActive = true; // Default is active if no saved one
+            }
+
+            // Set active obstacle skin
+            obstacleSkins.forEach(skin => skin.isActive = false); // Deactivate all first
+            if (savedEquippedObstacleSkinId) {
+                currentEquippedObstacleSkinId = savedEquippedObstacleSkinId;
+                const activeSkin = obstacleSkins.find(skin => skin.id === currentEquippedObstacleSkinId);
+                if (activeSkin) activeSkin.isActive = true;
+                else obstacleSkins[0].isActive = true; // Fallback to default if saved skin not found
+            } else {
+                obstacleSkins[0].isActive = true; // Default is active if no saved one
+            }
+
+            // Apply permanent upgrade effects after loading
+            applyPermanentUpgrades();
+        }
+
+        /**
+         * Saves game data (skins, high score, current gold, dollars, upgrades) to localStorage.
+         */
+        function saveGameData() {
+            localStorage.setItem('seaKingGold', gold);
+            localStorage.setItem('seaKingDollars', dollars);
+            localStorage.setItem('seaKingHighScore', highScore);
+            localStorage.setItem('seaKingTotalGoldCollected', totalGoldCollected);
+            localStorage.setItem('seaKingTotalDollarsCollected', totalDollarsCollected);
+            localStorage.setItem('seaKingGamesPlayed', gamesPlayed);
+            localStorage.setItem('seaKingPlayerLevel', playerLevel);
+            localStorage.setItem('seaKingPlayerXP', playerXP);
+
+            // Remove drawFunction before saving as functions cannot be stringified
+            const serializablePlayerSkins = playerSkins.map(({ drawFunction, ...rest }) => rest);
+            const serializableObstacleSkins = obstacleSkins.map(({ drawFunction, ...rest }) => rest);
+            localStorage.setItem('playerSkins', JSON.stringify(serializablePlayerSkins));
+            localStorage.setItem('obstacleSkins', JSON.stringify(serializableObstacleSkins));
+            localStorage.setItem('gameUpgrades', JSON.stringify(gameUpgrades));
+            localStorage.setItem('currentEquippedPlayerSkinId', currentEquippedPlayerSkinId);
+            localStorage.setItem('currentEquippedObstacleSkinId', currentEquippedObstacleSkinId);
+        }
+
+        /**
+         * Applies permanent effects from upgrades. Call this after loading game data.
+         */
+        function applyPermanentUpgrades() {
+            const speedUpgrade = gameUpgrades.find(u => u.id === 'upgrade-speed');
+            player.speed = 5 + (speedUpgrade ? speedUpgrade.currentLevel * speedUpgrade.levels[0].value : 0);
+
+            const goldMultiplierUpgrade = gameUpgrades.find(u => u.id === 'upgrade-gold-multiplier');
+            goldMultiplier = 1 + (goldMultiplierUpgrade ? goldMultiplierUpgrade.levels.slice(0, goldMultiplierUpgrade.currentLevel).reduce((sum, level) => sum + level.value, 0) : 0);
+
+            const obstacleSlowdownUpgrade = gameUpgrades.find(u => u.id === 'upgrade-obstacle-slowdown');
+            obstacleSpeedReduction = (obstacleSlowdownUpgrade ? obstacleSlowdownUpgrade.levels.slice(0, obstacleSlowdownUpgrade.currentLevel).reduce((sum, level) => sum + level.value, 0) : 0);
+
+            const luckyCharmUpgrade = gameUpgrades.find(u => u.id === 'upgrade-lucky-charm');
+            luckyCharmChance = (luckyCharmUpgrade ? luckyCharmUpgrade.levels.slice(0, luckyCharmUpgrade.currentLevel).reduce((sum, level) => sum + level.value, 0) : 0);
+        }
+
+        /**
+         * Shows a custom message box (for game over) with the given text.
+         * @param {string} message - The message to display.
+         */
+        function showMessageBox(message) {
             messageText.textContent = message;
-            messageBox.style.display = 'block';
-            overlay.style.display = 'block';
-            messageOkBtn.onclick = () => {
-                messageBox.style.display = 'none';
-                overlay.style.display = 'none';
-            };
+            messageBox.classList.add('active'); // Add active class for transition
         }
 
-        function showScreen(screenId) {
-            startScreen.classList.add('hidden');
-            roomScreen.classList.add('hidden');
-            waitingRoomScreen.classList.add('hidden');
-            gameScreen.classList.add('hidden');
-            mainMenu.classList.add('hidden');
-            leaderboardScreen.classList.add('hidden');
-            storeScreen.classList.add('hidden');
-            profileScreen.classList.add('hidden');
-            settingsScreen.classList.add('hidden');
-
-            document.getElementById(screenId).classList.remove('hidden');
-            document.getElementById(screenId).classList.add('flex');
+        /**
+         * Hides the custom message box.
+         */
+        function hideMessageBox() {
+            messageBox.classList.remove('active'); // Remove active class for transition
         }
 
-        function generateRoomId() {
-            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        /**
+         * Shows a small, temporary notification at the top of the screen.
+         * @param {string} message - The message to display.
+         * @param {number} duration - Duration in milliseconds (default 2000).
+         */
+        function showInGameNotification(message, duration = 2000) {
+            inGameNotification.textContent = message;
+            inGameNotification.classList.add('active');
+            setTimeout(() => {
+                inGameNotification.classList.remove('active');
+            }, duration);
         }
 
-        // --- Room Management Functions ---
-        async function createRoom() {
-            if (!userId) {
-                showMessage("الرجاء الانتظار حتى يتم تهيئة Firebase.");
+        /**
+         * Draws the player ship on the canvas using the currently equipped skin's draw function.
+         */
+        function drawPlayer() {
+            const activeSkin = playerSkins.find(s => s.isActive);
+            if (!activeSkin || !activeSkin.drawFunction) {
+                console.error("No active player skin or draw function found. Falling back to default.");
+                drawShipDefault(ctx, player.x, player.y, player.width, player.height, '#ffeb3b', '#fbc02d');
                 return;
             }
-            if (!playerName) {
-                showMessage("الرجاء إدخال اسمك أولاً.");
-                return;
-            }
+            activeSkin.drawFunction(ctx, player.x, player.y, player.width, player.height, activeSkin.color, activeSkin.detailsColor);
 
-            currentRoomId = generateRoomId();
-            displayRoomId.textContent = currentRoomId;
-            waitingMessage.textContent = "في انتظار لاعب آخر...";
-            showScreen('waiting-room-screen');
-
-            try {
-                await setDoc(doc(db, `artifacts/${appId}/public/data/rooms`, currentRoomId), {
-                    hostId: userId,
-                    hostName: playerName,
-                    player2Id: null,
-                    player2Name: null,
-                    status: 'waiting',
-                    questions: [],
-                    playerScores: { [userId]: { score: 0, money: 0 } },
-                    currentQuestionIndex: 0,
-                    currentTurnPlayerId: userId,
-                    lastUpdated: new Date()
-                });
-                console.log("Room created with ID:", currentRoomId);
-                showMessage(`تم إنشاء الغرفة بنجاح! رمز الغرفة: ${currentRoomId}. شاركه مع صديقك.`);
-
-                listenToRoomChanges(currentRoomId);
-
-            } catch (error) {
-                console.error("Error creating room:", error);
-                showMessage("فشل في إنشاء الغرفة. الرجاء المحاولة مرة أخرى.");
-                showScreen('room-screen');
+            // Draw shield effect if invulnerable
+            if (player.isInvulnerable) {
+                ctx.strokeStyle = 'rgba(173, 216, 230, 0.8)'; // Light blue, semi-transparent
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.arc(player.x, player.y + player.height / 2, player.width * 0.8, 0, Math.PI * 2);
+                ctx.stroke();
             }
         }
 
-        async function joinRoom() {
-            if (!userId) {
-                showMessage("الرجاء الانتظار حتى يتم تهيئة Firebase.");
+        /**
+         * Creates a new falling object (obstacle, collectible, or power-up) and adds it to the array.
+         */
+        function createFallingObject() {
+            const rand = Math.random();
+            let type;
+            // Probabilities: Obstacle (55%), Gold (25%), Power-up (10%), Mine (5%), Whirlpool (4%), Dollar (0.9%), Treasure Chest (0.1%)
+            if (rand < 0.55) {
+                type = 'obstacle';
+            } else if (rand < 0.80) { // 0.55 + 0.25 = 0.80
+                type = 'collectible'; // Gold
+            } else if (rand < 0.90) { // 0.80 + 0.10 = 0.90
+                type = 'powerup';
+            } else if (rand < 0.95) { // 0.90 + 0.05 = 0.95
+                type = 'mine'; // Explosive Mine
+            } else if (rand < 0.99) { // 0.95 + 0.04 = 0.99
+                type = 'whirlpool'; // New Whirlpool obstacle
+            } else if (rand < 0.999) { // 0.99 + 0.009 = 0.999
+                type = 'dollar'; // Rare Dollar
+            } else { // 0.999 + 0.001 = 1.0
+                type = 'treasure-chest'; // Very rare Treasure Chest
+            }
+
+
+            const objectWidth = (type === 'obstacle' || type === 'mine' || type === 'whirlpool') ? (35 + Math.random() * 45) : (type === 'treasure-chest' ? 40 : 25);
+            const objectHeight = (type === 'obstacle' || type === 'mine' || type === 'whirlpool') ? (35 + Math.random() * 45) : (type === 'treasure-chest' ? 40 : 25);
+            const objectX = Math.random() * (canvas.width - objectWidth);
+            let objectSpeed = 2 + Math.floor(gold / 10) * OBJECT_SPEED_INCREMENT; // Base speed scales with gold
+            objectSpeed *= (1 - obstacleSpeedReduction); // Apply permanent obstacle slowdown upgrade
+
+            let powerupDetails = null;
+            if (type === 'powerup') {
+                const randomPowerupIndex = Math.floor(Math.random() * powerupData.length);
+                powerupDetails = powerupData[randomPowerupIndex];
+            }
+
+            fallingObjects.push({
+                x: objectX,
+                y: -objectHeight,
+                width: objectWidth,
+                height: objectHeight,
+                speed: objectSpeed,
+                type: type,
+                powerup: powerupDetails // Store power-up details if it's a power-up
+            });
+        }
+
+        /**
+         * Draws all falling objects on the canvas using the currently equipped obstacle skin's draw function.
+         */
+        function drawFallingObjects() {
+            const activeObstacleSkin = obstacleSkins.find(s => s.isActive);
+            if (!activeObstacleSkin || !activeObstacleSkin.drawFunction) {
+                console.error("No active obstacle skin or draw function found. Falling back to default.");
+                drawRockDefault(ctx, -100, -100, 40, 40, '#ef5350', '#d32f2f'); // Draw off-screen to avoid visual clutter
                 return;
             }
-            if (!playerName) {
-                showMessage("الرجاء إدخال اسمك أولاً.");
-                return;
+
+            fallingObjects.forEach(obj => {
+                if (obj.type === 'obstacle') {
+                    activeObstacleSkin.drawFunction(ctx, obj.x, obj.y, obj.width, obj.height, activeObstacleSkin.color, activeObstacleSkin.detailsColor);
+                } else if (obj.type === 'mine') {
+                    drawMine(ctx, obj.x, obj.y, obj.width);
+                } else if (obj.type === 'whirlpool') {
+                    drawWhirlpool(ctx, obj.x, obj.y, obj.width);
+                }
+                else if (obj.type === 'collectible') { // Gold coin
+                    ctx.fillStyle = '#ffd700'; // Gold color
+                    ctx.beginPath();
+                    ctx.arc(obj.x + obj.width / 2, obj.y + obj.height / 2, obj.width / 2, 0, Math.PI * 2); // Circle
+                    ctx.fill();
+                    ctx.strokeStyle = '#b8860b'; // Darker gold border
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    // Add a small star or shine effect on the coin
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+                    ctx.beginPath();
+                    ctx.arc(obj.x + obj.width * 0.7, obj.y + obj.height * 0.3, obj.width * 0.1, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (obj.type === 'powerup' && obj.powerup && obj.powerup.drawFunction) {
+                    obj.powerup.drawFunction(ctx, obj.x, obj.y, obj.width); // Power-ups draw based on their own function
+                } else if (obj.type === 'dollar') { // Dollar
+                    drawDollar(ctx, obj.x, obj.y, obj.width);
+                } else if (obj.type === 'treasure-chest') { // Treasure Chest
+                    drawTreasureChest(ctx, obj.x, obj.y, obj.width);
+                }
+            });
+        }
+
+        /**
+         * Updates the position of player and falling objects, handles collisions.
+         */
+        function update() {
+            if (!gameRunning) return;
+
+            // Update player position
+            player.x += player.dx;
+
+            // Keep player within canvas bounds
+            if (player.x - player.width / 2 < 0) {
+                player.x = player.width / 2;
+            }
+            if (player.x + player.width / 2 > canvas.width) {
+                player.x = canvas.width - player.width / 2;
             }
 
-            const roomId = roomIdInput.value.trim().toUpperCase();
-            if (!roomId) {
-                showMessage("الرجاء إدخال رمز الغرفة.");
-                return;
-            }
-
-            currentRoomId = roomId;
-            displayRoomId.textContent = currentRoomId;
-            waitingMessage.textContent = "جاري الانضمام للغرفة...";
-            showScreen('waiting-room-screen');
-
-            try {
-                const roomRef = doc(db, `artifacts/${appId}/public/data/rooms`, roomId);
-                const roomSnap = await getDoc(roomRef);
-
-                if (roomSnap.exists()) {
-                    const roomData = roomSnap.data();
-                    if (roomData.status === 'waiting' && !roomData.player2Id) {
-                        await updateDoc(roomRef, {
-                            player2Id: userId,
-                            player2Name: playerName,
-                            status: 'playing',
-                            playerScores: {
-                                ...roomData.playerScores,
-                                [userId]: { score: 0, money: 0 }
-                            },
-                            lastUpdated: new Date()
-                        });
-                        console.log("Joined room:", roomId);
-                        showMessage(`تم الانضمام إلى الغرفة ${roomId} بنجاح!`);
-
-                        listenToRoomChanges(roomId);
-
-                    } else if (roomData.status === 'playing') {
-                        showMessage("هذه الغرفة قيد اللعب بالفعل أو ممتلئة.");
-                        showScreen('room-screen');
+            // Update falling object positions and handle collisions/removal
+            fallingObjects = fallingObjects.filter(obj => {
+                // Apply magnet effect if active
+                if (player.hasMagnet && obj.type === 'collectible') {
+                    const dx = player.x - obj.x;
+                    const dy = player.y - obj.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < player.magnetRange) { // Magnet range
+                        obj.x += (dx / distance) * (obj.speed * player.magnetPullSpeedMultiplier); // Pull faster
+                        obj.y += (dy / distance) * (obj.speed * player.magnetPullSpeedMultiplier);
                     } else {
-                        showMessage("لا يمكن الانضمام لهذه الغرفة حالياً.");
-                        showScreen('room-screen');
+                        obj.y += obj.speed;
                     }
                 } else {
-                    showMessage("رمز الغرفة غير صحيح أو الغرفة غير موجودة.");
-                    showScreen('room-screen');
+                    obj.y += obj.speed;
                 }
-            } catch (error) {
-                console.error("Error joining room:", error);
-                showMessage("فشل في الانضمام إلى الغرفة. الرجاء المحاولة مرة أخرى.");
-                showScreen('room-screen');
+
+                // Apply whirlpool effect
+                if (obj.type === 'whirlpool') {
+                    const dx = player.x - (obj.x + obj.width / 2);
+                    const dy = player.y - (obj.y + obj.height / 2);
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    const pullStrength = 0.5; // How strongly the whirlpool pulls
+                    const whirlpoolRadius = obj.width * 1.5; // Radius of pull effect
+
+                    if (distance < whirlpoolRadius) {
+                        player.x -= (dx / distance) * pullStrength;
+                        player.y -= (dy / distance) * pullStrength;
+                    }
+                }
+
+
+                // Check for collision with player
+                if (
+                    player.x - player.width / 2 < obj.x + obj.width &&
+                    player.x + player.width / 2 > obj.x &&
+                    player.y < obj.y + obj.height &&
+                    player.y + player.height > obj.y
+                ) {
+                    if (obj.type === 'obstacle' || obj.type === 'whirlpool') {
+                        if (!player.isInvulnerable) { // Only end game if not invulnerable
+                            endGame(); // Collision with obstacle ends game
+                        } else {
+                            showInGameNotification('الدرع يحميك!');
+                        }
+                        return false; // Remove obstacle/whirlpool regardless
+                    } else if (obj.type === 'mine') {
+                        // Mine explodes on contact, regardless of shield
+                        showInGameNotification('انفجار لغم!');
+                        // Clear nearby objects
+                        fallingObjects = fallingObjects.filter(otherObj => {
+                            const dist = Math.sqrt(Math.pow((obj.x + obj.width/2) - (otherObj.x + otherObj.width/2), 2) + Math.pow((obj.y + obj.height/2) - (otherObj.y + otherObj.height/2), 2));
+                            return dist > 150; // Remove objects within 150px radius
+                        });
+                        if (!player.isInvulnerable) { // Still takes damage if not shielded
+                            endGame();
+                        }
+                        return false; // Remove mine
+                    }
+                    else if (obj.type === 'collectible') { // Gold
+                        const goldAmount = Math.floor(Math.random() * 4) + 1; // 1 to 4 gold
+                        const finalGold = Math.round(goldAmount * goldMultiplier); // Apply multiplier
+                        gold += finalGold;
+                        totalGoldCollected += finalGold; // Update total collected gold
+                        addXP(finalGold); // Add XP for gold collected
+                        goldScoreDisplay.textContent = `الذهب: ${gold}`;
+                        saveGameData(); // Save gold immediately
+                        showInGameNotification(`+${finalGold} ذهب!`);
+
+                        // Lucky Charm chance
+                        if (luckyCharmChance > 0 && Math.random() < luckyCharmChance) {
+                            dollars++;
+                            totalDollarsCollected++;
+                            addXP(5); // Add XP for rare dollar
+                            dollarScoreDisplay.textContent = `الدولار: ${dollars}`;
+                            showInGameNotification(`+1 دولار من التميمة المحظوظة!`);
+                        }
+                        return false; // Remove collectible
+                    } else if (obj.type === 'powerup' && obj.powerup) { // Power-up
+                        applyPowerup(obj.powerup);
+                        return false; // Remove power-up
+                    } else if (obj.type === 'dollar') { // Dollar
+                        dollars++;
+                        totalDollarsCollected++;
+                        addXP(10); // Add XP for dollar collected
+                        dollarScoreDisplay.textContent = `الدولار: ${dollars}`;
+                        saveGameData();
+                        showInGameNotification(`+1 دولار!`);
+                        return false; // Remove dollar
+                    } else if (obj.type === 'treasure-chest') { // Treasure Chest
+                        const treasureGold = Math.floor(Math.random() * 31) + 20; // 20-50 gold
+                        gold += treasureGold;
+                        totalGoldCollected += treasureGold;
+                        addXP(treasureGold * 0.5); // Half XP for treasure gold
+                        goldScoreDisplay.textContent = `الذهب: ${gold}`;
+                        saveGameData();
+                        showInGameNotification(`+${treasureGold} ذهب من صندوق الكنز!`);
+
+                        if (Math.random() < 0.5) { // 50% chance for a dollar
+                            dollars++;
+                            totalDollarsCollected++;
+                            addXP(10); // Add XP for dollar from treasure
+                            dollarScoreDisplay.textContent = `الدولار: ${dollars}`;
+                            showInGameNotification(`+1 دولار من صندوق الكنز!`);
+                        }
+                        return false; // Remove treasure chest
+                    }
+                }
+
+                // Remove object if it goes off-screen
+                if (obj.y > canvas.height) {
+                    return false;
+                }
+                return true; // Keep object
+            });
+
+            // Spawn new objects
+            const currentTime = Date.now();
+            if (currentTime - lastObjectTime > OBJECT_SPAWN_INTERVAL) {
+                createFallingObject();
+                lastObjectTime = currentTime;
+            }
+
+            // Update active power-ups and revert if expired
+            activePowerups = activePowerups.filter(p => {
+                if (currentTime >= p.endTime) {
+                    p.revert();
+                    showInGameNotification(`انتهى تأثير: ${p.name}`);
+                    return false; // Remove expired power-up
+                }
+                return true; // Keep active power-up
+            });
+            updatePowerupsDisplay(); // Update UI for active power-ups
+        }
+
+        /**
+         * Clears the canvas and redraws all game elements.
+         */
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+            drawPlayer();
+            drawFallingObjects();
+        }
+
+        /**
+         * Main game loop.
+         */
+        function gameLoop() {
+            update();
+            draw();
+            if (gameRunning) {
+                requestAnimationFrame(gameLoop); // Continue loop if game is running
             }
         }
 
-        function leaveRoom() {
-            if (unsubscribeFromRoom) {
-                unsubscribeFromRoom();
-                unsubscribeFromRoom = null;
+        /**
+         * Applies a power-up effect.
+         * @param {object} powerup - The power-up object.
+         */
+        function applyPowerup(powerup) {
+            // Special handling for instant power-ups like 'clear-screen'
+            if (powerup.id === 'clear-screen') {
+                powerup.effect(); // Apply effect immediately
+                return; // No duration, no need to add to activePowerups
             }
-            currentRoomId = null;
-            showMessage("لقد غادرت الغرفة.");
-            showScreen('room-screen');
+
+            // Remove any existing power-up of the same type before applying new one
+            activePowerups = activePowerups.filter(p => {
+                if (p.id === powerup.id) {
+                    p.revert(); // Revert old effect
+                    return false;
+                }
+                return true;
+            });
+
+            // Apply base effect
+            powerup.effect();
+
+            // Apply upgrade duration if available
+            let actualDuration = powerup.duration;
+            // For magnet and shield, value is directly added to duration
+            if (powerup.id === 'gold-magnet') {
+                const upgrade = gameUpgrades.find(u => u.id === 'upgrade-magnet');
+                if (upgrade && upgrade.currentLevel > 0) {
+                    actualDuration += upgrade.levels.slice(0, upgrade.currentLevel).reduce((sum, level) => sum + level.value, 0);
+                }
+            } else if (powerup.id === 'shield') {
+                const upgrade = gameUpgrades.find(u => u.id === 'upgrade-shield');
+                if (upgrade && upgrade.currentLevel > 0) {
+                    actualDuration += upgrade.levels.slice(0, upgrade.currentLevel).reduce((sum, level) => sum + level.value, 0);
+                }
+            }
+            // Speed boost and dash duration are fixed unless specific upgrades for them are added
+
+            activePowerups.push({
+                id: powerup.id,
+                name: powerup.name,
+                icon: powerup.icon,
+                revert: powerup.revert,
+                endTime: Date.now() + actualDuration
+            });
+            updatePowerupsDisplay();
         }
 
-        function listenToRoomChanges(roomId) {
-            if (!db) {
-                console.warn("Firestore not initialized, cannot listen to room changes.");
-                return;
-            }
-
-            const roomRef = doc(db, `artifacts/${appId}/public/data/rooms`, roomId);
-
-            if (unsubscribeFromRoom) {
-                unsubscribeFromRoom();
-            }
-
-            unsubscribeFromRoom = onSnapshot(roomRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const roomData = docSnap.data();
-                    console.log("Room data updated:", roomData);
-
-                    if (roomData.status === 'playing' && roomData.player2Id && roomData.hostId) {
-                        players[0] = { id: roomData.hostId, name: roomData.hostName, score: roomData.playerScores[roomData.hostId]?.score || 0, money: roomData.playerScores[roomData.hostId]?.money || 0 };
-                        players[1] = { id: roomData.player2Id, name: roomData.player2Name, score: roomData.playerScores[roomData.player2Id]?.score || 0, money: roomData.playerScores[roomData.player2Id]?.money || 0 };
-
-                        player1NameDisplay.textContent = players[0].name;
-                        player2NameDisplay.textContent = players[1].name;
-
-                        if (roomData.questions.length === 0 && userId === roomData.hostId) {
-                            const shuffledQuestions = [...questions].sort(() => Math.random() - 0.5).slice(0, maxQuestionsPerGame);
-                            updateDoc(roomRef, { questions: shuffledQuestions });
-                        }
-
-                        if (roomData.questions.length > 0) {
-                            currentQuestionIndex = roomData.currentQuestionIndex;
-                            currentTurnPlayerId = roomData.currentTurnPlayerId;
-                            currentPlayerIndex = players.findIndex(p => p.id === currentTurnPlayerId);
-                            if (currentPlayerIndex === -1) currentPlayerIndex = 0;
-
-                            showScreen('game-screen');
-                            updatePlayerDisplays();
-                            loadQuestionFromRoomState(roomData.questions[currentQuestionIndex]);
-                        }
-                    } else if (roomData.status === 'finished') {
-                        endGame(roomData.playerScores);
-                    }
-                    if (roomData.status === 'waiting' && !roomData.player2Id && userId === roomData.hostId) {
-                         waitingMessage.textContent = "في انتظار لاعب آخر...";
-                    }
-                } else {
-                    showMessage("الغرفة لم تعد موجودة. الرجاء إنشاء غرفة جديدة أو الانضمام إلى أخرى.");
-                    leaveRoom();
-                    showScreen('room-screen');
-                }
-            }, (error) => {
-                console.error("Error listening to room changes:", error);
-                showMessage("حدث خطأ أثناء الاتصال بالغرفة. الرجاء المحاولة مرة أخرى.");
-                leaveRoom();
-                showScreen('room-screen');
+        /**
+         * Updates the display of active power-ups.
+         */
+        function updatePowerupsDisplay() {
+            powerupsDisplay.innerHTML = '';
+            const currentTime = Date.now();
+            activePowerups.forEach(p => {
+                const remainingTime = Math.ceil((p.endTime - currentTime) / 1000);
+                const powerupDiv = document.createElement('div');
+                powerupDiv.className = 'powerup-item';
+                powerupDiv.innerHTML = `
+                    <span class="powerup-icon">${p.icon}</span>
+                    <span>${p.name} (${remainingTime}s)</span>
+                `;
+                powerupsDisplay.appendChild(powerupDiv);
             });
         }
 
-        function getRandomQuestion() {
-            if (askedQuestions.size === questions.length) {
-                return null;
-            }
-            let randomIndex;
-            do {
-                randomIndex = Math.floor(Math.random() * questions.length);
-            } while (askedQuestions.has(randomIndex));
-            askedQuestions.add(randomIndex);
-            return questions[randomIndex];
+        /**
+         * Starts the game.
+         */
+        function startGame() {
+            // Hide all modals
+            mainMenuModal.classList.remove('active');
+            shopModal.classList.remove('active');
+            profileModal.classList.remove('active');
+            myItemsModal.classList.remove('active');
+
+            // Show game elements
+            canvas.style.display = 'block'; // Ensure canvas is visible
+            gameButtons.style.display = 'flex'; // Ensure game buttons are visible
+            goldScoreDisplay.style.display = 'flex';
+            dollarScoreDisplay.style.display = 'flex';
+            highScoreDisplay.style.display = 'block';
+            powerupsDisplay.style.display = 'flex';
+
+
+            player.x = canvas.width / 2;
+            player.y = canvas.height - 60;
+
+            // Apply permanent upgrades at start of game
+            applyPermanentUpgrades();
+
+            player.isInvulnerable = false; // Reset invulnerability
+            player.hasMagnet = false; // Reset magnet
+            player.isDashing = false; // Reset dashing
+
+            // Revert any lingering power-up effects
+            activePowerups.forEach(p => p.revert());
+            activePowerups = []; // Clear active power-ups
+            updatePowerupsDisplay(); // Clear UI
+
+            fallingObjects = []; // Clear all objects
+            gold = parseInt(localStorage.getItem('seaKingGold') || '0'); // Load gold on start
+            dollars = parseInt(localStorage.getItem('seaKingDollars') || '0'); // Load dollars on start
+            goldScoreDisplay.textContent = `الذهب: ${gold}`;
+            dollarScoreDisplay.textContent = `الدولار: ${dollars}`;
+
+            gamesPlayed++; // Increment games played
+            saveGameData(); // Save updated games played
+
+            gameRunning = true;
+            startButton.style.display = 'none';
+            resetButton.style.display = 'inline-block';
+            shopButton.style.display = 'none'; // Hide shop button during game
+            hideMessageBox(); // Hide any existing message box
+            lastObjectTime = Date.now(); // Reset object spawn timer
+            gameLoop();
         }
 
-        // --- Game Logic Functions ---
-        function setPlayerName() {
-            const name = playerNameInput.value.trim();
-            if (!name) {
-                showMessage("الرجاء إدخال اسمك.");
-                return;
+        /**
+         * Ends the game.
+         */
+        function endGame() {
+            gameRunning = false;
+            // Revert any lingering power-up effects
+            activePowerups.forEach(p => p.revert());
+            activePowerups = []; // Clear active power-ups
+            updatePowerupsDisplay(); // Clear UI
+
+            if (gold > highScore) {
+                highScore = gold;
+                localStorage.setItem('seaKingHighScore', highScore); // Save new high score
+                highScoreDisplay.textContent = `أعلى ذهب: ${highScore}`;
+                showMessageBox(`انتهت اللعبة! لقد جمعت ${gold} ذهباً وحققت رقماً قياسياً جديداً!`);
+            } else {
+                showMessageBox(`انتهت اللعبة! لقد جمعت ${gold} ذهباً.`);
             }
-            playerName = name;
-            showScreen('room-screen');
+            resetButton.style.display = 'inline-block';
+            shopButton.style.display = 'inline-block'; // Show shop button after game
+            gameButtons.style.display = 'flex'; // Ensure buttons are visible
+            saveGameData(); // Ensure all data is saved on game end
+
+            // Hide game elements and show main menu after a short delay
+            setTimeout(() => {
+                canvas.style.display = 'none';
+                gameButtons.style.display = 'none';
+                goldScoreDisplay.style.display = 'none';
+                dollarScoreDisplay.style.display = 'none';
+                highScoreDisplay.style.display = 'none';
+                powerupsDisplay.style.display = 'none';
+                mainMenuModal.classList.add('active');
+            }, 1500); // Small delay before showing main menu
         }
 
-        function loadQuestionFromRoomState(questionData) {
-            if (!questionData) {
-                endGame();
-                return;
+        // --- Profile Functions ---
+        function openProfile() {
+            mainMenuModal.classList.remove('active');
+            shopModal.classList.remove('active');
+            myItemsModal.classList.remove('active'); // Ensure my items is hidden
+            profileModal.classList.add('active');
+            updateProfileDisplay();
+        }
+
+        function updateProfileDisplay() {
+            profileTotalGold.textContent = totalGoldCollected;
+            profileTotalDollars.textContent = totalDollarsCollected;
+            profileHighScore.textContent = highScore;
+            profileGamesPlayed.textContent = gamesPlayed;
+            playerLevelDisplay.textContent = playerLevel;
+            playerXPDisplay.textContent = playerXP;
+            xpToNextLevelDisplay.textContent = getXpForLevel(playerLevel);
+
+            const xpPercentage = (playerLevel <= 100) ? (playerXP / getXpForLevel(playerLevel)) * 100 : 100;
+            xpBar.style.width = `${xpPercentage}%`;
+        }
+
+        function openMyItems() {
+            profileModal.classList.remove('active');
+            myItemsModal.classList.add('active');
+            renderMyItems();
+        }
+
+        function renderMyItems() {
+            myPlayerSkinsContainer.innerHTML = '';
+            myObstacleSkinsContainer.innerHTML = '';
+            myUpgradesContainer.innerHTML = '';
+
+            // Owned Player Skins
+            playerSkins.filter(skin => skin.isOwned).forEach(skin => {
+                const skinDiv = document.createElement('div');
+                skinDiv.className = `my-item-card p-3 border rounded-lg flex flex-col items-center gap-2 ${skin.isActive ? 'active border-green-500' : 'border-gray-700'}`;
+
+                const previewCanvas = document.createElement('canvas');
+                previewCanvas.width = 60;
+                previewCanvas.height = 60;
+                previewCanvas.className = 'skin-preview';
+                const previewCtx = previewCanvas.getContext('2d');
+                previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                previewCtx.save();
+                const scale = 0.8;
+                previewCtx.translate(previewCanvas.width / 2, previewCanvas.height / 2);
+                previewCtx.scale(scale, scale);
+                previewCtx.translate(-previewCanvas.width / 2, -previewCanvas.height / 2);
+                const previewYOffset = skin.id.startsWith('ship') ? 10 : 0;
+                skin.drawFunction(previewCtx, previewCanvas.width / 2, previewCanvas.height / 2 + previewYOffset, 40, 40, skin.color, skin.detailsColor);
+                previewCtx.restore();
+
+                skinDiv.appendChild(previewCanvas);
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'text-white text-sm font-bold';
+                nameSpan.textContent = skin.name;
+                skinDiv.appendChild(nameSpan);
+                myPlayerSkinsContainer.appendChild(skinDiv);
+            });
+
+            // Owned Obstacle Skins
+            obstacleSkins.filter(skin => skin.isOwned).forEach(skin => {
+                const skinDiv = document.createElement('div');
+                skinDiv.className = `my-item-card p-3 border rounded-lg flex flex-col items-center gap-2 ${skin.isActive ? 'active border-green-500' : 'border-gray-700'}`;
+
+                const previewCanvas = document.createElement('canvas');
+                previewCanvas.width = 60;
+                previewCanvas.height = 60;
+                previewCanvas.className = 'skin-preview';
+                const previewCtx = previewCanvas.getContext('2d');
+                previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                previewCtx.save();
+                const scale = 0.8;
+                previewCtx.translate(previewCanvas.width / 2, previewCanvas.height / 2);
+                previewCtx.scale(scale, scale);
+                previewCtx.translate(-previewCanvas.width / 2, -previewCanvas.height / 2);
+                skin.drawFunction(previewCtx, previewCanvas.width / 2, previewCanvas.height / 2, 40, 40, skin.color, skin.detailsColor);
+                previewCtx.restore();
+
+                skinDiv.appendChild(previewCanvas);
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'text-white text-sm font-bold';
+                nameSpan.textContent = skin.name;
+                skinDiv.appendChild(nameSpan);
+                myObstacleSkinsContainer.appendChild(skinDiv);
+            });
+
+            // Owned Upgrades
+            gameUpgrades.filter(upgrade => upgrade.currentLevel > 0).forEach(upgrade => {
+                const upgradeDiv = document.createElement('div');
+                upgradeDiv.className = `my-item-card p-3 border rounded-lg flex flex-col items-center gap-2 border-gray-700`;
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'text-white text-sm font-bold';
+                nameSpan.textContent = upgrade.name;
+                upgradeDiv.appendChild(nameSpan);
+
+                const levelSpan = document.createElement('span');
+                levelSpan.className = 'text-blue-300 text-xs';
+                levelSpan.textContent = `المستوى: ${upgrade.currentLevel} / ${upgrade.maxLevel}`;
+                upgradeDiv.appendChild(levelSpan);
+
+                const descSpan = document.createElement('span');
+                descSpan.className = 'text-gray-400 text-xs text-center mt-1';
+                descSpan.textContent = upgrade.description;
+                upgradeDiv.appendChild(descSpan);
+                myUpgradesContainer.appendChild(upgradeDiv);
+            });
+        }
+
+        function resetGameData() {
+            // Using browser's confirm for critical action
+            if (confirm('هل أنت متأكد أنك تريد إعادة تعيين جميع بيانات اللعبة؟ هذا لا يمكن التراجع عنه!')) {
+                localStorage.clear(); // Clear all local storage data
+                // Reset in-memory variables
+                gold = 0;
+                dollars = 0;
+                highScore = 0;
+                totalGoldCollected = 0;
+                totalDollarsCollected = 0;
+                gamesPlayed = 0;
+                playerLevel = 1;
+                playerXP = 0;
+
+                loadGameData(); // Reload default data
+                updateProfileDisplay(); // Update profile UI
+                renderShop(); // Update shop UI
+                renderMyItems(); // Update my items UI
+
+                goldScoreDisplay.textContent = `الذهب: ${gold}`;
+                dollarScoreDisplay.textContent = `الدولار: ${dollars}`;
+                highScoreDisplay.textContent = `أعلى ذهب: ${highScore}`;
+                showInGameNotification('تمت إعادة تعيين جميع بيانات اللعبة!');
+                myItemsModal.classList.remove('active');
+                mainMenuModal.classList.add('active'); // Go back to main menu
             }
+        }
 
-            questionText.textContent = questionData.question;
-            answersContainer.innerHTML = '';
-            nextQuestionBtn.classList.add('hidden');
+        // --- Shop Functions ---
 
-            const shuffledOptions = [...questionData.options].sort(() => Math.random() - 0.5);
+        /**
+         * Renders the shop UI based on current skin and upgrade data.
+         */
+        function renderShop() {
+            shopCurrentGoldDisplay.innerHTML = `${goldIconSVG} الذهب الحالي: ${gold}`;
+            shopCurrentDollarsDisplay.innerHTML = `${dollarIconSVG} الدولار الحالي: ${dollars}`;
+            playerSkinsContainer.innerHTML = '';
+            obstacleSkinsContainer.innerHTML = '';
+            upgradesContainer.innerHTML = ''; // Clear upgrades container
 
-            shuffledOptions.forEach(option => {
+            // Render Player Skins
+            playerSkins.forEach(skin => {
+                const skinDiv = document.createElement('div');
+                skinDiv.className = `skin-item p-3 border rounded-lg flex flex-col items-center gap-2 ${skin.isActive ? 'active border-green-500' : 'border-gray-700'} transition-all duration-200`;
+
+                const previewCanvas = document.createElement('canvas');
+                previewCanvas.width = 60;
+                previewCanvas.height = 60;
+                previewCanvas.className = 'skin-preview';
+                const previewCtx = previewCanvas.getContext('2d');
+                previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                previewCtx.save();
+                const scale = 0.8;
+                previewCtx.translate(previewCanvas.width / 2, previewCanvas.height / 2);
+                previewCtx.scale(scale, scale);
+                previewCtx.translate(-previewCanvas.width / 2, -previewCanvas.height / 2);
+                const previewYOffset = skin.id.startsWith('ship') ? 10 : 0;
+                skin.drawFunction(previewCtx, previewCanvas.width / 2, previewCanvas.height / 2 + previewYOffset, 40, 40, skin.color, skin.detailsColor);
+                previewCtx.restore();
+
+                skinDiv.appendChild(previewCanvas);
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'text-white text-sm font-bold';
+                nameSpan.textContent = skin.name;
+                skinDiv.appendChild(nameSpan);
+
                 const button = document.createElement('button');
-                button.textContent = option;
-                button.classList.add('answer-option', 'w-full');
-                button.disabled = (userId !== currentTurnPlayerId);
-                button.style.cursor = (userId !== currentTurnPlayerId) ? 'not-allowed' : 'pointer';
-                button.onclick = () => checkAnswer(option, questionData.correct, button);
-                answersContainer.appendChild(button);
+                button.className = `game-button text-xs px-2 py-1 ${skin.isActive ? 'bg-green-600 cursor-default' : ''}`;
+                button.dataset.id = skin.id;
+                button.dataset.type = 'player';
+
+                if (skin.isOwned) {
+                    button.textContent = skin.isActive ? 'مُجهز' : 'تجهيز';
+                    button.disabled = skin.isActive;
+                    button.classList.add('equip-button');
+                } else {
+                    let costText = '';
+                    if (skin.cost.gold > 0) costText += `${skin.cost.gold} ${goldIconSVG}`;
+                    if (skin.cost.dollars > 0) costText += `${skin.cost.dollars} ${dollarIconSVG}`;
+                    button.innerHTML = `شراء (${costText.trim()})`;
+                    button.classList.add('buy-button');
+                }
+                skinDiv.appendChild(button);
+                playerSkinsContainer.appendChild(skinDiv);
             });
-        }
 
-        async function checkAnswer(selectedOption, correctAnswer, clickedButton) {
-            Array.from(answersContainer.children).forEach(btn => {
-                btn.disabled = true;
-                btn.style.cursor = 'default';
+            // Render Obstacle Skins
+            obstacleSkins.forEach(skin => {
+                const skinDiv = document.createElement('div');
+                skinDiv.className = `skin-item p-3 border rounded-lg flex flex-col items-center gap-2 ${skin.isActive ? 'active border-green-500' : 'border-gray-700'} transition-all duration-200`;
+
+                const previewCanvas = document.createElement('canvas');
+                previewCanvas.width = 60;
+                previewCanvas.height = 60;
+                previewCanvas.className = 'skin-preview';
+                const previewCtx = previewCanvas.getContext('2d');
+                previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                previewCtx.save();
+                const scale = 0.8;
+                previewCtx.translate(previewCanvas.width / 2, previewCanvas.height / 2);
+                previewCtx.scale(scale, scale);
+                previewCtx.translate(-previewCanvas.width / 2, -previewCanvas.height / 2);
+                skin.drawFunction(previewCtx, previewCanvas.width / 2, previewCanvas.height / 2, 40, 40, skin.color, skin.detailsColor);
+                previewCtx.restore();
+
+                skinDiv.appendChild(previewCanvas);
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'text-white text-sm font-bold';
+                nameSpan.textContent = skin.name;
+                skinDiv.appendChild(nameSpan);
+
+                const button = document.createElement('button');
+                button.className = `game-button text-xs px-2 py-1 ${skin.isActive ? 'bg-green-600 cursor-default' : ''}`;
+                button.dataset.id = skin.id;
+                button.dataset.type = 'obstacle';
+
+                if (skin.isOwned) {
+                    button.textContent = skin.isActive ? 'مُجهز' : 'تجهيز';
+                    button.disabled = skin.isActive;
+                    button.classList.add('equip-button');
+                } else {
+                    let costText = '';
+                    if (skin.cost.gold > 0) costText += `${skin.cost.gold} ${goldIconSVG}`;
+                    if (skin.cost.dollars > 0) costText += `${skin.cost.dollars} ${dollarIconSVG}`;
+                    button.innerHTML = `شراء (${costText.trim()})`;
+                    button.classList.add('buy-button');
+                }
+                skinDiv.appendChild(button);
+                obstacleSkinsContainer.appendChild(skinDiv);
             });
 
-            let isCorrect = (selectedOption === correctAnswer);
+            // Render Upgrades
+            gameUpgrades.forEach(upgrade => {
+                const upgradeDiv = document.createElement('div');
+                upgradeDiv.className = `upgrade-item p-3 border rounded-lg flex flex-col items-center gap-2 border-gray-700 transition-all duration-200`;
 
-            if (isCorrect) {
-                clickedButton.classList.add('correct');
-                showMessage("إجابة صحيحة!");
-            } else {
-                clickedButton.classList.add('incorrect');
-                Array.from(answersContainer.children).forEach(btn => {
-                    if (btn.textContent === correctAnswer) {
-                        btn.classList.add('correct');
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'text-white text-sm font-bold';
+                nameSpan.textContent = upgrade.name;
+                upgradeDiv.appendChild(nameSpan);
+
+                const levelSpan = document.createElement('span');
+                levelSpan.className = 'text-blue-300 text-xs';
+                levelSpan.textContent = `المستوى: ${upgrade.currentLevel} / ${upgrade.maxLevel}`;
+                upgradeDiv.appendChild(levelSpan);
+
+                const descSpan = document.createElement('span');
+                descSpan.className = 'text-gray-400 text-xs text-center mt-1';
+                descSpan.textContent = upgrade.description;
+                upgradeDiv.appendChild(descSpan);
+
+                const button = document.createElement('button');
+                button.className = `game-button text-xs px-2 py-1 mt-2`;
+                button.dataset.id = upgrade.id;
+                button.dataset.type = 'upgrade';
+
+                if (upgrade.currentLevel < upgrade.maxLevel) {
+                    const nextLevelCost = upgrade.levels[upgrade.currentLevel].cost;
+                    let costText = '';
+                    if (typeof nextLevelCost === 'object') { // If cost is an object (gold and dollars)
+                        if (nextLevelCost.gold > 0) costText += `${nextLevelCost.gold} ${goldIconSVG}`;
+                        if (nextLevelCost.dollars > 0) costText += `${nextLevelCost.dollars} ${dollarIconSVG}`;
+                    } else { // If cost is just gold (number)
+                        costText += `${nextLevelCost} ${goldIconSVG}`;
                     }
-                });
-                showMessage(`إجابة خاطئة. الإجابة الصحيحة هي: ${correctAnswer}`);
-            }
+                    button.innerHTML = `ترقية (${costText.trim()})`;
+                    button.classList.add('buy-upgrade-button');
+                } else {
+                    button.textContent = 'أقصى مستوى';
+                    button.disabled = true;
+                    button.classList.add('bg-gray-600', 'cursor-default');
+                }
+                upgradeDiv.appendChild(button);
+                upgradesContainer.appendChild(upgradeDiv);
+            });
 
-            const currentPlayer = players.find(p => p.id === userId);
-            if (currentPlayer) {
-                if (isCorrect) {
-                    currentPlayer.score += pointsPerCorrectAnswer;
-                    currentPlayer.money += moneyPerCorrectAnswer;
+
+            // Add event listeners to newly created buttons (delegation or re-attach)
+            document.querySelectorAll('.buy-button').forEach(button => {
+                button.onclick = (e) => buySkin(e.target.dataset.type, e.target.dataset.id);
+            });
+            document.querySelectorAll('.equip-button').forEach(button => {
+                button.onclick = (e) => equipSkin(e.target.dataset.type, e.target.dataset.id);
+            });
+            document.querySelectorAll('.buy-upgrade-button').forEach(button => {
+                button.onclick = (e) => buyUpgrade(e.target.dataset.id);
+            });
+        }
+
+        /**
+         * Handles buying a skin.
+         * @param {string} type - 'player' or 'obstacle'
+         * @param {string} skinId - The ID of the skin to buy.
+         */
+        function buySkin(type, skinId) {
+            let skinsArray = type === 'player' ? playerSkins : obstacleSkins;
+            const skin = skinsArray.find(s => s.id === skinId);
+
+            if (skin && !skin.isOwned) {
+                const requiredGold = skin.cost.gold || 0;
+                const requiredDollars = skin.cost.dollars || 0;
+
+                if (gold >= requiredGold && dollars >= requiredDollars) {
+                    gold -= requiredGold;
+                    dollars -= requiredDollars;
+                    skin.isOwned = true;
+                    goldScoreDisplay.textContent = `الذهب: ${gold}`;
+                    dollarScoreDisplay.textContent = `الدولار: ${dollars}`;
+                    saveGameData();
+                    renderShop(); // Re-render shop to update button states
+                    showInGameNotification(`تم شراء ${skin.name} بنجاح!`);
+                } else {
+                    let missingCurrency = [];
+                    if (gold < requiredGold) missingCurrency.push(`${requiredGold - gold} ${goldIconSVG}`);
+                    if (dollars < requiredDollars) missingCurrency.push(`${requiredDollars - dollars} ${dollarIconSVG}`);
+                    showInGameNotification(`ليس لديك ما يكفي: ${missingCurrency.join(' و ')}`);
                 }
             }
-            updatePlayerDisplays();
-
-            if (db && currentRoomId) {
-                const roomRef = doc(db, `artifacts/${appId}/public/data/rooms`, currentRoomId);
-                const nextQuestionIdx = currentQuestionIndex + 1;
-                const nextPlayerIdx = (currentPlayerIndex + 1) % players.length;
-                const nextTurnPlayerId = players[nextPlayerIdx].id;
-
-                let updatedPlayerScores = {};
-                players.forEach(p => {
-                    updatedPlayerScores[p.id] = { score: p.score, money: p.money };
-                });
-
-                await updateDoc(roomRef, {
-                    playerScores: updatedPlayerScores,
-                    currentQuestionIndex: nextQuestionIdx,
-                    currentTurnPlayerId: nextTurnPlayerId,
-                    lastUpdated: new Date()
-                }).catch(error => {
-                    console.error("Error updating room state after answer:", error);
-                });
-            }
-
-            nextQuestionBtn.classList.remove('hidden');
-            nextQuestionBtn.disabled = (userId !== currentTurnPlayerId);
-            nextQuestionBtn.style.cursor = (userId !== currentTurnPlayerId) ? 'not-allowed' : 'pointer';
         }
 
-        function updatePlayerDisplays() {
-            const player1 = players[0];
-            const player2 = players[1];
+        /**
+         * Handles equipping a skin.
+         * @param {string} type - 'player' or 'obstacle'
+         * @param {string} skinId - The ID of the skin to equip.
+         */
+        function equipSkin(type, skinId) {
+            let skinsArray = type === 'player' ? playerSkins : obstacleSkins;
+            skinsArray.forEach(s => s.isActive = false); // Deactivate all
 
-            player1NameDisplay.textContent = player1.name || "اللاعب 1";
-            player1ScoreDisplay.textContent = `النقاط: ${player1.score}`;
-            player1MoneyDisplay.textContent = `المال: ${player1.money}`;
-
-            player2NameDisplay.textContent = player2.name || "اللاعب 2";
-            player2ScoreDisplay.textContent = `النقاط: ${player2.score}`;
-            player2MoneyDisplay.textContent = `المال: ${player2.money}`;
-
-            currentPlayerDisplay.textContent = `الدور: ${players.find(p => p.id === currentTurnPlayerId)?.name || '...'}`;
-            turnDisplay.textContent = `السؤال ${currentQuestionIndex + 1} من ${maxQuestionsPerGame}`;
-        }
-
-        async function nextTurn() {
-            if (currentQuestionIndex + 1 >= maxQuestionsPerGame) {
-                endGame();
-                return;
-            }
-
-            if (userId !== currentTurnPlayerId) {
-                showMessage("ليس دورك!");
-                return;
-            }
-            showMessage("جاري الانتقال للسؤال التالي...");
-        }
-
-        async function endGame(finalScores = null) {
-            if (unsubscribeFromRoom) {
-                unsubscribeFromRoom();
-                unsubscribeFromRoom = null;
-            }
-
-            let winnerMessage = "";
-            let p1Score = finalScores ? finalScores[players[0].id]?.score || 0 : players[0].score;
-            let p2Score = finalScores ? finalScores[players[1].id]?.score || 0 : players[1].score;
-            let p1Money = finalScores ? finalScores[players[0].id]?.money || 0 : players[0].money;
-            let p2Money = finalScores ? finalScores[players[1].id]?.money || 0 : players[1].money;
-
-            if (p1Score > p2Score) {
-                winnerMessage = `تهانينا، ${players[0].name} فاز باللعبة!`;
-            } else if (p2Score > p1Score) {
-                winnerMessage = `تهانينا، ${players[1].name} فاز باللعبة!`;
-            } else {
-                winnerMessage = "تعادل بين اللاعبين!";
-            }
-            showMessage(`انتهت اللعبة!\n${winnerMessage}\nالنتائج النهائية:\n${players[0].name}: ${p1Score} نقطة, ${p1Money} مال\n${players[1].name}: ${p2Score} نقطة, ${p2Money} مال`);
-
-            await updatePlayerProfile(players[0].id, players[0].name, p1Score, p1Money);
-            await updatePlayerProfile(players[1].id, players[1].name, p2Score, p2Money);
-
-            showScreen('main-menu');
-
-            if (db && userId && currentRoomId) {
-                try {
-                    const userGameResultRef = doc(collection(db, `artifacts/${appId}/users/${userId}/game_history`));
-                    await setDoc(userGameResultRef, {
-                        roomId: currentRoomId,
-                        player1Id: players[0].id,
-                        player1Name: players[0].name,
-                        player1Score: p1Score,
-                        player1Money: p1Money,
-                        player2Id: players[1].id,
-                        player2Name: players[1].name,
-                        player2Score: p2Score,
-                        player2Money: p2Money,
-                        timestamp: new Date(),
-                        playedBy: userId
-                    });
-                    console.log("Game results saved to Firestore for user:", userId);
-
-                    await updateDoc(doc(db, `artifacts/${appId}/public/data/rooms`, currentRoomId), {
-                        status: 'finished',
-                        lastUpdated: new Date()
-                    });
-
-                } catch (error) {
-                    console.error("Error saving game results to Firestore:", error);
-                    showMessage("حدث خطأ في حفظ نتائج اللعبة سحابياً.");
+            const skinToEquip = skinsArray.find(s => s.id === skinId);
+            if (skinToEquip && skinToEquip.isOwned) {
+                skinToEquip.isActive = true;
+                if (type === 'player') {
+                    currentEquippedPlayerSkinId = skinId;
+                } else {
+                    currentEquippedObstacleSkinId = skinId;
                 }
-            } else {
-                console.warn("Firebase not initialized, userId, or currentRoomId not available. Cannot save to cloud.");
+                saveGameData();
+                renderShop();
+                showInGameNotification(`تم تجهيز: ${skinToEquip.name}`);
             }
-            currentRoomId = null;
         }
 
-        // --- Player Profile & Leaderboard Functions ---
-        async function updatePlayerProfile(playerId, playerName, gameScore, gameMoney) {
-            if (!db || !playerId) {
-                console.warn("Firestore not initialized or player ID not available. Cannot update profile.");
-                return;
-            }
+        /**
+         * Handles buying an upgrade.
+         * @param {string} upgradeId - The ID of the upgrade to buy.
+         */
+        function buyUpgrade(upgradeId) {
+            const upgrade = gameUpgrades.find(u => u.id === upgradeId);
 
-            const profileRef = doc(db, `artifacts/${appId}/public/data/player_profiles`, playerId);
-            try {
-                const profileSnap = await getDoc(profileRef);
-                let currentTotalScore = 0;
-                let currentTotalMoney = 0;
+            if (upgrade && upgrade.currentLevel < upgrade.maxLevel) {
+                const nextLevelCost = upgrade.levels[upgrade.currentLevel].cost;
+                let requiredGold = 0;
+                let requiredDollars = 0;
 
-                if (profileSnap.exists()) {
-                    const data = profileSnap.data();
-                    currentTotalScore = data.totalScore || 0;
-                    currentTotalMoney = data.totalMoney || 0;
+                if (typeof nextLevelCost === 'object') {
+                    requiredGold = nextLevelCost.gold || 0;
+                    requiredDollars = nextLevelCost.dollars || 0;
+                } else { // Assume it's gold if not an object
+                    requiredGold = nextLevelCost;
                 }
 
-                await setDoc(profileRef, {
-                    name: playerName,
-                    totalScore: currentTotalScore + gameScore,
-                    totalMoney: currentTotalMoney + gameMoney,
-                    lastPlayed: new Date(),
-                    userId: playerId
-                }, { merge: true });
-                console.log(`Player profile updated for ${playerName} (${playerId})`);
-            } catch (error) {
-                console.error("Error updating player profile:", error);
-                showMessage("حدث خطأ أثناء تحديث ملف اللاعب الشخصي.");
-            }
-        }
+                if (gold >= requiredGold && dollars >= requiredDollars) {
+                    gold -= requiredGold;
+                    dollars -= requiredDollars;
+                    upgrade.currentLevel++;
+                    goldScoreDisplay.textContent = `الذهب: ${gold}`;
+                    dollarScoreDisplay.textContent = `الدولار: ${dollars}`;
+                    shopCurrentGoldDisplay.innerHTML = `${goldIconSVG} الذهب الحالي: ${gold}`;
+                    shopCurrentDollarsDisplay.innerHTML = `${dollarIconSVG} الدولار الحالي: ${dollars}`;
+                    saveGameData();
+                    renderShop();
+                    showInGameNotification(`تم ترقية ${upgrade.name} إلى المستوى ${upgrade.currentLevel}!`);
 
-        async function loadLeaderboard() {
-            if (!db) {
-                showMessage("Firebase غير مهيأ. لا يمكن تحميل لوحة الترتيب.");
-                return;
-            }
-
-            leaderboardList.innerHTML = '';
-            leaderboardLoading.classList.remove('hidden');
-
-            try {
-                const profilesCollection = collection(db, `artifacts/${appId}/public/data/player_profiles`);
-                const querySnapshot = await getDocs(profilesCollection);
-                const playersData = [];
-                querySnapshot.forEach((doc) => {
-                    playersData.push(doc.data());
-                });
-
-                playersData.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
-
-                leaderboardLoading.classList.add('hidden');
-
-                if (playersData.length === 0) {
-                    leaderboardList.innerHTML = '<p class="text-center text-gray-400">لا توجد بيانات في لوحة الترتيب بعد.</p>';
-                    return;
+                    // Apply immediate permanent effect
+                    applyPermanentUpgrades();
+                } else {
+                    let missingCurrency = [];
+                    if (gold < requiredGold) missingCurrency.push(`${requiredGold - gold} ${goldIconSVG}`);
+                    if (dollars < requiredDollars) missingCurrency.push(`${requiredDollars - dollars} ${dollarIconSVG}`);
+                    showInGameNotification(`ليس لديك ما يكفي: ${missingCurrency.join(' و ')}`);
                 }
-
-                playersData.forEach((player, index) => {
-                    const playerItem = document.createElement('div');
-                    playerItem.classList.add('leaderboard-item');
-                    playerItem.innerHTML = `
-                        <span>${index + 1}. ${player.name}</span>
-                        <span class="golden-text">${player.totalScore || 0} نقطة</span>
-                    `;
-                    leaderboardList.appendChild(playerItem);
-                });
-
-            } catch (error) {
-                console.error("Error loading leaderboard:", error);
-                showMessage("فشل في تحميل لوحة الترتيب. الرجاء المحاولة مرة أخرى.");
-                leaderboardLoading.classList.add('hidden');
-                leaderboardList.innerHTML = '<p class="text-center text-red-400">حدث خطأ أثناء تحميل لوحة الترتيب.</p>';
             }
         }
-
 
         // --- Event Listeners ---
-        showRoomScreenBtn.addEventListener('click', setPlayerName);
-        createRoomBtn.addEventListener('click', createRoom);
-        joinRoomBtn.addEventListener('click', joinRoom);
-        nextQuestionBtn.addEventListener('click', nextTurn);
-        leaveRoomBtn.addEventListener('click', leaveRoom);
-        backToStartBtn.addEventListener('click', () => showScreen('start-screen'));
-        backToMainFromStoreBtn.addEventListener('click', () => showScreen('main-menu'));
-        backToMainFromProfileBtn.addEventListener('click', () => showScreen('main-menu'));
-        backToMainFromSettingsBtn.addEventListener('click', () => showScreen('main-menu'));
-        backToMainFromLeaderboardBtn.addEventListener('click', () => showScreen('main-menu'));
 
-        playAgainBtn.addEventListener('click', () => {
-            players = [
-                { id: '', name: '', score: 0, money: 0 },
-                { id: '', name: '', score: 0, money: 0 }
-            ];
-            currentPlayerIndex = 0;
-            currentQuestionIndex = 0;
-            askedQuestions.clear();
-            currentRoomId = null;
-            playerNameInput.value = '';
-            roomIdInput.value = '';
-            showScreen('start-screen');
-        });
-        storeBtn.addEventListener('click', () => showScreen('store-screen'));
-        profileBtn.addEventListener('click', () => showScreen('profile-screen'));
-        settingsBtn.addEventListener('click', () => showScreen('settings-screen'));
-        leaderboardBtn.addEventListener('click', () => {
-            showScreen('leaderboard-screen');
-            loadLeaderboard();
+        // Keyboard controls
+        document.addEventListener('keydown', e => {
+            if (gameRunning) {
+                if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+                    player.dx = player.speed;
+                } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+                    player.dx = -player.speed;
+                }
+            }
         });
 
-        // Initial screen on load
-        showScreen('start-screen');
+        document.addEventListener('keyup', e => {
+            if (gameRunning && (e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === 'd' || e.key === 'D' || e.key === 'a' || e.key === 'A')) {
+                player.dx = 0; // Stop movement when key is released
+            }
+        });
+
+        // Touch controls for mobile: Tap and hold left/right half of the screen
+        canvas.addEventListener('touchstart', e => {
+            if (gameRunning) {
+                const touchX = e.touches[0].clientX;
+                const canvasRect = canvas.getBoundingClientRect(); // Get canvas position on screen
+                const relativeX = touchX - canvasRect.left; // Calculate touch X relative to canvas
+
+                if (relativeX < canvas.width / 2) {
+                    player.dx = -player.speed; // Move left if touch is on left half
+                } else {
+                    player.dx = player.speed; // Move right if touch is on right half
+                }
+                e.preventDefault(); // Prevent scrolling/zooming on touch
+            }
+        }, { passive: false }); // Set passive to false to allow preventDefault
+
+        canvas.addEventListener('touchend', () => {
+            if (gameRunning) {
+                player.dx = 0; // Stop movement when touch ends
+            }
+        });
+
+        // Main Menu Button Listeners
+        mainMenuPlayButton.addEventListener('click', startGame);
+        mainMenuShopButton.addEventListener('click', () => {
+            mainMenuModal.classList.remove('active');
+            shopModal.classList.add('active');
+            renderShop();
+        });
+        mainMenuProfileButton.addEventListener('click', openProfile);
+
+
+        // Game Screen Button Listeners (initially hidden)
+        startButton.addEventListener('click', startGame);
+        resetButton.addEventListener('click', startGame);
+        shopButton.addEventListener('click', () => {
+            gameButtons.style.display = 'none'; // Hide game buttons
+            shopModal.classList.add('active');
+            renderShop();
+        });
+
+        // Modal Close Buttons
+        messageBoxClose.addEventListener('click', hideMessageBox);
+        shopCloseButton.addEventListener('click', () => {
+            shopModal.classList.remove('active');
+            mainMenuModal.classList.add('active'); // Go back to main menu
+            canvas.style.display = 'none'; // Hide canvas
+            gameButtons.style.display = 'none'; // Hide game buttons
+            goldScoreDisplay.style.display = 'none';
+            dollarScoreDisplay.style.display = 'none';
+            highScoreDisplay.style.display = 'none';
+            powerupsDisplay.style.display = 'none';
+        });
+        profileCloseButton.addEventListener('click', () => {
+            profileModal.classList.remove('active');
+            mainMenuModal.classList.add('active'); // Go back to main menu
+            canvas.style.display = 'none'; // Hide canvas
+            gameButtons.style.display = 'none'; // Hide game buttons
+            goldScoreDisplay.style.display = 'none';
+            dollarScoreDisplay.style.display = 'none';
+            highScoreDisplay.style.display = 'none';
+            powerupsDisplay.style.display = 'none';
+        });
+
+        // My Items Button and Close
+        myItemsButton.addEventListener('click', openMyItems);
+        myItemsCloseButton.addEventListener('click', () => {
+            myItemsModal.classList.remove('active');
+            profileModal.classList.add('active'); // Go back to profile
+        });
+        resetGameDataButton.addEventListener('click', resetGameData); // This button is now inside My Items modal
+
+
+        // Handle canvas resizing
+        window.addEventListener('resize', () => {
+            // Update canvas dimensions to match its CSS size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            // Recenter player if game is running or not
+            player.x = canvas.width / 2;
+            player.y = canvas.height - 60; // Keep at bottom
+
+            // Redraw immediately if game is not running
+            if (!gameRunning) {
+                draw();
+            }
+            // If game is running, the next gameLoop frame will handle the updated positions
+        });
+
+        // Initial setup when the window loads
+        window.onload = function() {
+            loadGameData(); // Load skins and high score
+            // Set initial canvas size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            draw(); // Draw initial state with loaded skins
+            // Initially hide game elements
+            canvas.style.display = 'none';
+            gameButtons.style.display = 'none';
+            goldScoreDisplay.style.display = 'none';
+            dollarScoreDisplay.style.display = 'none';
+            highScoreDisplay.style.display = 'none';
+            powerupsDisplay.style.display = 'none';
+            // Show the main menu
+            mainMenuModal.classList.add('active');
+        };
     </script>
 </body>
 </html>
