@@ -88,7 +88,7 @@
             align-items: center;
             opacity: 0;
             transform: translateY(100%);
-            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+            transition: transform 0.25s ease-out, opacity 0.25s ease-out; /* Smoother transitions */
             pointer-events: none;
         }
 
@@ -109,7 +109,7 @@
             text-align: center;
         }
 
-        .close-button {
+        .close-button { /* This is not used anymore as 'back' button is used */
             color: #aaa;
             float: left;
             font-size: 28px;
@@ -125,7 +125,7 @@
 
         .screen {
             position: absolute;
-            top: 0; /* Adjusted to 0 as points header is now separate */
+            top: 0;
             left: 0;
             width: 100%;
             height: 100%;
@@ -133,12 +133,12 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
+            transition: transform 0.25s ease-out, opacity 0.25s ease-out; /* Smoother transitions */
             opacity: 0;
             transform: translateX(100%);
             box-sizing: border-box;
             padding: 1.5rem;
-            padding-top: 0; /* Remove top padding as points header is separate */
+            padding-top: 0;
         }
 
         .screen.active {
@@ -173,8 +173,8 @@
             width: 100%;
             padding-right: 0.5rem;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 0.6rem;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 0.8rem;
             justify-items: center;
         }
         .menu-scroll-area::-webkit-scrollbar {
@@ -199,7 +199,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            padding: 0.3rem;
+            padding: 0.5rem;
             background-color: #3a475a;
             border: 2px solid transparent;
             width: 100%;
@@ -217,25 +217,25 @@
         }
         .menu-item p {
             margin: 0;
-            line-height: 1.1;
+            line-height: 1.2;
         }
         .menu-item .item-name {
-            font-size: 0.7rem; /* Smaller font for name */
+            font-size: 0.9rem;
             font-weight: 600;
             color: #f3f4f6;
-            margin-bottom: 0.1rem;
+            margin-bottom: 0.2rem;
         }
         .menu-item .item-price {
-            font-size: 0.6rem; /* Smaller font for price */
+            font-size: 0.8rem;
             color: #fca5a5;
         }
         .quantity-controls {
-            margin-top: 0.3rem;
+            margin-top: 0.4rem;
         }
         .quantity-controls button {
-            font-size: 0.75rem; /* Smaller button font */
-            width: 18px;
-            height: 18px;
+            font-size: 1rem;
+            width: 24px;
+            height: 24px;
             line-height: 1;
             padding: 0;
             display: flex;
@@ -243,8 +243,8 @@
             justify-content: center;
         }
         .quantity-display {
-            font-size: 0.7rem; /* Smaller quantity display font */
-            min-width: 16px;
+            font-size: 0.9rem;
+            min-width: 20px;
             text-align: center;
         }
 
@@ -288,6 +288,7 @@
             border: 2px solid transparent;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, border-color 0.2s ease-in-out;
+            padding: 0.75rem 1.25rem;
         }
         .main-nav-item:hover {
             background-color: #4a5568;
@@ -297,18 +298,18 @@
 
         .points-header {
             position: absolute;
-            top: 0.5rem; /* Adjusted top position */
-            width: 90%; /* Match iphone-container width */
-            max-width: 414px; /* Match iphone-container max-width */
+            top: 0.5rem;
+            width: calc(100% - 3rem);
+            max-width: calc(414px - 3rem);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 20;
-            padding: 0.5rem 1rem; /* Added padding for better appearance */
+            padding: 0.5rem 1rem;
             box-sizing: border-box;
-            background-color: rgba(45, 55, 72, 0.8); /* Semi-transparent background */
-            border-radius: 0.5rem; /* Rounded corners */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            background-color: rgba(45, 55, 72, 0.8);
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             transition: opacity 0.4s ease-in-out;
             opacity: 1;
         }
@@ -345,7 +346,7 @@
                 <nav class="w-full">
                     <ul class="flex flex-col space-y-4">
                         <li>
-                            <a href="#" id="orderFoodTab" class="flex items-center justify-center py-3 px-4 text-gray-200 hover:text-red-300 font-semibold transition duration-200 rounded-element space-x-2 main-nav-item">
+                            <a href="#" id="orderFoodTab" class="flex items-center justify-center py-4 px-6 text-gray-200 hover:text-red-300 text-lg font-semibold transition duration-200 rounded-element space-x-2 main-nav-item">
                                 <img src="https://up6.cc/2025/07/175169894637571.png"
                                      onerror="this.onerror=null;this.src='https://placehold.co/24x24/333333/FFFFFF?text=🍽️'"
                                      alt="أيقونة طعام" class="w-6 h-6 object-contain">
@@ -353,7 +354,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#" id="phoneTab" class="flex items-center justify-center py-3 px-4 text-gray-200 hover:text-red-300 font-semibold transition duration-200 rounded-element space-x-2 main-nav-item">
+                            <a href="#" id="phoneTab" class="flex items-center justify-center py-4 px-6 text-gray-200 hover:text-red-300 text-lg font-semibold transition duration-200 rounded-element space-x-2 main-nav-item">
                                 <img src="https://up6.cc/2025/07/17516991998091.png"
                                      onerror="this.onerror=null;this.src='https://placehold.co/24x24/333333/FFFFFF?text=📞'"
                                      alt="أيقونة هاتف" class="w-6 h-6 object-contain">
@@ -488,6 +489,10 @@
             <div id="cartItemsDisplay" class="cart-item-list text-gray-100">
                 <p class="text-gray-400">السلة فارغة.</p>
             </div>
+            <div class="mb-4">
+                <input type="tel" id="deliveryPhoneNumberInput" placeholder="رقم هاتف التوصيل" class="w-full p-2 mb-2 rounded-element bg-gray-600 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500" dir="ltr">
+                <input type="text" id="deliveryLocationInput" placeholder="موقع التوصيل (الشارع، رقم المنزل، تفاصيل)" class="w-full p-2 rounded-element bg-gray-600 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500" dir="rtl">
+            </div>
             <div class="text-xl font-bold mt-4 text-gray-100">
                 الإجمالي: <span id="cartTotalDisplay" class="text-red-300">0 د.ع</span>
             </div>
@@ -495,7 +500,7 @@
                 <button id="clearCartBtn" class="px-6 py-2 bg-gray-600 hover:bg-gray-500 active:bg-gray-700 text-white font-semibold rounded-element shadow-lg transition duration-300 ease-in-out mr-2">
                     مسح السلة
                 </button>
-                <button id="confirmOrderBtn" class="px-6 py-2 bg-red-700 hover:bg-red-600 active:bg-red-800 text-white font-semibold rounded-element shadow-lg transition duration-300 ease-in-out ml-2">
+                <button id="confirmOrderBtn" class="px-6 py-2 bg-red-700 hover:bg-red-600 active:bg-red-800 text-white font-semibold rounded-element shadow-lg transition duration-300 ease-in-out ml-2" disabled>
                     تأكيد الطلب
                 </button>
             </div>
@@ -507,59 +512,33 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
+        // Global state object
         const appState = {
             cart: [],
-            currentPhoneNumber: null,
-            userPoints: 0,
+            currentPhoneNumber: localStorage.getItem('phoneNumber') || null, // Load from localStorage
+            userPoints: parseInt(localStorage.getItem('userPoints') || '0'), // Load from localStorage
+            deliveryPhoneNumber: localStorage.getItem('deliveryPhoneNumber') || '', // New: Load delivery phone from localStorage
+            deliveryLocation: localStorage.getItem('deliveryLocation') || '', // New: Load delivery location from localStorage
             pointsInterval: null,
             currentActiveScreen: 'mainMenuScreen',
             currentImageIndex: 0
         };
 
-        let db;
-        let auth;
-        let userId = null;
-        let phoneNumberDocRef = null;
-        let userPointsDocRef = null;
+        // A dummy ID for local storage context, as Firebase is not used
+        const userId = 'local_user';
 
-        const initFirebase = async () => {
-            try {
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        phoneNumberDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile/phoneNumberDoc`);
-                        userPointsDocRef = doc(db, `artifacts/${appId}/users/${userId}/profile/userPointsDoc`);
-                        setupPhoneNumberListener();
-                        setupPointsListener();
-                        setTimeout(startPointsInterval, 1000);
-                    } else {
-                        userId = null;
-                        phoneNumberDocRef = null;
-                        userPointsDocRef = null;
-                        if (appState.pointsInterval) clearInterval(appState.pointsInterval);
-                    }
-                });
-            } catch (error) {
-                console.error("Error initializing Firebase:", error);
+        const initLocalApp = () => {
+            // Initialize UI elements based on loaded localStorage data
+            updatePhoneNumberUI(appState.currentPhoneNumber);
+            if (userPointsDisplay) {
+                userPointsDisplay.textContent = appState.userPoints;
             }
+            // Populate delivery inputs if data exists
+            if (deliveryPhoneNumberInput) deliveryPhoneNumberInput.value = appState.deliveryPhoneNumber;
+            if (deliveryLocationInput) deliveryLocationInput.value = appState.deliveryLocation;
+
+            checkConfirmButtonState(); // Check button state on load
+            setTimeout(startPointsInterval, 1000); // Start points interval
         };
 
         let mainMenuScreen;
@@ -587,6 +566,9 @@
         let confirmOrderBtn;
         let orderConfirmationMessage;
         let clearCartBtn;
+
+        let deliveryPhoneNumberInput; // New element reference
+        let deliveryLocationInput; // New element reference
 
         let userPointsDisplay;
         let pointsContainer;
@@ -624,49 +606,8 @@
             }
         };
 
-        const setupPhoneNumberListener = () => {
-            if (!phoneNumberDocRef) {
-                return;
-            }
-            onSnapshot(phoneNumberDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    appState.currentPhoneNumber = docSnap.data().number;
-                } else {
-                    appState.currentPhoneNumber = null;
-                }
-                if (phoneNumberModal.classList.contains('active')) {
-                    updatePhoneNumberUI(appState.currentPhoneNumber);
-                }
-            }, (error) => {
-                console.error("Error listening to phone number:", error);
-            });
-        };
-
-        const setupPointsListener = () => {
-            if (!userPointsDocRef) return;
-            onSnapshot(userPointsDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    appState.userPoints = docSnap.data().points || 0;
-                } else {
-                    appState.userPoints = 0;
-                }
-                if (userPointsDisplay) {
-                    userPointsDisplay.textContent = appState.userPoints;
-                }
-            }, (error) => {
-                console.error("Error listening to user points:", error);
-            });
-        };
-
-        const savePoints = async () => {
-            if (!userId || !userPointsDocRef) {
-                return;
-            }
-            try {
-                await setDoc(userPointsDocRef, { points: appState.userPoints }, { merge: true });
-            } catch (error) {
-                console.error("Error saving user points:", error);
-            }
+        const savePoints = () => {
+            localStorage.setItem('userPoints', appState.userPoints.toString());
         };
 
         const startPointsInterval = () => {
@@ -681,17 +622,31 @@
             }, 10000);
         };
 
-        const savePhoneNumber = async () => {
+        const savePhoneNumber = () => {
             const number = phoneNumberInput.value.trim();
-            if (number && phoneNumberDocRef) {
-                try {
-                    await setDoc(phoneNumberDocRef, { number: number });
-                    hidePhoneNumberModal();
-                } catch (error) {
-                    console.error("Error saving phone number:", error);
-                }
+            if (number) {
+                localStorage.setItem('phoneNumber', number);
+                appState.currentPhoneNumber = number;
+                hidePhoneNumberModal();
             } else {
                 console.warn("Please enter a phone number.");
+            }
+        };
+
+        // New function to save delivery details to localStorage
+        const saveDeliveryDetails = () => {
+            localStorage.setItem('deliveryPhoneNumber', deliveryPhoneNumberInput.value.trim());
+            localStorage.setItem('deliveryLocation', deliveryLocationInput.value.trim());
+            appState.deliveryPhoneNumber = deliveryPhoneNumberInput.value.trim();
+            appState.deliveryLocation = deliveryLocationInput.value.trim();
+        };
+
+        // New function to check and enable/disable confirm button
+        const checkConfirmButtonState = () => {
+            const phoneFilled = deliveryPhoneNumberInput && deliveryPhoneNumberInput.value.trim() !== '';
+            const locationFilled = deliveryLocationInput && deliveryLocationInput.value.trim() !== '';
+            if (confirmOrderBtn) {
+                confirmOrderBtn.disabled = !(phoneFilled && locationFilled);
             }
         };
 
@@ -745,7 +700,7 @@
                     if (appState.currentActiveScreen === 'mainMenuScreen') {
                         togglePointsVisibility(true);
                     }
-                }, 400);
+                }, 250);
             }, 10);
         };
 
@@ -767,7 +722,7 @@
                 if (appState.currentActiveScreen === 'mainMenuScreen') {
                     togglePointsVisibility(true);
                 }
-            }, 400);
+            }, 250);
         };
 
         const showCartModal = () => {
@@ -779,6 +734,10 @@
             }, 10);
             updateCartDisplay();
             orderConfirmationMessage.classList.add('hidden');
+            // Populate delivery inputs when cart modal is shown
+            if (deliveryPhoneNumberInput) deliveryPhoneNumberInput.value = appState.deliveryPhoneNumber;
+            if (deliveryLocationInput) deliveryLocationInput.value = appState.deliveryLocation;
+            checkConfirmButtonState(); // Re-check button state
         };
 
         const hideCartModal = () => {
@@ -789,7 +748,7 @@
                 if (appState.currentActiveScreen === 'mainMenuScreen') {
                     togglePointsVisibility(true);
                 }
-            }, 400);
+            }, 250);
         };
 
         const updateCartDisplay = () => {
@@ -817,6 +776,7 @@
             }
             cartTotalDisplay.textContent = `${total.toLocaleString()} د.ع`;
             cartItemCount.textContent = totalItems;
+            checkConfirmButtonState(); // Re-check button state after cart update
         };
 
         const updateItemQuantity = (itemId, change) => {
@@ -858,9 +818,14 @@
                 itemElement.querySelector('.quantity-display').textContent = '0';
             });
             orderConfirmationMessage.classList.add('hidden');
+            // Clear delivery inputs as well
+            if (deliveryPhoneNumberInput) deliveryPhoneNumberInput.value = '';
+            if (deliveryLocationInput) deliveryLocationInput.value = '';
+            saveDeliveryDetails(); // Save empty details
+            checkConfirmButtonState(); // Disable button
         };
 
-        const confirmOrder = async () => {
+        const confirmOrder = () => {
             if (appState.cart.length === 0) {
                 orderConfirmationMessage.textContent = 'السلة فارغة. لا يمكن تأكيد الطلب.';
                 orderConfirmationMessage.classList.remove('hidden', 'text-green-400');
@@ -868,39 +833,49 @@
                 return;
             }
 
-            if (!userId) {
-                orderConfirmationMessage.textContent = 'خطأ: المستخدم غير مسجل الدخول.';
+            // Get delivery details from inputs
+            const deliveryPhone = deliveryPhoneNumberInput.value.trim();
+            const deliveryLocation = deliveryLocationInput.value.trim();
+
+            if (!deliveryPhone || !deliveryLocation) {
+                orderConfirmationMessage.textContent = 'الرجاء إدخال رقم هاتف التوصيل والموقع.';
                 orderConfirmationMessage.classList.remove('hidden', 'text-green-400');
                 orderConfirmationMessage.classList.add('text-red-400');
                 return;
             }
 
-            try {
-                const order = {
-                    userId: userId,
-                    items: appState.cart.map(item => ({ name: item.name, price: item.price, quantity: item.quantity })),
-                    total: appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-                    timestamp: new Date().toISOString()
-                };
-                await addDoc(collection(db, `artifacts/${appId}/users/${userId}/orders`), order);
+            // Save current delivery details to localStorage
+            saveDeliveryDetails();
 
-                orderConfirmationMessage.textContent = 'تم تأكيد طلبك بنجاح!';
-                orderConfirmationMessage.classList.remove('hidden', 'text-red-400');
-                orderConfirmationMessage.classList.add('text-green-400');
+            // Construct WhatsApp message
+            let orderSummary = "طلب جديد من مطعم مندي الأصيل:\n\n";
+            appState.cart.forEach(item => {
+                orderSummary += `- ${item.name} (الكمية: ${item.quantity}) - ${item.price.toLocaleString()} د.ع\n`;
+            });
+            orderSummary += `\nالإجمالي: ${appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString()} د.ع`;
+            orderSummary += `\n\nرقم هاتف التوصيل: ${deliveryPhone}`;
+            orderSummary += `\nموقع التوصيل: ${deliveryLocation}`;
 
-                clearCart();
-
-                setTimeout(() => {
-                    hideCartModal();
-                }, 2000);
-
-            } catch (error) {
-                orderConfirmationMessage.textContent = `حدث خطأ أثناء تأكيد الطلب: ${error.message}`;
-                orderConfirmationMessage.classList.remove('hidden', 'text-green-400');
-                orderConfirmationMessage.classList.add('text-red-400');
+            if (appState.currentPhoneNumber) {
+                orderSummary += `\n\nرقم هاتفي (للتواصل الشخصي): ${appState.currentPhoneNumber}`;
             }
+
+            const whatsappNumber = "9647713123322"; // WhatsApp number for Iraq, without '+'
+            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(orderSummary)}`;
+
+            orderConfirmationMessage.textContent = 'جاري تحويلك إلى واتساب لإرسال الطلب...';
+            orderConfirmationMessage.classList.remove('hidden', 'text-red-400');
+            orderConfirmationMessage.classList.add('text-green-400');
+
+            clearCart(); // Clear cart after preparing order
+
+            setTimeout(() => {
+                window.open(whatsappUrl, '_blank'); // Open in new tab/window for better UX
+                hideCartModal(); // Hide modal after redirect
+            }, 2000); // Give time for message to be read before redirect
         };
 
+        // Initialize elements and add event listeners on window load
         window.onload = () => {
             mainMenuScreen = document.getElementById('mainMenuScreen');
             orderFoodScreen = document.getElementById('orderFoodScreen');
@@ -920,7 +895,7 @@
             viewCartBtn = document.getElementById('viewCartBtn');
             cartItemCount = document.getElementById('cartItemCount');
             cartModal = document.getElementById('cartModal');
-            closeCartModalBtn = document.getElementById('closeCartModalBtn');
+            closeCartModalBtn = document.getElementById('closeCartModalBtn'); // Still exists in HTML, but back button is preferred
             backFromCartModalBtn = document.getElementById('backFromCartModalBtn');
             cartItemsDisplay = document.getElementById('cartItemsDisplay');
             cartTotalDisplay = document.getElementById('cartTotalDisplay');
@@ -928,19 +903,24 @@
             orderConfirmationMessage = document.getElementById('orderConfirmationMessage');
             clearCartBtn = document.getElementById('clearCartBtn');
 
+            deliveryPhoneNumberInput = document.getElementById('deliveryPhoneNumberInput'); // Get reference
+            deliveryLocationInput = document.getElementById('deliveryLocationInput'); // Get reference
+
             userPointsDisplay = document.getElementById('userPointsDisplay');
             pointsContainer = document.getElementById('pointsContainer');
             mainRestaurantImage = document.getElementById('mainRestaurantImage');
 
-            initFirebase();
+            initLocalApp(); // Initialize the app with local storage
 
-            // Initial setup for screen and points visibility
+            // Set initial screen and points visibility
             mainMenuScreen.classList.add('active');
             mainMenuScreen.classList.remove('hidden');
             togglePointsVisibility(true);
 
+            // Start image carousel
             setInterval(rotateMainImage, displayDuration + fadeDuration / 2);
 
+            // Event listeners
             orderFoodTab.addEventListener('click', (e) => {
                 e.preventDefault();
                 switchScreen('orderFoodScreen', 'forward');
@@ -965,6 +945,14 @@
                 editPhoneNumberBtn.classList.add('hidden');
             });
 
+            // Add event listeners for delivery inputs to enable/disable confirm button
+            if (deliveryPhoneNumberInput) {
+                deliveryPhoneNumberInput.addEventListener('input', checkConfirmButtonState);
+            }
+            if (deliveryLocationInput) {
+                deliveryLocationInput.addEventListener('input', checkConfirmButtonState);
+            }
+
             menuItems.forEach(itemElement => {
                 const itemId = itemElement.dataset.itemId;
                 itemElement.querySelector('.increment-btn').addEventListener('click', () => updateItemQuantity(itemId, 1));
@@ -976,7 +964,8 @@
             confirmOrderBtn.addEventListener('click', confirmOrder);
             clearCartBtn.addEventListener('click', clearCart);
 
-            updateCartDisplay();
+            updateCartDisplay(); // Initial update to reflect any loaded cart items
+            checkConfirmButtonState(); // Initial check for confirm button state
         };
     </script>
 </body>
