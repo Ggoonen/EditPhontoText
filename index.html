@@ -327,8 +327,10 @@
         <!-- Points and Logo Header -->
         <div id="pointsContainer" class="points-header">
             <p class="text-xl text-yellow-300 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star text-yellow-400 mr-1">
-                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gem text-blue-400 mr-1">
+                    <path d="M6 3h12l4 6-10 13L2 9Z"/>
+                    <path d="M12 17.5V3"/>
+                    <path d="M2.81 9h18.38"/>
                 </svg>
                 نقاطك: <span id="userPointsDisplay">0</span>
             </p>
@@ -489,10 +491,21 @@
             <div id="cartItemsDisplay" class="cart-item-list text-gray-100">
                 <p class="text-gray-400">السلة فارغة.</p>
             </div>
+
+            <!-- Delivery Information Inputs -->
             <div class="mb-4">
                 <input type="tel" id="deliveryPhoneNumberInput" placeholder="رقم هاتف التوصيل" class="w-full p-2 mb-2 rounded-element bg-gray-600 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500" dir="ltr">
                 <input type="text" id="deliveryLocationInput" placeholder="موقع التوصيل (الشارع، رقم المنزل، تفاصيل)" class="w-full p-2 rounded-element bg-gray-600 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500" dir="rtl">
             </div>
+
+            <!-- Coupon Section -->
+            <div id="couponSection" class="bg-gray-800 p-3 rounded-element mb-4 hidden">
+                <p id="couponMessage" class="text-sm text-center mb-2"></p>
+                <button id="applyCouponBtn" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 active:bg-yellow-700 text-white font-semibold rounded-element shadow-lg transition duration-300 ease-in-out w-full" disabled>
+                    تطبيق خصم 10%
+                </button>
+            </div>
+
             <div class="text-xl font-bold mt-4 text-gray-100">
                 الإجمالي: <span id="cartTotalDisplay" class="text-red-300">0 د.ع</span>
             </div>
@@ -515,30 +528,29 @@
         // Global state object
         const appState = {
             cart: [],
-            currentPhoneNumber: localStorage.getItem('phoneNumber') || null, // Load from localStorage
-            userPoints: parseInt(localStorage.getItem('userPoints') || '0'), // Load from localStorage
-            deliveryPhoneNumber: localStorage.getItem('deliveryPhoneNumber') || '', // New: Load delivery phone from localStorage
-            deliveryLocation: localStorage.getItem('deliveryLocation') || '', // New: Load delivery location from localStorage
+            currentPhoneNumber: localStorage.getItem('phoneNumber') || null,
+            userPoints: parseInt(localStorage.getItem('userPoints') || '0'),
+            deliveryPhoneNumber: localStorage.getItem('deliveryPhoneNumber') || '',
+            deliveryLocation: localStorage.getItem('deliveryLocation') || '',
+            lifetimeCouponUsed: localStorage.getItem('lifetimeCouponUsed') === 'true', // Track if coupon was ever used
+            couponAppliedForCurrentOrder: false, // Track if coupon is applied for current cart session
             pointsInterval: null,
             currentActiveScreen: 'mainMenuScreen',
             currentImageIndex: 0
         };
 
-        // A dummy ID for local storage context, as Firebase is not used
-        const userId = 'local_user';
+        const userId = 'local_user'; // Dummy ID for local storage context
 
         const initLocalApp = () => {
-            // Initialize UI elements based on loaded localStorage data
             updatePhoneNumberUI(appState.currentPhoneNumber);
             if (userPointsDisplay) {
                 userPointsDisplay.textContent = appState.userPoints;
             }
-            // Populate delivery inputs if data exists
             if (deliveryPhoneNumberInput) deliveryPhoneNumberInput.value = appState.deliveryPhoneNumber;
             if (deliveryLocationInput) deliveryLocationInput.value = appState.deliveryLocation;
 
-            checkConfirmButtonState(); // Check button state on load
-            setTimeout(startPointsInterval, 1000); // Start points interval
+            checkConfirmButtonState();
+            setTimeout(startPointsInterval, 1000);
         };
 
         let mainMenuScreen;
@@ -567,8 +579,12 @@
         let orderConfirmationMessage;
         let clearCartBtn;
 
-        let deliveryPhoneNumberInput; // New element reference
-        let deliveryLocationInput; // New element reference
+        let deliveryPhoneNumberInput;
+        let deliveryLocationInput;
+
+        let couponSection; // New element reference
+        let couponMessage; // New element reference
+        let applyCouponBtn; // New element reference
 
         let userPointsDisplay;
         let pointsContainer;
@@ -619,6 +635,7 @@
                     userPointsDisplay.textContent = appState.userPoints;
                 }
                 savePoints();
+                updateCartDisplay(); // Update cart display to reflect potential coupon eligibility
             }, 10000);
         };
 
@@ -633,7 +650,6 @@
             }
         };
 
-        // New function to save delivery details to localStorage
         const saveDeliveryDetails = () => {
             localStorage.setItem('deliveryPhoneNumber', deliveryPhoneNumberInput.value.trim());
             localStorage.setItem('deliveryLocation', deliveryLocationInput.value.trim());
@@ -641,12 +657,13 @@
             appState.deliveryLocation = deliveryLocationInput.value.trim();
         };
 
-        // New function to check and enable/disable confirm button
         const checkConfirmButtonState = () => {
             const phoneFilled = deliveryPhoneNumberInput && deliveryPhoneNumberInput.value.trim() !== '';
             const locationFilled = deliveryLocationInput && deliveryLocationInput.value.trim() !== '';
+            const cartNotEmpty = appState.cart.length > 0;
+
             if (confirmOrderBtn) {
-                confirmOrderBtn.disabled = !(phoneFilled && locationFilled);
+                confirmOrderBtn.disabled = !(phoneFilled && locationFilled && cartNotEmpty);
             }
         };
 
@@ -734,10 +751,10 @@
             }, 10);
             updateCartDisplay();
             orderConfirmationMessage.classList.add('hidden');
-            // Populate delivery inputs when cart modal is shown
             if (deliveryPhoneNumberInput) deliveryPhoneNumberInput.value = appState.deliveryPhoneNumber;
             if (deliveryLocationInput) deliveryLocationInput.value = appState.deliveryLocation;
-            checkConfirmButtonState(); // Re-check button state
+            checkConfirmButtonState();
+            updateCouponSection(); // Update coupon section visibility and message
         };
 
         const hideCartModal = () => {
@@ -774,9 +791,24 @@
                     totalItems += item.quantity;
                 });
             }
-            cartTotalDisplay.textContent = `${total.toLocaleString()} د.ع`;
+
+            // Apply coupon discount if applicable for the current order session
+            let finalTotal = total;
+            if (appState.couponAppliedForCurrentOrder && appState.cart.length > 0) {
+                const mostExpensiveItem = appState.cart.reduce((max, item) => item.price > max.price ? item : max, appState.cart[0]);
+                const discountAmount = Math.round(mostExpensiveItem.price * 0.10);
+                finalTotal -= discountAmount;
+                couponMessage.textContent = `تم تطبيق خصم 10% (${discountAmount.toLocaleString()} د.ع) على ${mostExpensiveItem.name}!`;
+                couponMessage.classList.remove('text-red-400', 'text-yellow-300');
+                couponMessage.classList.add('text-green-400');
+                applyCouponBtn.disabled = true;
+                applyCouponBtn.textContent = 'تم استخدام الخصم';
+            }
+
+            cartTotalDisplay.textContent = `${finalTotal.toLocaleString()} د.ع`;
             cartItemCount.textContent = totalItems;
-            checkConfirmButtonState(); // Re-check button state after cart update
+            checkConfirmButtonState();
+            updateCouponSection(); // Ensure coupon section is updated after cart changes
         };
 
         const updateItemQuantity = (itemId, change) => {
@@ -812,20 +844,81 @@
 
         const clearCart = () => {
             appState.cart = [];
+            appState.couponAppliedForCurrentOrder = false; // Reset coupon for new order
             updateCartDisplay();
             menuItems.forEach(itemElement => {
                 itemElement.classList.remove('selected');
                 itemElement.querySelector('.quantity-display').textContent = '0';
             });
             orderConfirmationMessage.classList.add('hidden');
-            // Clear delivery inputs as well
             if (deliveryPhoneNumberInput) deliveryPhoneNumberInput.value = '';
             if (deliveryLocationInput) deliveryLocationInput.value = '';
-            saveDeliveryDetails(); // Save empty details
-            checkConfirmButtonState(); // Disable button
+            saveDeliveryDetails();
+            checkConfirmButtonState();
+            updateCouponSection(); // Reset coupon section UI
+        };
+
+        const updateCouponSection = () => {
+            if (!couponSection || !couponMessage || !applyCouponBtn) return;
+
+            if (appState.lifetimeCouponUsed) {
+                couponSection.classList.remove('hidden');
+                couponMessage.textContent = 'لقد استخدمت كوبون الخصم الخاص بك مسبقاً.';
+                couponMessage.classList.remove('text-yellow-300', 'text-green-400');
+                couponMessage.classList.add('text-red-400');
+                applyCouponBtn.disabled = true;
+                applyCouponBtn.textContent = 'تم استخدام الخصم';
+            } else if (appState.userPoints >= 10000) {
+                couponSection.classList.remove('hidden');
+                couponMessage.textContent = 'لديك نقاط كافية! احصل على خصم 10% على أغلى صنف.';
+                couponMessage.classList.remove('text-red-400', 'text-green-400');
+                couponMessage.classList.add('text-yellow-300');
+                applyCouponBtn.disabled = appState.cart.length === 0 || appState.couponAppliedForCurrentOrder;
+                applyCouponBtn.textContent = 'تطبيق خصم 10%';
+            } else {
+                couponSection.classList.remove('hidden');
+                couponMessage.textContent = `تحتاج ${10000 - appState.userPoints} نقطة إضافية للحصول على خصم 10%.`;
+                couponMessage.classList.remove('text-green-400', 'text-red-400');
+                couponMessage.classList.add('text-yellow-300');
+                applyCouponBtn.disabled = true;
+                applyCouponBtn.textContent = 'تطبيق خصم 10%';
+            }
+        };
+
+        const applyCoupon = () => {
+            if (appState.cart.length === 0) {
+                couponMessage.textContent = 'السلة فارغة. لا يمكن تطبيق الخصم.';
+                couponMessage.classList.remove('text-green-400', 'text-yellow-300');
+                couponMessage.classList.add('text-red-400');
+                return;
+            }
+
+            if (appState.userPoints < 10000 || appState.lifetimeCouponUsed || appState.couponAppliedForCurrentOrder) {
+                couponMessage.textContent = 'لا يمكنك تطبيق الخصم حالياً.';
+                couponMessage.classList.remove('text-green-400', 'text-yellow-300');
+                couponMessage.classList.add('text-red-400');
+                return;
+            }
+
+            // Find the most expensive item
+            const mostExpensiveItem = appState.cart.reduce((max, item) => item.price > max.price ? item : max, appState.cart[0]);
+
+            // Apply discount
+            appState.userPoints -= 10000; // Deduct points
+            appState.lifetimeCouponUsed = true; // Mark coupon as used for lifetime
+            appState.couponAppliedForCurrentOrder = true; // Mark coupon as applied for current order session
+
+            localStorage.setItem('userPoints', appState.userPoints.toString());
+            localStorage.setItem('lifetimeCouponUsed', 'true');
+
+            userPointsDisplay.textContent = appState.userPoints; // Update points display
+            updateCartDisplay(); // Recalculate total with discount and update UI
         };
 
         const confirmOrder = () => {
+            const deliveryPhone = deliveryPhoneNumberInput.value.trim();
+            const deliveryLocation = deliveryLocationInput.value.trim();
+
             if (appState.cart.length === 0) {
                 orderConfirmationMessage.textContent = 'السلة فارغة. لا يمكن تأكيد الطلب.';
                 orderConfirmationMessage.classList.remove('hidden', 'text-green-400');
@@ -833,26 +926,31 @@
                 return;
             }
 
-            // Get delivery details from inputs
-            const deliveryPhone = deliveryPhoneNumberInput.value.trim();
-            const deliveryLocation = deliveryLocationInput.value.trim();
-
             if (!deliveryPhone || !deliveryLocation) {
-                orderConfirmationMessage.textContent = 'الرجاء إدخال رقم هاتف التوصيل والموقع.';
+                orderConfirmationMessage.textContent = 'الرجاء ملء جميع حقول التوصيل المطلوبة (رقم الهاتف والموقع).';
                 orderConfirmationMessage.classList.remove('hidden', 'text-green-400');
                 orderConfirmationMessage.classList.add('text-red-400');
                 return;
             }
 
-            // Save current delivery details to localStorage
-            saveDeliveryDetails();
+            saveDeliveryDetails(); // Save current delivery details
+
+            let orderTotal = appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            let discountAppliedText = "";
+
+            if (appState.couponAppliedForCurrentOrder) {
+                const mostExpensiveItem = appState.cart.reduce((max, item) => item.price > max.price ? item : max, appState.cart[0]);
+                const discountAmount = Math.round(mostExpensiveItem.price * 0.10);
+                orderTotal -= discountAmount;
+                discountAppliedText = `\n(تم تطبيق خصم 10% على ${mostExpensiveItem.name}: ${discountAmount.toLocaleString()} د.ع)`;
+            }
 
             // Construct WhatsApp message
             let orderSummary = "طلب جديد من مطعم مندي الأصيل:\n\n";
             appState.cart.forEach(item => {
-                orderSummary += `- ${item.name} (الكمية: ${item.quantity}) - ${item.price.toLocaleString()} د.ع\n`;
+                orderSummary += `- ${item.name} (الكمية: ${item.quantity}) - ${item.price.toLocaleString()} د.ع للوحدة\n`;
             });
-            orderSummary += `\nالإجمالي: ${appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString()} د.ع`;
+            orderSummary += `\nالإجمالي النهائي: ${orderTotal.toLocaleString()} د.ع${discountAppliedText}`;
             orderSummary += `\n\nرقم هاتف التوصيل: ${deliveryPhone}`;
             orderSummary += `\nموقع التوصيل: ${deliveryLocation}`;
 
@@ -860,7 +958,7 @@
                 orderSummary += `\n\nرقم هاتفي (للتواصل الشخصي): ${appState.currentPhoneNumber}`;
             }
 
-            const whatsappNumber = "9647713123322"; // WhatsApp number for Iraq, without '+'
+            const whatsappNumber = "9647713123322";
             const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(orderSummary)}`;
 
             orderConfirmationMessage.textContent = 'جاري تحويلك إلى واتساب لإرسال الطلب...';
@@ -870,12 +968,11 @@
             clearCart(); // Clear cart after preparing order
 
             setTimeout(() => {
-                window.open(whatsappUrl, '_blank'); // Open in new tab/window for better UX
-                hideCartModal(); // Hide modal after redirect
-            }, 2000); // Give time for message to be read before redirect
+                window.open(whatsappUrl, '_blank');
+                hideCartModal();
+            }, 2000);
         };
 
-        // Initialize elements and add event listeners on window load
         window.onload = () => {
             mainMenuScreen = document.getElementById('mainMenuScreen');
             orderFoodScreen = document.getElementById('orderFoodScreen');
@@ -895,7 +992,7 @@
             viewCartBtn = document.getElementById('viewCartBtn');
             cartItemCount = document.getElementById('cartItemCount');
             cartModal = document.getElementById('cartModal');
-            closeCartModalBtn = document.getElementById('closeCartModalBtn'); // Still exists in HTML, but back button is preferred
+            closeCartModalBtn = document.getElementById('closeCartModalBtn');
             backFromCartModalBtn = document.getElementById('backFromCartModalBtn');
             cartItemsDisplay = document.getElementById('cartItemsDisplay');
             cartTotalDisplay = document.getElementById('cartTotalDisplay');
@@ -903,24 +1000,25 @@
             orderConfirmationMessage = document.getElementById('orderConfirmationMessage');
             clearCartBtn = document.getElementById('clearCartBtn');
 
-            deliveryPhoneNumberInput = document.getElementById('deliveryPhoneNumberInput'); // Get reference
-            deliveryLocationInput = document.getElementById('deliveryLocationInput'); // Get reference
+            deliveryPhoneNumberInput = document.getElementById('deliveryPhoneNumberInput');
+            deliveryLocationInput = document.getElementById('deliveryLocationInput');
+
+            couponSection = document.getElementById('couponSection');
+            couponMessage = document.getElementById('couponMessage');
+            applyCouponBtn = document.getElementById('applyCouponBtn');
 
             userPointsDisplay = document.getElementById('userPointsDisplay');
             pointsContainer = document.getElementById('pointsContainer');
             mainRestaurantImage = document.getElementById('mainRestaurantImage');
 
-            initLocalApp(); // Initialize the app with local storage
+            initLocalApp();
 
-            // Set initial screen and points visibility
             mainMenuScreen.classList.add('active');
             mainMenuScreen.classList.remove('hidden');
             togglePointsVisibility(true);
 
-            // Start image carousel
             setInterval(rotateMainImage, displayDuration + fadeDuration / 2);
 
-            // Event listeners
             orderFoodTab.addEventListener('click', (e) => {
                 e.preventDefault();
                 switchScreen('orderFoodScreen', 'forward');
@@ -945,12 +1043,15 @@
                 editPhoneNumberBtn.classList.add('hidden');
             });
 
-            // Add event listeners for delivery inputs to enable/disable confirm button
             if (deliveryPhoneNumberInput) {
                 deliveryPhoneNumberInput.addEventListener('input', checkConfirmButtonState);
             }
             if (deliveryLocationInput) {
                 deliveryLocationInput.addEventListener('input', checkConfirmButtonState);
+            }
+
+            if (applyCouponBtn) {
+                applyCouponBtn.addEventListener('click', applyCoupon);
             }
 
             menuItems.forEach(itemElement => {
@@ -964,8 +1065,9 @@
             confirmOrderBtn.addEventListener('click', confirmOrder);
             clearCartBtn.addEventListener('click', clearCart);
 
-            updateCartDisplay(); // Initial update to reflect any loaded cart items
-            checkConfirmButtonState(); // Initial check for confirm button state
+            updateCartDisplay();
+            checkConfirmButtonState();
+            updateCouponSection(); // Initial update for coupon section
         };
     </script>
 </body>
