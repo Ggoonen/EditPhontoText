@@ -3,1072 +3,2825 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مطعم مندي الأصيل</title>
+    <title>قائمة الجوال الرئيسية - داكنة وذهبية مع انتقالات</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
-            font-family: 'Cairo', sans-serif;
-            font-size: 16.9px;
-            overflow: hidden;
+            font-family: 'Almarai', sans-serif;
+            background-color: #1a202c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #e2e8f0;
+            overflow: hidden; /* Prevent body scroll */
+            position: relative;
+            -webkit-user-select: none; /* Disable text selection */
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-image: url('https://f.top4top.io/p_34775wh0c0.png'); /* New background image */
+            background-size: cover; /* Cover the entire area */
+            background-position: center; /* Center the image */
+            background-repeat: no-repeat; /* Do not repeat */
+            background-attachment: fixed; /* Keep background fixed when scrolling content */
         }
 
-        @keyframes gradient-animation {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
+        /* Global subtle gold background animation - removed, replaced by static image */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,215,0,0.05) 0%, rgba(255,215,0,0) 50%, rgba(255,215,0,0.05) 100%);
+            background-size: 400% 400%; /* Increased size for larger movement */
+            animation: subtleGoldMove 30s infinite linear; /* Slower animation */
+            z-index: 0; /* Ensure it's behind content */
+            pointer-events: none; /* Make it non-interactive */
         }
 
-        .animated-background {
-            background: linear-gradient(135deg,
-                #1a202c 0%,
-                #2d3748 30%,
-                #4a0404 50%,
-                #2d3748 70%,
-                #1a202c 100%
-            );
-            background-size: 400% 400%;
-            animation: gradient-animation 15s ease infinite;
+        @keyframes subtleGoldMove {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+        }
+
+
+        .app-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            height: 600px; /* Fixed height */
+            background-color: rgba(45, 55, 72, 0.85); /* Slightly transparent background */
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden; /* Prevent scrolling inside app container */
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            z-index: 10;
+        }
+
+        .content-section {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
-        }
-
-        .iphone-container {
-            max-width: 414px;
-            max-height: 896px;
-            aspect-ratio: 9 / 16;
-            width: 90%;
-            height: 90vh;
-            position: relative;
-            overflow: hidden;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-        }
-
-        .rounded-element {
-            border-radius: 0.75rem;
-        }
-
-        .main-carousel-image {
-            transition: opacity 1s ease-in-out;
-        }
-
-        @keyframes phone-pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.9; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .phone-icon-animated {
-            animation: phone-pulse 2s ease-in-out infinite;
-        }
-
-        .modal {
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transform: translateY(100%);
-            transition: transform 0.25s ease-out, opacity 0.25s ease-out; /* Smoother transitions */
-            pointer-events: none;
-        }
-
-        .modal.active {
-            opacity: 1;
-            transform: translateY(0%);
-            pointer-events: auto;
-        }
-
-        .modal-content {
-            background-color: #2d3748;
-            margin: auto;
-            padding: 20px;
-            border-radius: 0.75rem;
-            width: 80%;
-            max-width: 400px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        .close-button { /* This is not used anymore as 'back' button is used */
-            color: #aaa;
-            float: left;
-            font-size: 28px;
-            font-weight: bold;
-        }
-
-        .close-button:hover,
-        .close-button:focus {
-            color: #fff;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: transform 0.25s ease-out, opacity 0.25s ease-out; /* Smoother transitions */
-            opacity: 0;
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
             transform: translateX(100%);
-            box-sizing: border-box;
-            padding: 1.5rem;
-            padding-top: 0;
-        }
-
-        .screen.active {
-            opacity: 1;
-            transform: translateX(0%);
+            opacity: 0;
             z-index: 10;
+            overflow-y: auto; /* Allow internal scrolling for content sections if needed */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            scroll-behavior: smooth; /* Smooth scrolling for content sections */
+            background-color: rgba(45, 55, 72, 0.85); /* Slightly transparent background */
         }
 
-        .screen.enter-from-right {
-            transform: translateX(100%);
+        .content-section.active-view {
+            transform: translateX(0);
+            opacity: 1;
+            z-index: 20;
         }
 
-        .screen.enter-from-left {
-            transform: translateX(-100%);
+        .slide-out-left {
+            transform: translateX(-100%) !important;
+            opacity: 0 !important;
         }
 
-        .screen.exit-left {
-            opacity: 0;
-            transform: translateX(-100%);
-            z-index: 5;
+        .slide-in-right {
+            transform: translateX(0) !important;
+            opacity: 1 !important;
         }
 
-        .screen.exit-right {
-            opacity: 0;
-            transform: translateX(100%);
-            z-index: 5;
+        .slide-out-right {
+            transform: translateX(100%) !important;
+            opacity: 0 !important;
         }
 
-        .menu-scroll-area {
-            max-height: 60vh;
-            overflow-y: auto;
-            width: 100%;
-            padding-right: 0.5rem;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 0.8rem;
-            justify-items: center;
-        }
-        .menu-scroll-area::-webkit-scrollbar {
-            width: 8px;
-        }
-        .menu-scroll-area::-webkit-scrollbar-track {
-            background: #3a475a;
-            border-radius: 10px;
-        }
-        .menu-scroll-area::-webkit-scrollbar-thumb {
-            background: #4a0404;
-            border-radius: 10px;
-        }
-        .menu-scroll-area::-webkit-scrollbar-thumb:hover {
-            background: #6a0606;
+        .slide-in-left {
+            transform: translateX(0) !important;
+            opacity: 1 !important;
         }
 
         .menu-item {
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, border 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0.5rem;
-            background-color: #3a475a;
-            border: 2px solid transparent;
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            text-align: center;
-        }
-        .menu-item:hover {
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             background-color: #4a5568;
-            transform: scale(1.05);
+            color: #e2e8f0;
+            width: 100%;
         }
-        .menu-item.selected {
-            border-color: #ef4444;
-            box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
-            transform: scale(1.05);
+
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 300%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                rgba(255, 215, 0, 0) 0%,
+                rgba(255, 215, 0, 0.15) 45%,
+                rgba(255, 215, 0, 0.15) 55%,
+                rgba(255, 215, 0, 0) 100%
+            );
+            animation: goldShimmer 4s infinite linear;
+            pointer-events: none;
         }
-        .menu-item p {
-            margin: 0;
-            line-height: 1.2;
+
+        @keyframes goldShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
         }
-        .menu-item .item-name {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #f3f4f6;
-            margin-bottom: 0.2rem;
+
+        .menu-item:hover {
+            background-color: #5a6578;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 215, 0, 0.2);
         }
-        .menu-item .item-price {
-            font-size: 0.8rem;
-            color: #fca5a5;
+        .menu-item:active {
+            background-color: #3a4558;
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-        .quantity-controls {
-            margin-top: 0.4rem;
-        }
-        .quantity-controls button {
-            font-size: 1rem;
-            width: 24px;
-            height: 24px;
-            line-height: 1;
-            padding: 0;
+
+        .back-button {
             display: flex;
             align-items: center;
             justify-content: center;
+            background-color: #5a6578;
+            color: #e2e8f0;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+            margin-top: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: fit-content; /* Make button fit content */
+            position: relative; /* Ensure it's above other content if z-index is set */
+            z-index: 25; /* Higher than content-section but lower than modal/messagebox */
         }
-        .quantity-display {
-            font-size: 0.9rem;
-            min-width: 20px;
-            text-align: center;
+        .back-button:hover {
+            background-color: #6a7588;
+            transform: translateY(-2px);
+        }
+        .back-button:active {
+            background-color: #4a5568;
+            transform: translateY(0);
+        }
+        .back-button svg {
+            margin-inline-end: 0.5rem;
         }
 
-        .cart-item-list {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 1rem;
-            padding: 0.5rem;
-            background-color: #2d3748;
-            border-radius: 0.5rem;
-        }
-        .cart-item {
+        .profile-stat, .settings-option {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #4a5568;
+            background-color: #3a4558;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.75rem;
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        .cart-item:last-child {
-            border-bottom: none;
+        .profile-stat span:first-child, .settings-option label {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
         }
-        .cart-item-info {
+        .profile-stat span:last-child {
+            color: gold;
+            font-size: 1.1em;
+        }
+        .profile-stat i, .settings-option i {
+            margin-inline-end: 0.5rem;
+            color: #FFD700;
+        }
+        .xp-bar-container {
+            width: 100%;
+            background-color: #5a6578;
+            border-radius: 0.5rem;
+            height: 10px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        .xp-bar {
+            height: 100%;
+            background-color: #FFD700;
+            width: 0%;
+            border-radius: 0.5rem;
+            transition: width 0.3s ease-out;
+        }
+        .xp-text {
+            font-size: 0.9em;
+            color: #cbd5e0;
+            margin-top: 0.25rem;
+            text-align: right;
+            width: 100%;
+        }
+
+        /* Store specific styles */
+        .store-header-stats {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 1.5rem;
+            background-color: #3a4558;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .store-header-stats div {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            color: #e2e8f0;
+        }
+        .store-header-stats div i {
+            margin-inline-end: 0.5rem;
+            color: #FFD700;
+        }
+        .store-header-stats div span {
+            color: gold;
+            font-size: 1.1em;
+        }
+
+        .store-items-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); /* Smaller squares */
+            gap: 1rem; /* Space between items */
+            width: 100%;
+            justify-content: center; /* Center items in the grid */
+        }
+
+        .store-item {
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            justify-content: space-around;
+            align-items: center;
+            background-color: #3a4558;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            aspect-ratio: 1 / 1; /* Make it square */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            flex-grow: 1; /* Allow items to grow within minmax */
         }
-        .cart-item-name {
-            font-weight: 600;
+        .store-item img {
+            width: 60px; /* Adjust image size */
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
         }
-        .cart-item-price {
-            font-size: 0.9rem;
-            color: #fca5a5;
+        .store-item .item-name {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center name text */
+            margin-bottom: 0.25rem;
+            font-size: 0.95em; /* Slightly smaller font for name */
         }
-        .cart-item-quantity {
-            font-size: 0.9rem;
+        .store-item .item-value {
+            color: gold;
+            font-size: 1.0em;
+            margin-bottom: 0.5rem;
+        }
+        .store-item i {
+            margin-inline-end: 0.4rem;
+            color: #FFD700;
+        }
+        .store-item button {
+            background-color: #FFD700;
+            color: #1a202c;
+            padding: 0.5rem 0.8rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-top: 0.5rem;
+            font-size: 0.85em;
+        }
+        .store-item button:hover:not(:disabled) {
+            background-color: #e6c200;
+            transform: translateY(-1px);
+        }
+        .store-item button:active:not(:disabled) {
+            background-color: #ccad00;
+            transform: translateY(0);
+        }
+        .store-item button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .message-box {
+            background-color: #FFD700;
+            color: #1a202c;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+            pointer-events: none;
+        }
+        .message-box.show {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: #FFD700;
+        }
+        input:focus + .toggle-slider {
+            box-shadow: 0 0 1px #FFD700;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(16px);
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background-color: #2d3748;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+            width: 90%;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .modal-content input[type="text"] {
+            background-color: #4a5568;
+            border: 1px solid #6a7588;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            color: #e2e8f0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .modal-content input[type="text"]::placeholder {
+            color: #a0aec0;
+        }
+        .modal-content .modal-buttons {
+            display: flex;
+            justify-content: space-around;
+            gap: 0.75rem;
+        }
+        .modal-content button {
+            flex-grow: 1;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .modal-content #confirmNameButton {
+            background-color: #FFD700;
+            color: #1a202c;
+        }
+        .modal-content #confirmNameButton:hover {
+            background-color: #e6c200;
+        }
+        .modal-content #cancelNameButton {
+            background-color: #5a6578;
+            color: #e2e8f0;
+        }
+        .modal-content #cancelNameButton:hover {
+            background-color: #6a7588;
+        }
+
+        .modal-close-button {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: none;
+            border: none;
+            color: #e2e8f0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            line-height: 1;
+            z-index: 40;
+        }
+        .modal-close-button:hover {
+            color: #FFD700;
+        }
+
+        /* Box Opening Modal specific styles */
+        #boxOpeningModal .modal-content {
+            background-color: #2d3748;
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+        }
+
+        #boxRewardsContainer {
+            min-height: 120px;
+            justify-content: center;
+        }
+
+        .reward-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #e2e8f0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .reward-item.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reward-item i {
+            color: #FFD700;
+        }
+        .reward-item img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+        .reward-item.lion-reward img {
+            filter: drop-shadow(0 0 10px gold) drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+        }
+
+        /* Store Item Preview Modal */
+        #storeItemPreviewModal .modal-content {
+            max-width: 350px;
+        }
+        #previewItemImage {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin: 0 auto 1rem;
+        }
+        #previewItemName {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 0.5rem;
+        }
+        #previewItemPrice {
+            font-size: 1.1em;
+            color: #e2e8f0;
+            margin-bottom: 1rem;
+        }
+        #previewItemRewards {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+        #previewItemRewards .reward-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1em;
+            color: #cbd5e0;
+            margin-bottom: 0.25rem;
+        }
+        #previewItemRewards .reward-line i {
+            color: #FFD700;
+        }
+        .preview-buttons {
+            display: flex;
+            justify-content: space-around;
+            gap: 1rem;
+            width: 100%;
+        }
+        .preview-buttons button {
+            flex-grow: 1;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        #confirmPurchaseButton {
+            background-color: #FFD700;
+            color: #1a202c;
+        }
+        #confirmPurchaseButton:hover {
+            background-color: #e6c200;
+        }
+        #cancelPurchaseButton {
+            background-color: #5a6578;
+            color: #e2e8f0;
+        }
+        #cancelPurchaseButton:hover {
+            background-color: #6a7588;
+        }
+
+
+        /* Village specific styles */
+        .village-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .house-item {
+            background-color: #3a4558;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: right;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, opacity 0.1s ease-out;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        .house-item:hover {
+            transform: translateY(-3px);
+            background-color: #4a5568;
+            border-color: #FFD700;
+        }
+        .house-item:active {
+            transform: translateY(0);
+            opacity: 0.8;
+        }
+        .house-item.cooldown {
+            opacity: 0.7;
+            cursor: not-allowed;
+            border-color: #888;
+        }
+        .house-item.max-level {
+            cursor: default;
+            opacity: 0.9;
+            border-color: #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+        .house-item.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+            border-color: #555;
+        }
+
+        .house-item img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            margin-inline-start: 0.75rem;
+            margin-inline-end: 0;
+            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.3));
+        }
+        .house-item .house-info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            padding-inline-end: 0.75rem;
+        }
+        .house-item .house-level {
+            font-weight: bold;
+            font-size: 1em;
+            color: #FFD700;
+            margin-bottom: 0.25rem;
+        }
+        .house-item .house-clicks-text {
+            font-size: 0.85em;
+            color: #cbd5e0;
+            margin-bottom: 0.5rem;
+        }
+        .house-item .house-clicks-text.upgrade-ready {
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .house-item .house-action-button {
+            background-color: #FFD700;
+            color: #1a202c;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 0.9em;
+            width: auto;
+            min-width: 80px;
+        }
+        .house-item .house-action-button:hover:not(:disabled) {
+            background-color: #e6c200;
+            transform: translateY(-1px);
+        }
+        .house-item .house-action-button:active:not(:disabled) {
+            background-color: #ccad00;
+            transform: translateY(0);
+        }
+        .house-item .house-action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .house-item .house-progress-bar-small {
+            width: 100%;
+            height: 4px;
+            background-color: #5a6578;
+            border-radius: 2px;
+            margin-top: 0.25rem;
+            overflow: hidden;
+        }
+        .house-item .house-progress-bar-small div {
+            height: 100%;
+            background-color: #FFD700;
+            width: 0%;
+            border-radius: 2px;
+            transition: width 0.1s ease-out;
+        }
+        .house-item .auto-click-controls {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            width: 100%;
+            margin-top: 0.5rem;
+            font-size: 0.75em;
+            color: #cbd5e0;
+        }
+        .house-item .auto-click-button {
+            background-color: #6a7588;
+            color: #e2e8f0;
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.4rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-inline-start: 0.5rem;
+        }
+        .house-item .auto-click-button:hover:not(:disabled) {
+            background-color: #7a8598;
+        }
+        .house-item .auto-click-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+
+        /* Gold Mine specific styles */
+        .gold-mine-item {
+            background-color: #3a4558;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 250px;
+            height: auto;
+            padding: 0.75rem;
+            border: 2px solid transparent;
+        }
+        .gold-mine-item.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+            border-color: #555;
+        }
+        .gold-mine-item:hover {
+            transform: translateY(-3px);
+            background-color: #4a5568;
+            border-color: #FFD700;
+        }
+        .gold-mine-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-bottom: 0.5rem;
+        }
+        .gold-mine-item .mine-level {
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #FFD700;
+        }
+        .gold-mine-item .mine-collected-coins {
+            font-size: 0.8em;
+            color: #e2e8f0;
+            margin-top: 0.25rem;
+        }
+        .gold-mine-item .mine-progress-bar-container {
+            width: 90%;
+            background-color: #5a6578;
+            border-radius: 0.25rem;
+            height: 6px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        .gold-mine-item .mine-progress-bar {
+            height: 100%;
+            background-color: gold;
+            width: 0%;
+            border-radius: 0.25rem;
+            transition: width 0.1s ease-out;
+        }
+        .gold-mine-item .mine-action-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 0.75rem;
+        }
+        .gold-mine-item .mine-action-button {
+            background-color: #FFD700;
+            color: #1a202c;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            font-size: 0.85em;
+            width: 100%;
+        }
+        .gold-mine-item .mine-action-button:hover:not(:disabled) {
+            background-color: #e6c200;
+            transform: translateY(-1px);
+        }
+        .gold-mine-item .mine-action-button:active:not(:disabled) {
+            background-color: #ccad00;
+            transform: translateY(0);
+        }
+        .gold-mine-item .mine-action-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .village-summary-button {
+            background-color: #FFD700;
+            color: #1a202c;
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .village-summary-button:hover {
+            background-color: #e6c200;
+        }
+        .village-summary-button i {
+            color: #1a202c;
+        }
+
+        .summary-modal-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #4a5568;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .summary-modal-item img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            margin-inline-end: 0.5rem;
+        }
+        .summary-modal-item .summary-text {
+            flex-grow: 1;
+            text-align: right;
+        }
+        .summary-modal-item .summary-text span {
+            display: block;
+            font-size: 0.9em;
+        }
+        .summary-modal-item .summary-text .level {
+            font-weight: bold;
+            color: #FFD700;
+        }
+        .summary-modal-item .summary-text .detail {
+            font-size: 0.8em;
             color: #cbd5e0;
         }
 
-        .main-nav-item {
-            background-color: #3a475a;
-            border: 2px solid transparent;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, border-color 0.2s ease-in-out;
-            padding: 0.75rem 1.25rem;
+        /* Leaderboard specific styles */
+        .leaderboard-list {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
-        .main-nav-item:hover {
-            background-color: #4a5568;
-            transform: scale(1.02);
-            border-color: #ef4444;
+        .leaderboard-item {
+            background-color: #3a4558;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+        .leaderboard-item .player-rank {
+            color: #FFD700;
+            font-size: 1.2em;
+        }
+        .leaderboard-item .player-name {
+            flex-grow: 1;
+            text-align: right;
+            margin-inline-end: 1rem;
+        }
+        .leaderboard-item .player-power {
+            color: #cbd5e0;
+            font-size: 0.9em;
+        }
+        .leaderboard-item.you {
+            border: 2px solid #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
 
-        .points-header {
+        /* Daily Quests Button */
+        #dailyQuestsButton {
             position: absolute;
-            top: 0.5rem;
-            width: calc(100% - 3rem);
-            max-width: calc(414px - 3rem);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 20;
-            padding: 0.5rem 1rem;
-            box-sizing: border-box;
-            background-color: rgba(45, 55, 72, 0.8);
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            transition: opacity 0.4s ease-in-out;
-            opacity: 1;
+            top: 1rem;
+            left: 1rem;
+            background-color: #FFD700;
+            padding: 0.5rem;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 30;
+            transition: transform 0.2s ease-in-out;
         }
-        .points-header.hidden {
-            opacity: 0;
-            pointer-events: none;
+        #dailyQuestsButton:hover {
+            transform: scale(1.1);
+        }
+        #dailyQuestsButton img {
+            width: 30px;
+            height: 30px;
+            display: block;
+        }
+
+        /* Daily Quests Modal */
+        #dailyQuestsModal .modal-content {
+            max-width: 350px;
+        }
+        .quest-item {
+            background-color: #4a5568;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: right;
+        }
+        .quest-item.completed {
+            background-color: #38a169;
+            opacity: 0.8;
+        }
+        .quest-title {
+            font-weight: bold;
+            font-size: 1em;
+            margin-bottom: 0.25rem;
+            color: #FFD700;
+        }
+        .quest-progress {
+            font-size: 0.85em;
+            color: #cbd5e0;
+            margin-bottom: 0.5rem;
+        }
+        .quest-rewards {
+            font-size: 0.8em;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .quest-rewards i {
+            color: #FFD700;
+        }
+        .quest-claim-button {
+            background-color: #FFD700;
+            color: #1a202c;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            margin-top: 0.75rem;
+            width: 100%;
+        }
+        .quest-claim-button:hover:not(:disabled) {
+            background-color: #e6c200;
+        }
+        .quest-claim-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .quest-reset-timer {
+            font-size: 0.8em;
+            color: #a0aec0;
+            margin-top: 1rem;
+            text-align: center;
+            width: 100%;
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen text-gray-100">
-    <div class="animated-background"></div>
+<body class="flex items-center justify-center min-h-screen">
 
-    <div class="iphone-container p-6 shadow-2xl rounded-element">
-
-        <!-- Points and Logo Header -->
-        <div id="pointsContainer" class="points-header">
-            <p class="text-xl text-yellow-300 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gem text-blue-400 mr-1">
-                    <path d="M6 3h12l4 6-10 13L2 9Z"/>
-                    <path d="M12 17.5V3"/>
-                    <path d="M2.81 9h18.38"/>
-                </svg>
-                نقاطك: <span id="userPointsDisplay">0</span>
-            </p>
+    <div class="app-container">
+        <!-- Daily Quests Button -->
+        <div id="dailyQuestsButton">
+            <img src="https://h.top4top.io/s_34774hfes0.png" onerror="this.onerror=null;this.src='https://placehold.co/30x30/FFD700/1a202c?text=Quest';" alt="مهام يومية">
         </div>
 
-        <div id="mainMenuScreen" class="screen active">
-            <div class="bg-gray-700 bg-opacity-70 p-6 rounded-element shadow-xl w-full max-w-xs">
-                <img src="https://up6.cc/2025/07/175169861405411.jpg"
-                     onerror="this.onerror=null;this.src='https://placehold.co/600x400/333333/FFFFFF?text=صورة+مندي+غير+متوفرة'"
-                     alt="صورة مندي" class="w-full h-48 object-cover rounded-element mb-4 shadow-md main-carousel-image"
-                     id="mainRestaurantImage" oncontextmenu="return false;">
-
-                <h1 class="text-4xl font-bold mb-2 text-red-300">مطعم مندي الأصيل</h1>
-                <p class="text-lg mb-6 text-gray-300">أبو الخصيب شارع العوجة قرب المستشفى الصيني</p>
-                <nav class="w-full">
-                    <ul class="flex flex-col space-y-4">
-                        <li>
-                            <a href="#" id="orderFoodTab" class="flex items-center justify-center py-4 px-6 text-gray-200 hover:text-red-300 text-lg font-semibold transition duration-200 rounded-element space-x-2 main-nav-item">
-                                <img src="https://up6.cc/2025/07/175169894637571.png"
-                                     onerror="this.onerror=null;this.src='https://placehold.co/24x24/333333/FFFFFF?text=🍽️'"
-                                     alt="أيقونة طعام" class="w-6 h-6 object-contain">
-                                <span>اطلب اكلاتنا</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" id="phoneTab" class="flex items-center justify-center py-4 px-6 text-gray-200 hover:text-red-300 text-lg font-semibold transition duration-200 rounded-element space-x-2 main-nav-item">
-                                <img src="https://up6.cc/2025/07/17516991998091.png"
-                                     onerror="this.onerror=null;this.src='https://placehold.co/24x24/333333/FFFFFF?text=📞'"
-                                     alt="أيقونة هاتف" class="w-6 h-6 object-contain">
-                                <span>رقم هاتفك</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
-
-        <div id="orderFoodScreen" class="screen hidden">
-            <div class="bg-gray-700 bg-opacity-70 p-6 rounded-element shadow-xl w-full max-w-xs flex flex-col items-center">
-                <h2 class="text-3xl font-bold mb-6 text-red-300">قائمة اكلاتنا</h2>
-                <div id="menuItemsContainer" class="menu-scroll-area">
-                    <div class="menu-item rounded-element shadow-md" data-item-id="mandi-chicken-half" data-item-name="مندي دجاج نصف" data-item-price="10000">
-                        <p class="item-name">مندي دجاج نصف</p>
-                        <p class="item-price">10,000 د.ع</p>
-                        <div class="quantity-controls flex items-center justify-center mt-2">
-                            <button class="decrement-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">-</button>
-                            <span class="quantity-display mx-2 text-lg">0</span>
-                            <button class="increment-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">+</button>
-                        </div>
-                    </div>
-                    <div class="menu-item rounded-element shadow-md" data-item-id="mandi-chicken-full" data-item-name="مندي دجاج كامل" data-item-price="18000">
-                        <p class="item-name">مندي دجاج كامل</p>
-                        <p class="item-price">18,000 د.ع</p>
-                        <div class="quantity-controls flex items-center justify-center mt-2">
-                            <button class="decrement-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">-</button>
-                            <span class="quantity-display mx-2 text-lg">0</span>
-                            <button class="increment-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">+</button>
-                        </div>
-                    </div>
-                    <div class="menu-item rounded-element shadow-md" data-item-id="mandi-lamb" data-item-name="مندي لحم" data-item-price="22000">
-                        <p class="item-name">مندي لحم</p>
-                        <p class="item-price">22,000 د.ع</p>
-                        <div class="quantity-controls flex items-center justify-center mt-2">
-                            <button class="decrement-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">-</button>
-                            <span class="quantity-display mx-2 text-lg">0</span>
-                            <button class="increment-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">+</button>
-                        </div>
-                    </div>
-                    <div class="menu-item rounded-element shadow-md" data-item-id="mandi-quarter-chicken" data-item-name="مندي ربع دجاج" data-item-price="6000">
-                        <p class="item-name">مندي ربع دجاج</p>
-                        <p class="item-price">6,000 د.ع</p>
-                        <div class="quantity-controls flex items-center justify-center mt-2">
-                            <button class="decrement-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">-</button>
-                            <span class="quantity-display mx-2 text-lg">0</span>
-                            <button class="increment-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">+</button>
-                        </div>
-                    </div>
-                    <div class="menu-item rounded-element shadow-md" data-item-id="haneeth-full-chicken" data-item-name="حنيذ دجاج كامل" data-item-price="20000">
-                        <p class="item-name">حنيذ دجاج كامل</p>
-                        <p class="item-price">20,000 د.ع</p>
-                        <div class="quantity-controls flex items-center justify-center mt-2">
-                            <button class="decrement-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">-</button>
-                            <span class="quantity-display mx-2 text-lg">0</span>
-                            <button class="increment-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">+</button>
-                        </div>
-                    </div>
-                    <div class="menu-item rounded-element shadow-md" data-item-id="haneeth-lamb" data-item-name="حنيذ لحم" data-item-price="22000">
-                        <p class="item-name">حنيذ لحم</p>
-                        <p class="item-price">22,000 د.ع</p>
-                        <div class="quantity-controls flex items-center justify-center mt-2">
-                            <button class="decrement-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">-</button>
-                            <span class="quantity-display mx-2 text-lg">0</span>
-                            <button class="increment-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">+</button>
-                        </div>
-                    </div>
-                    <div class="menu-item rounded-element shadow-md" data-item-id="haneeth-half-chicken" data-item-name="حنيذ نصف دجاج" data-item-price="10000">
-                        <p class="item-name">حنيذ نصف دجاج</p>
-                        <p class="item-price">10,000 د.ع</p>
-                        <div class="quantity-controls flex items-center justify-center mt-2">
-                            <button class="decrement-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">-</button>
-                            <span class="quantity-display mx-2 text-lg">0</span>
-                            <button class="increment-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">+</button>
-                        </div>
-                    </div>
-                    <div class="menu-item rounded-element shadow-md" data-item-id="laban" data-item-name="لبن" data-item-price="500">
-                        <p class="item-name">لبن</p>
-                        <p class="item-price">500 د.ع</p>
-                        <div class="quantity-controls flex items-center justify-center mt-2">
-                            <button class="decrement-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">-</button>
-                            <span class="quantity-display mx-2 text-lg">0</span>
-                            <button class="increment-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">+</button>
-                        </div>
-                    </div>
-                    <div class="menu-item rounded-element shadow-md" data-item-id="pepsi" data-item-name="بيبسي" data-item-price="500">
-                        <p class="item-name">بيبسي</p>
-                        <p class="item-price">500 د.ع</p>
-                        <div class="quantity-controls flex items-center justify-center mt-2">
-                            <button class="decrement-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">-</button>
-                            <span class="quantity-display mx-2 text-lg">0</span>
-                            <button class="increment-btn bg-red-800 text-white w-6 h-6 rounded-full flex items-center justify-center">+</button>
-                        </div>
-                    </div>
+        <!-- Main Menu Section -->
+        <div id="mainMenu" class="content-section active-view">
+            <h1 class="text-3xl font-bold text-center mb-8">
+                <span id="mainMenuPlayerID">0000</span> - <span id="mainMenuPlayerName">اللاعب</span>
+            </h1>
+            <nav class="flex flex-col space-y-4 w-full">
+                <!-- Tab 1 -->
+                <div class="menu-item p-4 rounded-xl shadow-md text-center text-lg font-semibold cursor-pointer" data-target="tab1Content">
+                    قريتي
                 </div>
-                <button id="viewCartBtn" class="px-6 py-2 bg-red-700 hover:bg-red-600 active:bg-red-800 text-white font-semibold rounded-element shadow-lg transition duration-300 ease-in-out mt-4">
-                    عرض السلة (<span id="cartItemCount">0</span>)
-                </button>
-                <button id="backToMainFromOrderBtn" class="px-6 py-2 bg-gray-600 hover:bg-gray-500 active:bg-gray-700 text-white font-semibold rounded-element shadow-lg transition duration-300 ease-in-out mt-2">
-                    رجوع
-                </button>
-            </div>
+                <!-- Tab 2 -->
+                <div class="menu-item p-4 rounded-xl shadow-md text-center text-lg font-semibold cursor-pointer" data-target="tab2Content">
+                    المتجر
+                </div>
+                <!-- Tab 3 -->
+                <div class="menu-item p-4 rounded-xl shadow-md text-center text-lg font-semibold cursor-pointer" data-target="tab3Content">
+                    الملف الشخصي
+                </div>
+                <!-- Tab 4 -->
+                <div class="menu-item p-4 rounded-xl shadow-md text-center text-lg font-semibold cursor-pointer" data-target="tab4Content">
+                    الاعدادات
+                </div>
+                <!-- Tab 5 -->
+                <div class="menu-item p-4 rounded-xl shadow-md text-center text-lg font-semibold cursor-pointer" data-target="tab5Content">
+                    الترتيب
+                </div>
+            </nav>
         </div>
 
-    </div>
-
-    <div id="phoneNumberModal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-2xl font-bold mb-4 text-red-300">رقم هاتفك</h2>
-            <div class="flex items-center justify-center mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone text-blue-300 mr-2 phone-icon-animated">
-                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+        <!-- Tab 1 Content Section (My Village) -->
+        <div id="tab1Content" class="content-section bg-gray-800">
+            <h2 class="text-2xl font-bold text-center mb-4">قريتي</h2>
+            <button id="villageSummaryButton" class="village-summary-button">
+                <i class="fas fa-info-circle"></i> ملخص القرية
+            </button>
+            <div id="villageGrid" class="village-grid">
+                <!-- Houses and Gold Mine will be dynamically loaded here -->
+            </div>
+            <div class="back-button cursor-pointer" data-target="mainMenu">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l-7 7 7 7" />
                 </svg>
-                <div id="phoneNumberDisplay" class="text-xl text-gray-100"></div>
+                العودة
             </div>
-            <div id="phoneNumberInputSection" class="hidden">
-                <input type="tel" id="phoneNumberInput" placeholder="أدخل رقم هاتفك" class="w-full p-2 mb-4 rounded-element bg-gray-600 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500" dir="ltr">
-                <button id="savePhoneNumberBtn" class="px-6 py-2 bg-red-700 hover:bg-red-600 active:bg-red-800 text-white font-semibold rounded-element shadow-lg transition duration-300 ease-in-out">حفظ الرقم</button>
+        </div>
+
+        <!-- Tab 2 Content Section (Store) -->
+        <div id="tab2Content" class="content-section bg-gray-800">
+            <h2 class="text-2xl font-bold text-center mb-4">المتجر</h2>
+            <div class="store-header-stats">
+                <div><i class="fas fa-coins"></i> الأموال: <span id="storePlayerCoins">0</span></div>
+                <div><i class="fas fa-gem"></i> القطع النادرة: <span id="storePlayerRareItems">0</span></div>
             </div>
-            <button id="editPhoneNumberBtn" class="px-6 py-2 bg-red-700 hover:bg-red-600 active:bg-red-800 text-white font-semibold rounded-element shadow-lg transition duration-300 ease-in-out mt-4">تعديل الرقم</button>
-            <button id="backFromPhoneModalBtn" class="px-6 py-2 bg-gray-600 hover:bg-gray-500 active:bg-gray-700 text-white font-semibold rounded-element shadow-lg transition duration-300 ease-in-out mt-2">
-                رجوع
-            </button>
+            <p class="text-center text-gray-300 mb-6">اكتشف العناصر والترقيات!</p>
+
+            <div class="store-items-container">
+                <div class="store-item">
+                    <span class="item-name"><i class="fas fa-arrow-up"></i> رفع القوة</span>
+                    <span class="item-value" id="powerIncreasePrice"></span>
+                    <button data-item-type="powerIncrease">شراء</button>
+                </div>
+
+                <div class="store-item">
+                    <span class="item-name"><i class="fas fa-gift"></i> أموال مجاناً</span>
+                    <span class="item-value" id="freeCoinsStatus">جاهز</span>
+                    <button data-item-type="freeCoins">احصل عليها</button>
+                </div>
+
+                <!-- Silver Box Item -->
+                <div class="store-item">
+                    <img src="https://d.top4top.io/p_3477acqh21.png" onerror="this.onerror=null;this.src='https://placehold.co/60x60/3a4558/FFD700?text=SilverBox';" alt="صندوق فضي">
+                    <span class="item-name"><i class="fas fa-box"></i> صندوق فضي</span>
+                    <span class="item-value">300 <i class="fas fa-coins"></i></span>
+                    <button data-item-type="silverBox">شراء</button>
+                </div>
+
+                <!-- Gold Box Item -->
+                <div class="store-item">
+                    <img src="https://c.top4top.io/p_3477shdaj0.png" onerror="this.onerror=null;this.src='https://placehold.co/60x60/3a4558/FFD700?text=GoldBox';" alt="صندوق ذهبي">
+                    <span class="item-name"><i class="fas fa-box-open"></i> صندوق ذهبي</span>
+                    <span class="item-value">600 <i class="fas fa-coins"></i></span>
+                    <button data-item-type="goldBox">شراء</button>
+                </div>
+
+                <!-- Crystal Box Item -->
+                <div class="store-item">
+                    <img src="https://f.top4top.io/p_3477cm3ei0.png" onerror="this.onerror=null;this.src='https://placehold.co/60x60/3a4558/FFD700?text=CrystalBox';" alt="صندوق كريستالي">
+                    <span class="item-name"><i class="fas fa-gem"></i> صندوق كريستالي</span>
+                    <span class="item-value">1000 <i class="fas fa-coins"></i></span>
+                    <button data-item-type="crystalBox">شراء</button>
+                </div>
+
+                <!-- Fire Lion Item -->
+                <div class="store-item">
+                    <img src="https://a.top4top.io/s_3477ox15e0.png" onerror="this.onerror=null;this.src='https://placehold.co/60x60/3a4558/FFD700?text=FireLion';" alt="الأسد الناري">
+                    <span class="item-name"><i class="fas fa-fire"></i> الأسد الناري</span>
+                    <span class="item-value">2500 <i class="fas fa-coins"></i> + 10 <i class="fas fa-gem"></i></span>
+                    <button data-item-type="fireLion">شراء</button>
+                </div>
+            </div>
+
+            <div class="back-button cursor-pointer" data-target="mainMenu">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l-7 7 7 7" />
+                </svg>
+                العودة
+            </div>
+        </div>
+
+        <!-- Tab 3 Content Section (Profile) -->
+        <div id="tab3Content" class="content-section bg-gray-800">
+            <h2 class="text-2xl font-bold text-center mb-4">الملف الشخصي</h2>
+            <p class="text-center text-gray-300 mb-6">مرحباً بك في ملفك الشخصي!</p>
+
+            <div class="profile-stat">
+                <span><i class="fas fa-user"></i> اسم اللاعب:</span>
+                <span id="displayedPlayerName"></span>
+                <button id="setPlayerNameButton" class="px-3 py-1 text-sm">تعيين</button>
+            </div>
+
+            <div class="profile-stat">
+                <span><i class="fas fa-id-card"></i> ID اللاعب:</span>
+                <span id="playerID">0000</span>
+            </div>
+            <div class="profile-stat">
+                <span><i class="fas fa-coins"></i> عدد الأموال:</span>
+                <span id="playerCoins">0</span>
+            </div>
+            <div class="profile-stat">
+                <span><i class="fas fa-gem"></i> عدد القطع النادرة:</span>
+                <span id="playerRareItems">0</span>
+            </div>
+            <div class="profile-stat flex-col items-start">
+                <div class="w-full flex justify-between items-center mb-1">
+                    <span><i class="fas fa-bolt"></i> القوة:</span>
+                    <span id="playerTotalPower">0</span>
+                </div>
+                <!-- Removed XP bar and progress text as per user request -->
+            </div>
+
+            <div class="back-button cursor-pointer" data-target="mainMenu">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l-7 7 7 7" />
+                </svg>
+                العودة
+            </div>
+        </div>
+
+        <!-- Tab 4 Content Section (Settings) -->
+        <div id="tab4Content" class="content-section bg-gray-800">
+            <h2 class="text-2xl font-bold text-center mb-4">الإعدادات</h2>
+            <p class="text-center text-gray-300 mb-6">ضبط إعدادات التطبيق.</p>
+
+            <div class="settings-option">
+                <label for="clickSoundToggle"><i class="fas fa-volume-up"></i> صوت النقر:</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="clickSoundToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="settings-option">
+                <label for="backgroundMusicToggle"><i class="fas fa-music"></i> موسيقى الخلفية:</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="backgroundMusicToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+
+            <div class="back-button cursor-pointer" data-target="mainMenu">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l-7 7 7 7" />
+                </svg>
+                العودة
+            </div>
+        </div>
+
+        <!-- Tab 5 Content Section -->
+        <div id="tab5Content" class="content-section bg-gray-800">
+            <h2 class="text-2xl font-bold text-center mb-4">الترتيب العالمي</h2>
+            <p class="text-center text-gray-300 mb-6">شاهد من هم الأقوى في العالم!</p>
+
+            <div class="leaderboard-list" id="leaderboardList">
+                <!-- Leaderboard items will be dynamically loaded here -->
+                <div class="leaderboard-item you">
+                    <span class="player-rank">#1</span>
+                    <span class="player-name" id="leaderboardPlayerName"></span>
+                    <span class="player-power" id="leaderboardPlayerPower"></span>
+                </div>
+                <!-- Placeholder for other players, will be populated by Realtime Database -->
+                <div class="leaderboard-item">
+                    <span class="player-rank">#2</span>
+                    <span class="player-name">...</span>
+                    <span class="player-power">...</span>
+                </div>
+            </div>
+
+            <div class="back-button cursor-pointer" data-target="mainMenu">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l-7 7 7 7" />
+                </svg>
+                العودة
+            </div>
+        </div>
+
+        <!-- Global Message Box -->
+        <div id="messageBox" class="message-box"></div>
+
+        <!-- Name Input Modal -->
+        <div id="nameInputModal" class="modal-overlay">
+            <div class="modal-content">
+                <button class="modal-close-button" id="closeNameModalButton"><i class="fas fa-xmark"></i></button>
+                <h3 class="text-xl font-bold mb-2">تعيين اسم اللاعب</h3>
+                <input type="text" id="modalPlayerNameInput" placeholder="أدخل اسمك (بحد أقصى 25 حرفًا)" maxlength="25">
+                <div class="modal-buttons">
+                    <button id="confirmNameButton">تأكيد</button>
+                    <button id="cancelNameButton">إلغاء</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Village Summary Modal -->
+        <div id="villageSummaryModal" class="modal-overlay">
+            <div class="modal-content">
+                <button class="modal-close-button" id="closeSummaryModalButton"><i class="fas fa-xmark"></i></button>
+                <h3 class="text-xl font-bold mb-2">ملخص القرية - معاينة المنزل</h3>
+                <div id="summaryContent">
+                    <!-- Summary items will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Box Opening Modal -->
+        <div id="boxOpeningModal" class="modal-overlay">
+            <div class="modal-content">
+                <h3 class="text-xl font-bold mb-4">لقد فتحت صندوقًا!</h3>
+                <div id="boxRewardsContainer" class="flex flex-col items-center gap-3">
+                    <!-- Rewards will be displayed here dynamically -->
+                </div>
+                <button id="claimBoxRewardsButton" class="bg-yellow-500 text-gray-900 py-2 px-4 rounded-lg mt-6 font-bold hidden">استلام</button>
+            </div>
+        </div>
+
+        <!-- Daily Quests Modal -->
+        <div id="dailyQuestsModal" class="modal-overlay">
+            <div class="modal-content">
+                <button class="modal-close-button" id="closeQuestsModalButton"><i class="fas fa-xmark"></i></button>
+                <h3 class="text-xl font-bold mb-4">المهام اليومية</h3>
+                <div id="questsList">
+                    <!-- Quests will be dynamically loaded here -->
+                </div>
+                <p id="questResetTimer" class="quest-reset-timer"></p>
+            </div>
+        </div>
+
+        <!-- Store Item Preview Modal -->
+        <div id="storeItemPreviewModal" class="modal-overlay">
+            <div class="modal-content">
+                <button class="modal-close-button" id="closeStorePreviewModalButton"><i class="fas fa-xmark"></i></button>
+                <img id="previewItemImage" src="" alt="صورة العنصر">
+                <h3 id="previewItemName" class="text-xl font-bold"></h3>
+                <p id="previewItemPrice" class="text-lg"></p>
+                <div id="previewItemRewards">
+                    <!-- Rewards/Effects will be listed here -->
+                </div>
+                <div class="preview-buttons">
+                    <button id="confirmPurchaseButton">تأكيد الشراء</button>
+                    <button id="cancelPurchaseButton">إلغاء</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="cartModal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-2xl font-bold mb-4 text-red-300">سلة الطلبات</h2>
-            <div id="cartItemsDisplay" class="cart-item-list text-gray-100">
-                <p class="text-gray-400">السلة فارغة.</p>
-            </div>
-
-            <!-- Delivery Information Inputs -->
-            <div class="mb-4">
-                <input type="tel" id="deliveryPhoneNumberInput" placeholder="رقم هاتف التوصيل" class="w-full p-2 mb-2 rounded-element bg-gray-600 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500" dir="ltr">
-                <input type="text" id="deliveryLocationInput" placeholder="موقع التوصيل (الشارع، رقم المنزل، تفاصيل)" class="w-full p-2 rounded-element bg-gray-600 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500" dir="rtl">
-            </div>
-
-            <!-- Coupon Section -->
-            <div id="couponSection" class="bg-gray-800 p-3 rounded-element mb-4 hidden">
-                <p id="couponMessage" class="text-sm text-center mb-2"></p>
-                <button id="applyCouponBtn" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-500 active:bg-yellow-700 text-white font-semibold rounded-element shadow-lg transition duration-300 ease-in-out w-full" disabled>
-                    تطبيق خصم 10%
-                </button>
-            </div>
-
-            <div class="text-xl font-bold mt-4 text-gray-100">
-                الإجمالي: <span id="cartTotalDisplay" class="text-red-300">0 د.ع</span>
-            </div>
-            <div class="flex justify-center mt-6">
-                <button id="clearCartBtn" class="px-6 py-2 bg-gray-600 hover:bg-gray-500 active:bg-gray-700 text-white font-semibold rounded-element shadow-lg transition duration-300 ease-in-out mr-2">
-                    مسح السلة
-                </button>
-                <button id="confirmOrderBtn" class="px-6 py-2 bg-red-700 hover:bg-red-600 active:bg-red-800 text-white font-semibold rounded-element shadow-lg transition duration-300 ease-in-out ml-2" disabled>
-                    تأكيد الطلب
-                </button>
-            </div>
-            <p id="orderConfirmationMessage" class="text-green-400 mt-4 hidden"></p>
-            <button id="backFromCartModalBtn" class="px-6 py-2 bg-gray-600 hover:bg-gray-500 active:bg-gray-700 text-white font-semibold rounded-element shadow-lg transition duration-300 ease-in-out mt-2">
-                رجوع
-            </button>
-        </div>
-    </div>
+    <!-- Background Music -->
+    <audio id="backgroundMusic" src="https://a.top4top.io/m_3477mfhik0.mp3" autoplay loop></audio>
 
     <script type="module">
-        // Global state object
-        const appState = {
-            cart: [],
-            currentPhoneNumber: localStorage.getItem('phoneNumber') || null,
-            userPoints: parseInt(localStorage.getItem('userPoints') || '0'),
-            deliveryPhoneNumber: localStorage.getItem('deliveryPhoneNumber') || '',
-            deliveryLocation: localStorage.getItem('deliveryLocation') || '',
-            lifetimeCouponUsed: localStorage.getItem('lifetimeCouponUsed') === 'true', // Track if coupon was ever used
-            couponAppliedForCurrentOrder: false, // Track if coupon is applied for current cart session
-            pointsInterval: null,
-            currentActiveScreen: 'mainMenuScreen',
-            currentImageIndex: 0
-        };
+        // Firebase Imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        // Import Realtime Database specific functions
+        import { getDatabase, ref, set, get, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
-        const userId = 'local_user'; // Dummy ID for local storage context
+        document.addEventListener('DOMContentLoaded', async () => {
+            const mainMenu = document.getElementById('mainMenu');
+            const menuItems = document.querySelectorAll('.menu-item');
+            const backButtons = document.querySelectorAll('.back-button');
+            const messageBox = document.getElementById('messageBox');
+            const backgroundMusic = document.getElementById('backgroundMusic');
 
-        const initLocalApp = () => {
-            updatePhoneNumberUI(appState.currentPhoneNumber);
-            if (userPointsDisplay) {
-                userPointsDisplay.textContent = appState.userPoints;
-            }
-            if (deliveryPhoneNumberInput) deliveryPhoneNumberInput.value = appState.deliveryPhoneNumber;
-            if (deliveryLocationInput) deliveryLocationInput.value = appState.deliveryLocation;
+            // Firebase Initialization
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            let firebaseConfig = {};
 
-            checkConfirmButtonState();
-            setTimeout(startPointsInterval, 1000);
-        };
-
-        let mainMenuScreen;
-        let orderFoodScreen;
-        let orderFoodTab;
-        let backToMainFromOrderBtn;
-        let phoneTab;
-        let phoneNumberModal;
-        let backFromPhoneModalBtn;
-        let phoneNumberDisplay;
-        let phoneNumberInputSection;
-        let phoneNumberInput;
-        let savePhoneNumberBtn;
-        let editPhoneNumberBtn;
-        let menuItemsContainer;
-        let menuItems;
-
-        let viewCartBtn;
-        let cartItemCount;
-        let cartModal;
-        let closeCartModalBtn;
-        let backFromCartModalBtn;
-        let cartItemsDisplay;
-        let cartTotalDisplay;
-        let confirmOrderBtn;
-        let orderConfirmationMessage;
-        let clearCartBtn;
-
-        let deliveryPhoneNumberInput;
-        let deliveryLocationInput;
-
-        let couponSection; // New element reference
-        let couponMessage; // New element reference
-        let applyCouponBtn; // New element reference
-
-        let userPointsDisplay;
-        let pointsContainer;
-
-        let mainRestaurantImage;
-        const mainImages = [
-            "https://up6.cc/2025/07/175169861405411.jpg",
-            "https://up6.cc/2025/07/175170103225831.jpg",
-            "https://up6.cc/2025/07/175170103231032.jpg"
-        ];
-        const fadeDuration = 1000;
-        const displayDuration = 3000;
-
-        const rotateMainImage = () => {
-            mainRestaurantImage.style.opacity = 0;
-
-            setTimeout(() => {
-                appState.currentImageIndex = (appState.currentImageIndex + 1) % mainImages.length;
-                mainRestaurantImage.src = mainImages[appState.currentImageIndex];
-                mainRestaurantImage.style.opacity = 1;
-            }, fadeDuration / 2);
-        };
-
-        const updatePhoneNumberUI = (number) => {
-            if (number) {
-                phoneNumberDisplay.textContent = `الرقم الحالي: ${number}`;
-                phoneNumberInput.value = number;
-                phoneNumberInputSection.classList.add('hidden');
-                editPhoneNumberBtn.classList.remove('hidden');
-            } else {
-                phoneNumberDisplay.textContent = 'لم يتم حفظ رقم هاتف بعد.';
-                phoneNumberInput.value = '';
-                phoneNumberInputSection.classList.remove('hidden');
-                editPhoneNumberBtn.classList.add('hidden');
-            }
-        };
-
-        const savePoints = () => {
-            localStorage.setItem('userPoints', appState.userPoints.toString());
-        };
-
-        const startPointsInterval = () => {
-            if (appState.pointsInterval) clearInterval(appState.pointsInterval);
-            appState.pointsInterval = setInterval(() => {
-                const randomPoints = Math.floor(Math.random() * (7 - 3 + 1)) + 3;
-                appState.userPoints += randomPoints;
-                if (userPointsDisplay) {
-                    userPointsDisplay.textContent = appState.userPoints;
-                }
-                savePoints();
-                updateCartDisplay(); // Update cart display to reflect potential coupon eligibility
-            }, 10000);
-        };
-
-        const savePhoneNumber = () => {
-            const number = phoneNumberInput.value.trim();
-            if (number) {
-                localStorage.setItem('phoneNumber', number);
-                appState.currentPhoneNumber = number;
-                hidePhoneNumberModal();
-            } else {
-                console.warn("Please enter a phone number.");
-            }
-        };
-
-        const saveDeliveryDetails = () => {
-            localStorage.setItem('deliveryPhoneNumber', deliveryPhoneNumberInput.value.trim());
-            localStorage.setItem('deliveryLocation', deliveryLocationInput.value.trim());
-            appState.deliveryPhoneNumber = deliveryPhoneNumberInput.value.trim();
-            appState.deliveryLocation = deliveryLocationInput.value.trim();
-        };
-
-        const checkConfirmButtonState = () => {
-            const phoneFilled = deliveryPhoneNumberInput && deliveryPhoneNumberInput.value.trim() !== '';
-            const locationFilled = deliveryLocationInput && deliveryLocationInput.value.trim() !== '';
-            const cartNotEmpty = appState.cart.length > 0;
-
-            if (confirmOrderBtn) {
-                confirmOrderBtn.disabled = !(phoneFilled && locationFilled && cartNotEmpty);
-            }
-        };
-
-        const togglePointsVisibility = (isVisible) => {
-            if (pointsContainer) {
-                if (isVisible) {
-                    pointsContainer.classList.remove('hidden');
+            // Try to parse __firebase_config, if it fails or is empty, use the hardcoded one
+            try {
+                const envConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+                if (Object.keys(envConfig).length > 0) {
+                    firebaseConfig = envConfig;
                 } else {
-                    pointsContainer.classList.add('hidden');
+                    // Fallback to the user's previously provided config if environment config is empty
+                    firebaseConfig = {
+                        apiKey: "AIzaSyAfn4xhFUg6EEGEKid8U0pPCSEhubL0Sug",
+                        authDomain: "golden-click-82c84.firebaseapp.com",
+                        databaseURL: "https://golden-click-82c84-default-rtdb.firebaseio.com", // Ensure this is Realtime DB URL
+                        projectId: "golden-click-82c84",
+                        storageBucket: "golden-click-82c84.firebasestorage.app",
+                        messagingSenderId: "155884045269",
+                        appId: "1:155884045269:web:610420a071e348b516f35c",
+                        measurementId: "G-0R9F0PDJTM"
+                    };
+                }
+            } catch (e) {
+                console.error("Error parsing __firebase_config, falling back to hardcoded config:", e);
+                firebaseConfig = {
+                    apiKey: "AIzaSyAfn4xhFUg6EEGEKid8U0pPCSEhubL0Sug",
+                    authDomain: "golden-click-82c84.firebaseapp.com",
+                    databaseURL: "https://golden-click-82c84-default-rtdb.firebaseio.com", // Ensure this is Realtime DB URL
+                    projectId: "golden-click-82c84",
+                    storageBucket: "golden-click-82c84.firebasestorage.app",
+                    messagingSenderId: "155884045269",
+                    appId: "1:155884045269:web:610420a071e348b516f35c",
+                    measurementId: "G-0R9F0PDJTM"
+                };
+            }
+
+            if (Object.keys(firebaseConfig).length === 0 || !firebaseConfig.apiKey) {
+                console.error("Firebase config is still missing or invalid after fallback.");
+                showMessage("خطأ: إعدادات Firebase مفقودة أو غير صالحة.");
+                return;
+            }
+
+            const app = initializeApp(firebaseConfig);
+            const rtdb = getDatabase(app); // Use getDatabase for Realtime Database
+            const auth = getAuth(app);
+
+            let userId = null; // Will be set after authentication
+            let isAuthReady = false; // Flag to indicate if authentication is complete
+
+            // Define FIRE_LION_POWER_GAIN here
+            const FIRE_LION_POWER_GAIN = 5000; // Example value, adjust as needed
+
+            // Player stats - Initial default values (will be overwritten by localStorage and then Realtime Database)
+            let playerStats = {
+                playerID: '...', // Will be Firebase UID
+                playerName: '',
+                coins: 0,
+                rareItems: 0,
+                totalPower: 0,
+                houses: [
+                    { id: 1, level: 1, clicks: 0, cooldownUntil: 0, lastMaxLevelRewardTime: 0, unlocked: true, autoClickEnabled: false, autoClickEndTime: 0 },
+                    { id: 2, level: 1, clicks: 0, cooldownUntil: 0, lastMaxLevelRewardTime: 0, unlocked: true, autoClickEnabled: false, autoClickEndTime: 0 },
+                    { id: 3, level: 1, clicks: 0, cooldownUntil: 0, lastMaxLevelRewardTime: 0, unlocked: false, autoClickEnabled: false, autoClickEndTime: 0 },
+                    { id: 4, level: 1, clicks: 0, cooldownUntil: 0, lastMaxLevelRewardTime: 0, unlocked: false, autoClickEnabled: false, autoClickEndTime: 0 },
+                    { id: 5, level: 1, clicks: 0, cooldownUntil: 0, lastMaxLevelRewardTime: 0, unlocked: false, autoClickEnabled: false, autoClickEndTime: 0 }
+                ],
+                goldMines: [
+                    { id: 1, level: 1, collectedCoins: 0, lastCollectionTime: Date.now(), unlocked: true },
+                    { id: 2, level: 1, collectedCoins: 0, lastCollectionTime: Date.now(), unlocked: false }
+                ],
+                dailyQuestProgress: {
+                    lastReset: '',
+                    quests: []
+                },
+                dailyLevelsUpgradedToday: 0,
+                lastFreeCoinsResetDay: ''
+            };
+
+            // Load from localStorage first to ensure immediate data availability
+            const savedPlayerStats = localStorage.getItem('playerStats');
+            if (savedPlayerStats) {
+                try {
+                    const parsedStats = JSON.parse(savedPlayerStats);
+                    // Deep merge properties, especially for nested arrays like houses and goldMines
+                    playerStats = {
+                        ...playerStats, // Start with default structure
+                        ...parsedStats, // Overlay saved simple stats
+                        houses: parsedStats.houses || playerStats.houses, // Ensure houses array is present
+                        goldMines: parsedStats.goldMines || playerStats.goldMines, // Ensure goldMines array is present
+                        dailyQuestProgress: parsedStats.dailyQuestProgress || playerStats.dailyQuestProgress // Ensure dailyQuestProgress is present
+                    };
+                    // Ensure nested objects/arrays have all expected fields (for new fields added later)
+                    playerStats.houses.forEach(house => {
+                        if (typeof house.cooldownUntil !== 'number') house.cooldownUntil = 0;
+                        if (typeof house.lastMaxLevelRewardTime !== 'number') house.lastMaxLevelRewardTime = 0;
+                        if (typeof house.unlocked === 'undefined') house.unlocked = true;
+                        if (typeof house.autoClickEnabled === 'undefined') house.autoClickEnabled = false;
+                        if (typeof house.autoClickEndTime === 'undefined') house.autoClickEndTime = 0;
+                    });
+                    playerStats.goldMines.forEach(mine => {
+                        if (typeof mine.lastCollectionTime !== 'number') mine.lastCollectionTime = Date.now();
+                        if (typeof mine.unlocked === 'undefined') mine.unlocked = true;
+                    });
+                    if (typeof playerStats.dailyLevelsUpgradedToday === 'undefined') playerStats.dailyLevelsUpgradedToday = 0;
+                    if (typeof playerStats.lastFreeCoinsResetDay === 'undefined') playerStats.lastFreeCoinsResetDay = '';
+
+                } catch (e) {
+                    console.error("Failed to parse playerStats from localStorage, using defaults:", e);
+                    // playerStats remains as default
                 }
             }
-        };
 
-        const switchScreen = (targetScreenId, direction = 'forward') => {
-            const currentScreenElement = document.getElementById(appState.currentActiveScreen);
-            const targetScreenElement = document.getElementById(targetScreenId);
+            // House leveling data
+            const HOUSE_CLICKS_NEEDED = [
+                0,    // Level 0 (unused)
+                0,    // Level 1 (no clicks needed to start at 1)
+                800,  // Level 2
+                1500, // Level 3
+                2500, // Level 4
+                3800, // Level 5
+                4650, // Level 6
+                6000, // Level 7
+                9000, // Level 8
+                12000,// Level 9
+                15000 // Level 10
+            ];
+            const HOUSE_MAX_LEVEL = 10;
+            const HOUSE_COOLDOWN_DURATION = 15 * 60 * 1000; // 15 minutes
+            const HOUSE_MAX_LEVEL_REWARD_INTERVAL = 5 * 60 * 1000; // 5 minutes (for max level houses)
+            const AUTO_CLICK_RATE_PER_HOUR = 300; // 300 clicks per hour
+            const AUTO_CLICK_DURATION = 1 * 60 * 60 * 1000; // 1 hour
 
-            if (currentScreenElement === targetScreenElement) return;
+            // House cumulative rewards at each level (Power, Coins, Rare Items)
+            const HOUSE_LEVEL_CUMULATIVE_REWARDS = [
+                { power: 0, coins: 0, rareItems: 0 }, // Level 0 (placeholder)
+                { power: 0, coins: 0, rareItems: 0 }, // Level 1 (base)
+                { power: 50, coins: 10, rareItems: 1 }, // Level 2
+                { power: 120, coins: 25, rareItems: 2 }, // Level 3
+                { power: 250, coins: 50, rareItems: 3 }, // Level 4
+                { power: 500, coins: 100, rareItems: 4 }, // Level 5
+                { power: 800, coins: 160, rareItems: 5 }, // Level 6
+                { power: 1200, coins: 240, rareItems: 6 }, // Level 7
+                { power: 1800, coins: 350, rareItems: 7 }, // Level 8
+                { power: 2700, coins: 500, rareItems: 8 }, // Level 9
+                { power: 4000, coins: 700, rareItems: 10 }  // Level 10 (Max)
+            ];
 
-            targetScreenElement.classList.remove('hidden');
-            targetScreenElement.style.zIndex = '10';
+            const houseImages = {
+                'level1-4': 'https://b.top4top.io/p_3477qmmft0.png', // Image of House Level 1-4
+                'level5-9': 'https://c.top4top.io/p_34771ltku1.png', // Image of House Level 5-9
+                'level10': 'https://d.top4top.io/p_3477eb4wz2.png' // Image of House Level 10
+            };
 
-            if (direction === 'forward') {
-                targetScreenElement.classList.add('enter-from-right');
-            } else {
-                targetScreenElement.classList.add('enter-from-left');
-            }
+            // Gold Mine data
+            const GOLD_MINE_BASE_RATE_PER_SECOND = 2 / 5; // 2 coins every 5 seconds = 0.4 coins/sec
+            const GOLD_MINE_BASE_CAPACITY = 500;
+            const GOLD_MINE_UPGRADE_COST_BASE = 25; // rare items
+            const GOLD_MINE_UPGRADE_COST_INCREMENT = 5; // rare items increment per level
+            const GOLD_MINE_CAPACITY_RATE_INCREASE_PERCENT = 0.10; // 10% increase per level
+            const GOLD_MINE_MAX_LEVEL = 10;
+            const GOLD_MINE_2_UNLOCK_COST = 50; // Rare items to unlock second mine
 
-            if (appState.currentActiveScreen === 'mainMenuScreen' && targetScreenId !== 'mainMenuScreen') {
-                togglePointsVisibility(false);
-            }
 
-            setTimeout(() => {
-                if (direction === 'forward') {
-                    currentScreenElement.classList.add('exit-left');
-                } else {
-                    currentScreenElement.classList.add('exit-right');
+            // Store items prices and details
+            let powerIncreasePrice = 0; // This will be randomized
+            const STORE_ITEMS_DATA = {
+                'powerIncrease': {
+                    name: 'رفع القوة',
+                    icon: '<i class="fas fa-arrow-up"></i>',
+                    image: '', // No specific image, just icon
+                    getPrice: () => powerIncreasePrice, // Dynamic price
+                    getRewards: () => [{ name: 'قوة', value: '150-300', type: 'power' }]
+                },
+                'freeCoins': {
+                    name: 'أموال مجاناً',
+                    icon: '<i class="fas fa-gift"></i>',
+                    image: '',
+                    getPrice: () => 'جاهز / مؤقت',
+                    getRewards: () => [{ name: 'أموال', value: '50-150', type: 'coins' }]
+                },
+                'silverBox': {
+                    name: 'صندوق فضي',
+                    icon: '<i class="fas fa-box"></i>',
+                    image: 'https://d.top4top.io/p_3477acqh21.png',
+                    price: 300,
+                    currency: 'coins',
+                    getRewards: () => [
+                        { name: 'قوة', value: '45-3780', type: 'power' },
+                        { name: 'قطع نادرة', value: '0-2', type: 'rareItems' }
+                    ]
+                },
+                'goldBox': {
+                    name: 'صندوق ذهبي',
+                    icon: '<i class="fas fa-box-open"></i>',
+                    image: 'https://c.top4top.io/p_3477shdaj0.png',
+                    price: 600,
+                    currency: 'coins',
+                    getRewards: () => [
+                        { name: 'قوة', value: '67-5670', type: 'power' }, // 50% higher than silver (45*1.5=67.5, 3780*1.5=5670)
+                        { name: 'قطع نادرة', value: '0-3', type: 'rareItems' } // 50% higher than silver (2*1.5=3)
+                    ]
+                },
+                'crystalBox': {
+                    name: 'صندوق كريستالي',
+                    icon: '<i class="fas fa-gem"></i>',
+                    image: 'https://f.top4top.io/p_3477cm3ei0.png',
+                    price: 1000,
+                    currency: 'coins',
+                    getRewards: () => [
+                        { name: 'قوة', value: '135-11340', type: 'power' }, // 100% higher than gold (67.5*2=135, 5670*2=11340)
+                        { name: 'قطع نادرة', value: '0-6', type: 'rareItems' } // 100% higher than gold (3*2=6)
+                    ]
+                },
+                'fireLion': {
+                    name: 'الأسد الناري',
+                    icon: '<i class="fas fa-fire"></i>',
+                    image: 'https://a.top4top.io/s_3477ox15e0.png',
+                    price: { coins: 2500, rareItems: 10 },
+                    currency: 'mixed',
+                    getRewards: () => [{ name: 'قوة', value: FIRE_LION_POWER_GAIN, type: 'power' }]
                 }
-                currentScreenElement.classList.remove('active');
-                currentScreenElement.style.zIndex = '5';
+            };
 
-                targetScreenElement.classList.remove('enter-from-right', 'enter-from-left');
-                targetScreenElement.classList.add('active');
+            // Settings state
+            let isClickSoundEnabled = localStorage.getItem('isClickSoundEnabled') === 'true';
+            let isBackgroundMusicEnabled = localStorage.getItem('isBackgroundMusicEnabled') === 'true';
 
+            // UI elements
+            const mainMenuPlayerIDEl = document.getElementById('mainMenuPlayerID');
+            const mainMenuPlayerNameEl = document.getElementById('mainMenuPlayerName');
+            const playerIDEl = document.getElementById('playerID');
+            const displayedPlayerNameEl = document.getElementById('displayedPlayerName');
+            const setPlayerNameButton = document.getElementById('setPlayerNameButton');
+            const playerCoinsEl = document.getElementById('playerCoins');
+            const playerRareItemsEl = document.getElementById('playerRareItems');
+            const playerTotalPowerEl = document.getElementById('playerTotalPower');
+
+            // Store UI elements
+            const storePlayerCoinsEl = document.getElementById('storePlayerCoins');
+            const storePlayerRareItemsEl = document.getElementById('storePlayerRareItems');
+
+            const powerIncreasePriceEl = document.getElementById('powerIncreasePrice');
+            const freeCoinsStatusEl = document.getElementById('freeCoinsStatus');
+
+            const clickSoundToggle = document.getElementById('clickSoundToggle');
+            const backgroundMusicToggle = document.getElementById('backgroundMusicToggle');
+
+            // Modal elements
+            const nameInputModal = document.getElementById('nameInputModal');
+            const modalPlayerNameInput = document.getElementById('modalPlayerNameInput');
+            const confirmNameButton = document.getElementById('confirmNameButton');
+            const cancelNameButton = document.getElementById('cancelNameButton');
+            const closeNameModalButton = document.getElementById('closeNameModalButton');
+
+            // Village elements
+            const villageGrid = document.getElementById('villageGrid');
+            const villageSummaryButton = document.getElementById('villageSummaryButton');
+            const villageSummaryModal = document.getElementById('villageSummaryModal');
+            const summaryContent = document.getElementById('summaryContent');
+            const closeSummaryModalButton = document.getElementById('closeSummaryModalButton');
+
+            // Box Opening Modal elements
+            const boxOpeningModal = document.getElementById('boxOpeningModal');
+            const boxRewardsContainer = document.getElementById('boxRewardsContainer');
+            const claimBoxRewardsButton = document.getElementById('claimBoxRewardsButton');
+
+            // Leaderboard elements
+            const leaderboardList = document.getElementById('leaderboardList');
+            const leaderboardPlayerNameEl = document.getElementById('leaderboardPlayerName');
+            const leaderboardPlayerPowerEl = document.getElementById('leaderboardPlayerPower');
+
+            // Daily Quests elements
+            const dailyQuestsButton = document.getElementById('dailyQuestsButton');
+            const dailyQuestsModal = document.getElementById('dailyQuestsModal');
+            const closeQuestsModalButton = document.getElementById('closeQuestsModalButton');
+            const questsList = document.getElementById('questsList');
+            const questResetTimerEl = document.getElementById('questResetTimer');
+
+            // Store Item Preview Modal elements
+            const storeItemPreviewModal = document.getElementById('storeItemPreviewModal');
+            const previewItemImage = document.getElementById('previewItemImage');
+            const previewItemName = document.getElementById('previewItemName');
+            const previewItemPrice = document.getElementById('previewItemPrice');
+            const previewItemRewards = document.getElementById('previewItemRewards');
+            const confirmPurchaseButton = document.getElementById('confirmPurchaseButton');
+            const cancelPurchaseButton = document.getElementById('cancelPurchaseButton');
+            const closeStorePreviewModalButton = document.getElementById('closeStorePreviewModalButton');
+
+            let currentItemToPurchase = null; // To hold the item data for the preview modal
+
+            // Helper function to format numbers (e.g., 12345 -> 12.3k)
+            function formatNumber(num) {
+                if (num >= 1000000) {
+                    return (num / 1000000).toFixed(1) + 'M';
+                }
+                if (num >= 1000) {
+                    return (num / 1000).toFixed(1) + 'k';
+                }
+                return num.toString();
+            }
+
+            // Function to play click sound (placeholder)
+            function playClickSound() {
+                if (isClickSoundEnabled) {
+                    // console.log("Click sound played!"); // For debugging, can be removed
+                }
+            }
+
+            // Function to show temporary messages
+            function showMessage(message, duration = 2000) {
+                messageBox.textContent = message;
+                messageBox.classList.add('show');
                 setTimeout(() => {
-                    currentScreenElement.classList.add('hidden');
-                    currentScreenElement.classList.remove('exit-left', 'exit-right');
-                    currentScreenElement.style.zIndex = '';
-                    appState.currentActiveScreen = targetScreenId;
+                    messageBox.classList.remove('show');
+                }, duration);
+            }
 
-                    if (appState.currentActiveScreen === 'mainMenuScreen') {
-                        togglePointsVisibility(true);
+            // Function to format time for cooldown display
+            function formatTime(ms) {
+                const totalSeconds = Math.floor(ms / 1000);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                const seconds = totalSeconds % 60;
+                return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            // Function to generate a random price for power increase
+            function generatePowerIncreasePrice() {
+                return Math.floor(Math.random() * (500 - 125 + 1)) + 125;
+            }
+
+            // Function to generate a random reward value from a string "min-max" or return fixed number
+            function getRandomRewardValue(valueString) {
+                if (typeof valueString === 'number') {
+                    return valueString; // If it's a fixed number, return it directly
+                }
+                const parts = valueString.split('-');
+                if (parts.length === 2) {
+                    const min = parseInt(parts[0]);
+                    const max = parseInt(parts[1]);
+                    if (!isNaN(min) && !isNaN(max)) {
+                        return Math.floor(Math.random() * (max - min + 1)) + min;
                     }
-                }, 250);
-            }, 10);
-        };
-
-        const showPhoneNumberModal = () => {
-            document.getElementById(appState.currentActiveScreen).classList.add('hidden');
-            phoneNumberModal.classList.remove('hidden');
-            togglePointsVisibility(false);
-            setTimeout(() => {
-                phoneNumberModal.classList.add('active');
-            }, 10);
-            updatePhoneNumberUI(appState.currentPhoneNumber);
-        };
-
-        const hidePhoneNumberModal = () => {
-            phoneNumberModal.classList.remove('active');
-            setTimeout(() => {
-                phoneNumberModal.classList.add('hidden');
-                document.getElementById(appState.currentActiveScreen).classList.remove('hidden');
-                if (appState.currentActiveScreen === 'mainMenuScreen') {
-                    togglePointsVisibility(true);
                 }
-            }, 250);
-        };
+                return 0; // Default or error case
+            }
 
-        const showCartModal = () => {
-            document.getElementById(appState.currentActiveScreen).classList.add('hidden');
-            cartModal.classList.remove('hidden');
-            togglePointsVisibility(false);
-            setTimeout(() => {
-                cartModal.classList.add('active');
-            }, 10);
-            updateCartDisplay();
-            orderConfirmationMessage.classList.add('hidden');
-            if (deliveryPhoneNumberInput) deliveryPhoneNumberInput.value = appState.deliveryPhoneNumber;
-            if (deliveryLocationInput) deliveryLocationInput.value = appState.deliveryLocation;
-            checkConfirmButtonState();
-            updateCouponSection(); // Update coupon section visibility and message
-        };
-
-        const hideCartModal = () => {
-            cartModal.classList.remove('active');
-            setTimeout(() => {
-                cartModal.classList.add('hidden');
-                document.getElementById(appState.currentActiveScreen).classList.remove('hidden');
-                if (appState.currentActiveScreen === 'mainMenuScreen') {
-                    togglePointsVisibility(true);
+            // Realtime Database Save Functions
+            async function savePlayerStatsToRealtimeDB() {
+                if (!userId || !isAuthReady) {
+                    // console.log("Not saving to Realtime Database: userId or auth not ready.");
+                    return;
                 }
-            }, 250);
-        };
+                try {
+                    // Save main player data
+                    await set(ref(rtdb, `artifacts/${appId}/users/${userId}/playerData`), {
+                        playerName: playerStats.playerName,
+                        coins: playerStats.coins,
+                        rareItems: playerStats.rareItems,
+                        totalPower: playerStats.totalPower,
+                        dailyLevelsUpgradedToday: playerStats.dailyLevelsUpgradedToday,
+                        lastFreeCoinsResetDay: playerStats.lastFreeCoinsResetDay
+                    });
 
-        const updateCartDisplay = () => {
-            cartItemsDisplay.innerHTML = '';
-            let total = 0;
-            let totalItems = 0;
+                    // Save houses data (Realtime DB handles arrays as objects with numeric keys, which is fine for this structure)
+                    await set(ref(rtdb, `artifacts/${appId}/users/${userId}/houses`), playerStats.houses);
 
-            if (appState.cart.length === 0) {
-                cartItemsDisplay.innerHTML = '<p class="text-gray-400">السلة فارغة.</p>';
-            } else {
-                appState.cart.forEach(item => {
-                    const itemElement = document.createElement('div');
-                    itemElement.classList.add('cart-item');
-                    itemElement.innerHTML = `
-                        <div class="cart-item-info">
-                            <span class="cart-item-name">${item.name}</span>
-                            <span class="cart-item-price">${item.price.toLocaleString()} د.ع</span>
+                    // Save gold mines data
+                    await set(ref(rtdb, `artifacts/${appId}/users/${userId}/goldMines`), playerStats.goldMines);
+
+                    // Save daily quests data
+                    await set(ref(rtdb, `artifacts/${appId}/users/${userId}/dailyQuests`), playerStats.dailyQuestProgress);
+
+                    // Update public leaderboard
+                    await set(ref(rtdb, `artifacts/${appId}/public/data/leaderboard/${userId}`), {
+                        userId: userId,
+                        playerName: playerStats.playerName || `اللاعب ${userId.substring(0, 4)}`,
+                        totalPower: playerStats.totalPower
+                    });
+                    // console.log("Data saved to Realtime Database.");
+                } catch (e) {
+                    console.error("Error saving data to Realtime Database: ", e);
+                    showMessage("خطأ في حفظ البيانات!");
+                }
+            }
+
+            // Function to update the profile UI
+            function updateProfileUI() {
+                // Update main menu header
+                mainMenuPlayerIDEl.textContent = userId ? userId.substring(0, 4) : '....'; // Show truncated UID
+                mainMenuPlayerNameEl.textContent = playerStats.playerName || 'اللاعب';
+
+                // Update profile section
+                playerIDEl.textContent = userId || '....'; // Show full UID
+                displayedPlayerNameEl.textContent = playerStats.playerName || 'لم يتم التعيين';
+
+                // Show/hide set name button
+                if (playerStats.playerName === '') {
+                    setPlayerNameButton.classList.remove('hidden');
+                } else {
+                    setPlayerNameButton.classList.add('hidden');
+                }
+
+                playerCoinsEl.textContent = playerStats.coins;
+                playerRareItemsEl.textContent = playerStats.rareItems;
+                playerTotalPowerEl.textContent = formatNumber(playerStats.totalPower); // Apply formatting
+
+                // Update store header stats
+                if (storePlayerCoinsEl) storePlayerCoinsEl.textContent = playerStats.coins;
+                if (storePlayerRareItemsEl) storePlayerRareItemsEl.textContent = playerStats.rareItems;
+
+                // Update leaderboard stats (for current player)
+                if (leaderboardPlayerNameEl) leaderboardPlayerNameEl.textContent = playerStats.playerName || 'أنت';
+                if (leaderboardPlayerPowerEl) leaderboardPlayerPowerEl.textContent = formatNumber(playerStats.totalPower);
+
+                // Save to localStorage immediately for responsiveness
+                localStorage.setItem('playerStats', JSON.stringify(playerStats));
+            }
+
+            // Function to update store UI
+            function updateStoreUI() {
+                powerIncreasePriceEl.innerHTML = `${powerIncreasePrice} <i class="fas fa-coins"></i>`;
+
+                const nowKsa = getKsaCurrentDate();
+                const currentKsaDateString = nowKsa.toISOString().split('T')[0];
+
+                if (currentKsaDateString !== playerStats.lastFreeCoinsResetDay) {
+                    freeCoinsStatusEl.textContent = 'جاهز';
+                } else {
+                    const nextMidnightTimestamp = getNextKsaMidnightTimestamp();
+                    const timeLeft = nextMidnightTimestamp - Date.now();
+                    if (timeLeft > 0) {
+                        freeCoinsStatusEl.textContent = `متبقي: ${formatTime(timeLeft)}`;
+                    } else {
+                        freeCoinsStatusEl.textContent = 'جاهز'; // Should be reset by initializeQuests
+                    }
+                }
+            }
+
+            // Function to gain power (XP system removed for simplified display)
+            function gainPower(amount) {
+                playerStats.totalPower += amount;
+                updateProfileUI();
+            }
+
+            // Function to get house image based on level
+            function getHouseImage(level) {
+                if (level >= 1 && level <= 4) {
+                    return houseImages['level1-4'];
+                } else if (level >= 5 && level <= 9) {
+                    return houseImages['level5-9'];
+                } else if (level === 10) {
+                    return houseImages['level10'];
+                }
+                return 'https://placehold.co/70x70/3a4558/FFD700?text=House'; // Default placeholder
+            }
+
+            // Function to get Gold Mine stats based on level
+            function getGoldMineStats(level) {
+                const rate = GOLD_MINE_BASE_RATE_PER_SECOND * (1 + (level - 1) * GOLD_MINE_CAPACITY_RATE_INCREASE_PERCENT);
+                const capacity = GOLD_MINE_BASE_CAPACITY * (1 + (level - 1) * GOLD_MINE_CAPACITY_RATE_INCREASE_PERCENT);
+                const upgradeCost = GOLD_MINE_UPGRADE_COST_BASE + (level - 1) * GOLD_MINE_UPGRADE_COST_INCREMENT;
+                return { rate: parseFloat(rate.toFixed(2)), capacity: Math.round(capacity), upgradeCost: Math.round(upgradeCost) };
+            }
+
+            // Function to render houses and gold mines
+            function renderVillage() {
+                villageGrid.innerHTML = ''; // Clear existing houses and mines
+                const now = Date.now();
+
+                // Render Houses first
+                playerStats.houses.forEach(house => {
+                    const houseDiv = document.createElement('div');
+                    houseDiv.classList.add('house-item');
+                    houseDiv.dataset.houseId = house.id;
+
+                    // Determine if house is locked
+                    let isLocked = false;
+                    if (house.id > 2) { // Houses 3, 4, 5 need previous house at level 5
+                        const prevHouse = playerStats.houses.find(h => h.id === house.id - 1);
+                        if (prevHouse && prevHouse.level < 5) {
+                            isLocked = true;
+                        }
+                    }
+
+                    if (isLocked) {
+                        houseDiv.classList.add('locked');
+                        houseDiv.innerHTML = `
+                            <img src="https://placehold.co/70x70/3a4558/FFD700?text=Locked" alt="بيت مقفل">
+                            <div class="house-info">
+                                <span class="house-level">المنزل ${house.id} - مقفل</span>
+                                <span class="house-clicks-text">طور المنزل ${house.id - 1} للمستوى 5 لفتحه</span>
+                            </div>
+                        `;
+                        villageGrid.appendChild(houseDiv);
+                        return; // Skip rendering interactive parts for locked houses
+                    }
+
+                    const clicksNeededForNextLevel = HOUSE_CLICKS_NEEDED[house.level + 1]; // Clicks needed to reach next level
+                    let progressPercentage = house.level === HOUSE_MAX_LEVEL ? 100 : (house.clicks / clicksNeededForNextLevel) * 100;
+                    progressPercentage = Math.min(100, Math.max(0, progressPercentage)); // Cap between 0 and 100
+
+                    const isOnCooldown = house.cooldownUntil > now;
+                    let clicksText = '';
+                    let isUpgradeReady = false;
+                    let actionButtonText = '';
+                    let actionButtonDisabled = false;
+
+                    if (house.level === HOUSE_MAX_LEVEL) {
+                        clicksText = 'الحد الأقصى';
+                        houseDiv.classList.add('max-level');
+                        actionButtonText = 'الحد الأقصى';
+                        actionButtonDisabled = true;
+
+                        // Handle max level reward
+                        if (now - house.lastMaxLevelRewardTime >= HOUSE_MAX_LEVEL_REWARD_INTERVAL) {
+                            playerStats.coins += 50;
+                            playerStats.rareItems += 1;
+                            house.lastMaxLevelRewardTime = now;
+                            showMessage(`المنزل ${house.id} (الحد الأقصى) منحك 50 أموال و 1 قطعة نادرة!`);
+                            updateProfileUI(); // Update immediately
+                        }
+                    } else if (isOnCooldown) {
+                        const timeLeft = house.cooldownUntil - now;
+                        clicksText = `راحة: ${formatTime(timeLeft)}`;
+                        houseDiv.classList.add('cooldown');
+                        actionButtonText = `راحة: ${formatTime(timeLeft)}`;
+                        actionButtonDisabled = true;
+                    } else if (house.clicks >= clicksNeededForNextLevel) {
+                        clicksText = 'ترقية';
+                        isUpgradeReady = true;
+                        houseDiv.classList.add('upgrade-ready');
+                        actionButtonText = 'ترقية';
+                        actionButtonDisabled = false;
+                    } else {
+                        clicksText = `${Math.floor(house.clicks)} / ${clicksNeededForNextLevel}`; // Floor clicks for display
+                        houseDiv.classList.remove('upgrade-ready');
+                        actionButtonText = 'نقرة';
+                        actionButtonDisabled = false;
+                    }
+
+                    // Auto-clicker display
+                    let autoClickStatus = '';
+                    let autoClickButtonText = 'تفعيل تلقائي';
+                    let autoClickButtonDisabled = actionButtonDisabled; // Disabled if on cooldown or max level
+
+                    if (house.autoClickEnabled) {
+                        const timeLeft = house.autoClickEndTime - now;
+                        if (timeLeft <= 0) {
+                            house.autoClickEnabled = false; // Session ended
+                            house.autoClickEndTime = 0;
+                            autoClickStatus = 'انتهى التلقائي';
+                            autoClickButtonText = 'تفعيل تلقائي';
+                        } else {
+                            autoClickStatus = `تلقائي: ${formatTime(timeLeft)}`;
+                            autoClickButtonText = 'إيقاف تلقائي';
+                        }
+                    } else {
+                        autoClickStatus = 'التلقائي غير مفعل';
+                    }
+
+                    houseDiv.innerHTML = `
+                        <img src="${getHouseImage(house.level)}" onerror="this.onerror=null;this.src='https://placehold.co/70x70/3a4558/FFD700?text=House';" alt="House Level ${house.level}">
+                        <div class="house-info">
+                            <span class="house-level">المنزل ${house.id} - المستوى ${house.level}</span>
+                            <span class="house-clicks-text">${clicksText}</span>
+                            <div class="house-progress-bar-small">
+                                <div style="width: ${progressPercentage}%"></div>
+                            </div>
+                            <button class="house-action-button" ${actionButtonDisabled ? 'disabled' : ''}>
+                                ${actionButtonText}
+                            </button>
+                            <div class="auto-click-controls">
+                                <span>${autoClickStatus}</span>
+                                <button class="auto-click-button" data-house-id="${house.id}" ${autoClickButtonDisabled ? 'disabled' : ''}>
+                                    ${autoClickButtonText}
+                                </button>
+                            </div>
                         </div>
-                        <span class="cart-item-quantity">الكمية: ${item.quantity}</span>
                     `;
-                    cartItemsDisplay.appendChild(itemElement);
-                    total += item.price * item.quantity;
-                    totalItems += item.quantity;
+
+                    const houseActionButton = houseDiv.querySelector('.house-action-button');
+                    // Attach event listener only if it's not disabled
+                    if (houseActionButton && !actionButtonDisabled) {
+                        houseActionButton.onclick = async () => { // Use onclick for simplicity and to re-attach
+                            playClickSound();
+                            // Visual click effect
+                            houseDiv.classList.add('active');
+                            setTimeout(() => {
+                                houseDiv.classList.remove('active');
+                            }, 100);
+
+                            if (isUpgradeReady) {
+                                // Calculate incremental rewards
+                                const prevRewards = HOUSE_LEVEL_CUMULATIVE_REWARDS[house.level];
+                                const nextRewards = HOUSE_LEVEL_CUMULATIVE_REWARDS[house.level + 1];
+
+                                const powerGain = Math.round(nextRewards.power - prevRewards.power);
+                                const coinsGain = Math.round(nextRewards.coins - prevRewards.coins);
+                                const rareItemsGain = Math.round(nextRewards.rareItems - prevRewards.rareItems);
+
+                                playerStats.totalPower += powerGain;
+                                playerStats.coins += coinsGain;
+                                playerStats.rareItems += rareItemsGain;
+
+                                house.level++;
+                                playerStats.dailyLevelsUpgradedToday++; // Increment daily levels upgraded
+                                // Update quest progress for "upgradeLevels"
+                                const upgradeLevelsQuest = playerStats.dailyQuestProgress.quests.find(q => q.type === 'upgradeLevels');
+                                if (upgradeLevelsQuest && !upgradeLevelsQuest.completed) {
+                                    upgradeLevelsQuest.current = playerStats.dailyLevelsUpgradedToday; // Use the global counter
+                                    if (upgradeLevelsQuest.current >= upgradeLevelsQuest.target) {
+                                        upgradeLevelsQuest.completed = true;
+                                    }
+                                }
+                                // Update quest progress for "upgradeAnyHouseLevel" (fixed 4th quest)
+                                const upgradeAnyHouseLevelQuest = playerStats.dailyQuestProgress.quests.find(q => q.type === 'upgradeAnyHouseLevel');
+                                if (upgradeAnyHouseLevelQuest && !upgradeAnyHouseLevelQuest.completed) {
+                                    upgradeAnyHouseLevelQuest.current++;
+                                    if (upgradeAnyHouseLevelQuest.current >= upgradeAnyHouseLevelQuest.target) {
+                                        upgradeAnyHouseLevelQuest.completed = true;
+                                    }
+                                }
+
+                                showMessage(`تم ترقية المنزل ${house.id} إلى المستوى ${house.level}! حصلت على ${powerGain} قوة، ${coinsGain} أموال، ${rareItemsGain} قطع نادرة.`);
+
+                                // Check for house unlocking
+                                if (house.level === 5 && house.id < playerStats.houses.length) {
+                                    const nextHouse = playerStats.houses.find(h => h.id === house.id + 1);
+                                    if (nextHouse) { // Check if nextHouse exists
+                                        nextHouse.unlocked = true;
+                                        showMessage(`تم فتح المنزل ${nextHouse.id} الجديد!`);
+                                    }
+                                }
+                                house.clicks = 0; // Reset clicks for new level
+                                house.cooldownUntil = Date.now() + HOUSE_COOLDOWN_DURATION; // Set cooldown
+                                house.lastMaxLevelRewardTime = Date.now(); // Reset max level reward timer
+                                house.autoClickEnabled = false; // Stop auto-click on upgrade
+                                house.autoClickEndTime = 0;
+
+                            } else {
+                                house.clicks++;
+                                // Update quest progress for "clickHouses"
+                                const clickHousesQuest = playerStats.dailyQuestProgress.quests.find(q => q.type === 'clickHouses');
+                                if (clickHousesQuest && !clickHousesQuest.completed) {
+                                    clickHousesQuest.current++;
+                                    if (clickHousesQuest.current >= clickHousesQuest.target) {
+                                        clickHousesQuest.completed = true;
+                                    }
+                                }
+                                showMessage(`نقرة! ${Math.floor(house.clicks)} / ${clicksNeededForNextLevel}`);
+                            }
+                            updateProfileUI();
+                            renderVillage(); // Re-render all houses to update progress and cooldown
+                        };
+                    }
+
+                    const autoClickButton = houseDiv.querySelector('.auto-click-button');
+                    // Attach event listener only if it's not disabled
+                    if (autoClickButton && !autoClickButtonDisabled) {
+                        autoClickButton.onclick = async () => { // Use onclick for simplicity and to re-attach
+                            playClickSound();
+                            const currentHouse = playerStats.houses.find(h => h.id === house.id);
+                            if (!currentHouse) return;
+
+                            if (currentHouse.autoClickEnabled) {
+                                // Disable auto-click
+                                currentHouse.autoClickEnabled = false;
+                                currentHouse.autoClickEndTime = 0;
+                                showMessage(`تم إيقاف النقر التلقائي للمنزل ${currentHouse.id}.`);
+                            } else {
+                                // Enable auto-click
+                                currentHouse.autoClickEnabled = true;
+                                currentHouse.autoClickEndTime = now + AUTO_CLICK_DURATION;
+                                showMessage(`تم تفعيل النقر التلقائي للمنزل ${currentHouse.id} لمدة ساعة.`);
+                            }
+                            updateProfileUI(); // Save updated house state
+                            renderVillage(); // Re-render to update UI
+                        };
+                    }
+
+                    villageGrid.appendChild(houseDiv);
+                });
+
+                // Render Gold Mines
+                playerStats.goldMines.forEach(mine => {
+                    const mineStats = getGoldMineStats(mine.level);
+                    const timeSinceLastCollection = now - mine.lastCollectionTime;
+                    let generatedCoins = Math.floor(mineStats.rate * (timeSinceLastCollection / 1000));
+                    generatedCoins = Math.min(generatedCoins, mineStats.capacity);
+                    mine.collectedCoins = generatedCoins;
+
+                    const mineDiv = document.createElement('div');
+                    mineDiv.classList.add('gold-mine-item');
+
+                    let isMineLocked = false;
+                    if (mine.id === 2 && !mine.unlocked) { // Second mine is locked
+                        isMineLocked = true;
+                        mineDiv.classList.add('locked');
+                        mineDiv.innerHTML = `
+                            <img src="https://l.top4top.io/s_3477ykzpk0.png" onerror="this.onerror=null;this.src='https://placehold.co/40x40/3a4558/FFD700?text=Locked';" alt="منجم ذهب مقفل">
+                            <span class="mine-level">منجم الذهب ${mine.id} - مقفل</span>
+                            <span class="mine-collected-coins">التكلفة: ${GOLD_MINE_2_UNLOCK_COST} <i class="fas fa-gem"></i></span>
+                            <div class="mine-action-container">
+                                <button class="mine-action-button" id="goldMine${mine.id}UnlockButton">
+                                    فتح
+                                </button>
+                            </div>
+                        `;
+                        villageGrid.appendChild(mineDiv);
+
+                        const unlockButton = mineDiv.querySelector(`#goldMine${mine.id}UnlockButton`);
+                        unlockButton.onclick = async () => { // Use onclick for simplicity and to re-attach
+                            playClickSound();
+                            if (playerStats.rareItems >= GOLD_MINE_2_UNLOCK_COST) {
+                                playerStats.rareItems -= GOLD_MINE_2_UNLOCK_COST;
+                                mine.unlocked = true;
+                                showMessage(`تم فتح منجم الذهب ${mine.id}!`);
+                            } else {
+                                showMessage(`تحتاج ${GOLD_MINE_2_UNLOCK_COST} قطعة نادرة لفتح المنجم!`);
+                            }
+                            updateProfileUI();
+                            renderVillage();
+                        };
+                        return;
+                    }
+
+                    mineDiv.innerHTML = `
+                        <img src="https://l.top4top.io/s_3477ykzpk0.png" onerror="this.onerror=null;this.src='https://placehold.co/40x40/3a4558/FFD700?text=Mine';" alt="منجم الذهب">
+                        <span class="mine-level">منجم الذهب ${mine.id} - المستوى ${mine.level}</span>
+                        <span class="mine-collected-coins">مجمع: ${mine.collectedCoins} / ${mineStats.capacity} <i class="fas fa-coins"></i></span>
+                        <div class="mine-progress-bar-container">
+                            <div class="mine-progress-bar" style="width: ${(mine.collectedCoins / mineStats.capacity) * 100}%"></div>
+                        </div>
+                        <div class="mine-action-container">
+                            <button class="mine-action-button" id="goldMine${mine.id}CollectButton" ${mine.collectedCoins === 0 ? 'disabled' : ''}>
+                                جمع
+                            </button>
+                            <button class="mine-action-button" id="goldMine${mine.id}UpgradeButton" ${mine.level === GOLD_MINE_MAX_LEVEL ? 'disabled' : ''}>
+                                ترقية: ${mineStats.upgradeCost} <i class="fas fa-gem"></i>
+                            </button>
+                        </div>
+                    `;
+                    villageGrid.appendChild(mineDiv);
+
+                    const goldMineCollectButton = mineDiv.querySelector(`#goldMine${mine.id}CollectButton`);
+                    const goldMineUpgradeButton = mineDiv.querySelector(`#goldMine${mine.id}UpgradeButton`);
+
+                    goldMineCollectButton.onclick = async () => { // Use onclick for simplicity and to re-attach
+                        playClickSound();
+                        if (mine.collectedCoins > 0) {
+                            playerStats.coins += mine.collectedCoins;
+                            showMessage(`تم جمع ${mine.collectedCoins} أموال من المنجم ${mine.id}!`);
+                            mine.collectedCoins = 0;
+                            mine.lastCollectionTime = Date.now(); // Reset timer after collection
+                        }
+                        updateProfileUI();
+                        renderVillage(); // Re-render to update mine status
+                    };
+
+                    goldMineUpgradeButton.onclick = async () => { // Use onclick for simplicity and to re-attach
+                        playClickSound();
+                        if (mine.level < GOLD_MINE_MAX_LEVEL) {
+                            const cost = getGoldMineStats(mine.level).upgradeCost;
+                            if (playerStats.rareItems >= cost) {
+                                playerStats.rareItems -= cost;
+                                mine.level++;
+                                showMessage(`تم ترقية منجم الذهب ${mine.id} إلى المستوى ${mine.level}!`);
+                            } else {
+                                showMessage(`تحتاج ${cost} قطعة نادرة لترقية المنجم!`);
+                            }
+                        }
+                        updateProfileUI();
+                        renderVillage(); // Re-render to update mine status
+                    };
                 });
             }
 
-            // Apply coupon discount if applicable for the current order session
-            let finalTotal = total;
-            if (appState.couponAppliedForCurrentOrder && appState.cart.length > 0) {
-                const mostExpensiveItem = appState.cart.reduce((max, item) => item.price > max.price ? item : max, appState.cart[0]);
-                const discountAmount = Math.round(mostExpensiveItem.price * 0.10);
-                finalTotal -= discountAmount;
-                couponMessage.textContent = `تم تطبيق خصم 10% (${discountAmount.toLocaleString()} د.ع) على ${mostExpensiveItem.name}!`;
-                couponMessage.classList.remove('text-red-400', 'text-yellow-300');
-                couponMessage.classList.add('text-green-400');
-                applyCouponBtn.disabled = true;
-                applyCouponBtn.textContent = 'تم استخدام الخصم';
+            // Central game loop for time-based updates
+            function startGameLoops() {
+                // Main game loop (every second)
+                setInterval(() => {
+                    if (!isAuthReady) return; // Only run game loop after authentication
+
+                    const now = Date.now();
+                    const clicksPerSecond = AUTO_CLICK_RATE_PER_HOUR / 3600; // Clicks per second
+
+                    playerStats.houses.forEach(house => {
+                        if (house.autoClickEnabled && !house.cooldownUntil > now && house.level !== HOUSE_MAX_LEVEL) {
+                            const clicksNeededForNextLevel = HOUSE_CLICKS_NEEDED[house.level + 1];
+                            if (house.clicks < clicksNeededForNextLevel) {
+                                house.clicks += clicksPerSecond; // Add fractional clicks
+                                if (house.clicks >= clicksNeededForNextLevel) {
+                                    house.clicks = clicksNeededForNextLevel; // Cap at required clicks
+                                    house.autoClickEnabled = false; // Stop auto-click when ready for upgrade
+                                    house.autoClickEndTime = 0;
+                                    showMessage(`المنزل ${house.id} جاهز للترقية! تم إيقاف النقر التلقائي.`);
+                                }
+                                // Update quest progress for "clickHouses"
+                                const clickHousesQuest = playerStats.dailyQuestProgress.quests.find(q => q.type === 'clickHouses');
+                                if (clickHousesQuest && !clickHousesQuest.completed) {
+                                    clickHousesQuest.current += clicksPerSecond; // Add fractional progress
+                                    if (clickHousesQuest.current >= clickHousesQuest.target) {
+                                        clickHousesQuest.completed = true;
+                                        clickHousesQuest.current = clickHousesQuest.target; // Cap progress
+                                    }
+                                }
+                            }
+                        }
+                        // Check if auto-click duration has ended
+                        if (house.autoClickEnabled && house.autoClickEndTime > 0 && now >= house.autoClickEndTime) {
+                            house.autoClickEnabled = false;
+                            house.autoClickEndTime = 0;
+                            showMessage(`انتهت مدة النقر التلقائي للمنزل ${house.id}.`);
+                        }
+                    });
+
+                    // Update UI and save data to localStorage (Realtime Database sync is separate)
+                    updateProfileUI();
+                    updateStoreUI();
+                    renderVillage(); // Re-render houses and gold mine to update timers/progress
+                    updateQuestsUI(); // Update quests timer and progress
+                }, 1000);
+
+                // Realtime Database sync loop (every 2 seconds)
+                setInterval(() => {
+                    savePlayerStatsToRealtimeDB();
+                }, 2000);
             }
 
-            cartTotalDisplay.textContent = `${finalTotal.toLocaleString()} د.ع`;
-            cartItemCount.textContent = totalItems;
-            checkConfirmButtonState();
-            updateCouponSection(); // Ensure coupon section is updated after cart changes
-        };
 
-        const updateItemQuantity = (itemId, change) => {
-            const itemElement = document.querySelector(`.menu-item[data-item-id="${itemId}"]`);
-            const quantityDisplay = itemElement.querySelector('.quantity-display');
-            const itemName = itemElement.dataset.itemName;
-            const itemPrice = parseInt(itemElement.dataset.itemPrice);
+            // Function to handle opening boxes and displaying rewards
+            function openBox(rewards, isLion = false) {
+                boxOpeningModal.classList.add('show');
+                boxRewardsContainer.innerHTML = '';
+                claimBoxRewardsButton.classList.add('hidden');
 
-            let itemInCart = appState.cart.find(item => item.id === itemId);
+                let delay = 0;
+                rewards.forEach(reward => {
+                    setTimeout(() => {
+                        const actualValue = getRandomRewardValue(reward.value); // Get random value
 
-            if (!itemInCart) {
-                itemInCart = { id: itemId, name: itemName, price: itemPrice, quantity: 0 };
-                appState.cart.push(itemInCart);
+                        const rewardItemDiv = document.createElement('div');
+                        rewardItemDiv.classList.add('reward-item');
+                        if (isLion && reward.type === 'power') { // Specific styling for lion power reward
+                            rewardItemDiv.classList.add('lion-reward');
+                            rewardItemDiv.innerHTML = `<img src="https://a.top4top.io/s_3477ox15e0.png" alt="الأسد الناري"> ${actualValue} قوة`;
+                        } else {
+                            let iconHtml = '';
+                            if (reward.type === 'coins') {
+                                iconHtml = `<i class="fas fa-coins"></i>`;
+                            } else if (reward.type === 'rareItems') {
+                                iconHtml = `<i class="fas fa-gem"></i>`;
+                            } else if (reward.type === 'power') {
+                                iconHtml = `<i class="fas fa-bolt"></i>`;
+                            }
+                            rewardItemDiv.innerHTML = `${iconHtml} ${actualValue} ${reward.name}`;
+                        }
+                        boxRewardsContainer.appendChild(rewardItemDiv);
+                        setTimeout(() => {
+                            rewardItemDiv.classList.add('show');
+                        }, 50); // Small delay for fade-in effect
+
+                        // Apply rewards to player stats
+                        if (reward.type === 'coins') {
+                            playerStats.coins += actualValue;
+                        } else if (reward.type === 'rareItems') {
+                            playerStats.rareItems += actualValue;
+                        } else if (reward.type === 'power') {
+                            gainPower(actualValue); // Use gainPower for power
+                        }
+                        updateProfileUI(); // Update UI after applying each reward
+                    }, delay);
+                    delay += 700; // Delay between each item appearing
+                });
+
+                setTimeout(() => {
+                    claimBoxRewardsButton.classList.remove('hidden');
+                }, delay); // Show claim button after all items appear
+
+                claimBoxRewardsButton.onclick = () => {
+                    playClickSound();
+                    boxOpeningModal.classList.remove('show');
+                    showMessage('تم استلام المكافآت!');
+                };
             }
 
-            const newQuantity = itemInCart.quantity + change;
 
-            if (newQuantity >= 0 && newQuantity <= 10) {
-                itemInCart.quantity = newQuantity;
-                quantityDisplay.textContent = newQuantity;
+            // Store Item Preview Logic
+            function showStoreItemPreview(itemType) {
+                const item = STORE_ITEMS_DATA[itemType];
+                if (!item) return;
 
-                if (newQuantity === 0) {
-                    appState.cart = appState.cart.filter(item => item.id !== itemId);
-                    itemElement.classList.remove('selected');
-                } else {
-                    itemElement.classList.add('selected');
+                previewItemImage.src = item.image || ''; // Set image, or empty if none
+                previewItemImage.alt = item.name;
+                previewItemImage.style.display = item.image ? 'block' : 'none'; // Show/hide image
+
+                previewItemName.textContent = item.name;
+
+                let priceHtml = '';
+                if (item.currency === 'coins') {
+                    priceHtml = `${item.price} <i class="fas fa-coins"></i>`;
+                } else if (item.currency === 'rareItems') {
+                    priceHtml = `${item.price} <i class="fas fa-gem"></i>`;
+                } else if (item.currency === 'mixed') {
+                    priceHtml = `${item.price.coins} <i class="fas fa-coins"></i> + ${item.price.rareItems} <i class="fas fa-gem"></i>`;
+                } else if (item.getPrice) { // For dynamic prices like free coins or power increase
+                    priceHtml = item.getPrice();
                 }
-                updateCartDisplay();
-            } else if (newQuantity > 10) {
-                console.warn(`Maximum quantity for ${itemName} is 10.`);
-            }
-        };
+                previewItemPrice.innerHTML = `السعر: ${priceHtml}`;
 
-        const clearCart = () => {
-            appState.cart = [];
-            appState.couponAppliedForCurrentOrder = false; // Reset coupon for new order
-            updateCartDisplay();
-            menuItems.forEach(itemElement => {
-                itemElement.classList.remove('selected');
-                itemElement.querySelector('.quantity-display').textContent = '0';
+                previewItemRewards.innerHTML = '';
+                item.getRewards().forEach(reward => {
+                    const rewardLine = document.createElement('div');
+                    rewardLine.classList.add('reward-line');
+                    let icon = '';
+                    if (reward.type === 'coins') icon = '<i class="fas fa-coins"></i>';
+                    if (reward.type === 'rareItems') icon = '<i class="fas fa-gem"></i>';
+                    if (reward.type === 'power') icon = '<i class="fas fa-bolt"></i>';
+                    rewardLine.innerHTML = `ستحصل على: ${reward.value} ${reward.name} ${icon}`;
+                    previewItemRewards.appendChild(rewardLine);
+                });
+
+                // Set current item for purchase confirmation
+                currentItemToPurchase = itemType;
+
+                // Check if player has enough currency and disable confirm button if not
+                let canAfford = true;
+                if (item.currency === 'coins') {
+                    if (playerStats.coins < item.price) canAfford = false;
+                } else if (item.currency === 'rareItems') {
+                    if (playerStats.rareItems < item.price) canAfford = false;
+                } else if (item.currency === 'mixed') {
+                    if (playerStats.coins < item.price.coins || playerStats.rareItems < item.price.rareItems) canAfford = false;
+                }
+                confirmPurchaseButton.disabled = !canAfford;
+                confirmPurchaseButton.classList.toggle('opacity-50', !canAfford);
+                confirmPurchaseButton.classList.toggle('cursor-not-allowed', !canAfford);
+
+                // Special case for free coins button
+                if (itemType === 'freeCoins') {
+                    confirmPurchaseButton.textContent = 'احصل عليها';
+                    const nowKsa = getKsaCurrentDate();
+                    const currentKsaDateString = nowKsa.toISOString().split('T')[0];
+                    if (currentKsaDateString === playerStats.lastFreeCoinsResetDay) { // Already claimed today
+                        confirmPurchaseButton.disabled = true;
+                        confirmPurchaseButton.classList.add('opacity-50', 'cursor-not-allowed');
+                    } else {
+                        confirmPurchaseButton.disabled = false;
+                        confirmPurchaseButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                    }
+                } else {
+                    confirmPurchaseButton.textContent = 'تأكيد الشراء';
+                }
+
+                storeItemPreviewModal.classList.add('show');
+            }
+
+            // Event listeners for store item buttons to open preview modal
+            function attachStoreItemListeners() {
+                document.querySelectorAll('.store-item button').forEach(button => {
+                    button.onclick = (event) => { // Use onclick to re-attach
+                        const itemType = event.target.dataset.itemType;
+                        if (itemType) {
+                            showStoreItemPreview(itemType);
+                        }
+                    };
+                });
+            }
+
+            // Confirm purchase from preview modal
+            function attachPurchaseModalListeners() {
+                confirmPurchaseButton.onclick = async () => { // Use onclick to re-attach
+                    playClickSound();
+                    if (!currentItemToPurchase) return;
+
+                    const item = STORE_ITEMS_DATA[currentItemToPurchase];
+
+                    // Perform purchase based on itemType
+                    if (currentItemToPurchase === 'powerIncrease') {
+                        if (playerStats.coins >= powerIncreasePrice) {
+                            playerStats.coins -= powerIncreasePrice;
+                            gainPower(getRandomRewardValue('150-300')); // Use getRandomRewardValue
+                            powerIncreasePrice = generatePowerIncreasePrice();
+                            showMessage('تم رفع القوة بنجاح!');
+                        } else {
+                            showMessage('ليس لديك أموال كافية!');
+                        }
+                    } else if (currentItemToPurchase === 'freeCoins') {
+                        const nowKsa = getKsaCurrentDate();
+                        const currentKsaDateString = nowKsa.toISOString().split('T')[0];
+
+                        if (currentKsaDateString !== playerStats.lastFreeCoinsResetDay) {
+                            const freeAmount = getRandomRewardValue('50-150'); // Use getRandomRewardValue
+                            playerStats.coins += freeAmount;
+                            playerStats.lastFreeCoinsResetDay = currentKsaDateString; // Mark as claimed for today
+
+                            // Update quest progress for "buyFreeCoins"
+                            const buyFreeCoinsQuest = playerStats.dailyQuestProgress.quests.find(q => q.type === 'buyFreeCoins');
+                            if (buyFreeCoinsQuest && !buyFreeCoinsQuest.completed) {
+                                buyFreeCoinsQuest.current++;
+                                if (buyFreeCoinsQuest.current >= buyFreeCoinsQuest.target) {
+                                    buyFreeCoinsQuest.completed = true;
+                                }
+                            }
+                            showMessage(`حصلت على ${freeAmount} أموال مجانية!`);
+                        } else {
+                            showMessage('الهدية اليومية ليست جاهزة بعد.');
+                        }
+                    } else if (item.currency === 'coins' && playerStats.coins >= item.price) {
+                        playerStats.coins -= item.price;
+                        openBox(item.getRewards(), currentItemToPurchase === 'fireLion');
+                    } else if (item.currency === 'mixed' && playerStats.coins >= item.price.coins && playerStats.rareItems >= item.price.rareItems) {
+                        playerStats.coins -= item.price.coins;
+                        playerStats.rareItems -= item.price.rareItems;
+                        openBox(item.getRewards(), currentItemToPurchase === 'fireLion');
+                    } else {
+                        showMessage('ليس لديك الموارد الكافية!');
+                    }
+
+                    updateProfileUI();
+                    updateStoreUI();
+                    storeItemPreviewModal.classList.remove('show');
+                };
+
+                cancelPurchaseButton.onclick = () => { // Use onclick to re-attach
+                    playClickSound();
+                    storeItemPreviewModal.classList.remove('show');
+                };
+
+                closeStorePreviewModalButton.onclick = () => { // Use onclick to re-attach
+                    playClickSound();
+                    storeItemPreviewModal.classList.remove('show');
+                };
+            }
+
+
+            // Profile Name Modal Logic
+            function attachProfileModalListeners() {
+                if (setPlayerNameButton) {
+                    setPlayerNameButton.onclick = () => { // Use onclick to re-attach
+                        playClickSound();
+                        modalPlayerNameInput.value = playerStats.playerName;
+                        nameInputModal.classList.add('show');
+                    };
+                }
+
+                if (confirmNameButton) {
+                    confirmNameButton.onclick = async () => { // Use onclick to re-attach
+                        playClickSound();
+                        const name = modalPlayerNameInput.value.trim();
+                        if (name.length > 0 && name.length <= 25) {
+                            playerStats.playerName = name;
+                            updateProfileUI();
+                            nameInputModal.classList.remove('show');
+                            showMessage('تم حفظ اسم اللاعب!');
+                        } else if (name.length === 0) {
+                            showMessage('الرجاء إدخال اسم صحيح.');
+                        } else {
+                            showMessage('الاسم يجب ألا يتجاوز 25 حرفًا.');
+                        }
+                    };
+                }
+
+                if (cancelNameButton) {
+                    cancelNameButton.onclick = () => { // Use onclick to re-attach
+                        playClickSound();
+                        nameInputModal.classList.remove('show');
+                    };
+                }
+
+                if (closeNameModalButton) {
+                    closeNameModalButton.onclick = () => { // Use onclick to re-attach
+                        playClickSound();
+                        nameInputModal.classList.remove('show');
+                    };
+                }
+            }
+
+            // Village Summary Modal Logic
+            function attachVillageSummaryListeners() {
+                if (villageSummaryButton) {
+                    villageSummaryButton.onclick = () => { // Use onclick to re-attach
+                        playClickSound();
+                        summaryContent.innerHTML = ''; // Clear previous content
+
+                        // Add House summary (single house preview for all levels)
+                        const houseSummaryHeader = document.createElement('h4');
+                        houseSummaryHeader.classList.add('text-lg', 'font-semibold', 'mt-4', 'mb-2', 'text-right', 'w-full');
+                        houseSummaryHeader.textContent = `معاينة المنزل (جميع المستويات):`;
+                        summaryContent.appendChild(houseSummaryHeader);
+
+                        for (let level = 1; level <= HOUSE_MAX_LEVEL; level++) {
+                            const levelSummaryItem = document.createElement('div');
+                            levelSummaryItem.classList.add('summary-modal-item');
+
+                            const cumulativePower = Math.round(HOUSE_LEVEL_CUMULATIVE_REWARDS[level].power);
+                            const cumulativeCoins = Math.round(HOUSE_LEVEL_CUMULATIVE_REWARDS[level].coins);
+                            const cumulativeRareItems = Math.round(HOUSE_LEVEL_CUMULATIVE_REWARDS[level].rareItems);
+
+                            // Calculate incremental gains
+                            const prevPower = HOUSE_LEVEL_CUMULATIVE_REWARDS[level - 1] ? Math.round(HOUSE_LEVEL_CUMULATIVE_REWARDS[level - 1].power) : 0;
+                            const prevCoins = HOUSE_LEVEL_CUMULATIVE_REWARDS[level - 1] ? Math.round(HOUSE_LEVEL_CUMULATIVE_REWARDS[level - 1].coins) : 0;
+                            const prevRareItems = HOUSE_LEVEL_CUMULATIVE_REWARDS[level - 1] ? Math.round(HOUSE_LEVEL_CUMULATIVE_REWARDS[level - 1].rareItems) : 0;
+
+                            const powerGain = cumulativePower - prevPower;
+                            const coinsGain = cumulativeCoins - prevCoins;
+                            const rareItemsGain = cumulativeRareItems - prevRareItems;
+
+                            const clicksNeeded = HOUSE_CLICKS_NEEDED[level]; // Clicks needed to reach this level
+                            const levelImage = getHouseImage(level);
+
+                            levelSummaryItem.innerHTML = `
+                                <img src="${levelImage}" onerror="this.onerror=null;this.src='https://placehold.co/40x40/3a4558/FFD700?text=House';" alt="House Level ${level}">
+                                <div class="summary-text">
+                                    <span>المستوى: <span class="level">${level}</span></span>
+                                    <span>القوة المكتسبة: <span class="detail">${powerGain}</span></span>
+                                    <span>الأموال المكتسبة: <span class="detail">${coinsGain}</span></span>
+                                    <span>القطع النادرة المكتسبة: <span class="detail">${rareItemsGain}</span></span>
+                                    <span>النقرات المطلوبة: <span class="detail">${level < HOUSE_MAX_LEVEL ? clicksNeeded : 'الحد الأقصى'}</span></span>
+                                </div>
+                            `;
+                            summaryContent.appendChild(levelSummaryItem);
+                        }
+
+                        villageSummaryModal.classList.add('show');
+                    };
+                }
+
+                if (closeSummaryModalButton) {
+                    closeSummaryModalButton.onclick = () => { // Use onclick to re-attach
+                        playClickSound();
+                        villageSummaryModal.classList.remove('show');
+                    };
+                }
+            }
+
+            // Settings actions
+            function attachSettingsListeners() {
+                if (clickSoundToggle) {
+                    clickSoundToggle.checked = isClickSoundEnabled;
+                    clickSoundToggle.onchange = () => { // Use onchange to re-attach
+                        isClickSoundEnabled = clickSoundToggle.checked;
+                        localStorage.setItem('isClickSoundEnabled', isClickSoundEnabled.toString());
+                        showMessage(isClickSoundEnabled ? 'تم تفعيل صوت النقر.' : 'تم تعطيل صوت النقر.');
+                    };
+                }
+
+                if (backgroundMusicToggle) {
+                    backgroundMusicToggle.checked = isBackgroundMusicEnabled;
+                    if (isBackgroundMusicEnabled) {
+                        backgroundMusic.play().catch(e => console.log("Music autoplay blocked:", e));
+                    } else {
+                        backgroundMusic.pause();
+                    }
+                    backgroundMusicToggle.onchange = () => { // Use onchange to re-attach
+                        isBackgroundMusicEnabled = backgroundMusicToggle.checked;
+                        localStorage.setItem('isBackgroundMusicEnabled', isBackgroundMusicEnabled.toString());
+                        if (isBackgroundMusicEnabled) {
+                            backgroundMusic.play().catch(e => console.log("Music autoplay blocked:", e));
+                            showMessage('تم تفعيل موسيقى الخلفية.');
+                        } else {
+                            backgroundMusic.pause();
+                            showMessage('تم تعطيل موسيقى الخلفية.');
+                        }
+                    };
+                }
+            }
+
+            // Daily Quests Logic
+            const KSA_OFFSET_MS = 3 * 60 * 60 * 1000; // GMT+3 in milliseconds
+
+            function getKsaCurrentDate() {
+                const now = new Date();
+                const utc = now.getTime() + (now.getTimezoneOffset() * 60 * 1000); // Convert to UTC
+                return new Date(utc + KSA_OFFSET_MS); // Add KSA offset
+            }
+
+            function getNextKsaMidnightTimestamp() {
+                const nowKsa = getKsaCurrentDate();
+                const nextMidnightKsa = new Date(nowKsa.getFullYear(), nowKsa.getMonth(), nowKsa.getDate() + 1, 0, 0, 0, 0);
+                // Convert back to UTC timestamp for comparison with Date.now()
+                return nextMidnightKsa.getTime() - KSA_OFFSET_MS - (new Date().getTimezoneOffset() * 60 * 1000);
+            }
+
+            function initializeQuests() {
+                const nowKsa = getKsaCurrentDate();
+                const currentKsaDateString = nowKsa.toISOString().split('T')[0];
+
+                // Check if it's a new day in KSA compared to last reset
+                if (currentKsaDateString !== playerStats.dailyQuestProgress.lastReset) {
+                    // Reset quests
+                    playerStats.dailyQuestProgress.lastReset = currentKsaDateString; // Store date string
+                    playerStats.dailyLevelsUpgradedToday = 0; // Reset daily levels upgraded
+
+                    playerStats.dailyQuestProgress.quests = [
+                        { id: 1, type: 'buyFreeCoins', text: 'اشترِ المال المجاني من المتجر', target: 1, current: 0, completed: false, claimed: false, rewards: { coins: 50 + Math.floor(Math.random() * 50), rareItems: 1 + Math.floor(Math.random() * 1) } },
+                        { id: 2, type: 'clickHouses', text: 'انقر 800 نقرة', target: 800, current: 0, completed: false, claimed: false, rewards: { coins: 100 + Math.floor(Math.random() * 100), rareItems: 2 + Math.floor(Math.random() * 2) } },
+                        { id: 3, type: 'upgradeLevels', text: 'ارفع 3 مستويات لليوم', target: 3, current: 0, completed: false, claimed: false, rewards: { coins: 150 + Math.floor(Math.random() * 150), rareItems: 3 + Math.floor(Math.random() * 2) } },
+                        { id: 4, type: 'upgradeAnyHouseLevel', text: 'ارفع مستوى أحد البيوت', target: 1, current: 0, completed: false, claimed: false, rewards: { coins: 200 + Math.floor(Math.random() * 200), rareItems: 4 + Math.floor(Math.random() * 2) } }
+                    ];
+                    // Also reset free coins availability for the new day
+                    playerStats.lastFreeCoinsResetDay = ''; // Clear to indicate it's available for new day
+                }
+                // Data is saved via updateProfileUI
+            }
+
+            function updateQuestsUI() {
+                questsList.innerHTML = '';
+                const now = Date.now();
+                const nextResetTimestamp = getNextKsaMidnightTimestamp();
+                const remainingTime = nextResetTimestamp - now;
+
+                // Call initializeQuests to handle daily reset logic
+                initializeQuests();
+
+                playerStats.dailyQuestProgress.quests.forEach(quest => {
+                    const questDiv = document.createElement('div');
+                    questDiv.classList.add('quest-item', 'rounded-lg', 'shadow-md', 'mb-2');
+                    if (quest.completed) {
+                        questDiv.classList.add('completed');
+                    }
+
+                    let progressText = '';
+                    let currentProgressValue = quest.current;
+
+                    if (quest.type === 'upgradeLevels') {
+                        currentProgressValue = playerStats.dailyLevelsUpgradedToday;
+                        if (currentProgressValue >= quest.target && !quest.completed) {
+                            quest.completed = true;
+                        }
+                    } else if (quest.type === 'clickHouses') {
+                        // Ensure current is floored for display, but actual can be float
+                        currentProgressValue = Math.floor(quest.current);
+                        if (quest.current >= quest.target && !quest.completed) {
+                            quest.completed = true;
+                        }
+                    } else if (quest.type === 'upgradeAnyHouseLevel') {
+                        if (quest.current >= quest.target && !quest.completed) {
+                            quest.completed = true;
+                        }
+                    } else if (quest.type === 'buyFreeCoins') {
+                        // This quest is completed by claiming free coins, which sets current to target (1)
+                        if (quest.current >= quest.target && !quest.completed) {
+                            quest.completed = true;
+                        }
+                    }
+
+                    progressText = `التقدم: ${currentProgressValue} / ${quest.target}`;
+
+                    questDiv.innerHTML = `
+                        <span class="quest-title">${quest.text}</span>
+                        <span class="quest-progress">${progressText}</span>
+                        <div class="quest-rewards">
+                            المكافآت: ${quest.rewards.coins} <i class="fas fa-coins"></i>, ${quest.rewards.rareItems} <i class="fas fa-gem"></i>
+                        </div>
+                        <button class="quest-claim-button" data-quest-id="${quest.id}" ${quest.completed && !quest.claimed ? '' : 'disabled'}>
+                            ${quest.claimed ? 'تم الاستلام' : (quest.completed ? 'استلام' : 'غير مكتمل')}
+                        </button>
+                    `;
+                    questsList.appendChild(questDiv);
+
+                    const claimButton = questDiv.querySelector('.quest-claim-button');
+                    if (claimButton && !claimButton.disabled) {
+                        claimButton.onclick = async () => { // Use onclick to re-attach
+                            playClickSound();
+                            if (quest.completed && !quest.claimed) {
+                                playerStats.coins += quest.rewards.coins;
+                                playerStats.rareItems += quest.rewards.rareItems;
+                                quest.claimed = true;
+                                showMessage(`تم استلام مكافآت المهمة: ${quest.rewards.coins} أموال و ${quest.rewards.rareItems} قطع نادرة!`);
+                                updateProfileUI();
+                                updateQuestsUI();
+                            }
+                        };
+                    }
+                });
+
+                // Update reset timer
+                if (remainingTime > 0) {
+                    questResetTimerEl.textContent = `إعادة تعيين المهام في: ${formatTime(remainingTime)}`;
+                } else {
+                    questResetTimerEl.textContent = `المهام جاهزة لإعادة التعيين!`;
+                }
+            }
+
+            // Event listeners for Daily Quests Modal
+            function attachDailyQuestsListeners() {
+                dailyQuestsButton.onclick = () => { // Use onclick to re-attach
+                    playClickSound();
+                    initializeQuests(); // Ensure quests are up-to-date before opening
+                    updateQuestsUI();
+                    dailyQuestsModal.classList.add('show');
+                };
+
+                closeQuestsModalButton.onclick = () => { // Use onclick to re-attach
+                    playClickSound();
+                    dailyQuestsModal.classList.remove('show');
+                };
+            }
+
+            // Function to attach all event listeners after Firebase is ready
+            function attachEventListeners() {
+                menuItems.forEach(item => {
+                    item.onclick = () => { // Use onclick for simplicity and to re-attach
+                        const targetId = item.dataset.target;
+                        const targetView = document.getElementById(targetId);
+                        const currentActiveView = document.querySelector('.active-view');
+
+                        if (targetView && currentActiveView !== targetView) {
+                            transitionView(currentActiveView, targetView, 'forward');
+                        }
+                    };
+                });
+
+                backButtons.forEach(button => {
+                    button.onclick = () => { // Use onclick for simplicity and to re-attach
+                        const targetId = button.dataset.target;
+                        const targetView = document.getElementById(targetId);
+                        const currentActiveView = document.querySelector('.active-view');
+
+                        if (targetView && currentActiveView !== targetView) {
+                            transitionView(currentActiveView, targetView, 'backward');
+                        }
+                    };
+                });
+
+                attachStoreItemListeners();
+                attachPurchaseModalListeners();
+                attachProfileModalListeners();
+                attachVillageSummaryListeners();
+                attachSettingsListeners();
+                attachDailyQuestsListeners();
+                // House and Gold Mine buttons are attached during renderVillage()
+                // which is called by game loop, so they will be re-attached.
+            }
+
+
+            // Firebase Authentication and Data Loading
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    playerStats.playerID = userId; // Set playerID to Firebase UID
+
+                    let isNewUser = false;
+
+                    // Listen to player data changes from Realtime Database
+                    onValue(ref(rtdb, `artifacts/${appId}/users/${userId}/playerData`), (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            // Merge Realtime Database data into playerStats, prioritizing RTDB
+                            Object.assign(playerStats, data);
+                        } else {
+                            isNewUser = true;
+                            showMessage("مرحباً بك في اللعبة! سيتم حفظ تقدمك تلقائياً.");
+                        }
+                        updateProfileUI(); // Update UI after loading player data
+                    });
+
+                    // Listen to houses data changes from Realtime Database
+                    onValue(ref(rtdb, `artifacts/${appId}/users/${userId}/houses`), (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            // Realtime DB might store arrays as objects with numeric keys, convert back to array
+                            playerStats.houses = Array.isArray(data) ? data : Object.values(data || {});
+                        } else if (isNewUser) {
+                            // If new user, houses are already default from localStorage load, save them
+                            set(ref(rtdb, `artifacts/${appId}/users/${userId}/houses`), playerStats.houses);
+                        }
+                        renderVillage(); // Re-render village after loading houses
+                    });
+
+                    // Listen to gold mines data changes from Realtime Database
+                    onValue(ref(rtdb, `artifacts/${appId}/users/${userId}/goldMines`), (snapshot) => {
+                        if (snapshot.exists()) {
+                            const data = snapshot.val();
+                            playerStats.goldMines = Array.isArray(data) ? data : Object.values(data || {});
+                        } else if (isNewUser) {
+                            // If new user, goldMines are already default from localStorage load, save them
+                            set(ref(rtdb, `artifacts/${appId}/users/${userId}/goldMines`), playerStats.goldMines);
+                        }
+                        renderVillage(); // Re-render village after loading gold mines
+                    });
+
+                    // Listen to daily quests data changes from Realtime Database
+                    onValue(ref(rtdb, `artifacts/${appId}/users/${userId}/dailyQuests`), (snapshot) => {
+                        if (snapshot.exists()) {
+                            playerStats.dailyQuestProgress = snapshot.val();
+                            // Ensure quests array is correctly formatted if it came as an object
+                            if (playerStats.dailyQuestProgress && !Array.isArray(playerStats.dailyQuestProgress.quests)) {
+                                playerStats.dailyQuestProgress.quests = Object.values(playerStats.dailyQuestProgress.quests || {});
+                            }
+                        } else if (isNewUser) {
+                            // If new user, quests are already default from localStorage load, save them
+                            set(ref(rtdb, `artifacts/${appId}/users/${userId}/dailyQuests`), playerStats.dailyQuestProgress);
+                        }
+                        initializeQuests(); // Ensure quests are correct for the day
+                        updateQuestsUI(); // Update quests UI
+                    });
+
+                    // Listen to leaderboard changes (public data) from Realtime Database
+                    // Order by totalPower and limit to top 10
+                    onValue(query(ref(rtdb, `artifacts/${appId}/public/data/leaderboard`), orderByChild('totalPower'), limitToLast(10)), (snapshot) => {
+                        const leaderboardData = [];
+                        snapshot.forEach((childSnapshot) => {
+                            leaderboardData.push(childSnapshot.val());
+                        });
+
+                        // Realtime DB's limitToLast gives results in ascending order, reverse for descending
+                        leaderboardData.reverse();
+
+                        leaderboardList.innerHTML = `
+                            <div class="leaderboard-item you">
+                                <span class="player-rank">#${playerStats.rank || '...'}</span>
+                                <span class="player-name" id="leaderboardPlayerName">${playerStats.playerName || 'أنت'}</span>
+                                <span class="player-power" id="leaderboardPlayerPower">${formatNumber(playerStats.totalPower)}</span>
+                            </div>
+                        `; // Always show current player at top, then fill others
+                        let rank = 1;
+                        leaderboardData.forEach((data) => {
+                            if (data.userId === userId) { // Skip current user, already displayed
+                                playerStats.rank = rank; // Update player's rank
+                                document.getElementById('leaderboardPlayerName').textContent = data.playerName;
+                                document.getElementById('leaderboardPlayerPower').textContent = formatNumber(data.totalPower);
+                                document.querySelector('.leaderboard-item.you .player-rank').textContent = `#${rank}`;
+                            } else {
+                                const leaderboardItemDiv = document.createElement('div');
+                                leaderboardItemDiv.classList.add('leaderboard-item');
+                                leaderboardItemDiv.innerHTML = `
+                                    <span class="player-rank">#${rank}</span>
+                                    <span class="player-name">${data.playerName}</span>
+                                    <span class="player-power">${formatNumber(data.totalPower)}</span>
+                                `;
+                                leaderboardList.appendChild(leaderboardItemDiv);
+                            }
+                            rank++;
+                        });
+                    });
+
+                    isAuthReady = true; // Mark authentication as ready
+
+                    // Now that data is loaded and auth is ready, attach all event listeners and start loops
+                    attachEventListeners();
+                    startGameLoops();
+
+                    // Initial UI updates (these will be updated again by onValue listeners, but good for first render)
+                    powerIncreasePrice = generatePowerIncreasePrice();
+                    updateProfileUI();
+                    updateStoreUI();
+                    renderVillage();
+                    updateQuestsUI();
+
+                    if (isBackgroundMusicEnabled) {
+                        backgroundMusic.play().catch(e => console.log("Music autoplay blocked:", e));
+                    }
+
+                } else {
+                    // User is signed out or not authenticated, try to sign in
+                    try {
+                        if (typeof __initial_auth_token !== 'undefined') {
+                            await signInWithCustomToken(auth, __initial_auth_token);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Firebase authentication error:", error);
+                        showMessage("خطأ في المصادقة مع Firebase.");
+                    }
+                }
             });
-            orderConfirmationMessage.classList.add('hidden');
-            if (deliveryPhoneNumberInput) deliveryPhoneNumberInput.value = '';
-            if (deliveryLocationInput) deliveryLocationInput.value = '';
-            saveDeliveryDetails();
-            checkConfirmButtonState();
-            updateCouponSection(); // Reset coupon section UI
-        };
 
-        const updateCouponSection = () => {
-            if (!couponSection || !couponMessage || !applyCouponBtn) return;
 
-            if (appState.lifetimeCouponUsed) {
-                couponSection.classList.remove('hidden');
-                couponMessage.textContent = 'لقد استخدمت كوبون الخصم الخاص بك مسبقاً.';
-                couponMessage.classList.remove('text-yellow-300', 'text-green-400');
-                couponMessage.classList.add('text-red-400');
-                applyCouponBtn.disabled = true;
-                applyCouponBtn.textContent = 'تم استخدام الخصم';
-            } else if (appState.userPoints >= 10000) {
-                couponSection.classList.remove('hidden');
-                couponMessage.textContent = 'لديك نقاط كافية! احصل على خصم 10% على أغلى صنف.';
-                couponMessage.classList.remove('text-red-400', 'text-green-400');
-                couponMessage.classList.add('text-yellow-300');
-                applyCouponBtn.disabled = appState.cart.length === 0 || appState.couponAppliedForCurrentOrder;
-                applyCouponBtn.textContent = 'تطبيق خصم 10%';
-            } else {
-                couponSection.classList.remove('hidden');
-                couponMessage.textContent = `تحتاج ${10000 - appState.userPoints} نقطة إضافية للحصول على خصم 10%.`;
-                couponMessage.classList.remove('text-green-400', 'text-red-400');
-                couponMessage.classList.add('text-yellow-300');
-                applyCouponBtn.disabled = true;
-                applyCouponBtn.textContent = 'تطبيق خصم 10%';
+            // Transition logic
+            function transitionView(fromView, toView, direction) {
+                playClickSound();
+                if (fromView === toView) return;
+
+                fromView.classList.remove('active-view');
+                toView.classList.add('active-view');
+
+                let fromClass, toClass;
+                if (direction === 'forward') {
+                    fromClass = 'slide-out-left';
+                    toClass = 'slide-in-right';
+                } else {
+                    fromClass = 'slide-out-right';
+                    toClass = 'slide-in-left';
+                }
+
+                fromView.classList.remove('slide-in-right', 'slide-in-left');
+                fromView.classList.add(fromClass);
+                fromView.style.zIndex = 10;
+
+                toView.classList.remove('slide-out-left', 'slide-out-right');
+                toView.classList.add(toClass);
+                toView.style.zIndex = 20;
+
+                setTimeout(() => {
+                    fromView.classList.remove(fromClass);
+                    toView.classList.remove(toClass);
+                }, 400);
             }
-        };
-
-        const applyCoupon = () => {
-            if (appState.cart.length === 0) {
-                couponMessage.textContent = 'السلة فارغة. لا يمكن تطبيق الخصم.';
-                couponMessage.classList.remove('text-green-400', 'text-yellow-300');
-                couponMessage.classList.add('text-red-400');
-                return;
-            }
-
-            if (appState.userPoints < 10000 || appState.lifetimeCouponUsed || appState.couponAppliedForCurrentOrder) {
-                couponMessage.textContent = 'لا يمكنك تطبيق الخصم حالياً.';
-                couponMessage.classList.remove('text-green-400', 'text-yellow-300');
-                couponMessage.classList.add('text-red-400');
-                return;
-            }
-
-            // Find the most expensive item
-            const mostExpensiveItem = appState.cart.reduce((max, item) => item.price > max.price ? item : max, appState.cart[0]);
-
-            // Apply discount
-            appState.userPoints -= 10000; // Deduct points
-            appState.lifetimeCouponUsed = true; // Mark coupon as used for lifetime
-            appState.couponAppliedForCurrentOrder = true; // Mark coupon as applied for current order session
-
-            localStorage.setItem('userPoints', appState.userPoints.toString());
-            localStorage.setItem('lifetimeCouponUsed', 'true');
-
-            userPointsDisplay.textContent = appState.userPoints; // Update points display
-            updateCartDisplay(); // Recalculate total with discount and update UI
-        };
-
-        const confirmOrder = () => {
-            const deliveryPhone = deliveryPhoneNumberInput.value.trim();
-            const deliveryLocation = deliveryLocationInput.value.trim();
-
-            if (appState.cart.length === 0) {
-                orderConfirmationMessage.textContent = 'السلة فارغة. لا يمكن تأكيد الطلب.';
-                orderConfirmationMessage.classList.remove('hidden', 'text-green-400');
-                orderConfirmationMessage.classList.add('text-red-400');
-                return;
-            }
-
-            if (!deliveryPhone || !deliveryLocation) {
-                orderConfirmationMessage.textContent = 'الرجاء ملء جميع حقول التوصيل المطلوبة (رقم الهاتف والموقع).';
-                orderConfirmationMessage.classList.remove('hidden', 'text-green-400');
-                orderConfirmationMessage.classList.add('text-red-400');
-                return;
-            }
-
-            saveDeliveryDetails(); // Save current delivery details
-
-            let orderTotal = appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            let discountAppliedText = "";
-
-            if (appState.couponAppliedForCurrentOrder) {
-                const mostExpensiveItem = appState.cart.reduce((max, item) => item.price > max.price ? item : max, appState.cart[0]);
-                const discountAmount = Math.round(mostExpensiveItem.price * 0.10);
-                orderTotal -= discountAmount;
-                discountAppliedText = `\n(تم تطبيق خصم 10% على ${mostExpensiveItem.name}: ${discountAmount.toLocaleString()} د.ع)`;
-            }
-
-            // Construct WhatsApp message
-            let orderSummary = "طلب جديد من مطعم مندي الأصيل:\n\n";
-            appState.cart.forEach(item => {
-                orderSummary += `- ${item.name} (الكمية: ${item.quantity}) - ${item.price.toLocaleString()} د.ع للوحدة\n`;
-            });
-            orderSummary += `\nالإجمالي النهائي: ${orderTotal.toLocaleString()} د.ع${discountAppliedText}`;
-            orderSummary += `\n\nرقم هاتف التوصيل: ${deliveryPhone}`;
-            orderSummary += `\nموقع التوصيل: ${deliveryLocation}`;
-
-            if (appState.currentPhoneNumber) {
-                orderSummary += `\n\nرقم هاتفي (للتواصل الشخصي): ${appState.currentPhoneNumber}`;
-            }
-
-            const whatsappNumber = "9647713123322";
-            const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(orderSummary)}`;
-
-            orderConfirmationMessage.textContent = 'جاري تحويلك إلى واتساب لإرسال الطلب...';
-            orderConfirmationMessage.classList.remove('hidden', 'text-red-400');
-            orderConfirmationMessage.classList.add('text-green-400');
-
-            clearCart(); // Clear cart after preparing order
-
-            setTimeout(() => {
-                window.open(whatsappUrl, '_blank');
-                hideCartModal();
-            }, 2000);
-        };
-
-        window.onload = () => {
-            mainMenuScreen = document.getElementById('mainMenuScreen');
-            orderFoodScreen = document.getElementById('orderFoodScreen');
-            orderFoodTab = document.getElementById('orderFoodTab');
-            backToMainFromOrderBtn = document.getElementById('backToMainFromOrderBtn');
-            phoneTab = document.getElementById('phoneTab');
-            phoneNumberModal = document.getElementById('phoneNumberModal');
-            backFromPhoneModalBtn = document.getElementById('backFromPhoneModalBtn');
-            phoneNumberDisplay = document.getElementById('phoneNumberDisplay');
-            phoneNumberInputSection = document.getElementById('phoneNumberInputSection');
-            phoneNumberInput = document.getElementById('phoneNumberInput');
-            savePhoneNumberBtn = document.getElementById('savePhoneNumberBtn');
-            editPhoneNumberBtn = document.getElementById('editPhoneNumberBtn');
-            menuItemsContainer = document.getElementById('menuItemsContainer');
-            menuItems = menuItemsContainer.querySelectorAll('.menu-item');
-
-            viewCartBtn = document.getElementById('viewCartBtn');
-            cartItemCount = document.getElementById('cartItemCount');
-            cartModal = document.getElementById('cartModal');
-            closeCartModalBtn = document.getElementById('closeCartModalBtn');
-            backFromCartModalBtn = document.getElementById('backFromCartModalBtn');
-            cartItemsDisplay = document.getElementById('cartItemsDisplay');
-            cartTotalDisplay = document.getElementById('cartTotalDisplay');
-            confirmOrderBtn = document.getElementById('confirmOrderBtn');
-            orderConfirmationMessage = document.getElementById('orderConfirmationMessage');
-            clearCartBtn = document.getElementById('clearCartBtn');
-
-            deliveryPhoneNumberInput = document.getElementById('deliveryPhoneNumberInput');
-            deliveryLocationInput = document.getElementById('deliveryLocationInput');
-
-            couponSection = document.getElementById('couponSection');
-            couponMessage = document.getElementById('couponMessage');
-            applyCouponBtn = document.getElementById('applyCouponBtn');
-
-            userPointsDisplay = document.getElementById('userPointsDisplay');
-            pointsContainer = document.getElementById('pointsContainer');
-            mainRestaurantImage = document.getElementById('mainRestaurantImage');
-
-            initLocalApp();
-
-            mainMenuScreen.classList.add('active');
-            mainMenuScreen.classList.remove('hidden');
-            togglePointsVisibility(true);
-
-            setInterval(rotateMainImage, displayDuration + fadeDuration / 2);
-
-            orderFoodTab.addEventListener('click', (e) => {
-                e.preventDefault();
-                switchScreen('orderFoodScreen', 'forward');
-                updateCartDisplay();
-            });
-
-            backToMainFromOrderBtn.addEventListener('click', () => {
-                switchScreen('mainMenuScreen', 'backward');
-            });
-
-            phoneTab.addEventListener('click', (e) => {
-                e.preventDefault();
-                showPhoneNumberModal();
-            });
-
-            backFromPhoneModalBtn.addEventListener('click', hidePhoneNumberModal);
-
-            savePhoneNumberBtn.addEventListener('click', savePhoneNumber);
-
-            editPhoneNumberBtn.addEventListener('click', () => {
-                phoneNumberInputSection.classList.remove('hidden');
-                editPhoneNumberBtn.classList.add('hidden');
-            });
-
-            if (deliveryPhoneNumberInput) {
-                deliveryPhoneNumberInput.addEventListener('input', checkConfirmButtonState);
-            }
-            if (deliveryLocationInput) {
-                deliveryLocationInput.addEventListener('input', checkConfirmButtonState);
-            }
-
-            if (applyCouponBtn) {
-                applyCouponBtn.addEventListener('click', applyCoupon);
-            }
-
-            menuItems.forEach(itemElement => {
-                const itemId = itemElement.dataset.itemId;
-                itemElement.querySelector('.increment-btn').addEventListener('click', () => updateItemQuantity(itemId, 1));
-                itemElement.querySelector('.decrement-btn').addEventListener('click', () => updateItemQuantity(itemId, -1));
-            });
-
-            viewCartBtn.addEventListener('click', showCartModal);
-            backFromCartModalBtn.addEventListener('click', hideCartModal);
-            confirmOrderBtn.addEventListener('click', confirmOrder);
-            clearCartBtn.addEventListener('click', clearCart);
-
-            updateCartDisplay();
-            checkConfirmButtonState();
-            updateCouponSection(); // Initial update for coupon section
-        };
+        });
     </script>
 </body>
 </html>
