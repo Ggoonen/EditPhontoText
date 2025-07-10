@@ -635,7 +635,7 @@
             transform: translateY(0);
             opacity: 0.8;
         }
-        .house-item.cooldown {
+        .house-item.cooldown { /* This class is no longer used for houses, but kept for other elements if needed */
             opacity: 0.7;
             cursor: not-allowed;
             border-color: #888;
@@ -674,15 +674,10 @@
             color: #FFD700;
             margin-bottom: 0.25rem;
         }
-        .house-item .house-clicks-text {
+        .house-item .house-upgrade-cost {
             font-size: 0.85em;
             color: #cbd5e0;
             margin-bottom: 0.5rem;
-        }
-        .house-item .house-clicks-text.upgrade-ready {
-            color: #FFD700;
-            font-weight: bold;
-            font-size: 0.9em;
         }
         .house-item .house-action-button {
             background-color: #FFD700;
@@ -709,49 +704,6 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
-        .house-item .house-progress-bar-small {
-            width: 100%;
-            height: 4px;
-            background-color: #5a6578;
-            border-radius: 2px;
-            margin-top: 0.25rem;
-            overflow: hidden;
-        }
-        .house-item .house-progress-bar-small div {
-            height: 100%;
-            background-color: #FFD700;
-            width: 0%;
-            border-radius: 2px;
-            transition: width 0.1s ease-out;
-        }
-        .house-item .auto-click-controls {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            width: 100%;
-            margin-top: 0.5rem;
-            font-size: 0.75em;
-            color: #cbd5e0;
-        }
-        .house-item .auto-click-button {
-            background-color: #6a7588;
-            color: #e2e8f0;
-            padding: 0.3rem 0.6rem;
-            border-radius: 0.4rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            margin-inline-start: 0.5rem;
-        }
-        .house-item .auto-click-button:hover:not(:disabled) {
-            background-color: #7a8598;
-        }
-        .house-item .auto-click-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
 
         /* Gold Mine specific styles */
         .gold-mine-item {
@@ -905,6 +857,10 @@
             display: flex;
             flex-direction: column;
             gap: 0.75rem;
+            background-color: #2d3748; /* Darker background for the list */
+            padding: 1rem;
+            border-radius: 1rem;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
         }
         .leaderboard-item {
             background-color: #3a4558;
@@ -915,23 +871,40 @@
             justify-content: space-between;
             align-items: center;
             font-weight: bold;
+            transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
+            cursor: pointer; /* Make items clickable */
+        }
+        .leaderboard-item:hover:not(.you) {
+            transform: translateY(-3px);
+            background-color: #4a5568;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(255, 215, 0, 0.2);
         }
         .leaderboard-item .player-rank {
             color: #FFD700;
             font-size: 1.2em;
+            min-width: 30px; /* Ensure rank takes consistent space */
+            text-align: left;
         }
         .leaderboard-item .player-name {
             flex-grow: 1;
             text-align: right;
             margin-inline-end: 1rem;
+            color: #e2e8f0;
         }
         .leaderboard-item .player-power {
             color: #cbd5e0;
             font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .leaderboard-item .player-power i {
+            color: #FFD700;
         }
         .leaderboard-item.you {
             border: 2px solid #FFD700;
             box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            background-color: #4a5568; /* Slightly different background for current user */
         }
 
         /* Daily Quests Button */
@@ -1020,6 +993,113 @@
             text-align: center;
             width: 100%;
         }
+
+        /* Collect Points Button */
+        #collectPointsButton {
+            background-color: #FFD700;
+            color: #1a202c;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-weight: bold;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 215, 0, 0.4);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+        #collectPointsButton:hover:not(:disabled) {
+            background-color: #e6c200;
+            transform: translateY(-3px) scale(1.02);
+        }
+        #collectPointsButton:active:not(:disabled) {
+            background-color: #ccad00;
+            transform: translateY(0) scale(1);
+        }
+        #collectPointsButton:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #a0aec0;
+            box-shadow: none;
+        }
+        #collectPointsButton .cooldown-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #e2e8f0;
+            font-weight: bold;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+        }
+        #collectPointsButton:disabled .cooldown-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Other Player Village Modal */
+        #otherPlayerVillageModal .modal-content {
+            max-width: 380px; /* Slightly wider for village content */
+            text-align: right;
+        }
+        #otherPlayerVillageContent .house-item,
+        #otherPlayerVillageContent .gold-mine-item {
+            cursor: default; /* Not clickable for interaction */
+            opacity: 0.9;
+            transition: none; /* No hover effects */
+            border-color: #555; /* Indicate read-only */
+        }
+        #otherPlayerVillageContent .house-item:hover,
+        #otherPlayerVillageContent .gold-mine-item:hover {
+            transform: none;
+            background-color: #3a4558;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        #otherPlayerVillageContent .house-action-button,
+        #otherPlayerVillageContent .auto-click-button,
+        #otherPlayerVillageContent .mine-action-button {
+            display: none; /* Hide all action buttons */
+        }
+        #otherPlayerVillageContent .house-upgrade-cost,
+        #otherPlayerVillageContent .mine-collected-coins {
+            font-size: 1em; /* Make text a bit larger for clarity */
+        }
+        #otherPlayerVillageContent h3 {
+            margin-bottom: 1rem;
+            color: #FFD700;
+        }
+        #otherPlayerVillageContent .village-grid {
+            margin-top: 0.5rem;
+        }
+        #otherPlayerNameDisplay {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 0.5rem;
+        }
+        #otherPlayerPowerDisplay {
+            font-size: 1.1em;
+            color: #e2e8f0;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        #otherPlayerPowerDisplay i {
+            color: #FFD700;
+        }
     </style>
 </head>
 <body class="flex items-center justify-center min-h-screen">
@@ -1033,7 +1113,7 @@
         <!-- Main Menu Section -->
         <div id="mainMenu" class="content-section active-view">
             <h1 class="text-3xl font-bold text-center mb-8">
-                <span id="mainMenuPlayerID">0000</span> - <span id="mainMenuPlayerName">اللاعب</span>
+                <span id="mainMenuPlayerName">اللاعب</span>
             </h1>
             <nav class="flex flex-col space-y-4 w-full">
                 <!-- Tab 1 -->
@@ -1062,6 +1142,12 @@
         <!-- Tab 1 Content Section (My Village) -->
         <div id="tab1Content" class="content-section bg-gray-800">
             <h2 class="text-2xl font-bold text-center mb-4">قريتي</h2>
+            <!-- New Collect Points Button -->
+            <button id="collectPointsButton">
+                <i class="fas fa-coins"></i> جمع الأموال
+                <div class="cooldown-overlay" id="collectPointsCooldownOverlay"></div>
+            </button>
+
             <button id="villageSummaryButton" class="village-summary-button">
                 <i class="fas fa-info-circle"></i> ملخص القرية
             </button>
@@ -1150,10 +1236,12 @@
                 <button id="setPlayerNameButton" class="px-3 py-1 text-sm">تعيين</button>
             </div>
 
-            <div class="profile-stat">
+            <!-- Removed Player ID display -->
+            <!-- <div class="profile-stat">
                 <span><i class="fas fa-id-card"></i> ID اللاعب:</span>
                 <span id="playerID">0000</span>
-            </div>
+            </div> -->
+
             <div class="profile-stat">
                 <span><i class="fas fa-coins"></i> عدد الأموال:</span>
                 <span id="playerCoins">0</span>
@@ -1167,7 +1255,6 @@
                     <span><i class="fas fa-bolt"></i> القوة:</span>
                     <span id="playerTotalPower">0</span>
                 </div>
-                <!-- Removed XP bar and progress text as per user request -->
             </div>
 
             <div class="back-button cursor-pointer" data-target="mainMenu">
@@ -1213,17 +1300,7 @@
 
             <div class="leaderboard-list" id="leaderboardList">
                 <!-- Leaderboard items will be dynamically loaded here -->
-                <div class="leaderboard-item you">
-                    <span class="player-rank">#1</span>
-                    <span class="player-name" id="leaderboardPlayerName"></span>
-                    <span class="player-power" id="leaderboardPlayerPower"></span>
-                </div>
-                <!-- Placeholder for other players, will be populated by Realtime Database -->
-                <div class="leaderboard-item">
-                    <span class="player-rank">#2</span>
-                    <span class="player-name">...</span>
-                    <span class="player-power">...</span>
-                </div>
+                <!-- The current player's item will be added dynamically based on their rank -->
             </div>
 
             <div class="back-button cursor-pointer" data-target="mainMenu">
@@ -1300,6 +1377,19 @@
                 </div>
             </div>
         </div>
+
+        <!-- Other Player Village Modal -->
+        <div id="otherPlayerVillageModal" class="modal-overlay">
+            <div class="modal-content">
+                <button class="modal-close-button" id="closeOtherPlayerVillageModalButton"><i class="fas fa-xmark"></i></button>
+                <span id="otherPlayerNameDisplay" class="text-2xl font-bold mb-2"></span>
+                <span id="otherPlayerPowerDisplay" class="text-lg mb-4"><i class="fas fa-bolt"></i> <span id="otherPlayerPowerValue"></span></span>
+                <h3 class="text-xl font-bold text-center">قريته</h3>
+                <div id="otherPlayerVillageContent" class="village-grid">
+                    <!-- Other player's houses and gold mines will be dynamically loaded here -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Background Music -->
@@ -1373,17 +1463,16 @@
 
             // Player stats - Initial default values (will be overwritten by localStorage and then Realtime Database)
             let playerStats = {
-                playerID: '...', // Will be Firebase UID
                 playerName: '',
                 coins: 0,
                 rareItems: 0,
                 totalPower: 0,
                 houses: [
-                    { id: 1, level: 1, clicks: 0, cooldownUntil: 0, lastMaxLevelRewardTime: 0, unlocked: true, autoClickEnabled: false, autoClickEndTime: 0 },
-                    { id: 2, level: 1, clicks: 0, cooldownUntil: 0, lastMaxLevelRewardTime: 0, unlocked: true, autoClickEnabled: false, autoClickEndTime: 0 },
-                    { id: 3, level: 1, clicks: 0, cooldownUntil: 0, lastMaxLevelRewardTime: 0, unlocked: false, autoClickEnabled: false, autoClickEndTime: 0 },
-                    { id: 4, level: 1, clicks: 0, cooldownUntil: 0, lastMaxLevelRewardTime: 0, unlocked: false, autoClickEnabled: false, autoClickEndTime: 0 },
-                    { id: 5, level: 1, clicks: 0, cooldownUntil: 0, lastMaxLevelRewardTime: 0, unlocked: false, autoClickEnabled: false, autoClickEndTime: 0 }
+                    { id: 1, level: 1, upgradeCost: 100, lastMaxLevelRewardTime: 0, unlocked: true },
+                    { id: 2, level: 1, upgradeCost: 150, lastMaxLevelRewardTime: 0, unlocked: true },
+                    { id: 3, level: 1, upgradeCost: 200, lastMaxLevelRewardTime: 0, unlocked: false },
+                    { id: 4, level: 1, upgradeCost: 250, lastMaxLevelRewardTime: 0, unlocked: false },
+                    { id: 5, level: 1, upgradeCost: 300, lastMaxLevelRewardTime: 0, unlocked: false }
                 ],
                 goldMines: [
                     { id: 1, level: 1, collectedCoins: 0, lastCollectionTime: Date.now(), unlocked: true },
@@ -1394,7 +1483,8 @@
                     quests: []
                 },
                 dailyLevelsUpgradedToday: 0,
-                lastFreeCoinsResetDay: ''
+                lastFreeCoinsResetDay: '',
+                lastCollectPointsTime: 0 // New field for collect points button cooldown
             };
 
             // Load from localStorage first to ensure immediate data availability
@@ -1412,11 +1502,9 @@
                     };
                     // Ensure nested objects/arrays have all expected fields (for new fields added later)
                     playerStats.houses.forEach(house => {
-                        if (typeof house.cooldownUntil !== 'number') house.cooldownUntil = 0;
+                        if (typeof house.upgradeCost !== 'number') house.upgradeCost = 100 + (house.id - 1) * 50; // Default if missing
                         if (typeof house.lastMaxLevelRewardTime !== 'number') house.lastMaxLevelRewardTime = 0;
                         if (typeof house.unlocked === 'undefined') house.unlocked = true;
-                        if (typeof house.autoClickEnabled === 'undefined') house.autoClickEnabled = false;
-                        if (typeof house.autoClickEndTime === 'undefined') house.autoClickEndTime = 0;
                     });
                     playerStats.goldMines.forEach(mine => {
                         if (typeof mine.lastCollectionTime !== 'number') mine.lastCollectionTime = Date.now();
@@ -1424,6 +1512,7 @@
                     });
                     if (typeof playerStats.dailyLevelsUpgradedToday === 'undefined') playerStats.dailyLevelsUpgradedToday = 0;
                     if (typeof playerStats.lastFreeCoinsResetDay === 'undefined') playerStats.lastFreeCoinsResetDay = '';
+                    if (typeof playerStats.lastCollectPointsTime === 'undefined') playerStats.lastCollectPointsTime = 0;
 
                 } catch (e) {
                     console.error("Failed to parse playerStats from localStorage, using defaults:", e);
@@ -1432,24 +1521,9 @@
             }
 
             // House leveling data
-            const HOUSE_CLICKS_NEEDED = [
-                0,    // Level 0 (unused)
-                0,    // Level 1 (no clicks needed to start at 1)
-                800,  // Level 2
-                1500, // Level 3
-                2500, // Level 4
-                3800, // Level 5
-                4650, // Level 6
-                6000, // Level 7
-                9000, // Level 8
-                12000,// Level 9
-                15000 // Level 10
-            ];
             const HOUSE_MAX_LEVEL = 10;
-            const HOUSE_COOLDOWN_DURATION = 15 * 60 * 1000; // 15 minutes
+            const HOUSE_UPGRADE_COST_MULTIPLIER = 1.5; // Cost increases by 50% each level
             const HOUSE_MAX_LEVEL_REWARD_INTERVAL = 5 * 60 * 1000; // 5 minutes (for max level houses)
-            const AUTO_CLICK_RATE_PER_HOUR = 300; // 300 clicks per hour
-            const AUTO_CLICK_DURATION = 1 * 60 * 60 * 1000; // 1 hour
 
             // House cumulative rewards at each level (Power, Coins, Rare Items)
             const HOUSE_LEVEL_CUMULATIVE_REWARDS = [
@@ -1547,9 +1621,7 @@
             let isBackgroundMusicEnabled = localStorage.getItem('isBackgroundMusicEnabled') === 'true';
 
             // UI elements
-            const mainMenuPlayerIDEl = document.getElementById('mainMenuPlayerID');
             const mainMenuPlayerNameEl = document.getElementById('mainMenuPlayerName');
-            const playerIDEl = document.getElementById('playerID');
             const displayedPlayerNameEl = document.getElementById('displayedPlayerName');
             const setPlayerNameButton = document.getElementById('setPlayerNameButton');
             const playerCoinsEl = document.getElementById('playerCoins');
@@ -1574,6 +1646,10 @@
             const closeNameModalButton = document.getElementById('closeNameModalButton');
 
             // Village elements
+            const collectPointsButton = document.getElementById('collectPointsButton');
+            const collectPointsCooldownOverlay = document.getElementById('collectPointsCooldownOverlay');
+            const COLLECT_POINTS_COOLDOWN = 30 * 1000; // 30 seconds
+
             const villageGrid = document.getElementById('villageGrid');
             const villageSummaryButton = document.getElementById('villageSummaryButton');
             const villageSummaryModal = document.getElementById('villageSummaryModal');
@@ -1587,8 +1663,7 @@
 
             // Leaderboard elements
             const leaderboardList = document.getElementById('leaderboardList');
-            const leaderboardPlayerNameEl = document.getElementById('leaderboardPlayerName');
-            const leaderboardPlayerPowerEl = document.getElementById('leaderboardPlayerPower');
+            // Removed leaderboardPlayerNameEl and leaderboardPlayerPowerEl as they are dynamically rendered inside the list
 
             // Daily Quests elements
             const dailyQuestsButton = document.getElementById('dailyQuestsButton');
@@ -1608,6 +1683,14 @@
             const closeStorePreviewModalButton = document.getElementById('closeStorePreviewModalButton');
 
             let currentItemToPurchase = null; // To hold the item data for the preview modal
+
+            // Other Player Village Modal elements
+            const otherPlayerVillageModal = document.getElementById('otherPlayerVillageModal');
+            const closeOtherPlayerVillageModalButton = document.getElementById('closeOtherPlayerVillageModalButton');
+            const otherPlayerNameDisplay = document.getElementById('otherPlayerNameDisplay');
+            const otherPlayerPowerValue = document.getElementById('otherPlayerPowerValue');
+            const otherPlayerVillageContent = document.getElementById('otherPlayerVillageContent');
+
 
             // Helper function to format numbers (e.g., 12345 -> 12.3k)
             function formatNumber(num) {
@@ -1673,24 +1756,8 @@
                     return;
                 }
                 try {
-                    // Save main player data
-                    await set(ref(rtdb, `artifacts/${appId}/users/${userId}/playerData`), {
-                        playerName: playerStats.playerName,
-                        coins: playerStats.coins,
-                        rareItems: playerStats.rareItems,
-                        totalPower: playerStats.totalPower,
-                        dailyLevelsUpgradedToday: playerStats.dailyLevelsUpgradedToday,
-                        lastFreeCoinsResetDay: playerStats.lastFreeCoinsResetDay
-                    });
-
-                    // Save houses data (Realtime DB handles arrays as objects with numeric keys, which is fine for this structure)
-                    await set(ref(rtdb, `artifacts/${appId}/users/${userId}/houses`), playerStats.houses);
-
-                    // Save gold mines data
-                    await set(ref(rtdb, `artifacts/${appId}/users/${userId}/goldMines`), playerStats.goldMines);
-
-                    // Save daily quests data
-                    await set(ref(rtdb, `artifacts/${appId}/users/${userId}/dailyQuests`), playerStats.dailyQuestProgress);
+                    // Save all player data under their userId
+                    await set(ref(rtdb, `artifacts/${appId}/users/${userId}`), playerStats);
 
                     // Update public leaderboard
                     await set(ref(rtdb, `artifacts/${appId}/public/data/leaderboard/${userId}`), {
@@ -1708,11 +1775,9 @@
             // Function to update the profile UI
             function updateProfileUI() {
                 // Update main menu header
-                mainMenuPlayerIDEl.textContent = userId ? userId.substring(0, 4) : '....'; // Show truncated UID
                 mainMenuPlayerNameEl.textContent = playerStats.playerName || 'اللاعب';
 
                 // Update profile section
-                playerIDEl.textContent = userId || '....'; // Show full UID
                 displayedPlayerNameEl.textContent = playerStats.playerName || 'لم يتم التعيين';
 
                 // Show/hide set name button
@@ -1729,10 +1794,6 @@
                 // Update store header stats
                 if (storePlayerCoinsEl) storePlayerCoinsEl.textContent = playerStats.coins;
                 if (storePlayerRareItemsEl) storePlayerRareItemsEl.textContent = playerStats.rareItems;
-
-                // Update leaderboard stats (for current player)
-                if (leaderboardPlayerNameEl) leaderboardPlayerNameEl.textContent = playerStats.playerName || 'أنت';
-                if (leaderboardPlayerPowerEl) leaderboardPlayerPowerEl.textContent = formatNumber(playerStats.totalPower);
 
                 // Save to localStorage immediately for responsiveness
                 localStorage.setItem('playerStats', JSON.stringify(playerStats));
@@ -1784,13 +1845,13 @@
                 return { rate: parseFloat(rate.toFixed(2)), capacity: Math.round(capacity), upgradeCost: Math.round(upgradeCost) };
             }
 
-            // Function to render houses and gold mines
-            function renderVillage() {
-                villageGrid.innerHTML = ''; // Clear existing houses and mines
+            // Function to render houses and gold mines (for current player or other player's view)
+            function renderVillageContent(targetElement, housesData, goldMinesData, isReadOnly = false) {
+                targetElement.innerHTML = ''; // Clear existing content
                 const now = Date.now();
 
                 // Render Houses first
-                playerStats.houses.forEach(house => {
+                housesData.forEach(house => {
                     const houseDiv = document.createElement('div');
                     houseDiv.classList.add('house-item');
                     houseDiv.dataset.houseId = house.id;
@@ -1798,7 +1859,7 @@
                     // Determine if house is locked
                     let isLocked = false;
                     if (house.id > 2) { // Houses 3, 4, 5 need previous house at level 5
-                        const prevHouse = playerStats.houses.find(h => h.id === house.id - 1);
+                        const prevHouse = housesData.find(h => h.id === house.id - 1);
                         if (prevHouse && prevHouse.level < 5) {
                             isLocked = true;
                         }
@@ -1810,201 +1871,118 @@
                             <img src="https://placehold.co/70x70/3a4558/FFD700?text=Locked" alt="بيت مقفل">
                             <div class="house-info">
                                 <span class="house-level">المنزل ${house.id} - مقفل</span>
-                                <span class="house-clicks-text">طور المنزل ${house.id - 1} للمستوى 5 لفتحه</span>
+                                <span class="house-upgrade-cost">طور المنزل ${house.id - 1} للمستوى 5 لفتحه</span>
                             </div>
                         `;
-                        villageGrid.appendChild(houseDiv);
+                        targetElement.appendChild(houseDiv);
                         return; // Skip rendering interactive parts for locked houses
                     }
 
-                    const clicksNeededForNextLevel = HOUSE_CLICKS_NEEDED[house.level + 1]; // Clicks needed to reach next level
-                    let progressPercentage = house.level === HOUSE_MAX_LEVEL ? 100 : (house.clicks / clicksNeededForNextLevel) * 100;
-                    progressPercentage = Math.min(100, Math.max(0, progressPercentage)); // Cap between 0 and 100
-
-                    const isOnCooldown = house.cooldownUntil > now;
-                    let clicksText = '';
-                    let isUpgradeReady = false;
+                    let upgradeCostText = '';
                     let actionButtonText = '';
                     let actionButtonDisabled = false;
 
                     if (house.level === HOUSE_MAX_LEVEL) {
-                        clicksText = 'الحد الأقصى';
+                        upgradeCostText = 'الحد الأقصى';
                         houseDiv.classList.add('max-level');
                         actionButtonText = 'الحد الأقصى';
                         actionButtonDisabled = true;
 
-                        // Handle max level reward
-                        if (now - house.lastMaxLevelRewardTime >= HOUSE_MAX_LEVEL_REWARD_INTERVAL) {
+                        // Handle max level reward (only for current player's view)
+                        if (!isReadOnly && now - house.lastMaxLevelRewardTime >= HOUSE_MAX_LEVEL_REWARD_INTERVAL) {
                             playerStats.coins += 50;
                             playerStats.rareItems += 1;
                             house.lastMaxLevelRewardTime = now;
                             showMessage(`المنزل ${house.id} (الحد الأقصى) منحك 50 أموال و 1 قطعة نادرة!`);
                             updateProfileUI(); // Update immediately
                         }
-                    } else if (isOnCooldown) {
-                        const timeLeft = house.cooldownUntil - now;
-                        clicksText = `راحة: ${formatTime(timeLeft)}`;
-                        houseDiv.classList.add('cooldown');
-                        actionButtonText = `راحة: ${formatTime(timeLeft)}`;
-                        actionButtonDisabled = true;
-                    } else if (house.clicks >= clicksNeededForNextLevel) {
-                        clicksText = 'ترقية';
-                        isUpgradeReady = true;
-                        houseDiv.classList.add('upgrade-ready');
+                    } else {
+                        upgradeCostText = `التكلفة: ${house.upgradeCost} <i class="fas fa-coins"></i>`;
                         actionButtonText = 'ترقية';
-                        actionButtonDisabled = false;
-                    } else {
-                        clicksText = `${Math.floor(house.clicks)} / ${clicksNeededForNextLevel}`; // Floor clicks for display
-                        houseDiv.classList.remove('upgrade-ready');
-                        actionButtonText = 'نقرة';
-                        actionButtonDisabled = false;
-                    }
-
-                    // Auto-clicker display
-                    let autoClickStatus = '';
-                    let autoClickButtonText = 'تفعيل تلقائي';
-                    let autoClickButtonDisabled = actionButtonDisabled; // Disabled if on cooldown or max level
-
-                    if (house.autoClickEnabled) {
-                        const timeLeft = house.autoClickEndTime - now;
-                        if (timeLeft <= 0) {
-                            house.autoClickEnabled = false; // Session ended
-                            house.autoClickEndTime = 0;
-                            autoClickStatus = 'انتهى التلقائي';
-                            autoClickButtonText = 'تفعيل تلقائي';
-                        } else {
-                            autoClickStatus = `تلقائي: ${formatTime(timeLeft)}`;
-                            autoClickButtonText = 'إيقاف تلقائي';
-                        }
-                    } else {
-                        autoClickStatus = 'التلقائي غير مفعل';
+                        actionButtonDisabled = isReadOnly || playerStats.coins < house.upgradeCost;
                     }
 
                     houseDiv.innerHTML = `
                         <img src="${getHouseImage(house.level)}" onerror="this.onerror=null;this.src='https://placehold.co/70x70/3a4558/FFD700?text=House';" alt="House Level ${house.level}">
                         <div class="house-info">
                             <span class="house-level">المنزل ${house.id} - المستوى ${house.level}</span>
-                            <span class="house-clicks-text">${clicksText}</span>
-                            <div class="house-progress-bar-small">
-                                <div style="width: ${progressPercentage}%"></div>
-                            </div>
+                            <span class="house-upgrade-cost">${upgradeCostText}</span>
                             <button class="house-action-button" ${actionButtonDisabled ? 'disabled' : ''}>
                                 ${actionButtonText}
                             </button>
-                            <div class="auto-click-controls">
-                                <span>${autoClickStatus}</span>
-                                <button class="auto-click-button" data-house-id="${house.id}" ${autoClickButtonDisabled ? 'disabled' : ''}>
-                                    ${autoClickButtonText}
-                                </button>
-                            </div>
                         </div>
                     `;
 
-                    const houseActionButton = houseDiv.querySelector('.house-action-button');
-                    // Attach event listener only if it's not disabled
-                    if (houseActionButton && !actionButtonDisabled) {
-                        houseActionButton.onclick = async () => { // Use onclick for simplicity and to re-attach
-                            playClickSound();
-                            // Visual click effect
-                            houseDiv.classList.add('active');
-                            setTimeout(() => {
-                                houseDiv.classList.remove('active');
-                            }, 100);
+                    if (!isReadOnly) {
+                        const houseActionButton = houseDiv.querySelector('.house-action-button');
+                        if (houseActionButton && !actionButtonDisabled) {
+                            houseActionButton.onclick = async () => {
+                                playClickSound();
+                                const currentHouse = playerStats.houses.find(h => h.id === house.id);
+                                if (!currentHouse) return;
 
-                            if (isUpgradeReady) {
-                                // Calculate incremental rewards
-                                const prevRewards = HOUSE_LEVEL_CUMULATIVE_REWARDS[house.level];
-                                const nextRewards = HOUSE_LEVEL_CUMULATIVE_REWARDS[house.level + 1];
+                                if (currentHouse.level < HOUSE_MAX_LEVEL && playerStats.coins >= currentHouse.upgradeCost) {
+                                    playerStats.coins -= currentHouse.upgradeCost;
 
-                                const powerGain = Math.round(nextRewards.power - prevRewards.power);
-                                const coinsGain = Math.round(nextRewards.coins - prevRewards.coins);
-                                const rareItemsGain = Math.round(nextRewards.rareItems - prevRewards.rareItems);
+                                    // Calculate incremental rewards
+                                    const prevRewards = HOUSE_LEVEL_CUMULATIVE_REWARDS[currentHouse.level];
+                                    const nextRewards = HOUSE_LEVEL_CUMULATIVE_REWARDS[currentHouse.level + 1];
 
-                                playerStats.totalPower += powerGain;
-                                playerStats.coins += coinsGain;
-                                playerStats.rareItems += rareItemsGain;
+                                    const powerGain = Math.round(nextRewards.power - prevRewards.power);
+                                    const coinsGain = Math.round(nextRewards.coins - prevRewards.coins);
+                                    const rareItemsGain = Math.round(nextRewards.rareItems - prevRewards.rareItems);
 
-                                house.level++;
-                                playerStats.dailyLevelsUpgradedToday++; // Increment daily levels upgraded
-                                // Update quest progress for "upgradeLevels"
-                                const upgradeLevelsQuest = playerStats.dailyQuestProgress.quests.find(q => q.type === 'upgradeLevels');
-                                if (upgradeLevelsQuest && !upgradeLevelsQuest.completed) {
-                                    upgradeLevelsQuest.current = playerStats.dailyLevelsUpgradedToday; // Use the global counter
-                                    if (upgradeLevelsQuest.current >= upgradeLevelsQuest.target) {
-                                        upgradeLevelsQuest.completed = true;
+                                    playerStats.totalPower += powerGain;
+                                    playerStats.coins += coinsGain;
+                                    playerStats.rareItems += rareItemsGain;
+
+                                    currentHouse.level++;
+                                    currentHouse.upgradeCost = Math.round(currentHouse.upgradeCost * HOUSE_UPGRADE_COST_MULTIPLIER);
+                                    playerStats.dailyLevelsUpgradedToday++; // Increment daily levels upgraded
+
+                                    // Update quest progress for "upgradeLevels"
+                                    const upgradeLevelsQuest = playerStats.dailyQuestProgress.quests.find(q => q.type === 'upgradeLevels');
+                                    if (upgradeLevelsQuest && !upgradeLevelsQuest.completed) {
+                                        upgradeLevelsQuest.current = playerStats.dailyLevelsUpgradedToday;
+                                        if (upgradeLevelsQuest.current >= upgradeLevelsQuest.target) {
+                                            upgradeLevelsQuest.completed = true;
+                                        }
                                     }
-                                }
-                                // Update quest progress for "upgradeAnyHouseLevel" (fixed 4th quest)
-                                const upgradeAnyHouseLevelQuest = playerStats.dailyQuestProgress.quests.find(q => q.type === 'upgradeAnyHouseLevel');
-                                if (upgradeAnyHouseLevelQuest && !upgradeAnyHouseLevelQuest.completed) {
-                                    upgradeAnyHouseLevelQuest.current++;
-                                    if (upgradeAnyHouseLevelQuest.current >= upgradeAnyHouseLevelQuest.target) {
-                                        upgradeAnyHouseLevelQuest.completed = true;
+                                    // Update quest progress for "upgradeAnyHouseLevel"
+                                    const upgradeAnyHouseLevelQuest = playerStats.dailyQuestProgress.quests.find(q => q.type === 'upgradeAnyHouseLevel');
+                                    if (upgradeAnyHouseLevelQuest && !upgradeAnyHouseLevelQuest.completed) {
+                                        upgradeAnyHouseLevelQuest.current++;
+                                        if (upgradeAnyHouseLevelQuest.current >= upgradeAnyHouseLevelQuest.target) {
+                                            upgradeAnyHouseLevelQuest.completed = true;
+                                        }
                                     }
-                                }
 
-                                showMessage(`تم ترقية المنزل ${house.id} إلى المستوى ${house.level}! حصلت على ${powerGain} قوة، ${coinsGain} أموال، ${rareItemsGain} قطع نادرة.`);
+                                    showMessage(`تم ترقية المنزل ${currentHouse.id} إلى المستوى ${currentHouse.level}! حصلت على ${powerGain} قوة، ${coinsGain} أموال، ${rareItemsGain} قطع نادرة.`);
 
-                                // Check for house unlocking
-                                if (house.level === 5 && house.id < playerStats.houses.length) {
-                                    const nextHouse = playerStats.houses.find(h => h.id === house.id + 1);
-                                    if (nextHouse) { // Check if nextHouse exists
-                                        nextHouse.unlocked = true;
-                                        showMessage(`تم فتح المنزل ${nextHouse.id} الجديد!`);
+                                    // Check for house unlocking
+                                    if (currentHouse.level === 5 && currentHouse.id < playerStats.houses.length) {
+                                        const nextHouse = playerStats.houses.find(h => h.id === currentHouse.id + 1);
+                                        if (nextHouse) {
+                                            nextHouse.unlocked = true;
+                                            showMessage(`تم فتح المنزل ${nextHouse.id} الجديد!`);
+                                        }
                                     }
+                                    currentHouse.lastMaxLevelRewardTime = Date.now(); // Reset max level reward timer
+                                } else if (currentHouse.level === HOUSE_MAX_LEVEL) {
+                                    showMessage('المنزل وصل للحد الأقصى من المستوى.');
+                                } else {
+                                    showMessage('ليس لديك أموال كافية للترقية!');
                                 }
-                                house.clicks = 0; // Reset clicks for new level
-                                house.cooldownUntil = Date.now() + HOUSE_COOLDOWN_DURATION; // Set cooldown
-                                house.lastMaxLevelRewardTime = Date.now(); // Reset max level reward timer
-                                house.autoClickEnabled = false; // Stop auto-click on upgrade
-                                house.autoClickEndTime = 0;
-
-                            } else {
-                                house.clicks++;
-                                // Update quest progress for "clickHouses"
-                                const clickHousesQuest = playerStats.dailyQuestProgress.quests.find(q => q.type === 'clickHouses');
-                                if (clickHousesQuest && !clickHousesQuest.completed) {
-                                    clickHousesQuest.current++;
-                                    if (clickHousesQuest.current >= clickHousesQuest.target) {
-                                        clickHousesQuest.completed = true;
-                                    }
-                                }
-                                showMessage(`نقرة! ${Math.floor(house.clicks)} / ${clicksNeededForNextLevel}`);
-                            }
-                            updateProfileUI();
-                            renderVillage(); // Re-render all houses to update progress and cooldown
-                        };
+                                updateProfileUI();
+                                renderVillageContent(villageGrid, playerStats.houses, playerStats.goldMines); // Re-render current player's village
+                            };
+                        }
                     }
-
-                    const autoClickButton = houseDiv.querySelector('.auto-click-button');
-                    // Attach event listener only if it's not disabled
-                    if (autoClickButton && !autoClickButtonDisabled) {
-                        autoClickButton.onclick = async () => { // Use onclick for simplicity and to re-attach
-                            playClickSound();
-                            const currentHouse = playerStats.houses.find(h => h.id === house.id);
-                            if (!currentHouse) return;
-
-                            if (currentHouse.autoClickEnabled) {
-                                // Disable auto-click
-                                currentHouse.autoClickEnabled = false;
-                                currentHouse.autoClickEndTime = 0;
-                                showMessage(`تم إيقاف النقر التلقائي للمنزل ${currentHouse.id}.`);
-                            } else {
-                                // Enable auto-click
-                                currentHouse.autoClickEnabled = true;
-                                currentHouse.autoClickEndTime = now + AUTO_CLICK_DURATION;
-                                showMessage(`تم تفعيل النقر التلقائي للمنزل ${currentHouse.id} لمدة ساعة.`);
-                            }
-                            updateProfileUI(); // Save updated house state
-                            renderVillage(); // Re-render to update UI
-                        };
-                    }
-
-                    villageGrid.appendChild(houseDiv);
+                    targetElement.appendChild(houseDiv);
                 });
 
                 // Render Gold Mines
-                playerStats.goldMines.forEach(mine => {
+                goldMinesData.forEach(mine => {
                     const mineStats = getGoldMineStats(mine.level);
                     const timeSinceLastCollection = now - mine.lastCollectionTime;
                     let generatedCoins = Math.floor(mineStats.rate * (timeSinceLastCollection / 1000));
@@ -2023,26 +2001,28 @@
                             <span class="mine-level">منجم الذهب ${mine.id} - مقفل</span>
                             <span class="mine-collected-coins">التكلفة: ${GOLD_MINE_2_UNLOCK_COST} <i class="fas fa-gem"></i></span>
                             <div class="mine-action-container">
-                                <button class="mine-action-button" id="goldMine${mine.id}UnlockButton">
+                                <button class="mine-action-button" id="goldMine${mine.id}UnlockButton" ${isReadOnly ? 'style="display:none;"' : ''}>
                                     فتح
                                 </button>
                             </div>
                         `;
-                        villageGrid.appendChild(mineDiv);
+                        targetElement.appendChild(mineDiv);
 
-                        const unlockButton = mineDiv.querySelector(`#goldMine${mine.id}UnlockButton`);
-                        unlockButton.onclick = async () => { // Use onclick for simplicity and to re-attach
-                            playClickSound();
-                            if (playerStats.rareItems >= GOLD_MINE_2_UNLOCK_COST) {
-                                playerStats.rareItems -= GOLD_MINE_2_UNLOCK_COST;
-                                mine.unlocked = true;
-                                showMessage(`تم فتح منجم الذهب ${mine.id}!`);
-                            } else {
-                                showMessage(`تحتاج ${GOLD_MINE_2_UNLOCK_COST} قطعة نادرة لفتح المنجم!`);
-                            }
-                            updateProfileUI();
-                            renderVillage();
-                        };
+                        if (!isReadOnly) {
+                            const unlockButton = mineDiv.querySelector(`#goldMine${mine.id}UnlockButton`);
+                            unlockButton.onclick = async () => {
+                                playClickSound();
+                                if (playerStats.rareItems >= GOLD_MINE_2_UNLOCK_COST) {
+                                    playerStats.rareItems -= GOLD_MINE_2_UNLOCK_COST;
+                                    mine.unlocked = true;
+                                    showMessage(`تم فتح منجم الذهب ${mine.id}!`);
+                                } else {
+                                    showMessage(`تحتاج ${GOLD_MINE_2_UNLOCK_COST} قطعة نادرة لفتح المنجم!`);
+                                }
+                                updateProfileUI();
+                                renderVillageContent(villageGrid, playerStats.houses, playerStats.goldMines);
+                            };
+                        }
                         return;
                     }
 
@@ -2054,48 +2034,79 @@
                             <div class="mine-progress-bar" style="width: ${(mine.collectedCoins / mineStats.capacity) * 100}%"></div>
                         </div>
                         <div class="mine-action-container">
-                            <button class="mine-action-button" id="goldMine${mine.id}CollectButton" ${mine.collectedCoins === 0 ? 'disabled' : ''}>
+                            <button class="mine-action-button" id="goldMine${mine.id}CollectButton" ${mine.collectedCoins === 0 || isReadOnly ? 'disabled' : ''} ${isReadOnly ? 'style="display:none;"' : ''}>
                                 جمع
                             </button>
-                            <button class="mine-action-button" id="goldMine${mine.id}UpgradeButton" ${mine.level === GOLD_MINE_MAX_LEVEL ? 'disabled' : ''}>
+                            <button class="mine-action-button" id="goldMine${mine.id}UpgradeButton" ${mine.level === GOLD_MINE_MAX_LEVEL || isReadOnly ? 'disabled' : ''} ${isReadOnly ? 'style="display:none;"' : ''}>
                                 ترقية: ${mineStats.upgradeCost} <i class="fas fa-gem"></i>
                             </button>
                         </div>
                     `;
-                    villageGrid.appendChild(mineDiv);
+                    targetElement.appendChild(mineDiv);
 
-                    const goldMineCollectButton = mineDiv.querySelector(`#goldMine${mine.id}CollectButton`);
-                    const goldMineUpgradeButton = mineDiv.querySelector(`#goldMine${mine.id}UpgradeButton`);
+                    if (!isReadOnly) {
+                        const goldMineCollectButton = mineDiv.querySelector(`#goldMine${mine.id}CollectButton`);
+                        const goldMineUpgradeButton = mineDiv.querySelector(`#goldMine${mine.id}UpgradeButton`);
 
-                    goldMineCollectButton.onclick = async () => { // Use onclick for simplicity and to re-attach
-                        playClickSound();
-                        if (mine.collectedCoins > 0) {
-                            playerStats.coins += mine.collectedCoins;
-                            showMessage(`تم جمع ${mine.collectedCoins} أموال من المنجم ${mine.id}!`);
-                            mine.collectedCoins = 0;
-                            mine.lastCollectionTime = Date.now(); // Reset timer after collection
-                        }
-                        updateProfileUI();
-                        renderVillage(); // Re-render to update mine status
-                    };
-
-                    goldMineUpgradeButton.onclick = async () => { // Use onclick for simplicity and to re-attach
-                        playClickSound();
-                        if (mine.level < GOLD_MINE_MAX_LEVEL) {
-                            const cost = getGoldMineStats(mine.level).upgradeCost;
-                            if (playerStats.rareItems >= cost) {
-                                playerStats.rareItems -= cost;
-                                mine.level++;
-                                showMessage(`تم ترقية منجم الذهب ${mine.id} إلى المستوى ${mine.level}!`);
-                            } else {
-                                showMessage(`تحتاج ${cost} قطعة نادرة لترقية المنجم!`);
+                        goldMineCollectButton.onclick = async () => {
+                            playClickSound();
+                            if (mine.collectedCoins > 0) {
+                                playerStats.coins += mine.collectedCoins;
+                                showMessage(`تم جمع ${mine.collectedCoins} أموال من المنجم ${mine.id}!`);
+                                mine.collectedCoins = 0;
+                                mine.lastCollectionTime = Date.now(); // Reset timer after collection
                             }
-                        }
-                        updateProfileUI();
-                        renderVillage(); // Re-render to update mine status
-                    };
+                            updateProfileUI();
+                            renderVillageContent(villageGrid, playerStats.houses, playerStats.goldMines); // Re-render current player's village
+                        };
+
+                        goldMineUpgradeButton.onclick = async () => {
+                            playClickSound();
+                            if (mine.level < GOLD_MINE_MAX_LEVEL) {
+                                const cost = getGoldMineStats(mine.level).upgradeCost;
+                                if (playerStats.rareItems >= cost) {
+                                    playerStats.rareItems -= cost;
+                                    mine.level++;
+                                    showMessage(`تم ترقية منجم الذهب ${mine.id} إلى المستوى ${mine.level}!`);
+                                } else {
+                                    showMessage(`تحتاج ${cost} قطعة نادرة لترقية المنجم!`);
+                                }
+                            }
+                            updateProfileUI();
+                            renderVillageContent(villageGrid, playerStats.houses, playerStats.goldMines); // Re-render current player's village
+                        };
+                    }
                 });
             }
+
+            // Collect Points Button Logic
+            function updateCollectPointsButton() {
+                const now = Date.now();
+                const timeLeft = playerStats.lastCollectPointsTime + COLLECT_POINTS_COOLDOWN - now;
+
+                if (timeLeft <= 0) {
+                    collectPointsButton.disabled = false;
+                    collectPointsCooldownOverlay.style.opacity = 0;
+                    collectPointsCooldownOverlay.style.visibility = 'hidden';
+                } else {
+                    collectPointsButton.disabled = true;
+                    collectPointsCooldownOverlay.textContent = formatTime(timeLeft);
+                    collectPointsCooldownOverlay.style.opacity = 1;
+                    collectPointsCooldownOverlay.style.visibility = 'visible';
+                }
+            }
+
+            collectPointsButton.onclick = () => {
+                if (collectPointsButton.disabled) return;
+
+                playClickSound();
+                const points = Math.floor(Math.random() * 20) + 1; // 1 to 20 coins
+                playerStats.coins += points;
+                playerStats.lastCollectPointsTime = Date.now();
+                showMessage(`حصلت على ${points} أموال!`);
+                updateProfileUI();
+                updateCollectPointsButton(); // Update cooldown immediately
+            };
 
             // Central game loop for time-based updates
             function startGameLoops() {
@@ -2104,43 +2115,32 @@
                     if (!isAuthReady) return; // Only run game loop after authentication
 
                     const now = Date.now();
-                    const clicksPerSecond = AUTO_CLICK_RATE_PER_HOUR / 3600; // Clicks per second
-
-                    playerStats.houses.forEach(house => {
-                        if (house.autoClickEnabled && !house.cooldownUntil > now && house.level !== HOUSE_MAX_LEVEL) {
-                            const clicksNeededForNextLevel = HOUSE_CLICKS_NEEDED[house.level + 1];
-                            if (house.clicks < clicksNeededForNextLevel) {
-                                house.clicks += clicksPerSecond; // Add fractional clicks
-                                if (house.clicks >= clicksNeededForNextLevel) {
-                                    house.clicks = clicksNeededForNextLevel; // Cap at required clicks
-                                    house.autoClickEnabled = false; // Stop auto-click when ready for upgrade
-                                    house.autoClickEndTime = 0;
-                                    showMessage(`المنزل ${house.id} جاهز للترقية! تم إيقاف النقر التلقائي.`);
-                                }
-                                // Update quest progress for "clickHouses"
-                                const clickHousesQuest = playerStats.dailyQuestProgress.quests.find(q => q.type === 'clickHouses');
-                                if (clickHousesQuest && !clickHousesQuest.completed) {
-                                    clickHousesQuest.current += clicksPerSecond; // Add fractional progress
-                                    if (clickHousesQuest.current >= clickHousesQuest.target) {
-                                        clickHousesQuest.completed = true;
-                                        clickHousesQuest.current = clickHousesQuest.target; // Cap progress
-                                    }
-                                }
-                            }
-                        }
-                        // Check if auto-click duration has ended
-                        if (house.autoClickEnabled && house.autoClickEndTime > 0 && now >= house.autoClickEndTime) {
-                            house.autoClickEnabled = false;
-                            house.autoClickEndTime = 0;
-                            showMessage(`انتهت مدة النقر التلقائي للمنزل ${house.id}.`);
+                    // Gold Mine passive collection
+                    playerStats.goldMines.forEach(mine => {
+                        if (mine.unlocked) {
+                            const mineStats = getGoldMineStats(mine.level);
+                            const timeSinceLastCollection = now - mine.lastCollectionTime;
+                            let generatedCoins = Math.floor(mineStats.rate * (timeSinceLastCollection / 1000));
+                            generatedCoins = Math.min(generatedCoins, mineStats.capacity);
+                            mine.collectedCoins = generatedCoins;
                         }
                     });
 
-                    // Update UI and save data to localStorage (Realtime Database sync is separate)
+                    // Max level house passive rewards
+                    playerStats.houses.forEach(house => {
+                        if (house.level === HOUSE_MAX_LEVEL && now - house.lastMaxLevelRewardTime >= HOUSE_MAX_LEVEL_REWARD_INTERVAL) {
+                            playerStats.coins += 50;
+                            playerStats.rareItems += 1;
+                            house.lastMaxLevelRewardTime = now;
+                            showMessage(`المنزل ${house.id} (الحد الأقصى) منحك 50 أموال و 1 قطعة نادرة!`);
+                        }
+                    });
+
                     updateProfileUI();
                     updateStoreUI();
-                    renderVillage(); // Re-render houses and gold mine to update timers/progress
+                    renderVillageContent(villageGrid, playerStats.houses, playerStats.goldMines); // Re-render current player's village
                     updateQuestsUI(); // Update quests timer and progress
+                    updateCollectPointsButton(); // Update collect points button cooldown
                 }, 1000);
 
                 // Realtime Database sync loop (every 2 seconds)
@@ -2428,7 +2428,6 @@
                             const coinsGain = cumulativeCoins - prevCoins;
                             const rareItemsGain = cumulativeRareItems - prevRareItems;
 
-                            const clicksNeeded = HOUSE_CLICKS_NEEDED[level]; // Clicks needed to reach this level
                             const levelImage = getHouseImage(level);
 
                             levelSummaryItem.innerHTML = `
@@ -2438,7 +2437,6 @@
                                     <span>القوة المكتسبة: <span class="detail">${powerGain}</span></span>
                                     <span>الأموال المكتسبة: <span class="detail">${coinsGain}</span></span>
                                     <span>القطع النادرة المكتسبة: <span class="detail">${rareItemsGain}</span></span>
-                                    <span>النقرات المطلوبة: <span class="detail">${level < HOUSE_MAX_LEVEL ? clicksNeeded : 'الحد الأقصى'}</span></span>
                                 </div>
                             `;
                             summaryContent.appendChild(levelSummaryItem);
@@ -2516,10 +2514,10 @@
 
                     playerStats.dailyQuestProgress.quests = [
                         { id: 1, type: 'buyFreeCoins', text: 'اشترِ المال المجاني من المتجر', target: 1, current: 0, completed: false, claimed: false, rewards: { coins: 50 + Math.floor(Math.random() * 50), rareItems: 1 + Math.floor(Math.random() * 1) } },
-                        { id: 2, type: 'clickHouses', text: 'انقر 800 نقرة', target: 800, current: 0, completed: false, claimed: false, rewards: { coins: 100 + Math.floor(Math.random() * 100), rareItems: 2 + Math.floor(Math.random() * 2) } },
-                        { id: 3, type: 'upgradeLevels', text: 'ارفع 3 مستويات لليوم', target: 3, current: 0, completed: false, claimed: false, rewards: { coins: 150 + Math.floor(Math.random() * 150), rareItems: 3 + Math.floor(Math.random() * 2) } },
-                        { id: 4, type: 'upgradeAnyHouseLevel', text: 'ارفع مستوى أحد البيوت', target: 1, current: 0, completed: false, claimed: false, rewards: { coins: 200 + Math.floor(Math.random() * 200), rareItems: 4 + Math.floor(Math.random() * 2) } }
+                        { id: 2, type: 'upgradeLevels', text: 'ارفع 3 مستويات لليوم', target: 3, current: 0, completed: false, claimed: false, rewards: { coins: 150 + Math.floor(Math.random() * 150), rareItems: 3 + Math.floor(Math.random() * 2) } },
+                        { id: 3, type: 'upgradeAnyHouseLevel', text: 'ارفع مستوى أحد البيوت', target: 1, current: 0, completed: false, claimed: false, rewards: { coins: 200 + Math.floor(Math.random() * 200), rareItems: 4 + Math.floor(Math.random() * 2) } }
                     ];
+                    // Removed 'clickHouses' quest as clicking houses is no longer a mechanic.
                     // Also reset free coins availability for the new day
                     playerStats.lastFreeCoinsResetDay = ''; // Clear to indicate it's available for new day
                 }
@@ -2548,12 +2546,6 @@
                     if (quest.type === 'upgradeLevels') {
                         currentProgressValue = playerStats.dailyLevelsUpgradedToday;
                         if (currentProgressValue >= quest.target && !quest.completed) {
-                            quest.completed = true;
-                        }
-                    } else if (quest.type === 'clickHouses') {
-                        // Ensure current is floored for display, but actual can be float
-                        currentProgressValue = Math.floor(quest.current);
-                        if (quest.current >= quest.target && !quest.completed) {
                             quest.completed = true;
                         }
                     } else if (quest.type === 'upgradeAnyHouseLevel') {
@@ -2620,6 +2612,39 @@
                 };
             }
 
+            // Function to handle viewing other player's village
+            async function viewOtherPlayerVillage(targetUserId, targetPlayerName, targetPlayerPower) {
+                otherPlayerNameDisplay.textContent = targetPlayerName;
+                otherPlayerPowerValue.textContent = formatNumber(targetPlayerPower);
+                otherPlayerVillageContent.innerHTML = '<p class="text-center text-gray-400">جاري تحميل قرية اللاعب...</p>';
+                otherPlayerVillageModal.classList.add('show');
+
+                try {
+                    const playerHousesRef = ref(rtdb, `artifacts/${appId}/users/${targetUserId}/houses`);
+                    const playerMinesRef = ref(rtdb, `artifacts/${appId}/users/${targetUserId}/goldMines`);
+
+                    const [housesSnapshot, minesSnapshot] = await Promise.all([
+                        get(playerHousesRef),
+                        get(playerMinesRef)
+                    ]);
+
+                    const otherHouses = housesSnapshot.exists() ? (Array.isArray(housesSnapshot.val()) ? housesSnapshot.val() : Object.values(housesSnapshot.val())) : [];
+                    const otherMines = minesSnapshot.exists() ? (Array.isArray(minesSnapshot.val()) ? minesSnapshot.val() : Object.values(minesSnapshot.val())) : [];
+
+                    renderVillageContent(otherPlayerVillageContent, otherHouses, otherMines, true); // True for read-only
+                } catch (error) {
+                    console.error("Error loading other player's village:", error);
+                    otherPlayerVillageContent.innerHTML = '<p class="text-center text-red-400">تعذر تحميل قرية اللاعب.</p>';
+                }
+            }
+
+            // Event listener for closing other player village modal
+            closeOtherPlayerVillageModalButton.onclick = () => {
+                playClickSound();
+                otherPlayerVillageModal.classList.remove('show');
+            };
+
+
             // Function to attach all event listeners after Firebase is ready
             function attachEventListeners() {
                 menuItems.forEach(item => {
@@ -2652,7 +2677,7 @@
                 attachVillageSummaryListeners();
                 attachSettingsListeners();
                 attachDailyQuestsListeners();
-                // House and Gold Mine buttons are attached during renderVillage()
+                // House and Gold Mine buttons are attached during renderVillageContent()
                 // which is called by game loop, so they will be re-attached.
             }
 
@@ -2661,66 +2686,57 @@
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     userId = user.uid;
-                    playerStats.playerID = userId; // Set playerID to Firebase UID
+                    // playerStats.playerID = userId; // Removed playerID display
 
                     let isNewUser = false;
 
-                    // Listen to player data changes from Realtime Database
-                    onValue(ref(rtdb, `artifacts/${appId}/users/${userId}/playerData`), (snapshot) => {
+                    // Listen to all player data changes under their userId
+                    onValue(ref(rtdb, `artifacts/${appId}/users/${userId}`), (snapshot) => {
                         if (snapshot.exists()) {
                             const data = snapshot.val();
                             // Merge Realtime Database data into playerStats, prioritizing RTDB
-                            Object.assign(playerStats, data);
+                            // Ensure arrays are correctly converted if RTDB stores them as objects
+                            playerStats = {
+                                ...playerStats,
+                                ...data,
+                                houses: Array.isArray(data.houses) ? data.houses : Object.values(data.houses || {}),
+                                goldMines: Array.isArray(data.goldMines) ? data.goldMines : Object.values(data.goldMines || {}),
+                                dailyQuestProgress: {
+                                    ...playerStats.dailyQuestProgress,
+                                    ...data.dailyQuestProgress,
+                                    quests: Array.isArray(data.dailyQuestProgress?.quests) ? data.dailyQuestProgress.quests : Object.values(data.dailyQuestProgress?.quests || {})
+                                }
+                            };
+
+                            // Ensure new fields are initialized if missing from old saved data
+                            playerStats.houses.forEach(house => {
+                                if (typeof house.upgradeCost !== 'number') house.upgradeCost = 100 + (house.id - 1) * 50;
+                                if (typeof house.lastMaxLevelRewardTime !== 'number') house.lastMaxLevelRewardTime = 0;
+                                if (typeof house.unlocked === 'undefined') house.unlocked = true;
+                            });
+                            playerStats.goldMines.forEach(mine => {
+                                if (typeof mine.lastCollectionTime !== 'number') mine.lastCollectionTime = Date.now();
+                                if (typeof mine.unlocked === 'undefined') mine.unlocked = true;
+                            });
+                            if (typeof playerStats.dailyLevelsUpgradedToday === 'undefined') playerStats.dailyLevelsUpgradedToday = 0;
+                            if (typeof playerStats.lastFreeCoinsResetDay === 'undefined') playerStats.lastFreeCoinsResetDay = '';
+                            if (typeof playerStats.lastCollectPointsTime === 'undefined') playerStats.lastCollectPointsTime = 0;
+
                         } else {
                             isNewUser = true;
                             showMessage("مرحباً بك في اللعبة! سيتم حفظ تقدمك تلقائياً.");
+                            // If new user, save initial default playerStats to RTDB
+                            set(ref(rtdb, `artifacts/${appId}/users/${userId}`), playerStats);
                         }
+                        initializeQuests(); // Always run to ensure quests are up-to-date for the day
                         updateProfileUI(); // Update UI after loading player data
-                    });
-
-                    // Listen to houses data changes from Realtime Database
-                    onValue(ref(rtdb, `artifacts/${appId}/users/${userId}/houses`), (snapshot) => {
-                        if (snapshot.exists()) {
-                            const data = snapshot.val();
-                            // Realtime DB might store arrays as objects with numeric keys, convert back to array
-                            playerStats.houses = Array.isArray(data) ? data : Object.values(data || {});
-                        } else if (isNewUser) {
-                            // If new user, houses are already default from localStorage load, save them
-                            set(ref(rtdb, `artifacts/${appId}/users/${userId}/houses`), playerStats.houses);
-                        }
-                        renderVillage(); // Re-render village after loading houses
-                    });
-
-                    // Listen to gold mines data changes from Realtime Database
-                    onValue(ref(rtdb, `artifacts/${appId}/users/${userId}/goldMines`), (snapshot) => {
-                        if (snapshot.exists()) {
-                            const data = snapshot.val();
-                            playerStats.goldMines = Array.isArray(data) ? data : Object.values(data || {});
-                        } else if (isNewUser) {
-                            // If new user, goldMines are already default from localStorage load, save them
-                            set(ref(rtdb, `artifacts/${appId}/users/${userId}/goldMines`), playerStats.goldMines);
-                        }
-                        renderVillage(); // Re-render village after loading gold mines
-                    });
-
-                    // Listen to daily quests data changes from Realtime Database
-                    onValue(ref(rtdb, `artifacts/${appId}/users/${userId}/dailyQuests`), (snapshot) => {
-                        if (snapshot.exists()) {
-                            playerStats.dailyQuestProgress = snapshot.val();
-                            // Ensure quests array is correctly formatted if it came as an object
-                            if (playerStats.dailyQuestProgress && !Array.isArray(playerStats.dailyQuestProgress.quests)) {
-                                playerStats.dailyQuestProgress.quests = Object.values(playerStats.dailyQuestProgress.quests || {});
-                            }
-                        } else if (isNewUser) {
-                            // If new user, quests are already default from localStorage load, save them
-                            set(ref(rtdb, `artifacts/${appId}/users/${userId}/dailyQuests`), playerStats.dailyQuestProgress);
-                        }
-                        initializeQuests(); // Ensure quests are correct for the day
+                        renderVillageContent(villageGrid, playerStats.houses, playerStats.goldMines); // Re-render current player's village
                         updateQuestsUI(); // Update quests UI
+                        updateCollectPointsButton(); // Update collect points button state
                     });
+
 
                     // Listen to leaderboard changes (public data) from Realtime Database
-                    // Order by totalPower and limit to top 10
                     onValue(query(ref(rtdb, `artifacts/${appId}/public/data/leaderboard`), orderByChild('totalPower'), limitToLast(10)), (snapshot) => {
                         const leaderboardData = [];
                         snapshot.forEach((childSnapshot) => {
@@ -2730,30 +2746,27 @@
                         // Realtime DB's limitToLast gives results in ascending order, reverse for descending
                         leaderboardData.reverse();
 
-                        leaderboardList.innerHTML = `
-                            <div class="leaderboard-item you">
-                                <span class="player-rank">#${playerStats.rank || '...'}</span>
-                                <span class="player-name" id="leaderboardPlayerName">${playerStats.playerName || 'أنت'}</span>
-                                <span class="player-power" id="leaderboardPlayerPower">${formatNumber(playerStats.totalPower)}</span>
-                            </div>
-                        `; // Always show current player at top, then fill others
+                        leaderboardList.innerHTML = ''; // Clear previous items
                         let rank = 1;
                         leaderboardData.forEach((data) => {
-                            if (data.userId === userId) { // Skip current user, already displayed
-                                playerStats.rank = rank; // Update player's rank
-                                document.getElementById('leaderboardPlayerName').textContent = data.playerName;
-                                document.getElementById('leaderboardPlayerPower').textContent = formatNumber(data.totalPower);
-                                document.querySelector('.leaderboard-item.you .player-rank').textContent = `#${rank}`;
+                            const leaderboardItemDiv = document.createElement('div');
+                            leaderboardItemDiv.classList.add('leaderboard-item', 'rounded-xl', 'shadow-md', 'text-center', 'text-lg', 'font-semibold', 'cursor-pointer');
+                            if (data.userId === userId) {
+                                leaderboardItemDiv.classList.add('you');
                             } else {
-                                const leaderboardItemDiv = document.createElement('div');
-                                leaderboardItemDiv.classList.add('leaderboard-item');
-                                leaderboardItemDiv.innerHTML = `
-                                    <span class="player-rank">#${rank}</span>
-                                    <span class="player-name">${data.playerName}</span>
-                                    <span class="player-power">${formatNumber(data.totalPower)}</span>
-                                `;
-                                leaderboardList.appendChild(leaderboardItemDiv);
+                                // Add click listener for other players
+                                leaderboardItemDiv.onclick = () => {
+                                    playClickSound();
+                                    viewOtherPlayerVillage(data.userId, data.playerName, data.totalPower);
+                                };
                             }
+
+                            leaderboardItemDiv.innerHTML = `
+                                <span class="player-rank">#${rank}</span>
+                                <span class="player-name">${data.playerName}</span>
+                                <span class="player-power">${formatNumber(data.totalPower)} <i class="fas fa-bolt"></i></span>
+                            `;
+                            leaderboardList.appendChild(leaderboardItemDiv);
                             rank++;
                         });
                     });
@@ -2764,12 +2777,9 @@
                     attachEventListeners();
                     startGameLoops();
 
-                    // Initial UI updates (these will be updated again by onValue listeners, but good for first render)
+                    // Initial dynamic price and UI updates
                     powerIncreasePrice = generatePowerIncreasePrice();
-                    updateProfileUI();
                     updateStoreUI();
-                    renderVillage();
-                    updateQuestsUI();
 
                     if (isBackgroundMusicEnabled) {
                         backgroundMusic.play().catch(e => console.log("Music autoplay blocked:", e));
