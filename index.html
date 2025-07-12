@@ -273,7 +273,7 @@
         #toast-notification {
             position: fixed;
             top: 1rem;
-            left: 50%;
+            left: 1/2;
             transform: translateX(-50%);
             background-color: rgba(76, 175, 80, 0.9);
             color: white;
@@ -356,7 +356,7 @@
         #level-up-toast {
             position: fixed;
             top: 1rem;
-            left: 50%;
+            left: 1/2;
             transform: translateX(-50%) translateY(-100px);
             background-color: rgba(76, 175, 80, 0.9);
             color: white;
@@ -530,36 +530,6 @@
         .challenge-player-item .attack-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-        }
-        /* Loading Overlay */
-        #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            flex-direction: column;
-            gap: 1rem;
-            color: white;
-            font-size: 1.2rem;
-            text-align: center;
-        }
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #6366f1;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
         /* Attack Log Styles */
         .attack-log-entry {
@@ -1051,11 +1021,6 @@
     <div id="toast-notification" class="fixed top-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-50">
     </div>
 
-    <div id="loading-overlay" class="hidden">
-        <div class="spinner"></div>
-        <p>جاري التحميل...</p>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
@@ -1081,7 +1046,6 @@
         let userId = 'anonymous';
         let isFirebaseLoaded = false;
         let totalPlayerPower = 0;
-        let loadingTimeout = null; // Variable to hold the loading timeout
 
         const mainMenu = document.getElementById('main-menu-view');
         const attackLogView = document.getElementById('attack-log-view');
@@ -1128,7 +1092,7 @@
         const messageModal = document.getElementById('message-modal');
         const messageModalTitle = document.getElementById('message-modal-title');
         const messageModalText = document.getElementById('message-modal-text');
-        const messageModalCloseButton = document.getElementById('message-modal-close-button');
+        const messageModalCloseButton = document = document.getElementById('message-modal-close-button');
 
         const storeItemReduceTime = document.getElementById('store-item-reduce-time');
         const storeItemConvertPoints = document.getElementById('store-item-convert-points');
@@ -1179,7 +1143,6 @@
         const storePlayerDollarsDisplay = document.getElementById('store-player-dollars-display');
 
         const toastNotification = document.getElementById('toast-notification');
-        const loadingOverlay = document.getElementById('loading-overlay');
 
         const chatMessagesDiv = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
@@ -1318,31 +1281,6 @@
         };
         let lastDailyResetDate = null;
         let lastChatClearDate = null;
-
-        function showLoading() {
-            if (loadingOverlay) {
-                loadingOverlay.classList.remove('hidden');
-                // Set a timeout to hide the loading overlay after 10 seconds as a fallback
-                loadingTimeout = setTimeout(() => {
-                    if (!loadingOverlay.classList.contains('hidden')) {
-                        console.warn("Loading overlay timed out. Forcing hide.");
-                        hideLoading();
-                        showMessageModal('تحذير', 'استغرقت عملية التحميل وقتًا طويلاً. قد تكون هناك مشكلة في الاتصال أو البيانات.');
-                    }
-                }, 10000); // 10 seconds
-            }
-        }
-
-        function hideLoading() {
-            if (loadingOverlay) {
-                loadingOverlay.classList.add('hidden');
-                // Clear the timeout if hideLoading is called successfully
-                if (loadingTimeout) {
-                    clearTimeout(loadingTimeout);
-                    loadingTimeout = null;
-                }
-            }
-        }
 
         function formatPower(num) {
             if (num >= 10000) {
@@ -2373,14 +2311,12 @@
                     showMessageModal('خطأ', 'البيانات غير جاهزة للحذف.');
                     return;
                 }
-                showLoading();
                 try {
                     await remove(ref(db, `artifacts/${appId}/public/playerProfiles/${userId}`));
                     await remove(ref(db, `artifacts/${appId}/public/onlineUsers/${userId}`));
                     await remove(ref(db, `artifacts/${appId}/users/${userId}`));
                     
                     localStorage.clear();
-                    hideLoading();
                     closeModal(deleteConfirmModal);
                     if (resetCountdownModal && countdownDisplay) {
                         resetCountdownModal.classList.remove('hidden');
@@ -2403,7 +2339,6 @@
                         }, 1000);
                     }
                 } catch (error) {
-                    hideLoading();
                     console.error("Error deleting user data from Firebase:", error);
                     showMessageModal('خطأ في الحذف', 'فشل حذف بيانات الحساب. يرجى المحاولة مرة أخرى.');
                 }
@@ -2610,7 +2545,6 @@
 
             if (hasLocalStorageData) {
                 showMessageModal('نقل البيانات', 'جاري نقل بياناتك القديمة إلى السحابة. قد يستغرق هذا بضع لحظات.');
-                showLoading();
                 try {
                     playerXP = parseInt(localStorage.getItem('playerXP') || '0');
                     playerLevel = parseInt(localStorage.getItem('playerLevel') || '0');
@@ -2629,6 +2563,7 @@
                         savedInnovationTypes.forEach(savedType => {
                             const existingType = innovationTypes.find(type => type.id === savedType.id);
                             if (existingType) {
+                                // For migration, if old data used cooldownTimeLeft, convert it to cooldownEndTime
                                 if (savedType.cooldownTimeLeft !== undefined) {
                                     existingType.cooldownEndTime = Date.now() + (savedType.cooldownTimeLeft * 1000);
                                 } else {
@@ -2667,10 +2602,8 @@
                     await saveAttackLog();
 
                     localStorage.clear();
-                    hideLoading();
                     showMessageModal('نقل البيانات', 'تم نقل بياناتك بنجاح إلى السحابة!');
                 } catch (error) {
-                    hideLoading();
                     console.error("Error migrating data:", error);
                     showMessageModal('خطأ في النقل', 'فشل نقل البيانات. يرجى تحديث الصفحة والمحاولة مرة أخرى.');
                 }
@@ -2849,19 +2782,16 @@
         }
 
         async function handleAttackClick(event) {
-            showLoading();
             const targetId = event.target.dataset.targetId;
             const targetName = event.target.dataset.targetName;
             const targetPower = parseInt(event.target.dataset.targetPower, 10);
 
             if (!targetId || !targetName || isNaN(targetPower)) {
-                hideLoading();
                 showMessageModal('خطأ', 'بيانات اللاعب المستهدف غير صالحة.');
                 return;
             }
 
             if (getAttackCooldownRemaining(targetId) > 0) {
-                hideLoading();
                 showMessageModal('مؤقت التهدئة', `لا يمكنك الهجوم على ${targetName} الآن. يرجى الانتظار.`);
                 return;
             }
@@ -2947,7 +2877,6 @@
             saveAttackCooldowns();
             updatePlayerInfoDisplay();
             renderChallengePlayers();
-            hideLoading();
         }
 
         function renderAttackLog() {
@@ -2999,37 +2928,33 @@
         }
 
 
-        let authReadyPromise;
-
         document.addEventListener('DOMContentLoaded', async () => {
-            showLoading();
-
-            authReadyPromise = (async () => {
-                try {
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                } catch (error) {
-                    console.error("Initial authentication failed:", error);
-                    // Ensure loading is hidden even if initial auth fails
-                    hideLoading();
-                    if (initialAuthToken && error.code === 'auth/custom-token-mismatch') {
-                        try {
-                            await signInAnonymously(auth);
-                        } catch (anonError) {
-                            console.error("Anonymous sign-in fallback also failed:", anonError);
-                            showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.');
-                            return null;
+            let authAttemptPromise;
+            if (initialAuthToken) {
+                authAttemptPromise = signInWithCustomToken(auth, initialAuthToken)
+                    .catch(async (error) => {
+                        console.error("Initial custom token authentication failed:", error);
+                        if (error.code === 'auth/custom-token-mismatch') {
+                            console.log("Attempting anonymous sign-in as fallback...");
+                            return signInAnonymously(auth).catch((anonError) => {
+                                console.error("Anonymous sign-in fallback also failed:", anonError);
+                                showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.');
+                                return null; // Return null if anonymous sign-in also fails
+                            });
+                        } else {
+                            showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول. يرجى تحديث الصفحة.');
+                            return null; // Return null for other authentication errors
                         }
-                    } else {
-                        showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول. يرجى تحديث الصفحة.');
-                        return null;
-                    }
-                }
-                return auth.currentUser;
-            })();
+                    });
+            } else {
+                authAttemptPromise = signInAnonymously(auth).catch((error) => {
+                    console.error("Anonymous sign-in failed:", error);
+                    showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.');
+                    return null;
+                });
+            }
+
+            await authAttemptPromise;
 
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
@@ -3038,8 +2963,7 @@
                     console.log("Firebase Auth State Changed: User is signed in with UID:", userId);
 
                     try {
-                        await migrateLocalStorageToFirebase();
-
+                        // Load data from Firebase immediately
                         await loadPlayerData();
                         await loadHouses();
                         await loadInnovationTypes();
@@ -3078,19 +3002,20 @@
                                 }, 10);
                             }
                         }
+                        
+                        // Migrate local storage data to Firebase after a 1-second delay
+                        setTimeout(async () => {
+                            await migrateLocalStorageToFirebase();
+                        }, 1000);
+
                     } catch (e) {
                         console.error("Error during data loading/setup:", e);
                         showMessageModal('خطأ في التحميل', 'حدث خطأ أثناء تحميل بياناتك. يرجى تحديث الصفحة.');
-                    } finally {
-                        hideLoading(); // Ensure hideLoading is called after all operations or on error
                     }
                 } else {
                     console.log("Firebase Auth State Changed: No user signed in.");
-                    hideLoading();
                 }
             });
-
-            await authReadyPromise;
         });
     </script>
 </body>
