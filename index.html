@@ -428,24 +428,6 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
-        .royal-name {
-            background: linear-gradient(90deg, #FFD700, #FFEA00, #FFD700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: royalGlow 3s infinite alternate, royalSlide 5s infinite linear;
-            display: inline-block;
-            font-weight: bold;
-            text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
-        }
-        @keyframes royalGlow {
-            0% { text-shadow: 0 0 8px rgba(255, 215, 0, 0.7); }
-            50% { text-shadow: 0 0 15px rgba(255, 234, 0, 0.9); }
-            100% { text-shadow: 0 0 8px rgba(255, 215, 0, 0.7); }
-        }
-        @keyframes royalSlide {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
-        }
         /* Chat specific styles */
         #chat-messages {
             flex-grow: 1;
@@ -549,6 +531,97 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+        /* Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 1rem;
+            color: white;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #6366f1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Attack Log Styles */
+        .attack-log-entry {
+            background-color: #2d3748;
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: right;
+        }
+        .attack-log-entry.win {
+            border-right: 4px solid #4CAF50; /* Green for win */
+        }
+        .attack-log-entry.loss {
+            border-right: 4px solid #ef4444; /* Red for loss */
+        }
+        .attack-log-entry .log-header {
+            font-weight: bold;
+            color: #6366f1;
+            margin-bottom: 0.5rem;
+        }
+        .attack-log-entry .log-details {
+            font-size: 0.9rem;
+            color: #a0aec0;
+        }
+        .attack-log-entry .log-timestamp {
+            font-size: 0.75rem;
+            color: #a0aec0;
+            margin-top: 0.5rem;
+            text-align: left;
+        }
+        #attack-log-view .view-content {
+            padding-bottom: 1rem; /* Ensure space for scrollbar */
+        }
+        /* Store item grid adjustment */
+        #store-view .view-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Adjust for tighter fit */
+            gap: 1rem; /* Reduced gap */
+            justify-items: center;
+            align-items: stretch;
+        }
+        #store-view .store-item {
+            height: auto; /* Allow height to adjust to content */
+            min-height: 150px; /* Ensure a minimum height */
+            padding: 0.75rem; /* Reduced padding */
+        }
+        #store-view .store-item img {
+            height: 4rem; /* Smaller image size */
+            width: 4rem;
+            margin-bottom: 0.5rem; /* Reduced margin */
+        }
+        #store-view .store-item .text-lg {
+            font-size: 0.95rem; /* Slightly smaller font */
+        }
+        #store-view .store-item .text-sm {
+            font-size: 0.8rem; /* Slightly smaller font */
+        }
+        #store-view .buy-button {
+            padding: 0.4rem 0.8rem; /* Smaller button padding */
+            font-size: 0.85rem; /* Smaller button font */
+        }
     </style>
 </head>
 <body oncontextmenu="return false;" ondragstart="return false;">
@@ -612,12 +685,11 @@
                     </svg>
                     <span class="text-lg font-semibold">العب</span>
                 </div>
-                <div id="settings-menu-item" class="menu-item bg-gradient-to-br from-orange-600 to-red-700 text-white p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg cursor-pointer">
+                <div id="attack-log-menu-item" class="menu-item bg-gradient-to-br from-orange-600 to-red-700 text-white p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.262 2.572-1.065z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                     </svg>
-                    <span class="text-lg font-semibold">إعدادات</span>
+                    <span class="text-lg font-semibold">سجل التحدي</span>
                 </div>
                 <div id="store-menu-item" class="menu-item bg-gradient-to-br from-blue-600 to-cyan-700 text-white p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -641,28 +713,30 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v3.06M16 17H8" />
                         </svg>
                     </div>
-                    <span class="lock-text absolute hidden text-xs">يتطلب المستوى 10</span>
+                    <span class="lock-text absolute hidden text-xs">يتطلب المستوى 5</span>
                 </div>
             </div>
         </div>
 
-        <div id="settings-view" class="view transform translate-x-full">
-            <div id="back-to-main-from-settings" class="absolute top-4 left-4 text-gray-400 hover:text-gray-200 cursor-pointer">
+        <div id="attack-log-view" class="view transform translate-x-full">
+            <div id="back-to-main-from-attack-log" class="absolute top-4 left-4 text-gray-400 hover:text-gray-200 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
             </div>
-            <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">الإعدادات</h1>
+            <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">سجل التحدي</h1>
 
             <div class="view-content">
                 <div class="bg-gray-700 p-6 rounded-xl mb-6 shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-100 mb-4">صوت الموسيقى</h2>
-                    <div class="flex items-center justify-between">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.12 2-2.5 2S4 20.105 4 19V6c0-1.105 1.12-2 2.5-2S9 4.895 9 6v13zm12-3c0 1.105-1.12 2-2.5 2s-2.5-.895-2.5-2V3c0-1.105 1.12-2 2.5-2s2.5.895 2.5 2v13z" />
-                        </svg>
-                        <input type="range" id="music-volume-slider" min="0" max="100" value="75" class="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer">
-                        <span id="music-volume-value" class="text-gray-200 ml-4 w-12 text-right">75%</span>
+                    <h2 class="text-xl font-semibold text-gray-100 mb-4">هجماتك</h2>
+                    <div id="outgoing-attacks-list" class="flex flex-col gap-3">
+                        <p class="text-gray-400 text-center">لا توجد هجمات صادرة.</p>
+                    </div>
+                </div>
+                <div class="bg-gray-700 p-6 rounded-xl mb-6 shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-100 mb-4">الذين هاجموك</h2>
+                    <div id="incoming-attacks-list" class="flex flex-col gap-3">
+                        <p class="text-gray-400 text-center">لا توجد هجمات واردة.</p>
                     </div>
                 </div>
                 <button id="delete-account-button" class="bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-8 w-full">
@@ -752,7 +826,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-6 view-content">
+            <div class="grid grid-cols-2 gap-4 view-content"> <!-- Changed gap to gap-4 -->
                 <div id="store-item-reduce-time" class="store-item">
                     <img src="https://f.top4top.io/p_3479ijdcl0.png" alt="Reduce Time" class="h-16 w-16 mb-2 object-contain">
                     <span class="text-lg font-semibold text-white">تقليل وقت الابتكار</span>
@@ -780,23 +854,13 @@
                     <span class="text-lg font-semibold text-white">شراء ابتكار ثالث</span>
                     <span class="text-sm text-gray-300 mt-1">يفتح ابتكارًا جديدًا</span>
                     <button class="buy-button mt-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
                         </svg>
                         <span>3000</span>
                     </button>
                 </div>
-                <div id="store-item-royal-name" class="store-item">
-                    <img src="https://placehold.co/100x100/FFD700/000000?text=👑" alt="Royal Name" class="h-16 w-16 mb-2 object-contain">
-                    <span class="text-lg font-semibold text-white">اسم ملكي</span>
-                    <span class="text-sm text-gray-300 mt-1">يجعل اسمك ذهبي متحرك</span>
-                    <button class="buy-button mt-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
-                        </svg>
-                        <span>2000</span>
-                    </button>
-                </div>
+                <!-- Royal Name item removed -->
             </div>
         </div>
 
@@ -944,7 +1008,7 @@
     <div id="updates-modal" class="modal-overlay hidden">
         <div class="bg-gray-700 p-8 rounded-xl shadow-2xl text-center max-w-sm w-full transform scale-95 opacity-0 transition-all duration-300 ease-out">
             <h3 class="text-2xl font-bold text-gray-100 mb-4">إضافات التحديث</h3>
-            <p class="text-gray-200 text-lg mb-6">لا يوجد تحديث حالياً.</p>
+            <p class="text-gray-200 text-lg mb-6">تم اضافة سجل الهجوم رقم التحديث ١.٢</p>
             <button id="updates-close-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                 حسناً
             </button>
@@ -991,10 +1055,15 @@
     <div id="toast-notification" class="fixed top-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-50">
     </div>
 
+    <div id="loading-overlay" class="hidden">
+        <div class="spinner"></div>
+        <p>جاري التحميل...</p>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, onValue, remove, push, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+        import { getDatabase, ref, set, get, onValue, remove, push, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAgmDkMKcfMG3r_16t_6rcjZQJOUFVpVOo",
@@ -1015,17 +1084,17 @@
 
         let userId = 'anonymous';
         let isFirebaseLoaded = false;
-        let totalPlayerPower = 0; // Added for challenge feature
+        let totalPlayerPower = 0;
 
         const mainMenu = document.getElementById('main-menu-view');
-        const settingsView = document.getElementById('settings-view');
+        const attackLogView = document.getElementById('attack-log-view');
         const gameView = document.getElementById('game-view');
         const storeView = document.getElementById('store-view');
         const challengeView = document.getElementById('challenge-view');
         const chatView = document.getElementById('chat-view');
         const onlineView = document.getElementById('online-view');
 
-        const settingsMenuItem = document.getElementById('settings-menu-item');
+        const attackLogMenuItem = document.getElementById('attack-log-menu-item');
         const playMenuItem = document.getElementById('play-menu-item');
         const storeMenuItem = document.getElementById('store-menu-item');
         const challengeMenuItem = document.getElementById('challenge-menu-item');
@@ -1067,7 +1136,6 @@
         const storeItemReduceTime = document.getElementById('store-item-reduce-time');
         const storeItemConvertPoints = document.getElementById('store-item-convert-points');
         const storeItemBuyInnovation3 = document.getElementById('store-item-buy-innovation3');
-        const storeItemRoyalName = document.getElementById('store-item-royal-name');
 
         const storeDetailModal = document.getElementById('store-detail-modal');
         const storeDetailImage = document.getElementById('store-detail-image');
@@ -1114,17 +1182,18 @@
         const storePlayerDollarsDisplay = document.getElementById('store-player-dollars-display');
 
         const toastNotification = document.getElementById('toast-notification');
+        const loadingOverlay = document.getElementById('loading-overlay');
 
-        // Chat elements
         const chatMessagesDiv = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
         const chatSendButton = document.getElementById('chat-send-button');
 
-        // Online users elements
         const onlineUsersList = document.getElementById('online-users-list');
 
-        // Challenge players elements
         const challengePlayersList = document.getElementById('challenge-players-list');
+        const outgoingAttacksList = document.getElementById('outgoing-attacks-list');
+        const incomingAttacksList = document.getElementById('incoming-attacks-list');
+
 
         let houses = [
             { id: 1, power: 1, unlocked: true, threshold: 5000, rewardedThresholds: [] },
@@ -1137,7 +1206,7 @@
         let activeHouseIndex = 0;
         let globalCooldownUpdater = null;
         let dailyResetTimerInterval = null;
-        let onlineStatusUpdater = null; // for online users feature
+        let onlineStatusUpdater = null;
 
         let playerXP = 0;
         let playerLevel = 0;
@@ -1148,8 +1217,9 @@
         };
         let playerName = "تعيين اسم";
         let isNameSetPermanently = false;
-        let isRoyalNameActive = false;
-        let attackCooldowns = {}; // Stores cooldowns for attacking other players { targetUserId: timestamp }
+        // isRoyalNameActive removed
+        let attackCooldowns = {};
+        let attackLog = { outgoing: {}, incoming: {} };
 
         const baseXpThreshold = 100;
         let xpForCurrentLevel = 0;
@@ -1174,8 +1244,8 @@
         ];
 
         const innovationTypes = [
-            { id: 'innovation1', name: 'ابتكار 1', cooldownTimeLeft: 0, initialCooldown: 5 * 60, colorClass: 'from-purple-600 to-indigo-700' },
-            { id: 'innovation2', name: 'ابتكار 2', cooldownTimeLeft: 0, initialCooldown: 10 * 60, colorClass: 'from-orange-600 to-amber-700' }
+            { id: 'innovation1', name: 'ابتكار 1', cooldownEndTime: 0, initialCooldown: 5 * 60, colorClass: 'from-purple-600 to-indigo-700' },
+            { id: 'innovation2', name: 'ابتكار 2', cooldownEndTime: 0, initialCooldown: 10 * 60, colorClass: 'from-orange-600 to-amber-700' }
         ];
         let currentInnovationTypeIndex = 0;
 
@@ -1190,10 +1260,10 @@
                     const timeReductionPerItem = 120;
                     const totalTimeReduction = timeReductionPerItem * quantity;
                     const currentInnovation = innovationTypes[currentInnovationTypeIndex];
-                    if (currentInnovation && currentInnovation.cooldownTimeLeft > 0) {
-                        currentInnovation.cooldownTimeLeft = Math.max(0, currentInnovation.cooldownTimeLeft - totalTimeReduction);
+                    if (currentInnovation && currentInnovation.cooldownEndTime > Date.now()) {
+                        currentInnovation.cooldownEndTime = Math.max(Date.now(), currentInnovation.cooldownEndTime - (totalTimeReduction * 1000));
                         updateInnovationTimerDisplay();
-                        showMessageModal('تم الاستخدام', `تم تقليل وقت الابتكار بمقدار ${quantity * 2} دقائق. الوقت المتبقي: ${formatTime(currentInnovation.cooldownTimeLeft)}`);
+                        showMessageModal('تم الاستخدام', `تم تقليل وقت الابتكار بمقدار ${quantity * 2} دقائق. الوقت المتبقي: ${formatTime(Math.max(0, Math.floor((currentInnovation.cooldownEndTime - Date.now()) / 1000)))}`);
                     } else {
                         showMessageModal('لا يوجد مؤقت', 'لا يوجد ابتكار قيد الانتظار حالياً.');
                     }
@@ -1228,7 +1298,7 @@
                     const innovationId = 'innovation3';
                     const innovationExists = innovationTypes.some(inv => inv.id === innovationId);
                     if (!innovationExists) {
-                        innovationTypes.push({ id: innovationId, name: 'ابتكار 3', cooldownTimeLeft: 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700' });
+                        innovationTypes.push({ id: innovationId, name: 'ابتكار 3', cooldownEndTime: 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700' });
                         saveInnovationTypes();
                         updateInnovationButtonText();
                         showMessageModal('تم الشراء', 'تم فتح الابتكار الثالث بنجاح!');
@@ -1237,21 +1307,6 @@
                     }
                     const xpGain = (Math.floor(Math.random() * (500 - 300 + 1)) + 300) * quantity;
                     updatePlayerXP(xpGain);
-                },
-                directUse: true
-            },
-            'royalName': {
-                name: 'اسم ملكي',
-                description: 'يجعل اسمك ذهبي متحرك وكأنه ملكي.',
-                cost: 2000,
-                costType: 'dollars',
-                image: 'https://placehold.co/100x100/FFD700/000000?text=👑',
-                levelRequirement: 20,
-                useEffect: () => {
-                    isRoyalNameActive = true;
-                    savePlayerData();
-                    applyRoyalNameEffect();
-                    showMessageModal('تهانينا!', 'أصبح اسمك ملكياً الآن!');
                 },
                 directUse: true
             }
@@ -1266,6 +1321,15 @@
             oneTime: []
         };
         let lastDailyResetDate = null;
+        let lastChatClearDate = null;
+
+        function showLoading() {
+            if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            if (loadingOverlay) loadingOverlay.classList.add('hidden');
+        }
 
         function formatPower(num) {
             if (num >= 10000) {
@@ -1361,7 +1425,7 @@
         }
 
         function updatePlayerInfoDisplay() {
-            calculateTotalPower(); // Update total player power before displaying
+            calculateTotalPower();
             if (document.getElementById('player-xp-display')) document.getElementById('player-xp-display').textContent = formatPower(playerXP);
             if (document.getElementById('player-level-display')) document.getElementById('player-level-display').textContent = playerLevel;
             if (document.getElementById('player-points-display')) document.getElementById('player-points-display').textContent = formatPower(playerPoints);
@@ -1377,13 +1441,10 @@
             if (storePlayerPointsDisplay) storePlayerPointsDisplay.textContent = formatPower(playerPoints);
             if (storePlayerDollarsDisplay) storePlayerDollarsDisplay.textContent = `$${formatPower(playerDollars)}`;
 
-            if (isRoyalNameActive) {
-                applyRoyalNameEffect();
-            } else {
-                if (playerNameDisplay) playerNameDisplay.classList.remove('royal-name');
-            }
+            // Royal name logic removed
+            if (playerNameDisplay) playerNameDisplay.classList.remove('royal-name');
 
-            // Update public player profile
+
             if (isFirebaseLoaded && userId && playerName !== "تعيين اسم") {
                 set(ref(db, `artifacts/${appId}/public/playerProfiles/${userId}`), {
                     name: playerName,
@@ -1434,6 +1495,9 @@
             }
             if (targetViewId === 'challenge-view') {
                 renderChallengePlayers();
+            }
+            if (targetViewId === 'attack-log-view') {
+                renderAttackLog();
             }
         }
 
@@ -1497,15 +1561,15 @@
             }, 10);
         }
 
-        if (settingsMenuItem) settingsMenuItem.addEventListener('click', () => navigateTo('settings-view', 'right'));
+        if (attackLogMenuItem) attackLogMenuItem.addEventListener('click', () => navigateTo('attack-log-view', 'right'));
         if (playMenuItem) playMenuItem.addEventListener('click', () => navigateTo('game-view', 'right'));
         if (storeMenuItem) storeMenuItem.addEventListener('click', () => navigateTo('store-view', 'right'));
         if (challengeMenuItem) {
             challengeMenuItem.addEventListener('click', () => {
-                if (playerLevel >= 10) {
+                if (playerLevel >= 5) {
                     navigateTo('challenge-view', 'right');
                 } else {
-                    showMessageModal('مقفول!', `يتطلب الوصول إلى المستوى 10 لفتح تحدي اللاعبون. مستواك الحالي: ${playerLevel}`);
+                    showMessageModal('مقفول!', `يتطلب الوصول إلى المستوى 5 لفتح تحدي اللاعبون. مستواك الحالي: ${playerLevel}`);
                 }
             });
         }
@@ -1513,7 +1577,7 @@
         if (onlineMenuItem) onlineMenuItem.addEventListener('click', () => navigateTo('online-view', 'right'));
 
         document.addEventListener('click', (event) => {
-            if (event.target.closest('#back-to-main-from-settings')) {
+            if (event.target.closest('#back-to-main-from-attack-log')) {
                 navigateTo('main-menu-view', 'left');
             } else if (event.target.closest('#back-to-main-from-game')) {
                 navigateTo('main-menu-view', 'left');
@@ -1553,7 +1617,8 @@
             innovationButton.className = `text-white font-bold flex items-center mx-2 bg-gradient-to-br ${currentType.colorClass}`;
             innovationButtonText.innerHTML = `<span>تفعيل ${currentType.name}</span><span class="price-display"><span>مجاني</span></span>`;
             
-            if (currentType.cooldownTimeLeft > 0) {
+            const cooldownRemaining = Math.max(0, Math.floor((currentType.cooldownEndTime - Date.now()) / 1000));
+            if (cooldownRemaining > 0) {
                 innovationButton.disabled = true;
                 innovationButton.classList.add('opacity-50', 'cursor-not-allowed');
             } else {
@@ -1566,9 +1631,11 @@
             if (!innovationTimer || !timerDisplayValue) return;
 
             const currentInnovation = innovationTypes[currentInnovationTypeIndex];
-            if (currentInnovation && currentInnovation.cooldownTimeLeft > 0) {
+            const cooldownRemaining = Math.max(0, Math.floor((currentInnovation.cooldownEndTime - Date.now()) / 1000));
+
+            if (cooldownRemaining > 0) {
                 innovationTimer.classList.remove('hidden');
-                timerDisplayValue.textContent = formatTime(currentInnovation.cooldownTimeLeft);
+                timerDisplayValue.textContent = formatTime(cooldownRemaining);
                 timerDisplayValue.classList.add('timer-digit-animation');
             } else {
                 innovationTimer.classList.add('hidden');
@@ -1582,9 +1649,10 @@
                 if (!houses[activeHouseIndex].unlocked) return;
 
                 const currentInnovation = innovationTypes[currentInnovationTypeIndex];
+                const cooldownRemaining = Math.max(0, Math.floor((currentInnovation.cooldownEndTime - Date.now()) / 1000));
 
-                if (currentInnovation && currentInnovation.cooldownTimeLeft > 0) {
-                    showMessageModal('الابتكار قيد الانتظار', `هذا الابتكار لا يزال في فترة التهدئة. الوقت المتبقي: ${formatTime(currentInnovation.cooldownTimeLeft)}`);
+                if (cooldownRemaining > 0) {
+                    showMessageModal('الابتكار قيد الانتظار', `هذا الابتكار لا يزال في فترة التهدئة. الوقت المتبقي: ${formatTime(cooldownRemaining)}`);
                     return;
                 }
 
@@ -1594,6 +1662,10 @@
                 const powerIncrease = Math.floor(Math.random() * (300 - 25 + 1)) + 25;
                 currentHouse.power += powerIncrease;
                 
+                // Add points reward for innovation
+                const pointsRewardForInnovation = Math.floor(Math.random() * (100 - 20 + 1)) + 20;
+                playerPoints += pointsRewardForInnovation;
+
                 houseUpgradeRewards.forEach(reward => {
                     if (currentHouse.power >= reward.power && oldPower < reward.power && !currentHouse.rewardedThresholds.includes(reward.power)) {
                         playerPoints += reward.points;
@@ -1630,12 +1702,13 @@
                 }
 
                 if (currentInnovation) {
-                    currentInnovation.cooldownTimeLeft = currentInnovation.initialCooldown;
+                    currentInnovation.cooldownEndTime = Date.now() + (currentInnovation.initialCooldown * 1000);
                     updateInnovationTimerDisplay();
                     startGlobalCooldownUpdater();
                 }
 
                 trackTaskProgress('innovate', 1);
+                updatePlayerInfoDisplay(); // Ensure points are updated on display
             });
         }
 
@@ -1704,10 +1777,6 @@
             showStoreItemDetail('buyInnovation3');
         });
 
-        if (storeItemRoyalName) storeItemRoyalName.addEventListener('click', () => {
-            showStoreItemDetail('royalName');
-        });
-
         let currentStoreItem = null;
         let currentStoreQuantity = 1;
 
@@ -1732,8 +1801,9 @@
                 if (currentStoreItem === 'reduceTime') {
                     const currentInnovation = innovationTypes[currentInnovationTypeIndex];
                     const timeReductionPerItem = 120;
-                    if (currentInnovation && currentInnovation.cooldownTimeLeft > 0) {
-                        const maxItemsToReduceToZero = Math.ceil(currentInnovation.cooldownTimeLeft / timeReductionPerItem);
+                    const cooldownRemaining = Math.max(0, Math.floor((currentInnovation.cooldownEndTime - Date.now()) / 1000));
+                    if (currentInnovation && cooldownRemaining > 0) {
+                        const maxItemsToReduceToZero = Math.ceil(cooldownRemaining / timeReductionPerItem);
                         maxQuantity = Math.min(maxQuantity, maxItemsToReduceToZero);
                     } else {
                         maxQuantity = 0;
@@ -1766,8 +1836,9 @@
                     if (currentStoreItem === 'reduceTime') {
                         const currentInnovation = innovationTypes[currentInnovationTypeIndex];
                         const timeReductionPerItem = 120;
-                        if (currentInnovation && currentInnovation.cooldownTimeLeft > 0) {
-                            const maxItemsToReduceToZero = Math.ceil(currentInnovation.cooldownTimeLeft / timeReductionPerItem);
+                        const cooldownRemaining = Math.max(0, Math.floor((currentInnovation.cooldownEndTime - Date.now()) / 1000));
+                        if (currentInnovation && cooldownRemaining > 0) {
+                            const maxItemsToReduceToZero = Math.ceil(cooldownRemaining / timeReductionPerItem);
                             maxQuantity = Math.min(maxQuantity, maxItemsToReduceToZero);
                         } else {
                             maxQuantity = 0;
@@ -2026,7 +2097,7 @@
             const localTime = now.getTime();
             const localOffset = now.getTimezoneOffset() * 60000;
             const utc = localTime + localOffset;
-            const saudiOffset = 3 * 60 * 60 * 1000;
+            const saudiOffset = 3 * 60 * 60 * 1000; // GMT+3
             return new Date(utc + saudiOffset);
         }
 
@@ -2045,7 +2116,8 @@
                     dailyTasksTimerDisplay.textContent = formatTime(remainingSeconds);
                 }
                 if (remainingSeconds <= 0) {
-                    loadTasks();
+                    resetDailyTasks();
+                    clearChatHistory();
                     updateTimer();
                 }
             }
@@ -2053,6 +2125,41 @@
             dailyResetTimerInterval = setInterval(updateTimer, 1000);
             updateTimer();
         }
+
+        function resetDailyTasks() {
+            tasks.daily.forEach(task => {
+                task.currentCount = 0;
+                task.completed = false;
+                task.claimed = false;
+            });
+            lastDailyResetDate = getSaudiTime().toDateString();
+            saveTasks();
+            showToast('تم تحديث المهام اليومية!', 'info');
+        }
+
+        function clearChatHistory() {
+            if (!isFirebaseLoaded) return;
+            const chatClearRef = ref(db, `artifacts/${appId}/public/chatManagement/lastChatClearDate`);
+            onValue(chatClearRef, (snapshot) => {
+                const storedLastClearDate = snapshot.val();
+                const now = getSaudiTime();
+                const todaySaudiDate = now.toDateString();
+
+                if (storedLastClearDate !== todaySaudiDate) {
+                    const chatRef = ref(db, `artifacts/${appId}/public/chat`);
+                    remove(chatRef)
+                        .then(() => {
+                            set(chatClearRef, todaySaudiDate);
+                            console.log("Chat history cleared for the new day.");
+                            showToast('تم مسح سجل الدردشة!', 'info');
+                        })
+                        .catch(error => {
+                            console.error("Error clearing chat history:", error);
+                        });
+                }
+            }, { onlyOnce: true });
+        }
+
 
         function loadTasks() {
             if (!isFirebaseLoaded) return;
@@ -2064,28 +2171,7 @@
                     tasks.oneTime = data.oneTime || [];
                     lastDailyResetDate = data.lastDailyResetDate || null;
                 } else {
-                    tasks.daily = [
-                        { id: 'innovate', name: 'فعل الابتكار', description: 'فعل الابتكار 3 مرات', targetCount: 3, currentCount: 0, completed: false, claimed: false, rewardPoints: 200, rewardDollars: 100 },
-                        { id: 'buy_store', name: 'اشتري من المتجر', description: 'اشتري 3 مرات من المتجر', targetCount: 3, currentCount: 0, completed: false, claimed: false, rewardPoints: 300, rewardDollars: 150 },
-                        { id: 'level_up', name: 'ارتفع مستوى', description: 'ارتفع 3 مستويات XP', targetCount: 3, currentCount: 0, completed: false, claimed: false, rewardPoints: 100, rewardDollars: 200 }
-                    ];
-                    tasks.oneTime = [];
-                    lastDailyResetDate = null;
-                    saveTasks();
-                }
-
-                const now = getSaudiTime();
-                const todaySaudiDate = now.toDateString();
-
-                if (lastDailyResetDate !== todaySaudiDate) {
-                    tasks.daily.forEach(task => {
-                        task.currentCount = 0;
-                        task.completed = false;
-                        task.claimed = false;
-                    });
-                    lastDailyResetDate = todaySaudiDate;
-                    saveTasks();
-                    showToast('تم تحديث المهام اليومية!', 'info');
+                    resetDailyTasks();
                 }
                 renderTasks();
             }, { onlyOnce: true });
@@ -2278,14 +2364,14 @@
                     showMessageModal('خطأ', 'البيانات غير جاهزة للحذف.');
                     return;
                 }
+                showLoading();
                 try {
-                    // Remove player's public profile and online status
                     await remove(ref(db, `artifacts/${appId}/public/playerProfiles/${userId}`));
                     await remove(ref(db, `artifacts/${appId}/public/onlineUsers/${userId}`));
-                    // Remove player's private data
                     await remove(ref(db, `artifacts/${appId}/users/${userId}`));
                     
                     localStorage.clear();
+                    hideLoading();
                     closeModal(deleteConfirmModal);
                     if (resetCountdownModal && countdownDisplay) {
                         resetCountdownModal.classList.remove('hidden');
@@ -2308,6 +2394,7 @@
                         }, 1000);
                     }
                 } catch (error) {
+                    hideLoading();
                     console.error("Error deleting user data from Firebase:", error);
                     showMessageModal('خطأ في الحذف', 'فشل حذف بيانات الحساب. يرجى المحاولة مرة أخرى.');
                 }
@@ -2329,10 +2416,10 @@
                     data.forEach(savedType => {
                         const existingType = innovationTypes.find(type => type.id === savedType.id);
                         if (existingType) {
-                            existingType.cooldownTimeLeft = savedType.cooldownTimeLeft;
+                            existingType.cooldownEndTime = savedType.cooldownEndTime || 0; // Load end time
                         } else {
                             if (savedType.id === 'innovation3') {
-                                innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownTimeLeft: savedType.cooldownTimeLeft, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700' });
+                                innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: savedType.cooldownEndTime || 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700' });
                             }
                         }
                     });
@@ -2341,6 +2428,11 @@
                 }
                 updateInnovationButtonText();
                 updateInnovationTimerDisplay();
+                // Start cooldown updater if any innovation is on cooldown after loading
+                let anyActiveCooldown = innovationTypes.some(type => type.cooldownEndTime > Date.now());
+                if (anyActiveCooldown && !globalCooldownUpdater) {
+                    startGlobalCooldownUpdater();
+                }
             }, { onlyOnce: true });
         }
 
@@ -2348,7 +2440,7 @@
             if (!isFirebaseLoaded) return;
             set(ref(db, `artifacts/${appId}/users/${userId}/innovationTypes`), innovationTypes.map(type => ({
                 id: type.id,
-                cooldownTimeLeft: type.cooldownTimeLeft
+                cooldownEndTime: type.cooldownEndTime // Save end time
             })));
         }
 
@@ -2358,9 +2450,11 @@
             globalCooldownUpdater = setInterval(() => {
                 let anyInnovationOnCooldown = false;
                 innovationTypes.forEach(type => {
-                    if (type.cooldownTimeLeft > 0) {
-                        type.cooldownTimeLeft--;
+                    const cooldownRemaining = Math.max(0, Math.floor((type.cooldownEndTime - Date.now()) / 1000));
+                    if (cooldownRemaining > 0) {
                         anyInnovationOnCooldown = true;
+                    } else {
+                        type.cooldownEndTime = 0; // Ensure it's reset if time has passed
                     }
                 });
                 updateInnovationTimerDisplay(); 
@@ -2378,7 +2472,7 @@
             const lockIcon = challengeMenuItem.querySelector('.lock-icon');
             const lockText = challengeMenuItem.querySelector('.lock-text');
             if (lockIcon && lockText) {
-                if (playerLevel < 10) {
+                if (playerLevel < 5) {
                     challengeMenuItem.classList.add('locked-menu-item');
                     lockIcon.classList.remove('hidden');
                     lockText.classList.remove('hidden');
@@ -2387,12 +2481,6 @@
                     lockIcon.classList.add('hidden');
                     lockText.classList.add('hidden');
                 }
-            }
-        }
-
-        function applyRoyalNameEffect() {
-            if (playerNameDisplay) {
-                playerNameDisplay.classList.add('royal-name');
             }
         }
 
@@ -2408,7 +2496,7 @@
                 playerDollars = data.playerDollars || 0;
                 playerName = data.playerName || "تعيين اسم";
                 isNameSetPermanently = data.isNameSetPermanently || false;
-                isRoyalNameActive = data.isRoyalNameActive || false;
+                // isRoyalNameActive removed
                 xpForCurrentLevel = data.xpForCurrentLevel || 0;
                 xpThresholdForNextLevel = data.xpThresholdForNextLevel || baseXpThreshold;
             } else {
@@ -2426,7 +2514,7 @@
                 playerDollars: playerDollars,
                 playerName: playerName,
                 isNameSetPermanently: isNameSetPermanently,
-                isRoyalNameActive: isRoyalNameActive,
+                // isRoyalNameActive removed
                 xpForCurrentLevel: xpForCurrentLevel,
                 xpThresholdForNextLevel: xpThresholdForNextLevel
             });
@@ -2475,7 +2563,7 @@
             const cooldownsRef = ref(db, `artifacts/${appId}/users/${userId}/attackCooldowns`);
             onValue(cooldownsRef, (snapshot) => {
                 attackCooldowns = snapshot.val() || {};
-                renderChallengePlayers(); // Re-render to update button states
+                renderChallengePlayers();
             });
         }
 
@@ -2484,10 +2572,24 @@
             set(ref(db, `artifacts/${appId}/users/${userId}/attackCooldowns`), attackCooldowns);
         }
 
+        async function loadAttackLog() {
+            if (!isFirebaseLoaded) return;
+            const attackLogRef = ref(db, `artifacts/${appId}/users/${userId}/attackLog`);
+            onValue(attackLogRef, (snapshot) => {
+                attackLog = snapshot.val() || { outgoing: {}, incoming: {} };
+                renderAttackLog();
+            });
+        }
+
+        function saveAttackLog() {
+            if (!isFirebaseLoaded) return;
+            set(ref(db, `artifacts/${appId}/users/${userId}/attackLog`), attackLog);
+        }
+
         async function migrateLocalStorageToFirebase() {
             const localStorageKeys = [
                 'playerXP', 'playerLevel', 'playerPoints', 'playerDollars',
-                'playerInventory', 'playerName', 'isNameSetPermanently', 'isRoyalNameActive',
+                'playerInventory', 'playerName', 'isNameSetPermanently',
                 'xpForCurrentLevel', 'xpThresholdForNextLevel',
                 'houses', 'innovationTypes', 'tasks', 'lastDailyResetDate'
             ];
@@ -2502,7 +2604,7 @@
 
             if (hasLocalStorageData) {
                 showMessageModal('نقل البيانات', 'جاري نقل بياناتك القديمة إلى السحابة. قد يستغرق هذا بضع لحظات.');
-                
+                showLoading();
                 try {
                     playerXP = parseInt(localStorage.getItem('playerXP') || '0');
                     playerLevel = parseInt(localStorage.getItem('playerLevel') || '0');
@@ -2510,7 +2612,6 @@
                     playerDollars = parseInt(localStorage.getItem('playerDollars') || '0');
                     playerName = localStorage.getItem('playerName') || "تعيين اسم";
                     isNameSetPermanently = localStorage.getItem('isNameSetPermanently') === 'true';
-                    isRoyalNameActive = localStorage.getItem('isRoyalNameActive') === 'true';
                     xpForCurrentLevel = parseInt(localStorage.getItem('xpForCurrentLevel') || '0');
                     xpThresholdForNextLevel = parseInt(localStorage.getItem('xpThresholdForNextLevel') || `${baseXpThreshold}`);
 
@@ -2522,10 +2623,21 @@
                         savedInnovationTypes.forEach(savedType => {
                             const existingType = innovationTypes.find(type => type.id === savedType.id);
                             if (existingType) {
-                                existingType.cooldownTimeLeft = savedType.cooldownTimeLeft;
+                                // For migration, if old data used cooldownTimeLeft, convert it to cooldownEndTime
+                                if (savedType.cooldownTimeLeft !== undefined) {
+                                    existingType.cooldownEndTime = Date.now() + (savedType.cooldownTimeLeft * 1000);
+                                } else {
+                                    existingType.cooldownEndTime = savedType.cooldownEndTime || 0;
+                                }
                             } else {
                                 if (savedType.id === 'innovation3') {
-                                    innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownTimeLeft: savedType.cooldownTimeLeft, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700' });
+                                    innovationTypes.push({
+                                        id: 'innovation3',
+                                        name: 'ابتكار 3',
+                                        cooldownEndTime: (savedType.cooldownTimeLeft !== undefined) ? (Date.now() + (savedType.cooldownTimeLeft * 1000)) : (savedType.cooldownEndTime || 0),
+                                        initialCooldown: 7 * 60,
+                                        colorClass: 'from-green-600 to-emerald-700'
+                                    });
                                 }
                             }
                         });
@@ -2546,11 +2658,14 @@
                     await saveInnovationTypes();
                     await savePlayerInventory();
                     await saveTasks();
-                    await saveAttackCooldowns(); // Save empty cooldowns if not present
+                    await saveAttackCooldowns();
+                    await saveAttackLog();
 
                     localStorage.clear();
+                    hideLoading();
                     showMessageModal('نقل البيانات', 'تم نقل بياناتك بنجاح إلى السحابة!');
                 } catch (error) {
+                    hideLoading();
                     console.error("Error migrating data:", error);
                     showMessageModal('خطأ في النقل', 'فشل نقل البيانات. يرجى تحديث الصفحة والمحاولة مرة أخرى.');
                 }
@@ -2562,7 +2677,6 @@
             updatePlayerXP(xpGain);
         }, 3 * 1000);
 
-        // Chat functionality
         if (chatSendButton) {
             chatSendButton.addEventListener('click', sendMessage);
         }
@@ -2608,7 +2722,6 @@
                     messages.push(message);
                 });
 
-                // Sort messages by timestamp to ensure correct order
                 messages.sort((a, b) => a.timestamp - b.timestamp);
 
                 messages.forEach(message => {
@@ -2620,14 +2733,12 @@
                         <p class="text-gray-100">${message.message}</p>
                         <span class="chat-timestamp">${date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</span>
                     `;
-                    chatMessagesDiv.prepend(messageElement); // Add to top for reverse-column display
+                    chatMessagesDiv.prepend(messageElement);
                 });
-                // Scroll to bottom if new message is added by self or if near bottom
                 chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
             });
         }
 
-        // Online Users functionality
         function updateOnlineStatus() {
             if (!isFirebaseLoaded || !userId || playerName === "تعيين اسم") return;
 
@@ -2653,7 +2764,7 @@
                 snapshot.forEach(childSnapshot => {
                     const user = childSnapshot.val();
                     const userUid = childSnapshot.key;
-                    if (userUid !== userId && user.lastOnline && (now - user.lastOnline < 60 * 1000)) { // Consider online if active in last minute
+                    if (userUid !== userId && user.lastOnline && (now - user.lastOnline < 60 * 1000)) {
                         users.push({ uid: userUid, ...user });
                     }
                 });
@@ -2678,7 +2789,6 @@
             });
         }
 
-        // Challenge functionality
         function renderChallengePlayers() {
             if (!isFirebaseLoaded || !challengePlayersList) return;
 
@@ -2689,7 +2799,7 @@
                 snapshot.forEach(childSnapshot => {
                     const player = childSnapshot.val();
                     const playerUid = childSnapshot.key;
-                    if (playerUid !== userId) { // Don't list self
+                    if (playerUid !== userId) {
                         players.push({ uid: playerUid, ...player });
                     }
                 });
@@ -2728,76 +2838,167 @@
         function getAttackCooldownRemaining(targetId) {
             const lastAttackTime = attackCooldowns[targetId];
             if (!lastAttackTime) return 0;
-            const cooldownDuration = 30 * 60; // 30 minutes in seconds
+            const cooldownDuration = 30 * 60;
             const elapsed = (Date.now() - lastAttackTime) / 1000;
             return Math.max(0, Math.floor(cooldownDuration - elapsed));
         }
 
         async function handleAttackClick(event) {
+            showLoading();
             const targetId = event.target.dataset.targetId;
             const targetName = event.target.dataset.targetName;
             const targetPower = parseInt(event.target.dataset.targetPower, 10);
 
             if (!targetId || !targetName || isNaN(targetPower)) {
+                hideLoading();
                 showMessageModal('خطأ', 'بيانات اللاعب المستهدف غير صالحة.');
                 return;
             }
 
             if (getAttackCooldownRemaining(targetId) > 0) {
+                hideLoading();
                 showMessageModal('مؤقت التهدئة', `لا يمكنك الهجوم على ${targetName} الآن. يرجى الانتظار.`);
                 return;
             }
 
-            // Calculate win chance
-            let winChance = 0.25; // Default 25% if weaker
+            let winChance = 0.25;
             if (totalPlayerPower > targetPower) {
-                winChance = 0.75; // 75% if stronger
+                winChance = 0.75;
             }
 
             const didWin = Math.random() < winChance;
             const pointsStolen = 50;
             const dollarsStolen = 50;
 
+            let outcomeMessage = '';
+            let attackerPointsChange = 0;
+            let attackerDollarsChange = 0;
+            let defenderPointsChange = 0;
+            let defenderDollarsChange = 0;
+
             if (didWin) {
-                playerPoints += pointsStolen;
-                playerDollars += dollarsStolen;
+                attackerPointsChange = pointsStolen;
+                attackerDollarsChange = dollarsStolen;
+                outcomeMessage = 'فوز!';
                 showMessageModal('فوز!', `لقد هاجمت ${targetName} بنجاح وسرقت ${pointsStolen} نقطة و ${dollarsStolen}$!`);
             } else {
-                playerPoints -= pointsStolen; // Lose points/dollars if fail
-                playerDollars -= dollarsStolen;
-                playerPoints = Math.max(0, playerPoints); // Ensure no negative points
-                playerDollars = Math.max(0, playerDollars); // Ensure no negative dollars
+                attackerPointsChange = -pointsStolen;
+                attackerDollarsChange = -dollarsStolen;
+                outcomeMessage = 'خسارة!';
                 showMessageModal('خسارة!', `فشلت في الهجوم على ${targetName} وخسرت ${pointsStolen} نقطة و ${dollarsStolen}$.`);
             }
 
-            // Update opponent's data (reduce their points/dollars)
-            if (didWin) {
-                const targetPlayerRef = ref(db, `artifacts/${appId}/users/${targetId}/playerData`);
-                get(targetPlayerRef).then(snapshot => {
-                    if (snapshot.exists()) {
-                        const targetData = snapshot.val();
-                        const newTargetPoints = Math.max(0, (targetData.playerPoints || 0) - pointsStolen);
-                        const newTargetDollars = Math.max(0, (targetData.playerDollars || 0) - dollarsStolen);
-                        set(targetPlayerRef, {
-                            ...targetData,
-                            playerPoints: newTargetPoints,
-                            playerDollars: newTargetDollars
-                        });
+            playerPoints += attackerPointsChange;
+            playerDollars += attackerDollarsChange;
+            playerPoints = Math.max(0, playerPoints);
+            playerDollars = Math.max(0, playerDollars);
+
+            push(ref(db, `artifacts/${appId}/users/${userId}/attackLog/outgoing`), {
+                targetId: targetId,
+                targetName: targetName,
+                timestamp: serverTimestamp(),
+                outcome: didWin ? 'win' : 'loss',
+                pointsChange: attackerPointsChange,
+                dollarsChange: attackerDollarsChange
+            }).catch(error => console.error("Error saving outgoing attack log:", error));
+
+            const targetPlayerRef = ref(db, `artifacts/${appId}/users/${targetId}/playerData`);
+            const targetAttackLogRef = ref(db, `artifacts/${appId}/users/${targetId}/attackLog/incoming`);
+
+            await get(targetPlayerRef).then(snapshot => {
+                if (snapshot.exists()) {
+                    const targetData = snapshot.val();
+                    if (didWin) {
+                        defenderPointsChange = -pointsStolen;
+                        defenderDollarsChange = -dollarsStolen;
+                    } else {
+                        defenderPointsChange = 0;
+                        defenderDollarsChange = 0;
                     }
-                }).catch(error => {
-                    console.error("Error updating target player data:", error);
-                });
-            }
+
+                    const newTargetPoints = Math.max(0, (targetData.playerPoints || 0) + defenderPointsChange);
+                    const newTargetDollars = Math.max(0, (targetData.playerDollars || 0) + defenderDollarsChange);
+                    set(targetPlayerRef, {
+                        ...targetData,
+                        playerPoints: newTargetPoints,
+                        playerDollars: newTargetDollars
+                    });
+
+                    push(targetAttackLogRef, {
+                        attackerId: userId,
+                        attackerName: playerName,
+                        timestamp: serverTimestamp(),
+                        outcome: didWin ? 'loss' : 'win',
+                        pointsChange: defenderPointsChange,
+                        dollarsChange: defenderDollarsChange
+                    }).catch(error => console.error("Error saving incoming attack log:", error));
+
+                }
+            }).catch(error => {
+                console.error("Error updating target player data:", error);
+            });
 
             attackCooldowns[targetId] = Date.now();
             saveAttackCooldowns();
-            updatePlayerInfoDisplay(); // Update player's own stats
-            renderChallengePlayers(); // Re-render challenge list to update cooldowns
+            updatePlayerInfoDisplay();
+            renderChallengePlayers();
+            hideLoading();
         }
+
+        function renderAttackLog() {
+            if (!outgoingAttacksList || !incomingAttacksList) return;
+
+            outgoingAttacksList.innerHTML = '';
+            incomingAttacksList.innerHTML = '';
+
+            const outgoingAttacks = Object.values(attackLog.outgoing || {}).sort((a, b) => b.timestamp - a.timestamp);
+            const incomingAttacks = Object.values(attackLog.incoming || {}).sort((a, b) => b.timestamp - a.timestamp);
+
+            if (outgoingAttacks.length === 0) {
+                outgoingAttacksList.innerHTML = '<p class="text-gray-400 text-center">لا توجد هجمات صادرة.</p>';
+            } else {
+                outgoingAttacks.forEach(attack => {
+                    const attackElement = document.createElement('div');
+                    attackElement.className = `attack-log-entry text-white ${attack.outcome === 'win' ? 'win' : 'loss'}`;
+                    const date = attack.timestamp ? new Date(attack.timestamp) : new Date();
+                    attackElement.innerHTML = `
+                        <div class="log-header">${attack.outcome === 'win' ? 'فوز!' : 'خسارة!'} ضد ${attack.targetName}</div>
+                        <div class="log-details">
+                            <p>النقاط: ${attack.pointsChange > 0 ? '+' : ''}${formatPower(attack.pointsChange)}</p>
+                            <p>الدولارات: ${attack.dollarsChange > 0 ? '+' : ''}${formatPower(attack.dollarsChange)}$</p>
+                        </div>
+                        <div class="log-timestamp">${date.toLocaleDateString('ar-SA')} ${date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</div>
+                    `;
+                    outgoingAttacksList.appendChild(attackElement);
+                });
+            }
+
+            if (incomingAttacks.length === 0) {
+                incomingAttacksList.innerHTML = '<p class="text-gray-400 text-center">لا توجد هجمات واردة.</p>';
+            } else {
+                incomingAttacks.forEach(attack => {
+                    const attackElement = document.createElement('div');
+                    attackElement.className = `attack-log-entry text-white ${attack.outcome === 'win' ? 'win' : 'loss'}`;
+                    const date = attack.timestamp ? new Date(attack.timestamp) : new Date();
+                    attackElement.innerHTML = `
+                        <div class="log-header">${attack.outcome === 'win' ? 'دفاع ناجح!' : 'هجوم فاشل!'} من ${attack.attackerName}</div>
+                        <div class="log-details">
+                            <p>النقاط: ${attack.pointsChange > 0 ? '+' : ''}${formatPower(attack.pointsChange)}</p>
+                            <p>الدولارات: ${attack.dollarsChange > 0 ? '+' : ''}${formatPower(attack.dollarsChange)}$</p>
+                        </div>
+                        <div class="log-timestamp">${date.toLocaleDateString('ar-SA')} ${date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</div>
+                    `;
+                    incomingAttacksList.appendChild(attackElement);
+                });
+            }
+        }
+
 
         let authReadyPromise;
 
         document.addEventListener('DOMContentLoaded', async () => {
+            showLoading();
+
             authReadyPromise = (async () => {
                 try {
                     if (initialAuthToken) {
@@ -2831,37 +3032,33 @@
 
                     await migrateLocalStorageToFirebase();
 
-                    // Load all data from Firebase
                     await loadPlayerData();
                     await loadHouses();
                     await loadInnovationTypes();
                     await loadPlayerInventory();
                     await loadTasks();
                     await loadAttackCooldowns();
+                    await loadAttackLog();
 
-                    // Start real-time listeners after initial data load
                     listenForChatMessages();
                     listenForOnlineUsers();
                     startDailyResetTimer();
+                    clearChatHistory();
 
-                    // Set up online status update interval
                     if (onlineStatusUpdater) clearInterval(onlineStatusUpdater);
-                    onlineStatusUpdater = setInterval(updateOnlineStatus, 30 * 1000); // Update every 30 seconds
-                    updateOnlineStatus(); // Initial update
+                    onlineStatusUpdater = setInterval(updateOnlineStatus, 30 * 1000);
+                    updateOnlineStatus();
 
-                    // Remove online status when user disconnects
                     const onlineRef = ref(db, `artifacts/${appId}/public/onlineUsers/${userId}`);
                     onDisconnect(onlineRef).remove().catch(error => {
                         console.error("Could not establish onDisconnect for online status:", error);
                     });
 
-                    // Start global cooldown updater if needed
-                    let anySavedCooldown = innovationTypes.some(type => type.cooldownTimeLeft > 0);
-                    if (anySavedCooldown && !globalCooldownUpdater) {
+                    let anyActiveCooldown = innovationTypes.some(type => type.cooldownEndTime > Date.now());
+                    if (anyActiveCooldown && !globalCooldownUpdater) {
                         startGlobalCooldownUpdater();
                     }
 
-                    // Check for initial name setup after data is loaded
                     if (!isNameSetPermanently && (!playerName || playerName === "تعيين اسم")) {
                         if (setNameModal) {
                             setNameModal.classList.remove('hidden');
@@ -2873,9 +3070,10 @@
                             }, 10);
                         }
                     }
-
+                    hideLoading();
                 } else {
                     console.log("Firebase Auth State Changed: No user signed in.");
+                    hideLoading();
                 }
             });
 
