@@ -506,6 +506,9 @@
             border-radius: 50%;
             margin-left: 0.5rem;
         }
+        .online-user-item.offline .status-dot {
+            background-color: #a0aec0; /* Gray for offline */
+        }
         /* Challenge players list */
         .challenge-player-item {
             background-color: #2d3748;
@@ -592,6 +595,30 @@
             padding: 0.4rem 0.8rem; /* Smaller button padding */
             font-size: 0.85rem; /* Smaller button font */
         }
+        .global-attack-log-entry {
+            background-color: #1f2937; /* Darker background for global log */
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.4rem;
+            font-size: 0.8rem;
+            color: #e2e8f0;
+            text-align: right;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .global-attack-log-entry.win {
+            border-right: 3px solid #4CAF50;
+        }
+        .global-attack-log-entry.loss {
+            border-right: 3px solid #ef4444;
+        }
+        .global-attack-log-entry .timestamp {
+            font-size: 0.7rem;
+            color: #94a3b8;
+            margin-left: 0.5rem;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body oncontextmenu="return false;" ondragstart="return false;">
@@ -610,7 +637,7 @@
 
             <div class="bg-gray-700 p-4 rounded-xl mb-6 shadow-md text-center">
                 <h2 class="text-xl font-bold text-gray-100 mb-3" id="player-name-display">تعيين اسم</h2>
-                <div class="flex items-center justify-center gap-x-8 mb-3">
+                <div class="flex items-center justify-center gap-x-4 mb-3">
                     <div class="flex items-center text-gray-200">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
@@ -622,6 +649,12 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
                         </svg>
                         <span class="text-base" id="player-dollars-display">$0</span>
+                    </div>
+                    <div class="flex items-center text-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span class="text-base" id="player-total-power-display-main">0</span>
                     </div>
                 </div>
                 <div class="flex flex-col items-center text-gray-200 mt-3">
@@ -683,7 +716,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v3.06M16 17H8" />
                         </svg>
                     </div>
-                    <span class="lock-text absolute hidden text-xs">يتطلب المستوى 5</span>
+                    <span class="lock-text absolute hidden text-xs">يتطلب المستوى 3</span>
                 </div>
             </div>
         </div>
@@ -707,6 +740,12 @@
                     <h2 class="text-xl font-semibold text-gray-100 mb-4">الذين هاجموك</h2>
                     <div id="incoming-attacks-list" class="flex flex-col gap-3">
                         <p class="text-gray-400 text-center">لا توجد هجمات واردة.</p>
+                    </div>
+                </div>
+                <div class="bg-gray-700 p-6 rounded-xl mb-6 shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-100 mb-4">سجل الهجمات العالمية (آخر 5)</h2>
+                    <div id="global-attacks-list" class="flex flex-col gap-2">
+                        <p class="text-gray-400 text-center">لا توجد هجمات عالمية حالياً.</p>
                     </div>
                 </div>
                 <button id="delete-account-button" class="bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-8 w-full">
@@ -766,6 +805,10 @@
                 الوقت المتبقي: <span id="timer-display-value">5:00</span>
             </div>
 
+            <div id="game-total-power-display" class="text-gray-200 text-lg text-center mb-4">
+                القوة الإجمالية: <span id="player-total-power-display-game" class="font-bold text-red-400">0</span>
+            </div>
+
             <div id="next-house-info" class="text-gray-300 text-center text-base mb-6 hidden">
             </div>
 
@@ -781,7 +824,7 @@
             </div>
             <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">المتجر</h1>
 
-            <div class="flex items-center justify-center gap-x-8 mb-6 bg-gray-700 p-3 rounded-xl shadow-md">
+            <div class="flex items-center justify-center gap-x-4 mb-6 bg-gray-700 p-3 rounded-xl shadow-md">
                 <div class="flex items-center text-gray-200">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
@@ -793,6 +836,12 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
                         </svg>
                     <span class="text-base" id="store-player-dollars-display">$0</span>
+                </div>
+                <div class="flex items-center text-gray-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span class="text-base" id="store-player-total-power-display">0</span>
                 </div>
             </div>
 
@@ -840,6 +889,9 @@
                 </svg>
             </div>
             <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">تحدي اللاعبون</h1>
+            <div id="global-attack-cooldown-display" class="text-gray-300 text-lg text-center mb-6 hidden">
+                يمكنك الهجوم <span id="attacks-remaining-display" class="font-bold text-yellow-400">0</span> مرات. وقت التهدئة العالمي: <span id="global-cooldown-timer-display" class="font-bold">0:00</span>
+            </div>
             <div id="challenge-players-list" class="view-content flex flex-col gap-4">
             </div>
         </div>
@@ -869,6 +921,9 @@
             </div>
             <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">اونلاين</h1>
             <div id="online-users-list" class="view-content flex flex-col gap-4">
+            </div>
+            <div id="online-player-total-power-display" class="text-gray-200 text-lg text-center mt-4">
+                قوتك الإجمالية: <span class="font-bold text-red-400" id="player-total-power-display-online">0</span>
             </div>
         </div>
     </div>
@@ -1024,7 +1079,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, onValue, remove, push, serverTimestamp, onDisconnect } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+        import { getDatabase, ref, set, get, onValue, remove, push, serverTimestamp, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAgmDkMKcfMG3r_16t_6rcjZQJOUFVpVOo",
@@ -1092,7 +1147,7 @@
         const messageModal = document.getElementById('message-modal');
         const messageModalTitle = document.getElementById('message-modal-title');
         const messageModalText = document.getElementById('message-modal-text');
-        const messageModalCloseButton = document.getElementById('message-modal-close-button'); // Fixed: Removed `document =`
+        const messageModalCloseButton = document.getElementById('message-modal-close-button');
 
         const storeItemReduceTime = document.getElementById('store-item-reduce-time');
         const storeItemConvertPoints = document.getElementById('store-item-convert-points');
@@ -1141,6 +1196,11 @@
 
         const storePlayerPointsDisplay = document.getElementById('store-player-points-display');
         const storePlayerDollarsDisplay = document.getElementById('store-player-dollars-display');
+        const storePlayerTotalPowerDisplay = document.getElementById('store-player-total-power-display');
+
+        const playerTotalPowerDisplayMain = document.getElementById('player-total-power-display-main');
+        const playerTotalPowerDisplayGame = document.getElementById('player-total-power-display-game');
+        const playerTotalPowerDisplayOnline = document.getElementById('player-total-power-display-online');
 
         const toastNotification = document.getElementById('toast-notification');
 
@@ -1153,6 +1213,11 @@
         const challengePlayersList = document.getElementById('challenge-players-list');
         const outgoingAttacksList = document.getElementById('outgoing-attacks-list');
         const incomingAttacksList = document.getElementById('incoming-attacks-list');
+        const globalAttacksList = document.getElementById('global-attacks-list');
+
+        const globalAttackCooldownDisplay = document.getElementById('global-attack-cooldown-display');
+        const attacksRemainingDisplay = document.getElementById('attacks-remaining-display');
+        const globalCooldownTimerDisplay = document.getElementById('global-cooldown-timer-display');
 
 
         let houses = [
@@ -1167,6 +1232,7 @@
         let globalCooldownUpdater = null;
         let dailyResetTimerInterval = null;
         let onlineStatusUpdater = null;
+        let globalAttackCooldownInterval = null;
 
         let playerXP = 0;
         let playerLevel = 0;
@@ -1177,7 +1243,12 @@
         };
         let playerName = "تعيين اسم";
         let isNameSetPermanently = false;
-        let attackCooldowns = {};
+        let attackCooldowns = {}; // Cooldown per target
+        let globalAttackCooldownEndTime = 0;
+        let attacksMadeInCurrentCooldown = 0;
+        const MAX_GLOBAL_ATTACKS = 3;
+        const GLOBAL_ATTACK_COOLDOWN_DURATION = 5 * 60; // 5 minutes in seconds
+
         let attackLog = { outgoing: {}, incoming: {} };
 
         const baseXpThreshold = 100;
@@ -1185,12 +1256,12 @@
         let xpThresholdForNextLevel = baseXpThreshold;
 
         const housePowerTiers = [
-            { minPower: 1, imageUrl: "https://d.top4top.io/p_347985vd10.png" },
-            { minPower: 2500, imageUrl: "https://l.top4top.io/p_3479h0oa70.png" },
-            { minPower: 7000, imageUrl: "https://a.top4top.io/p_3479npbk21.png" },
-            { minPower: 10000, imageUrl: "https://b.top4top.io/p_3479hfhop2.png" },
-            { minPower: 15000, imageUrl: "https://b.top4top.io/p_3479hfhop2.png" },
-            { minPower: 25000, imageUrl: "https://d.top4top.io/p_34798y7o83.png" }
+            { minPower: 1, imageUrl: "https://d.top4top.io/p_347985vd10.png" }, // Image of a basic house
+            { minPower: 2500, imageUrl: "https://l.top4top.io/p_3479h0oa70.png" }, // Image of a medium house
+            { minPower: 7000, imageUrl: "https://a.top4top.io/p_3479npbk21.png" }, // Image of a large house
+            { minPower: 10000, imageUrl: "https://b.top4top.io/p_3479hfhop2.png" }, // Image of a villa
+            { minPower: 15000, imageUrl: "https://b.top4top.io/p_3479hfhop2.png" }, // Image of a mansion
+            { minPower: 25000, imageUrl: "https://d.top4top.io/p_34798y7o83.png" } // Image of a castle
         ];
 
         const houseUpgradeRewards = [
@@ -1384,6 +1455,11 @@
             if (inventoryCountDisplay) inventoryCountDisplay.textContent = playerInventory.reduceTime;
             if (playerNameDisplay) playerNameDisplay.textContent = playerName;
             
+            // Update total power displays
+            if (playerTotalPowerDisplayMain) playerTotalPowerDisplayMain.textContent = formatPower(totalPlayerPower);
+            if (playerTotalPowerDisplayGame) playerTotalPowerDisplayGame.textContent = formatPower(totalPlayerPower);
+            if (playerTotalPowerDisplayOnline) playerTotalPowerDisplayOnline.textContent = formatPower(totalPlayerPower);
+
             const progressBarWidth = (xpForCurrentLevel / xpThresholdForNextLevel) * 100;
             if (document.getElementById('xp-progress-bar')) document.getElementById('xp-progress-bar').style.width = `${progressBarWidth}%`;
             
@@ -1391,6 +1467,7 @@
 
             if (storePlayerPointsDisplay) storePlayerPointsDisplay.textContent = formatPower(playerPoints);
             if (storePlayerDollarsDisplay) storePlayerDollarsDisplay.textContent = `$${formatPower(playerDollars)}`;
+            if (storePlayerTotalPowerDisplay) storePlayerTotalPowerDisplay.textContent = formatPower(totalPlayerPower);
 
             if (isFirebaseLoaded && userId && playerName !== "تعيين اسم") {
                 set(ref(db, `artifacts/${appId}/public/playerProfiles/${userId}`), {
@@ -1438,13 +1515,17 @@
                 updatePlayerInfoDisplay();
             }
             if (targetViewId === 'online-view') {
-                updateOnlineStatus();
+                listenForOnlineUsers(); // Refresh online users when entering view
             }
             if (targetViewId === 'challenge-view') {
                 renderChallengePlayers();
+                startGlobalAttackCooldownUpdater();
+            } else {
+                clearInterval(globalAttackCooldownInterval);
             }
             if (targetViewId === 'attack-log-view') {
                 renderAttackLog();
+                listenForGlobalAttackLog();
             }
         }
 
@@ -1464,16 +1545,25 @@
             houses.forEach((house, index) => {
                 const houseElement = document.createElement('div');
                 const houseImageUrl = getHouseImage(house.power);
-                houseElement.className = `house-container ${!house.unlocked ? 'locked-house' : ''}`;
+                houseElement.className = `house-container ${!house.unlocked ? 'locked-house' : ''} cursor-pointer`;
                 if (index === activeHouseIndex) {
                     houseElement.classList.add('active-house');
                 }
+                houseElement.dataset.houseIndex = index; // Add data attribute for index
                 houseElement.innerHTML = `
                     <img src="${houseImageUrl}" alt="House">
                     <div class="text-sm font-bold mt-1">القوة: ${formatPower(house.power)}</div>
                     ${!house.unlocked ? '<div class="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center rounded-xl"><svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v3.06M16 17H8"></path></svg></div>' : ''}
                 `;
                 housesContainer.appendChild(houseElement);
+
+                if (house.unlocked) {
+                    houseElement.addEventListener('click', () => {
+                        activeHouseIndex = index;
+                        renderHouses(); // Re-render to update active class
+                        saveHouses();
+                    });
+                }
             });
 
             updateNextHouseInfo();
@@ -1503,7 +1593,7 @@
             setTimeout(() => {
                 if (messageModal.querySelector('.message-modal-content')) {
                     messageModal.querySelector('.message-modal-content').classList.remove('scale-95', 'opacity-0');
-                    messageModal.querySelector('div').classList.add('scale-100', 'opacity-100');
+                    messageModal.querySelector('.message-modal-content').classList.add('scale-100', 'opacity-100');
                 }
             }, 10);
         }
@@ -1513,10 +1603,10 @@
         if (storeMenuItem) storeMenuItem.addEventListener('click', () => navigateTo('store-view', 'right'));
         if (challengeMenuItem) {
             challengeMenuItem.addEventListener('click', () => {
-                if (playerLevel >= 5) {
+                if (playerLevel >= 3) { // Changed from 5 to 3
                     navigateTo('challenge-view', 'right');
                 } else {
-                    showMessageModal('مقفول!', `يتطلب الوصول إلى المستوى 5 لفتح تحدي اللاعبون. مستواك الحالي: ${playerLevel}`);
+                    showMessageModal('مقفول!', `يتطلب الوصول إلى المستوى 3 لفتح تحدي اللاعبون. مستواك الحالي: ${playerLevel}`);
                 }
             });
         }
@@ -1593,7 +1683,10 @@
 
         if (innovationButton) {
             innovationButton.addEventListener('click', () => {
-                if (!houses[activeHouseIndex].unlocked) return;
+                if (!houses[activeHouseIndex].unlocked) {
+                    showMessageModal('بيت مقفول', 'لا يمكنك استخدام الابتكار على بيت مقفول. يرجى اختيار بيت مفتوح.');
+                    return;
+                }
 
                 const currentInnovation = innovationTypes[currentInnovationTypeIndex];
                 const cooldownRemaining = Math.max(0, Math.floor((currentInnovation.cooldownEndTime - Date.now()) / 1000));
@@ -1609,7 +1702,6 @@
                 const powerIncrease = Math.floor(Math.random() * (300 - 25 + 1)) + 25;
                 currentHouse.power += powerIncrease;
                 
-                // Add points reward for innovation
                 const pointsRewardForInnovation = Math.floor(Math.random() * (100 - 20 + 1)) + 20;
                 playerPoints += pointsRewardForInnovation;
 
@@ -1641,12 +1733,16 @@
                     }, 10);
                 }
 
-                if (currentHouse.power >= currentHouse.threshold && activeHouseIndex < houses.length - 1) {
-                    activeHouseIndex++;
-                    houses[activeHouseIndex].unlocked = true;
-                    renderHouses();
-                    saveHouses();
+                // Auto-unlock next house if current house reaches its threshold and it's not the last house
+                if (currentHouse.id !== houses[houses.length - 1].id && currentHouse.power >= currentHouse.threshold) {
+                    const nextHouseIndex = houses.findIndex(h => h.id === currentHouse.id + 1);
+                    if (nextHouseIndex !== -1 && !houses[nextHouseIndex].unlocked) {
+                        houses[nextHouseIndex].unlocked = true;
+                        showMessageModal('بيت جديد مفتوح!', `تهانينا! لقد فتحت البيت رقم ${houses[nextHouseIndex].id}!`);
+                    }
                 }
+                renderHouses(); // Re-render to show unlocked house if applicable
+                saveHouses(); // Save updated houses state
 
                 if (currentInnovation) {
                     currentInnovation.cooldownEndTime = Date.now() + (currentInnovation.initialCooldown * 1000);
@@ -1729,20 +1825,22 @@
 
         function updateStoreDetailQuantityDisplay() {
             if (!storeDetailQuantityDisplay || !storeDetailTotalCost || !storeDetailQuantityPlus || !storeDetailQuantityMinus) {
-                console.error("DOM elements for store detail quantity/cost not found. Cannot update display.");
+                return;
+            }
+
+            const item = storeItems[currentStoreItem];
+            if (!item) {
+                storeDetailTotalCost.textContent = "N/A";
                 return;
             }
 
             storeDetailQuantityDisplay.textContent = currentStoreQuantity;
-            const item = storeItems[currentStoreItem];
-            if (item) {
-                storeDetailTotalCost.textContent = `${formatPower(item.cost * currentStoreQuantity)}${item.costType === 'dollars' ? '$' : ' نقطة'}`;
-            } else {
-                console.error("Current store item not found:", currentStoreItem);
-                storeDetailTotalCost.textContent = "N/A";
-            }
+            storeDetailTotalCost.textContent = `${formatPower(item.cost * currentStoreQuantity)}${item.costType === 'dollars' ? '$' : ' نقطة'}`;
 
-            if (item && !item.directUse) {
+            if (item.directUse) {
+                storeDetailQuantityPlus.disabled = true;
+                storeDetailQuantityMinus.disabled = true;
+            } else {
                 let maxQuantity = item.costType === 'dollars' ? Math.floor(playerDollars / item.cost) : Math.floor(playerPoints / item.cost);
 
                 if (currentStoreItem === 'reduceTime') {
@@ -1753,15 +1851,12 @@
                         const maxItemsToReduceToZero = Math.ceil(cooldownRemaining / timeReductionPerItem);
                         maxQuantity = Math.min(maxQuantity, maxItemsToReduceToZero);
                     } else {
-                        maxQuantity = 0;
+                        maxQuantity = 0; // Cannot reduce time if no cooldown
                     }
                 }
-
+                
                 storeDetailQuantityPlus.disabled = currentStoreQuantity >= maxQuantity;
                 storeDetailQuantityMinus.disabled = currentStoreQuantity <= 1;
-            } else {
-                storeDetailQuantityPlus.disabled = true;
-                storeDetailQuantityMinus.disabled = true;
             }
         }
 
@@ -1806,7 +1901,6 @@
             const item = storeItems[itemId];
 
             if (!item || !storeDetailImage || !storeDetailTitle || !storeDetailDescription || !storeDetailModal || !document.getElementById('quantity-selection')) {
-                console.error("One or more DOM elements or item data missing for store detail modal.");
                 return;
             }
 
@@ -2000,7 +2094,6 @@
             const plusButton = container.querySelector('.inventory-quantity-plus');
             
             if (!quantityDisplay || !minusButton || !plusButton) {
-                console.error("Missing elements for inventory quantity buttons update.");
                 return;
             }
 
@@ -2097,7 +2190,6 @@
                     remove(chatRef)
                         .then(() => {
                             set(chatClearRef, todaySaudiDate);
-                            console.log("Chat history cleared for the new day.");
                             showToast('تم مسح سجل الدردشة!', 'info');
                         })
                         .catch(error => {
@@ -2415,7 +2507,7 @@
             const lockIcon = challengeMenuItem.querySelector('.lock-icon');
             const lockText = challengeMenuItem.querySelector('.lock-text');
             if (lockIcon && lockText) {
-                if (playerLevel < 5) {
+                if (playerLevel < 3) { // Changed from 5 to 3
                     challengeMenuItem.classList.add('locked-menu-item');
                     lockIcon.classList.remove('hidden');
                     lockText.classList.remove('hidden');
@@ -2441,6 +2533,8 @@
                 isNameSetPermanently = data.isNameSetPermanently || false;
                 xpForCurrentLevel = data.xpForCurrentLevel || 0;
                 xpThresholdForNextLevel = data.xpThresholdForNextLevel || baseXpThreshold;
+                globalAttackCooldownEndTime = data.globalAttackCooldownEndTime || 0;
+                attacksMadeInCurrentCooldown = data.attacksMadeInCurrentCooldown || 0;
             } else {
                 savePlayerData();
             }
@@ -2457,7 +2551,9 @@
                 playerName: playerName,
                 isNameSetPermanently: isNameSetPermanently,
                 xpForCurrentLevel: xpForCurrentLevel,
-                xpThresholdForNextLevel: xpThresholdForNextLevel
+                xpThresholdForNextLevel: xpThresholdForNextLevel,
+                globalAttackCooldownEndTime: globalAttackCooldownEndTime,
+                attacksMadeInCurrentCooldown: attacksMadeInCurrentCooldown
             });
         }
 
@@ -2467,9 +2563,12 @@
             const snapshot = await get(housesRef);
             if (snapshot.exists()) {
                 houses = snapshot.val();
-                activeHouseIndex = houses.findIndex(h => h.unlocked === true && h.power < h.threshold) || 0;
-                if (activeHouseIndex === -1) {
-                    activeHouseIndex = houses.length - 1;
+                // Ensure activeHouseIndex is valid, or default to the first unlocked house
+                const firstUnlockedIndex = houses.findIndex(h => h.unlocked);
+                if (firstUnlockedIndex !== -1) {
+                    activeHouseIndex = firstUnlockedIndex;
+                } else {
+                    activeHouseIndex = 0; // Fallback to first house if none unlocked (shouldn't happen with initial data)
                 }
             } else {
                 saveHouses();
@@ -2532,7 +2631,8 @@
                 'playerXP', 'playerLevel', 'playerPoints', 'playerDollars',
                 'playerInventory', 'playerName', 'isNameSetPermanently',
                 'xpForCurrentLevel', 'xpThresholdForNextLevel',
-                'houses', 'innovationTypes', 'tasks', 'lastDailyResetDate'
+                'houses', 'innovationTypes', 'tasks', 'lastDailyResetDate',
+                'globalAttackCooldownEndTime', 'attacksMadeInCurrentCooldown'
             ];
 
             let hasLocalStorageData = false;
@@ -2554,6 +2654,8 @@
                     isNameSetPermanently = localStorage.getItem('isNameSetPermanently') === 'true';
                     xpForCurrentLevel = parseInt(localStorage.getItem('xpForCurrentLevel') || '0');
                     xpThresholdForNextLevel = parseInt(localStorage.getItem('xpThresholdForNextLevel') || `${baseXpThreshold}`);
+                    globalAttackCooldownEndTime = parseInt(localStorage.getItem('globalAttackCooldownEndTime') || '0');
+                    attacksMadeInCurrentCooldown = parseInt(localStorage.getItem('attacksMadeInCurrentCooldown') || '0');
 
                     const savedHouses = JSON.parse(localStorage.getItem('houses'));
                     if (savedHouses) houses = savedHouses;
@@ -2563,7 +2665,6 @@
                         savedInnovationTypes.forEach(savedType => {
                             const existingType = innovationTypes.find(type => type.id === savedType.id);
                             if (existingType) {
-                                // For migration, if old data used cooldownTimeLeft, convert it to cooldownEndTime
                                 if (savedType.cooldownTimeLeft !== undefined) {
                                     existingType.cooldownEndTime = Date.now() + (savedType.cooldownTimeLeft * 1000);
                                 } else {
@@ -2638,6 +2739,8 @@
             push(chatRef, {
                 senderId: userId,
                 senderName: playerName,
+                senderLevel: playerLevel,
+                senderPower: totalPlayerPower,
                 message: messageText,
                 timestamp: serverTimestamp()
             }).then(() => {
@@ -2669,6 +2772,7 @@
                     messageElement.innerHTML = `
                         <span class="chat-sender">${message.senderName}:</span>
                         <p class="text-gray-100">${message.message}</p>
+                        <p class="text-xs text-gray-400 mt-1">المستوى: ${message.senderLevel || 0} | القوة: ${formatPower(message.senderPower || 0)}</p>
                         <span class="chat-timestamp">${date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</span>
                     `;
                     chatMessagesDiv.prepend(messageElement);
@@ -2693,37 +2797,73 @@
 
         function listenForOnlineUsers() {
             if (!isFirebaseLoaded) return;
+            const playerProfilesRef = ref(db, `artifacts/${appId}/public/playerProfiles`);
             const onlineUsersRef = ref(db, `artifacts/${appId}/public/onlineUsers`);
-            onValue(onlineUsersRef, (snapshot) => {
-                if (!onlineUsersList) return;
-                onlineUsersList.innerHTML = '';
-                const users = [];
-                const now = Date.now();
-                snapshot.forEach(childSnapshot => {
-                    const user = childSnapshot.val();
-                    const userUid = childSnapshot.key;
-                    if (userUid !== userId && user.lastOnline && (now - user.lastOnline < 60 * 1000)) {
-                        users.push({ uid: userUid, ...user });
-                    }
+
+            // Fetch all player profiles first
+            get(playerProfilesRef).then(profilesSnapshot => {
+                const allPlayers = {};
+                profilesSnapshot.forEach(childSnapshot => {
+                    allPlayers[childSnapshot.key] = { ...childSnapshot.val(), isOnline: false };
                 });
 
-                if (users.length === 0) {
-                    onlineUsersList.innerHTML = '<p class="text-gray-300 text-center">لا يوجد لاعبون متصلون حالياً غيرك.</p>';
-                } else {
-                    users.forEach(user => {
-                        const userElement = document.createElement('div');
-                        userElement.className = 'online-user-item text-white';
-                        userElement.innerHTML = `
-                            <div class="user-info">
-                                <p class="font-bold text-lg">${user.name}</p>
-                                <p class="text-sm text-gray-300">المستوى: ${user.level}</p>
-                                <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(user.totalPower)}</p>
-                            </div>
-                            <div class="status-dot"></div>
-                        `;
-                        onlineUsersList.appendChild(userElement);
+                // Then listen for online status changes
+                onValue(onlineUsersRef, (onlineSnapshot) => {
+                    if (!onlineUsersList) return;
+                    onlineUsersList.innerHTML = '';
+                    const now = Date.now();
+
+                    // Update online status for all players
+                    for (const playerId in allPlayers) {
+                        allPlayers[playerId].isOnline = false; // Reset status
+                    }
+
+                    onlineSnapshot.forEach(childSnapshot => {
+                        const user = childSnapshot.val();
+                        const userUid = childSnapshot.key;
+                        if (user.lastOnline && (now - user.lastOnline < 60 * 1000)) { // Consider online if last seen within 60 seconds
+                            if (allPlayers[userUid]) {
+                                allPlayers[userUid].isOnline = true;
+                            }
+                        }
                     });
-                }
+
+                    const sortedPlayers = Object.keys(allPlayers).sort((a, b) => {
+                        // Sort by online status (online first), then by level, then by power, then by name
+                        const playerA = allPlayers[a];
+                        const playerB = allPlayers[b];
+
+                        if (playerA.isOnline && !playerB.isOnline) return -1;
+                        if (!playerA.isOnline && playerB.isOnline) return 1;
+
+                        if (playerB.level !== playerA.level) return playerB.level - playerA.level;
+                        if (playerB.totalPower !== playerA.totalPower) return playerB.totalPower - playerA.totalPower;
+                        return playerA.name.localeCompare(playerB.name);
+                    });
+
+                    if (sortedPlayers.length === 0) {
+                        onlineUsersList.innerHTML = '<p class="text-gray-300 text-center">لا يوجد لاعبون مسجلون حالياً.</p>';
+                    } else {
+                        sortedPlayers.forEach(uid => {
+                            const user = allPlayers[uid];
+                            if (uid === userId) return; // Don't list self here, power is shown separately
+
+                            const userElement = document.createElement('div');
+                            userElement.className = `online-user-item text-white ${user.isOnline ? '' : 'offline'}`;
+                            userElement.innerHTML = `
+                                <div class="user-info">
+                                    <p class="font-bold text-lg">${user.name}</p>
+                                    <p class="text-sm text-gray-300">المستوى: ${user.level}</p>
+                                    <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(user.totalPower)}</p>
+                                </div>
+                                <div class="status-dot"></div>
+                            `;
+                            onlineUsersList.appendChild(userElement);
+                        });
+                    }
+                });
+            }).catch(error => {
+                console.error("Error fetching player profiles for online list:", error);
             });
         }
 
@@ -2749,6 +2889,16 @@
                         const attackCooldownRemaining = getAttackCooldownRemaining(player.uid);
                         const isAttackReady = attackCooldownRemaining <= 0;
 
+                        // Calculate win/loss chance
+                        let winChancePercentage = 0;
+                        if (totalPlayerPower > player.totalPower) {
+                            winChancePercentage = 75; // 75% win chance if stronger
+                        } else if (totalPlayerPower < player.totalPower) {
+                            winChancePercentage = 25; // 25% win chance if weaker
+                        } else {
+                            winChancePercentage = 50; // 50% if equal
+                        }
+
                         const playerElement = document.createElement('div');
                         playerElement.className = 'challenge-player-item text-white';
                         playerElement.innerHTML = `
@@ -2756,10 +2906,11 @@
                                 <p class="font-bold text-lg">${player.name}</p>
                                 <p class="text-sm text-gray-300">المستوى: ${player.level}</p>
                                 <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(player.totalPower)}</p>
+                                <p class="text-sm mt-1">فرصة الفوز: <span class="${winChancePercentage >= 50 ? 'text-green-400' : 'text-red-400'} font-bold">${winChancePercentage}%</span></p>
                             </div>
                             <button data-target-id="${player.uid}" data-target-name="${player.name}" data-target-power="${player.totalPower}"
-                                class="attack-button ${isAttackReady ? '' : 'opacity-50 cursor-not-allowed'}" ${isAttackReady ? '' : 'disabled'}>
-                                ${isAttackReady ? 'هجوم' : formatTime(attackCooldownRemaining)}
+                                class="attack-button ${isAttackReady && attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS ? '' : 'opacity-50 cursor-not-allowed'}" ${isAttackReady && attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS ? '' : 'disabled'}>
+                                ${isAttackReady ? (attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS ? 'هجوم' : 'تهدئة عالمية') : formatTime(attackCooldownRemaining)}
                             </button>
                         `;
                         challengePlayersList.appendChild(playerElement);
@@ -2776,9 +2927,32 @@
         function getAttackCooldownRemaining(targetId) {
             const lastAttackTime = attackCooldowns[targetId];
             if (!lastAttackTime) return 0;
-            const cooldownDuration = 30 * 60;
+            const cooldownDuration = 30 * 60; // 30 minutes
             const elapsed = (Date.now() - lastAttackTime) / 1000;
             return Math.max(0, Math.floor(cooldownDuration - elapsed));
+        }
+
+        function updateGlobalAttackCooldownDisplay() {
+            if (!globalAttackCooldownDisplay || !attacksRemainingDisplay || !globalCooldownTimerDisplay) return;
+
+            const remainingTime = Math.max(0, Math.floor((globalAttackCooldownEndTime - Date.now()) / 1000));
+
+            if (remainingTime > 0) {
+                globalAttackCooldownDisplay.classList.remove('hidden');
+                attacksRemainingDisplay.textContent = MAX_GLOBAL_ATTACKS - attacksMadeInCurrentCooldown;
+                globalCooldownTimerDisplay.textContent = formatTime(remainingTime);
+            } else {
+                globalAttackCooldownDisplay.classList.add('hidden');
+                attacksMadeInCurrentCooldown = 0; // Reset attacks if cooldown expired
+                savePlayerData(); // Save the reset
+            }
+            renderChallengePlayers(); // Update buttons based on global cooldown
+        }
+
+        function startGlobalAttackCooldownUpdater() {
+            clearInterval(globalAttackCooldownInterval);
+            globalAttackCooldownInterval = setInterval(updateGlobalAttackCooldownDisplay, 1000);
+            updateGlobalAttackCooldownDisplay();
         }
 
         async function handleAttackClick(event) {
@@ -2792,7 +2966,12 @@
             }
 
             if (getAttackCooldownRemaining(targetId) > 0) {
-                showMessageModal('مؤقت التهدئة', `لا يمكنك الهجوم على ${targetName} الآن. يرجى الانتظار.`);
+                showMessageModal('مؤقت التهدئة', `لا يمكنك الهجوم على ${targetName} الآن. يرجى الانتظار: ${formatTime(getAttackCooldownRemaining(targetId))}`);
+                return;
+            }
+
+            if (attacksMadeInCurrentCooldown >= MAX_GLOBAL_ATTACKS) {
+                showMessageModal('تهدئة الهجوم العالمي', `لقد وصلت إلى الحد الأقصى للهجمات (${MAX_GLOBAL_ATTACKS}) في فترة التهدئة الحالية. يرجى الانتظار: ${formatTime(Math.max(0, Math.floor((globalAttackCooldownEndTime - Date.now()) / 1000)))}`);
                 return;
             }
 
@@ -2828,6 +3007,7 @@
             playerPoints = Math.max(0, playerPoints);
             playerDollars = Math.max(0, playerDollars);
 
+            // Record outgoing attack
             push(ref(db, `artifacts/${appId}/users/${userId}/attackLog/outgoing`), {
                 targetId: targetId,
                 targetName: targetName,
@@ -2837,6 +3017,7 @@
                 dollarsChange: attackerDollarsChange
             }).catch(error => console.error("Error saving outgoing attack log:", error));
 
+            // Record incoming attack for target player
             const targetPlayerRef = ref(db, `artifacts/${appId}/users/${targetId}/playerData`);
             const targetAttackLogRef = ref(db, `artifacts/${appId}/users/${targetId}/attackLog/incoming`);
 
@@ -2873,10 +3054,27 @@
                 console.error("Error updating target player data:", error);
             });
 
+            // Record global attack
+            push(ref(db, `artifacts/${appId}/public/globalAttackLog`), {
+                attackerId: userId,
+                attackerName: playerName,
+                targetId: targetId,
+                targetName: targetName,
+                outcome: didWin ? 'win' : 'loss',
+                timestamp: serverTimestamp()
+            }).catch(error => console.error("Error saving global attack log:", error));
+
             attackCooldowns[targetId] = Date.now();
             saveAttackCooldowns();
+
+            attacksMadeInCurrentCooldown++;
+            if (attacksMadeInCurrentCooldown >= MAX_GLOBAL_ATTACKS) {
+                globalAttackCooldownEndTime = Date.now() + (GLOBAL_ATTACK_COOLDOWN_DURATION * 1000);
+            }
+            savePlayerData(); // Save global attack cooldown state
+
             updatePlayerInfoDisplay();
-            renderChallengePlayers();
+            renderChallengePlayers(); // Re-render to update cooldowns and global attack count
         }
 
         function renderAttackLog() {
@@ -2927,28 +3125,53 @@
             }
         }
 
+        function listenForGlobalAttackLog() {
+            if (!isFirebaseLoaded || !globalAttacksList) return;
+            const globalAttackLogRef = query(ref(db, `artifacts/${appId}/public/globalAttackLog`), orderByChild('timestamp'), limitToLast(5));
+            onValue(globalAttackLogRef, (snapshot) => {
+                globalAttacksList.innerHTML = '';
+                const globalAttacks = [];
+                snapshot.forEach(childSnapshot => {
+                    globalAttacks.push(childSnapshot.val());
+                });
+                globalAttacks.sort((a, b) => b.timestamp - a.timestamp); // Sort descending by timestamp
+
+                if (globalAttacks.length === 0) {
+                    globalAttacksList.innerHTML = '<p class="text-gray-400 text-center">لا توجد هجمات عالمية حالياً.</p>';
+                } else {
+                    globalAttacks.forEach(attack => {
+                        const attackElement = document.createElement('div');
+                        attackElement.className = `global-attack-log-entry ${attack.outcome === 'win' ? 'win' : 'loss'}`;
+                        const date = attack.timestamp ? new Date(attack.timestamp) : new Date();
+                        const outcomeText = attack.outcome === 'win' ? 'فاز على' : 'خسر أمام';
+                        attackElement.innerHTML = `
+                            <span>${attack.attackerName} ${outcomeText} ${attack.targetName}</span>
+                            <span class="timestamp">${date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</span>
+                        `;
+                        globalAttacksList.appendChild(attackElement);
+                    });
+                }
+            });
+        }
+
 
         document.addEventListener('DOMContentLoaded', async () => {
             let authAttemptPromise;
             if (initialAuthToken) {
                 authAttemptPromise = signInWithCustomToken(auth, initialAuthToken)
                     .catch(async (error) => {
-                        console.error("Initial custom token authentication failed:", error);
                         if (error.code === 'auth/custom-token-mismatch') {
-                            console.log("Attempting anonymous sign-in as fallback...");
                             return signInAnonymously(auth).catch((anonError) => {
-                                console.error("Anonymous sign-in fallback also failed:", anonError);
                                 showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.');
-                                return null; // Return null if anonymous sign-in also fails
+                                return null;
                             });
                         } else {
                             showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول. يرجى تحديث الصفحة.');
-                            return null; // Return null for other authentication errors
+                            return null;
                         }
                     });
             } else {
                 authAttemptPromise = signInAnonymously(auth).catch((error) => {
-                    console.error("Anonymous sign-in failed:", error);
                     showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.');
                     return null;
                 });
@@ -2960,10 +3183,8 @@
                 if (user) {
                     userId = user.uid;
                     isFirebaseLoaded = true;
-                    console.log("Firebase Auth State Changed: User is signed in with UID:", userId);
 
                     try {
-                        // Load data from Firebase immediately
                         await loadPlayerData();
                         await loadHouses();
                         await loadInnovationTypes();
@@ -2983,7 +3204,6 @@
 
                         const onlineRef = ref(db, `artifacts/${appId}/public/onlineUsers/${userId}`);
                         onDisconnect(onlineRef).remove().catch(error => {
-                            console.error("Could not establish onDisconnect for online status:", error);
                         });
 
                         let anyActiveCooldown = innovationTypes.some(type => type.cooldownEndTime > Date.now());
@@ -3003,17 +3223,14 @@
                             }
                         }
                         
-                        // Migrate local storage data to Firebase after a 1-second delay
                         setTimeout(async () => {
                             await migrateLocalStorageToFirebase();
                         }, 1000);
 
                     } catch (e) {
-                        console.error("Error during data loading/setup:", e);
                         showMessageModal('خطأ في التحميل', 'حدث خطأ أثناء تحميل بياناتك. يرجى تحديث الصفحة.');
                     }
                 } else {
-                    console.log("Firebase Auth State Changed: No user signed in.");
                 }
             });
         });
