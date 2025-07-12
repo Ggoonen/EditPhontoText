@@ -826,7 +826,7 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 view-content"> <!-- Changed gap to gap-4 -->
+            <div class="grid grid-cols-2 gap-4 view-content">
                 <div id="store-item-reduce-time" class="store-item">
                     <img src="https://f.top4top.io/p_3479ijdcl0.png" alt="Reduce Time" class="h-16 w-16 mb-2 object-contain">
                     <span class="text-lg font-semibold text-white">تقليل وقت الابتكار</span>
@@ -854,13 +854,12 @@
                     <span class="text-lg font-semibold text-white">شراء ابتكار ثالث</span>
                     <span class="text-sm text-gray-300 mt-1">يفتح ابتكارًا جديدًا</span>
                     <button class="buy-button mt-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
                         </svg>
                         <span>3000</span>
                     </button>
                 </div>
-                <!-- Royal Name item removed -->
             </div>
         </div>
 
@@ -872,7 +871,6 @@
             </div>
             <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">تحدي اللاعبون</h1>
             <div id="challenge-players-list" class="view-content flex flex-col gap-4">
-                <!-- Players will be listed here -->
             </div>
         </div>
 
@@ -884,7 +882,6 @@
             </div>
             <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">دردش</h1>
             <div id="chat-messages" class="view-content flex flex-col-reverse">
-                <!-- Chat messages will be loaded here -->
             </div>
             <div id="chat-input-container" class="flex p-4 bg-gray-800 rounded-b-3xl">
                 <input type="text" id="chat-input" placeholder="اكتب رسالتك..." class="flex-grow p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -902,7 +899,6 @@
             </div>
             <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">اونلاين</h1>
             <div id="online-users-list" class="view-content flex flex-col gap-4">
-                <!-- Online users will be listed here -->
             </div>
         </div>
     </div>
@@ -1085,6 +1081,7 @@
         let userId = 'anonymous';
         let isFirebaseLoaded = false;
         let totalPlayerPower = 0;
+        let loadingTimeout = null; // Variable to hold the loading timeout
 
         const mainMenu = document.getElementById('main-menu-view');
         const attackLogView = document.getElementById('attack-log-view');
@@ -1217,7 +1214,6 @@
         };
         let playerName = "تعيين اسم";
         let isNameSetPermanently = false;
-        // isRoyalNameActive removed
         let attackCooldowns = {};
         let attackLog = { outgoing: {}, incoming: {} };
 
@@ -1324,11 +1320,28 @@
         let lastChatClearDate = null;
 
         function showLoading() {
-            if (loadingOverlay) loadingOverlay.classList.remove('hidden');
+            if (loadingOverlay) {
+                loadingOverlay.classList.remove('hidden');
+                // Set a timeout to hide the loading overlay after 10 seconds as a fallback
+                loadingTimeout = setTimeout(() => {
+                    if (!loadingOverlay.classList.contains('hidden')) {
+                        console.warn("Loading overlay timed out. Forcing hide.");
+                        hideLoading();
+                        showMessageModal('تحذير', 'استغرقت عملية التحميل وقتًا طويلاً. قد تكون هناك مشكلة في الاتصال أو البيانات.');
+                    }
+                }, 10000); // 10 seconds
+            }
         }
 
         function hideLoading() {
-            if (loadingOverlay) loadingOverlay.classList.add('hidden');
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('hidden');
+                // Clear the timeout if hideLoading is called successfully
+                if (loadingTimeout) {
+                    clearTimeout(loadingTimeout);
+                    loadingTimeout = null;
+                }
+            }
         }
 
         function formatPower(num) {
@@ -1440,10 +1453,6 @@
 
             if (storePlayerPointsDisplay) storePlayerPointsDisplay.textContent = formatPower(playerPoints);
             if (storePlayerDollarsDisplay) storePlayerDollarsDisplay.textContent = `$${formatPower(playerDollars)}`;
-
-            // Royal name logic removed
-            if (playerNameDisplay) playerNameDisplay.classList.remove('royal-name');
-
 
             if (isFirebaseLoaded && userId && playerName !== "تعيين اسم") {
                 set(ref(db, `artifacts/${appId}/public/playerProfiles/${userId}`), {
@@ -1708,7 +1717,7 @@
                 }
 
                 trackTaskProgress('innovate', 1);
-                updatePlayerInfoDisplay(); // Ensure points are updated on display
+                updatePlayerInfoDisplay();
             });
         }
 
@@ -2416,7 +2425,7 @@
                     data.forEach(savedType => {
                         const existingType = innovationTypes.find(type => type.id === savedType.id);
                         if (existingType) {
-                            existingType.cooldownEndTime = savedType.cooldownEndTime || 0; // Load end time
+                            existingType.cooldownEndTime = savedType.cooldownEndTime || 0;
                         } else {
                             if (savedType.id === 'innovation3') {
                                 innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: savedType.cooldownEndTime || 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700' });
@@ -2428,7 +2437,6 @@
                 }
                 updateInnovationButtonText();
                 updateInnovationTimerDisplay();
-                // Start cooldown updater if any innovation is on cooldown after loading
                 let anyActiveCooldown = innovationTypes.some(type => type.cooldownEndTime > Date.now());
                 if (anyActiveCooldown && !globalCooldownUpdater) {
                     startGlobalCooldownUpdater();
@@ -2440,7 +2448,7 @@
             if (!isFirebaseLoaded) return;
             set(ref(db, `artifacts/${appId}/users/${userId}/innovationTypes`), innovationTypes.map(type => ({
                 id: type.id,
-                cooldownEndTime: type.cooldownEndTime // Save end time
+                cooldownEndTime: type.cooldownEndTime
             })));
         }
 
@@ -2454,7 +2462,7 @@
                     if (cooldownRemaining > 0) {
                         anyInnovationOnCooldown = true;
                     } else {
-                        type.cooldownEndTime = 0; // Ensure it's reset if time has passed
+                        type.cooldownEndTime = 0;
                     }
                 });
                 updateInnovationTimerDisplay(); 
@@ -2496,7 +2504,6 @@
                 playerDollars = data.playerDollars || 0;
                 playerName = data.playerName || "تعيين اسم";
                 isNameSetPermanently = data.isNameSetPermanently || false;
-                // isRoyalNameActive removed
                 xpForCurrentLevel = data.xpForCurrentLevel || 0;
                 xpThresholdForNextLevel = data.xpThresholdForNextLevel || baseXpThreshold;
             } else {
@@ -2514,7 +2521,6 @@
                 playerDollars: playerDollars,
                 playerName: playerName,
                 isNameSetPermanently: isNameSetPermanently,
-                // isRoyalNameActive removed
                 xpForCurrentLevel: xpForCurrentLevel,
                 xpThresholdForNextLevel: xpThresholdForNextLevel
             });
@@ -2623,7 +2629,6 @@
                         savedInnovationTypes.forEach(savedType => {
                             const existingType = innovationTypes.find(type => type.id === savedType.id);
                             if (existingType) {
-                                // For migration, if old data used cooldownTimeLeft, convert it to cooldownEndTime
                                 if (savedType.cooldownTimeLeft !== undefined) {
                                     existingType.cooldownEndTime = Date.now() + (savedType.cooldownTimeLeft * 1000);
                                 } else {
@@ -2885,7 +2890,7 @@
                 attackerPointsChange = -pointsStolen;
                 attackerDollarsChange = -dollarsStolen;
                 outcomeMessage = 'خسارة!';
-                showMessageModal('خسارة!', `فشلت في الهجوم على ${targetName} وخسرت ${pointsStolen} نقطة و ${dollarsStolen}$.`);
+                showMessageModal('خسارة!', `فشلت في الهجوم على ${targetName} وخسرت ${pointsStolen} نقطة و ${dollarsStolen}.`);
             }
 
             playerPoints += attackerPointsChange;
@@ -3008,6 +3013,8 @@
                     }
                 } catch (error) {
                     console.error("Initial authentication failed:", error);
+                    // Ensure loading is hidden even if initial auth fails
+                    hideLoading();
                     if (initialAuthToken && error.code === 'auth/custom-token-mismatch') {
                         try {
                             await signInAnonymously(auth);
@@ -3030,47 +3037,53 @@
                     isFirebaseLoaded = true;
                     console.log("Firebase Auth State Changed: User is signed in with UID:", userId);
 
-                    await migrateLocalStorageToFirebase();
+                    try {
+                        await migrateLocalStorageToFirebase();
 
-                    await loadPlayerData();
-                    await loadHouses();
-                    await loadInnovationTypes();
-                    await loadPlayerInventory();
-                    await loadTasks();
-                    await loadAttackCooldowns();
-                    await loadAttackLog();
+                        await loadPlayerData();
+                        await loadHouses();
+                        await loadInnovationTypes();
+                        await loadPlayerInventory();
+                        await loadTasks();
+                        await loadAttackCooldowns();
+                        await loadAttackLog();
 
-                    listenForChatMessages();
-                    listenForOnlineUsers();
-                    startDailyResetTimer();
-                    clearChatHistory();
+                        listenForChatMessages();
+                        listenForOnlineUsers();
+                        startDailyResetTimer();
+                        clearChatHistory();
 
-                    if (onlineStatusUpdater) clearInterval(onlineStatusUpdater);
-                    onlineStatusUpdater = setInterval(updateOnlineStatus, 30 * 1000);
-                    updateOnlineStatus();
+                        if (onlineStatusUpdater) clearInterval(onlineStatusUpdater);
+                        onlineStatusUpdater = setInterval(updateOnlineStatus, 30 * 1000);
+                        updateOnlineStatus();
 
-                    const onlineRef = ref(db, `artifacts/${appId}/public/onlineUsers/${userId}`);
-                    onDisconnect(onlineRef).remove().catch(error => {
-                        console.error("Could not establish onDisconnect for online status:", error);
-                    });
+                        const onlineRef = ref(db, `artifacts/${appId}/public/onlineUsers/${userId}`);
+                        onDisconnect(onlineRef).remove().catch(error => {
+                            console.error("Could not establish onDisconnect for online status:", error);
+                        });
 
-                    let anyActiveCooldown = innovationTypes.some(type => type.cooldownEndTime > Date.now());
-                    if (anyActiveCooldown && !globalCooldownUpdater) {
-                        startGlobalCooldownUpdater();
-                    }
-
-                    if (!isNameSetPermanently && (!playerName || playerName === "تعيين اسم")) {
-                        if (setNameModal) {
-                            setNameModal.classList.remove('hidden');
-                            setTimeout(() => {
-                                if (setNameModal.querySelector('div')) {
-                                    setNameModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
-                                    setNameModal.querySelector('div').classList.add('scale-100', 'opacity-100');
-                                }
-                            }, 10);
+                        let anyActiveCooldown = innovationTypes.some(type => type.cooldownEndTime > Date.now());
+                        if (anyActiveCooldown && !globalCooldownUpdater) {
+                            startGlobalCooldownUpdater();
                         }
+
+                        if (!isNameSetPermanently && (!playerName || playerName === "تعيين اسم")) {
+                            if (setNameModal) {
+                                setNameModal.classList.remove('hidden');
+                                setTimeout(() => {
+                                    if (setNameModal.querySelector('div')) {
+                                        setNameModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
+                                        setNameModal.querySelector('div').classList.add('scale-100', 'opacity-100');
+                                    }
+                                }, 10);
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error during data loading/setup:", e);
+                        showMessageModal('خطأ في التحميل', 'حدث خطأ أثناء تحميل بياناتك. يرجى تحديث الصفحة.');
+                    } finally {
+                        hideLoading(); // Ensure hideLoading is called after all operations or on error
                     }
-                    hideLoading();
                 } else {
                     console.log("Firebase Auth State Changed: No user signed in.");
                     hideLoading();
