@@ -511,6 +511,7 @@
         }
         /* Challenge players list */
         .challenge-player-item {
+            position: relative; /* Needed for absolute positioning of overlay */
             background-color: #2d3748;
             padding: 1rem;
             border-radius: 1rem;
@@ -561,8 +562,8 @@
         .attack-log-entry .log-timestamp {
             font-size: 0.75rem;
             color: #a0aec0;
-            margin-top: 0.5rem;
             text-align: left;
+            margin-top: 0.5rem;
         }
         #attack-log-view .view-content {
             padding-bottom: 1rem; /* Ensure space for scrollbar */
@@ -618,6 +619,35 @@
             color: #94a3b8;
             margin-left: 0.5rem;
             flex-shrink: 0;
+        }
+        .attack-outcome-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.3s ease-out;
+            border-radius: 1rem;
+            pointer-events: none; /* Allow clicks to pass through */
+        }
+        .attack-outcome-overlay.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .attack-outcome-overlay.win {
+            background-color: rgba(76, 175, 80, 0.7); /* Green overlay */
+        }
+        .attack-outcome-overlay.loss {
+            background-color: rgba(239, 68, 68, 0.7); /* Red overlay */
         }
     </style>
 </head>
@@ -719,6 +749,18 @@
                     <span class="lock-text absolute hidden text-xs">يتطلب المستوى 3</span>
                 </div>
             </div>
+            <div id="dollar-collector" class="bg-gray-700 p-4 rounded-xl shadow-md text-center mt-auto">
+                <h3 class="text-xl font-semibold text-gray-100 mb-2">دولارات متراكمة</h3>
+                <div class="flex items-center justify-center gap-2 mb-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
+                    </svg>
+                    <span class="text-2xl font-bold text-green-300" id="accumulated-dollars-display">$0</span>
+                </div>
+                <button id="collect-dollars-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out w-full">
+                    استلام الدولارات
+                </button>
+            </div>
         </div>
 
         <div id="attack-log-view" class="view transform translate-x-full">
@@ -730,18 +772,6 @@
             <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">سجل التحدي</h1>
 
             <div class="view-content">
-                <div class="bg-gray-700 p-6 rounded-xl mb-6 shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-100 mb-4">هجماتك</h2>
-                    <div id="outgoing-attacks-list" class="flex flex-col gap-3">
-                        <p class="text-gray-400 text-center">لا توجد هجمات صادرة.</p>
-                    </div>
-                </div>
-                <div class="bg-gray-700 p-6 rounded-xl mb-6 shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-100 mb-4">الذين هاجموك</h2>
-                    <div id="incoming-attacks-list" class="flex flex-col gap-3">
-                        <p class="text-gray-400 text-center">لا توجد هجمات واردة.</p>
-                    </div>
-                </div>
                 <div class="bg-gray-700 p-6 rounded-xl mb-6 shadow-md">
                     <h2 class="text-xl font-semibold text-gray-100 mb-4">سجل الهجمات العالمية (آخر 5)</h2>
                     <div id="global-attacks-list" class="flex flex-col gap-2">
@@ -1079,7 +1109,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
-        import { getDatabase, ref, set, get, onValue, remove, push, serverTimestamp, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+        import { getDatabase, ref, set, get, onValue, remove, push, serverTimestamp, query, orderByChild, limitToLast, onDisconnect } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAgmDkMKcfMG3r_16t_6rcjZQJOUFVpVOo",
@@ -1211,13 +1241,17 @@
         const onlineUsersList = document.getElementById('online-users-list');
 
         const challengePlayersList = document.getElementById('challenge-players-list');
-        const outgoingAttacksList = document.getElementById('outgoing-attacks-list');
-        const incomingAttacksList = document.getElementById('incoming-attacks-list');
+        const outgoingAttacksList = document.getElementById('outgoing-attacks-list'); // Kept for consistency, but not rendered
+        const incomingAttacksList = document.getElementById('incoming-attacks-list'); // Kept for consistency, but not rendered
         const globalAttacksList = document.getElementById('global-attacks-list');
 
         const globalAttackCooldownDisplay = document.getElementById('global-attack-cooldown-display');
         const attacksRemainingDisplay = document.getElementById('attacks-remaining-display');
         const globalCooldownTimerDisplay = document.getElementById('global-cooldown-timer-display');
+
+        const dollarCollector = document.getElementById('dollar-collector');
+        const accumulatedDollarsDisplay = document.getElementById('accumulated-dollars-display');
+        const collectDollarsButton = document.getElementById('collect-dollars-button');
 
 
         let houses = [
@@ -1233,11 +1267,13 @@
         let dailyResetTimerInterval = null;
         let onlineStatusUpdater = null;
         let globalAttackCooldownInterval = null;
+        let dollarCollectionInterval = null;
 
         let playerXP = 0;
         let playerLevel = 0;
         let playerPoints = 0;
         let playerDollars = 0;
+        let accumulatedDollars = 0; // New variable for dollar collection
         let playerInventory = {
             reduceTime: 0
         };
@@ -1249,7 +1285,7 @@
         const MAX_GLOBAL_ATTACKS = 3;
         const GLOBAL_ATTACK_COOLDOWN_DURATION = 5 * 60; // 5 minutes in seconds
 
-        let attackLog = { outgoing: {}, incoming: {} };
+        let attackLog = { outgoing: {}, incoming: {} }; // Kept for data structure, but not rendered personally
 
         const baseXpThreshold = 100;
         let xpForCurrentLevel = 0;
@@ -1524,7 +1560,7 @@
                 clearInterval(globalAttackCooldownInterval);
             }
             if (targetViewId === 'attack-log-view') {
-                renderAttackLog();
+                // Personal attack logs are removed, only global is shown
                 listenForGlobalAttackLog();
             }
         }
@@ -2529,6 +2565,7 @@
                 playerLevel = data.playerLevel || 0;
                 playerPoints = data.playerPoints || 0;
                 playerDollars = data.playerDollars || 0;
+                accumulatedDollars = data.accumulatedDollars || 0; // Load accumulated dollars
                 playerName = data.playerName || "تعيين اسم";
                 isNameSetPermanently = data.isNameSetPermanently || false;
                 xpForCurrentLevel = data.xpForCurrentLevel || 0;
@@ -2539,6 +2576,7 @@
                 savePlayerData();
             }
             updatePlayerInfoDisplay();
+            updateAccumulatedDollarsDisplay(); // Update display on load
         }
 
         function savePlayerData() {
@@ -2548,6 +2586,7 @@
                 playerLevel: playerLevel,
                 playerPoints: playerPoints,
                 playerDollars: playerDollars,
+                accumulatedDollars: accumulatedDollars, // Save accumulated dollars
                 playerName: playerName,
                 isNameSetPermanently: isNameSetPermanently,
                 xpForCurrentLevel: xpForCurrentLevel,
@@ -2613,11 +2652,13 @@
         }
 
         async function loadAttackLog() {
+            // Personal attack logs are no longer rendered, but we still load the data structure
+            // for consistency if needed for other logic or future features.
             if (!isFirebaseLoaded) return;
             const attackLogRef = ref(db, `artifacts/${appId}/users/${userId}/attackLog`);
             onValue(attackLogRef, (snapshot) => {
                 attackLog = snapshot.val() || { outgoing: {}, incoming: {} };
-                renderAttackLog();
+                // No need to call renderAttackLog here as it now only handles global
             });
         }
 
@@ -2632,7 +2673,8 @@
                 'playerInventory', 'playerName', 'isNameSetPermanently',
                 'xpForCurrentLevel', 'xpThresholdForNextLevel',
                 'houses', 'innovationTypes', 'tasks', 'lastDailyResetDate',
-                'globalAttackCooldownEndTime', 'attacksMadeInCurrentCooldown'
+                'globalAttackCooldownEndTime', 'attacksMadeInCurrentCooldown',
+                'accumulatedDollars' // Add accumulatedDollars to migration
             ];
 
             let hasLocalStorageData = false;
@@ -2650,6 +2692,7 @@
                     playerLevel = parseInt(localStorage.getItem('playerLevel') || '0');
                     playerPoints = parseInt(localStorage.getItem('playerPoints') || '0');
                     playerDollars = parseInt(localStorage.getItem('playerDollars') || '0');
+                    accumulatedDollars = parseInt(localStorage.getItem('accumulatedDollars') || '0'); // Migrate accumulated dollars
                     playerName = localStorage.getItem('playerName') || "تعيين اسم";
                     isNameSetPermanently = localStorage.getItem('isNameSetPermanently') === 'true';
                     xpForCurrentLevel = parseInt(localStorage.getItem('xpForCurrentLevel') || '0');
@@ -3007,6 +3050,32 @@
             playerPoints = Math.max(0, playerPoints);
             playerDollars = Math.max(0, playerDollars);
 
+            // Visual effect for attack outcome
+            const playerElement = event.target.closest('.challenge-player-item');
+            if (playerElement) {
+                let overlay = playerElement.querySelector('.attack-outcome-overlay');
+                if (!overlay) {
+                    overlay = document.createElement('div');
+                    overlay.className = 'attack-outcome-overlay';
+                    playerElement.style.position = 'relative'; // Ensure parent is positioned for absolute overlay
+                    playerElement.appendChild(overlay);
+                }
+
+                overlay.textContent = didWin ? 'فوز!' : 'خسارة!';
+                overlay.classList.remove('win', 'loss'); // Clear previous outcome
+                overlay.classList.add(didWin ? 'win' : 'loss');
+                overlay.classList.add('show');
+
+                setTimeout(() => {
+                    overlay.classList.remove('show');
+                    setTimeout(() => {
+                        if (overlay.parentNode) {
+                            overlay.parentNode.removeChild(overlay);
+                        }
+                    }, 300); // Match CSS transition duration
+                }, 1500); // Show for 1.5 seconds
+            }
+
             // Record outgoing attack
             push(ref(db, `artifacts/${appId}/users/${userId}/attackLog/outgoing`), {
                 targetId: targetId,
@@ -3068,7 +3137,7 @@
             saveAttackCooldowns();
 
             attacksMadeInCurrentCooldown++;
-            if (attacksMadeInCurrentCooldown >= MAX_GLOBAL_ATTACKS) {
+            if (attacksMadeInCurrentCooldown >= MAX_GLOBAL_ATTACKS && globalAttackCooldownEndTime === 0) { // Only set cooldown if not already active
                 globalAttackCooldownEndTime = Date.now() + (GLOBAL_ATTACK_COOLDOWN_DURATION * 1000);
             }
             savePlayerData(); // Save global attack cooldown state
@@ -3078,51 +3147,10 @@
         }
 
         function renderAttackLog() {
-            if (!outgoingAttacksList || !incomingAttacksList) return;
-
-            outgoingAttacksList.innerHTML = '';
-            incomingAttacksList.innerHTML = '';
-
-            const outgoingAttacks = Object.values(attackLog.outgoing || {}).sort((a, b) => b.timestamp - a.timestamp);
-            const incomingAttacks = Object.values(attackLog.incoming || {}).sort((a, b) => b.timestamp - a.timestamp);
-
-            if (outgoingAttacks.length === 0) {
-                outgoingAttacksList.innerHTML = '<p class="text-gray-400 text-center">لا توجد هجمات صادرة.</p>';
-            } else {
-                outgoingAttacks.forEach(attack => {
-                    const attackElement = document.createElement('div');
-                    attackElement.className = `attack-log-entry text-white ${attack.outcome === 'win' ? 'win' : 'loss'}`;
-                    const date = attack.timestamp ? new Date(attack.timestamp) : new Date();
-                    attackElement.innerHTML = `
-                        <div class="log-header">${attack.outcome === 'win' ? 'فوز!' : 'خسارة!'} ضد ${attack.targetName}</div>
-                        <div class="log-details">
-                            <p>النقاط: ${attack.pointsChange > 0 ? '+' : ''}${formatPower(attack.pointsChange)}</p>
-                            <p>الدولارات: ${attack.dollarsChange > 0 ? '+' : ''}${formatPower(attack.dollarsChange)}$</p>
-                        </div>
-                        <div class="log-timestamp">${date.toLocaleDateString('ar-SA')} ${date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</div>
-                    `;
-                    outgoingAttacksList.appendChild(attackElement);
-                });
-            }
-
-            if (incomingAttacks.length === 0) {
-                incomingAttacksList.innerHTML = '<p class="text-gray-400 text-center">لا توجد هجمات واردة.</p>';
-            } else {
-                incomingAttacks.forEach(attack => {
-                    const attackElement = document.createElement('div');
-                    attackElement.className = `attack-log-entry text-white ${attack.outcome === 'win' ? 'win' : 'loss'}`;
-                    const date = attack.timestamp ? new Date(attack.timestamp) : new Date();
-                    attackElement.innerHTML = `
-                        <div class="log-header">${attack.outcome === 'win' ? 'دفاع ناجح!' : 'هجوم فاشل!'} من ${attack.attackerName}</div>
-                        <div class="log-details">
-                            <p>النقاط: ${attack.pointsChange > 0 ? '+' : ''}${formatPower(attack.pointsChange)}</p>
-                            <p>الدولارات: ${attack.dollarsChange > 0 ? '+' : ''}${formatPower(attack.dollarsChange)}$</p>
-                        </div>
-                        <div class="log-timestamp">${date.toLocaleDateString('ar-SA')} ${date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</div>
-                    `;
-                    incomingAttacksList.appendChild(attackElement);
-                });
-            }
+            // Personal attack logs are no longer rendered
+            // outgoingAttacksList.innerHTML = '<p class="text-gray-400 text-center">لا توجد هجمات صادرة.</p>';
+            // incomingAttacksList.innerHTML = '<p class="text-gray-400 text-center">لا توجد هجمات واردة.</p>';
+            // Global attacks are handled by listenForGlobalAttackLog
         }
 
         function listenForGlobalAttackLog() {
@@ -3152,6 +3180,39 @@
                     });
                 }
             });
+        }
+
+        // Dollar Collection Feature Functions
+        function startDollarCollection() {
+            if (dollarCollectionInterval) clearInterval(dollarCollectionInterval);
+            dollarCollectionInterval = setInterval(() => {
+                accumulatedDollars += 1; // 1 dollar every 5 seconds
+                updateAccumulatedDollarsDisplay();
+                savePlayerData(); // Save accumulated dollars
+            }, 5000);
+        }
+
+        function updateAccumulatedDollarsDisplay() {
+            if (accumulatedDollarsDisplay) {
+                accumulatedDollarsDisplay.textContent = `$${formatPower(accumulatedDollars)}`;
+            }
+        }
+
+        function collectDollars() {
+            if (accumulatedDollars > 0) {
+                playerDollars += accumulatedDollars;
+                showToast(`لقد جمعت $${formatPower(accumulatedDollars)}!`, 'success');
+                accumulatedDollars = 0;
+                updatePlayerInfoDisplay();
+                updateAccumulatedDollarsDisplay();
+                savePlayerData();
+            } else {
+                showToast('لا توجد دولارات لجمعها بعد.', 'info');
+            }
+        }
+
+        if (collectDollarsButton) {
+            collectDollarsButton.addEventListener('click', collectDollars);
         }
 
 
@@ -3191,12 +3252,13 @@
                         await loadPlayerInventory();
                         await loadTasks();
                         await loadAttackCooldowns();
-                        await loadAttackLog();
+                        await loadAttackLog(); // Load personal attack log data (though not rendered)
 
                         listenForChatMessages();
-                        listenForOnlineUsers();
+                        // listenForOnlineUsers is called when navigating to online-view
                         startDailyResetTimer();
                         clearChatHistory();
+                        startDollarCollection(); // Start dollar collection
 
                         if (onlineStatusUpdater) clearInterval(onlineStatusUpdater);
                         onlineStatusUpdater = setInterval(updateOnlineStatus, 30 * 1000);
@@ -3204,6 +3266,7 @@
 
                         const onlineRef = ref(db, `artifacts/${appId}/public/onlineUsers/${userId}`);
                         onDisconnect(onlineRef).remove().catch(error => {
+                            console.error("Could not establish onDisconnect for online status:", error);
                         });
 
                         let anyActiveCooldown = innovationTypes.some(type => type.cooldownEndTime > Date.now());
@@ -3228,9 +3291,11 @@
                         }, 1000);
 
                     } catch (e) {
+                        console.error("Error during data loading/setup:", e);
                         showMessageModal('خطأ في التحميل', 'حدث خطأ أثناء تحميل بياناتك. يرجى تحديث الصفحة.');
                     }
                 } else {
+                    console.log("Firebase Auth State Changed: No user signed in.");
                 }
             });
         });
