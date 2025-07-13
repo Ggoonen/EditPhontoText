@@ -428,12 +428,11 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
-        /* Chat specific styles */
         #chat-messages {
             flex-grow: 1;
             overflow-y: auto;
             display: flex;
-            flex-direction: column-reverse; /* New messages at bottom */
+            flex-direction: column-reverse;
             padding-bottom: 1rem;
         }
         .chat-message {
@@ -485,7 +484,6 @@
         #chat-send-button:hover {
             background-color: #5a5fe0;
         }
-        /* Online users list */
         .online-user-item {
             background-color: #2d3748;
             padding: 1rem;
@@ -502,16 +500,15 @@
         .online-user-item .status-dot {
             width: 10px;
             height: 10px;
-            background-color: #4CAF50; /* Green for online */
+            background-color: #4CAF50;
             border-radius: 50%;
             margin-left: 0.5rem;
         }
         .online-user-item.offline .status-dot {
-            background-color: #a0aec0; /* Gray for offline */
+            background-color: #a0aec0;
         }
-        /* Challenge players list */
         .challenge-player-item {
-            position: relative; /* Needed for absolute positioning of overlay */
+            position: relative;
             background-color: #2d3748;
             padding: 1rem;
             border-radius: 1rem;
@@ -522,7 +519,7 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
         .challenge-player-item .attack-button {
-            background-color: #ef4444; /* Red for attack */
+            background-color: #ef4444;
             color: white;
             padding: 0.5rem 1rem;
             border-radius: 0.75rem;
@@ -535,69 +532,8 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
-        /* Attack Log Styles */
-        .attack-log-entry {
-            background-color: #2d3748;
-            padding: 1rem;
-            border-radius: 1rem;
-            margin-bottom: 0.75rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            text-align: right;
-        }
-        .attack-log-entry.win {
-            border-right: 4px solid #4CAF50; /* Green for win */
-        }
-        .attack-log-entry.loss {
-            border-right: 4px solid #ef4444; /* Red for loss */
-        }
-        .attack-log-entry .log-header {
-            font-weight: bold;
-            color: #6366f1;
-            margin-bottom: 0.5rem;
-        }
-        .attack-log-entry .log-details {
-            font-size: 0.9rem;
-            color: #a0aec0;
-        }
-        .attack-log-entry .log-timestamp {
-            font-size: 0.75rem;
-            color: #a0aec0;
-            text-align: left;
-            margin-top: 0.5rem;
-        }
-        #attack-log-view .view-content {
-            padding-bottom: 1rem; /* Ensure space for scrollbar */
-        }
-        /* Store item grid adjustment */
-        #store-view .view-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Adjust for tighter fit */
-            gap: 1rem; /* Reduced gap */
-            justify-items: center;
-            align-items: stretch;
-        }
-        #store-view .store-item {
-            height: auto; /* Allow height to adjust to content */
-            min-height: 150px; /* Ensure a minimum height */
-            padding: 0.75rem; /* Reduced padding */
-        }
-        #store-view .store-item img {
-            height: 4rem; /* Smaller image size */
-            width: 4rem;
-            margin-bottom: 0.5rem; /* Reduced margin */
-        }
-        #store-view .store-item .text-lg {
-            font-size: 0.95rem; /* Slightly smaller font */
-        }
-        #store-view .store-item .text-sm {
-            font-size: 0.8rem; /* Slightly smaller font */
-        }
-        #store-view .buy-button {
-            padding: 0.4rem 0.8rem; /* Smaller button padding */
-            font-size: 0.85rem; /* Smaller button font */
-        }
         .global-attack-log-entry {
-            background-color: #1f2937; /* Darker background for global log */
+            background-color: #1f2937;
             padding: 0.5rem 1rem;
             border-radius: 0.5rem;
             margin-bottom: 0.4rem;
@@ -637,17 +573,36 @@
             transform: scale(0.5);
             transition: all 0.3s ease-out;
             border-radius: 1rem;
-            pointer-events: none; /* Allow clicks to pass through */
+            pointer-events: none;
         }
         .attack-outcome-overlay.show {
             opacity: 1;
             transform: scale(1);
         }
         .attack-outcome-overlay.win {
-            background-color: rgba(76, 175, 80, 0.7); /* Green overlay */
+            background-color: rgba(76, 175, 80, 0.7);
         }
         .attack-outcome-overlay.loss {
-            background-color: rgba(239, 68, 68, 0.7); /* Red overlay */
+            background-color: rgba(239, 68, 68, 0.7);
+        }
+        /* Smaller dollar collector styles */
+        #dollar-collector {
+            padding: 0.75rem; /* Reduced padding */
+            border-radius: 0.75rem; /* Slightly smaller border radius */
+        }
+        #dollar-collector h3 {
+            font-size: 1rem; /* Reduced font size */
+            margin-bottom: 0.5rem; /* Reduced margin */
+        }
+        #dollar-collector .flex {
+            margin-bottom: 0.5rem; /* Reduced margin */
+        }
+        #dollar-collector .text-2xl {
+            font-size: 1.5rem; /* Reduced font size for dollars display */
+        }
+        #collect-dollars-button {
+            padding: 0.5rem 1rem; /* Reduced padding */
+            font-size: 0.875rem; /* Reduced font size */
         }
     </style>
 </head>
@@ -749,15 +704,15 @@
                     <span class="lock-text absolute hidden text-xs">يتطلب المستوى 3</span>
                 </div>
             </div>
-            <div id="dollar-collector" class="bg-gray-700 p-4 rounded-xl shadow-md text-center mt-auto">
-                <h3 class="text-xl font-semibold text-gray-100 mb-2">دولارات متراكمة</h3>
-                <div class="flex items-center justify-center gap-2 mb-3">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div id="dollar-collector" class="bg-gray-700 p-3 rounded-xl shadow-md text-center mt-auto">
+                <h3 class="text-base font-semibold text-gray-100 mb-1">دولارات متراكمة</h3>
+                <div class="flex items-center justify-center gap-1 mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
                     </svg>
-                    <span class="text-2xl font-bold text-green-300" id="accumulated-dollars-display">$0</span>
+                    <span class="text-xl font-bold text-green-300" id="accumulated-dollars-display">$0</span>
                 </div>
-                <button id="collect-dollars-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out w-full">
+                <button id="collect-dollars-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-4 rounded-lg shadow-md transition duration-200 ease-in-out w-full text-sm">
                     استلام الدولارات
                 </button>
             </div>
@@ -1116,7 +1071,7 @@
             authDomain: "kingb7ar-935b8.firebaseapp.com",
             databaseURL: "https://kingb7ar-935b8-default-rtdb.firebaseio.com",
             projectId: "kingb7ar-935b8",
-            storageBucket: "kingb7ar-935b8.firebasestorage.app",
+            storageBucket: "kingb7ar-935b8.firebase storage.app",
             messagingSenderId: "157617641483",
             appId: "1:157617641483:web:f8a0e51c1cd1bc4199cf0e"
         };
@@ -1132,23 +1087,12 @@
         let isFirebaseLoaded = false;
         let totalPlayerPower = 0;
 
-        const mainMenu = document.getElementById('main-menu-view');
-        const attackLogView = document.getElementById('attack-log-view');
-        const gameView = document.getElementById('game-view');
-        const storeView = document.getElementById('store-view');
-        const challengeView = document.getElementById('challenge-view');
-        const chatView = document.getElementById('chat-view');
-        const onlineView = document.getElementById('online-view');
-
         const attackLogMenuItem = document.getElementById('attack-log-menu-item');
         const playMenuItem = document.getElementById('play-menu-item');
         const storeMenuItem = document.getElementById('store-menu-item');
         const challengeMenuItem = document.getElementById('challenge-menu-item');
         const chatMenuItem = document.getElementById('chat-menu-item');
         const onlineMenuItem = document.getElementById('online-menu-item');
-
-        const musicVolumeSlider = document.getElementById('music-volume-slider');
-        const musicVolumeValue = document.getElementById('music-volume-value');
 
         const housesContainer = document.getElementById('houses-container');
         const innovationButton = document.getElementById('innovation-button');
@@ -1241,15 +1185,12 @@
         const onlineUsersList = document.getElementById('online-users-list');
 
         const challengePlayersList = document.getElementById('challenge-players-list');
-        const outgoingAttacksList = document.getElementById('outgoing-attacks-list'); // Kept for consistency, but not rendered
-        const incomingAttacksList = document.getElementById('incoming-attacks-list'); // Kept for consistency, but not rendered
         const globalAttacksList = document.getElementById('global-attacks-list');
 
         const globalAttackCooldownDisplay = document.getElementById('global-attack-cooldown-display');
         const attacksRemainingDisplay = document.getElementById('attacks-remaining-display');
         const globalCooldownTimerDisplay = document.getElementById('global-cooldown-timer-display');
 
-        const dollarCollector = document.getElementById('dollar-collector');
         const accumulatedDollarsDisplay = document.getElementById('accumulated-dollars-display');
         const collectDollarsButton = document.getElementById('collect-dollars-button');
 
@@ -1273,31 +1214,31 @@
         let playerLevel = 0;
         let playerPoints = 0;
         let playerDollars = 0;
-        let accumulatedDollars = 0; // New variable for dollar collection
-        let playerInventory = {
-            reduceTime: 0
-        };
+        let accumulatedDollars = 0;
         let playerName = "تعيين اسم";
         let isNameSetPermanently = false;
-        let attackCooldowns = {}; // Cooldown per target
+        let lastPlayerNameChangeTimestamp = 0; // New variable for name change cooldown
+        let attackCooldowns = {};
         let globalAttackCooldownEndTime = 0;
         let attacksMadeInCurrentCooldown = 0;
         const MAX_GLOBAL_ATTACKS = 3;
-        const GLOBAL_ATTACK_COOLDOWN_DURATION = 5 * 60; // 5 minutes in seconds
-
-        let attackLog = { outgoing: {}, incoming: {} }; // Kept for data structure, but not rendered personally
+        const GLOBAL_ATTACK_COOLDOWN_DURATION = 5 * 60;
+        const NAME_CHANGE_COOLDOWN_DURATION = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
 
         const baseXpThreshold = 100;
         let xpForCurrentLevel = 0;
         let xpThresholdForNextLevel = baseXpThreshold;
 
+        // Initialize playerInventory with a default structure
+        let playerInventory = { reduceTime: 0 };
+
         const housePowerTiers = [
-            { minPower: 1, imageUrl: "https://d.top4top.io/p_347985vd10.png" }, // Image of a basic house
-            { minPower: 2500, imageUrl: "https://l.top4top.io/p_3479h0oa70.png" }, // Image of a medium house
-            { minPower: 7000, imageUrl: "https://a.top4top.io/p_3479npbk21.png" }, // Image of a large house
-            { minPower: 10000, imageUrl: "https://b.top4top.io/p_3479hfhop2.png" }, // Image of a villa
-            { minPower: 15000, imageUrl: "https://b.top4top.io/p_3479hfhop2.png" }, // Image of a mansion
-            { minPower: 25000, imageUrl: "https://d.top4top.io/p_34798y7o83.png" } // Image of a castle
+            { minPower: 1, imageUrl: "https://d.top4top.io/p_347985vd10.png" },
+            { minPower: 2500, imageUrl: "https://l.top4top.io/p_3479h0oa70.png" },
+            { minPower: 7000, imageUrl: "https://a.top4top.io/p_3479npbk21.png" },
+            { minPower: 10000, imageUrl: "https://b.top4top.io/p_3479hfhop2.png" },
+            { minPower: 15000, imageUrl: "https://b.top4top.io/p_3479hfhop2.png" },
+            { minPower: 25000, imageUrl: "https://d.top4top.io/p_34798y7o83.png" }
         ];
 
         const houseUpgradeRewards = [
@@ -1491,7 +1432,6 @@
             if (inventoryCountDisplay) inventoryCountDisplay.textContent = playerInventory.reduceTime;
             if (playerNameDisplay) playerNameDisplay.textContent = playerName;
             
-            // Update total power displays
             if (playerTotalPowerDisplayMain) playerTotalPowerDisplayMain.textContent = formatPower(totalPlayerPower);
             if (playerTotalPowerDisplayGame) playerTotalPowerDisplayGame.textContent = formatPower(totalPlayerPower);
             if (playerTotalPowerDisplayOnline) playerTotalPowerDisplayOnline.textContent = formatPower(totalPlayerPower);
@@ -1551,7 +1491,7 @@
                 updatePlayerInfoDisplay();
             }
             if (targetViewId === 'online-view') {
-                listenForOnlineUsers(); // Refresh online users when entering view
+                listenForOnlineUsers();
             }
             if (targetViewId === 'challenge-view') {
                 renderChallengePlayers();
@@ -1560,7 +1500,6 @@
                 clearInterval(globalAttackCooldownInterval);
             }
             if (targetViewId === 'attack-log-view') {
-                // Personal attack logs are removed, only global is shown
                 listenForGlobalAttackLog();
             }
         }
@@ -1585,7 +1524,7 @@
                 if (index === activeHouseIndex) {
                     houseElement.classList.add('active-house');
                 }
-                houseElement.dataset.houseIndex = index; // Add data attribute for index
+                houseElement.dataset.houseIndex = index;
                 houseElement.innerHTML = `
                     <img src="${houseImageUrl}" alt="House">
                     <div class="text-sm font-bold mt-1">القوة: ${formatPower(house.power)}</div>
@@ -1596,7 +1535,7 @@
                 if (house.unlocked) {
                     houseElement.addEventListener('click', () => {
                         activeHouseIndex = index;
-                        renderHouses(); // Re-render to update active class
+                        renderHouses();
                         saveHouses();
                     });
                 }
@@ -1629,7 +1568,7 @@
             setTimeout(() => {
                 if (messageModal.querySelector('.message-modal-content')) {
                     messageModal.querySelector('.message-modal-content').classList.remove('scale-95', 'opacity-0');
-                    messageModal.querySelector('.message-modal-content').classList.add('scale-100', 'opacity-100');
+                    messageModal.querySelector('div').classList.add('scale-100', 'opacity-100');
                 }
             }, 10);
         }
@@ -1639,7 +1578,7 @@
         if (storeMenuItem) storeMenuItem.addEventListener('click', () => navigateTo('store-view', 'right'));
         if (challengeMenuItem) {
             challengeMenuItem.addEventListener('click', () => {
-                if (playerLevel >= 3) { // Changed from 5 to 3
+                if (playerLevel >= 3) {
                     navigateTo('challenge-view', 'right');
                 } else {
                     showMessageModal('مقفول!', `يتطلب الوصول إلى المستوى 3 لفتح تحدي اللاعبون. مستواك الحالي: ${playerLevel}`);
@@ -1664,12 +1603,6 @@
                 navigateTo('main-menu-view', 'left');
             }
         });
-
-        if (musicVolumeSlider) {
-            musicVolumeSlider.addEventListener('input', (event) => {
-                if (musicVolumeValue) musicVolumeValue.textContent = `${event.target.value}%`;
-            });
-        }
 
         if (innovationPrevButton) innovationPrevButton.addEventListener('click', () => {
             currentInnovationTypeIndex = (currentInnovationTypeIndex - 1 + innovationTypes.length) % innovationTypes.length;
@@ -1764,12 +1697,11 @@
                     setTimeout(() => {
                         if (popupModal.querySelector('.popup-content')) {
                             popupModal.querySelector('.popup-content').classList.remove('scale-95', 'opacity-0');
-                            popupModal.querySelector('.popup-content').classList.add('scale-100', 'opacity-100');
+                            popupModal.querySelector('div').classList.add('scale-100', 'opacity-100');
                         }
                     }, 10);
                 }
 
-                // Auto-unlock next house if current house reaches its threshold and it's not the last house
                 if (currentHouse.id !== houses[houses.length - 1].id && currentHouse.power >= currentHouse.threshold) {
                     const nextHouseIndex = houses.findIndex(h => h.id === currentHouse.id + 1);
                     if (nextHouseIndex !== -1 && !houses[nextHouseIndex].unlocked) {
@@ -1777,8 +1709,8 @@
                         showMessageModal('بيت جديد مفتوح!', `تهانينا! لقد فتحت البيت رقم ${houses[nextHouseIndex].id}!`);
                     }
                 }
-                renderHouses(); // Re-render to show unlocked house if applicable
-                saveHouses(); // Save updated houses state
+                renderHouses();
+                saveHouses();
 
                 if (currentInnovation) {
                     currentInnovation.cooldownEndTime = Date.now() + (currentInnovation.initialCooldown * 1000);
@@ -1887,7 +1819,7 @@
                         const maxItemsToReduceToZero = Math.ceil(cooldownRemaining / timeReductionPerItem);
                         maxQuantity = Math.min(maxQuantity, maxItemsToReduceToZero);
                     } else {
-                        maxQuantity = 0; // Cannot reduce time if no cooldown
+                        maxQuantity = 0;
                     }
                 }
                 
@@ -2173,7 +2105,7 @@
             const localTime = now.getTime();
             const localOffset = now.getTimezoneOffset() * 60000;
             const utc = localTime + localOffset;
-            const saudiOffset = 3 * 60 * 60 * 1000; // GMT+3
+            const saudiOffset = 3 * 60 * 60 * 1000;
             return new Date(utc + saudiOffset);
         }
 
@@ -2232,9 +2164,8 @@
                             console.error("Error clearing chat history:", error);
                         });
                 }
-            }, { onlyOnce: true });
+            }, { once: true });
         }
-
 
         function loadTasks() {
             if (!isFirebaseLoaded) return;
@@ -2249,7 +2180,7 @@
                     resetDailyTasks();
                 }
                 renderTasks();
-            }, { onlyOnce: true });
+            }, { once: true });
         }
 
         function saveTasks() {
@@ -2375,19 +2306,22 @@
 
         if (playerNameDisplay) {
             playerNameDisplay.addEventListener('click', () => {
-                if (!isNameSetPermanently) {
-                    if (setNameModal && playerNameInput) {
-                        setNameModal.classList.remove('hidden');
-                        playerNameInput.value = playerName === "تعيين اسم" ? "" : playerName;
-                        setTimeout(() => {
-                            if (setNameModal.querySelector('div')) {
-                                setNameModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
-                                setNameModal.querySelector('div').classList.add('scale-100', 'opacity-100');
-                            }
-                        }, 10);
-                    }
-                } else {
-                    showMessageModal('الاسم', `اسمك الحالي هو: ${playerName}`);
+                // Check if name is already set permanently and if cooldown is active
+                if (isNameSetPermanently && (Date.now() - lastPlayerNameChangeTimestamp < NAME_CHANGE_COOLDOWN_DURATION)) {
+                    const remainingTime = Math.ceil((NAME_CHANGE_COOLDOWN_DURATION - (Date.now() - lastPlayerNameChangeTimestamp)) / (1000 * 60 * 60 * 24));
+                    showMessageModal('لا يمكن تغيير الاسم', `لا يمكنك تغيير اسمك إلا بعد مرور ${remainingTime} يوم(أيام) أخرى.`);
+                    return;
+                }
+
+                if (setNameModal && playerNameInput) {
+                    setNameModal.classList.remove('hidden');
+                    playerNameInput.value = playerName === "تعيين اسم" ? "" : playerName;
+                    setTimeout(() => {
+                        if (setNameModal.querySelector('div')) {
+                            setNameModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
+                            setNameModal.querySelector('div').classList.add('scale-100', 'opacity-100');
+                        }
+                    }, 10);
                 }
             });
         }
@@ -2397,8 +2331,20 @@
                 if (!playerNameInput) return;
                 const newName = playerNameInput.value.trim();
                 if (newName !== '') {
+                    // Check cooldown again before confirming
+                    if (isNameSetPermanently && (Date.now() - lastPlayerNameChangeTimestamp < NAME_CHANGE_COOLDOWN_DURATION)) {
+                        const remainingTime = Math.ceil((NAME_CHANGE_COOLDOWN_DURATION - (Date.now() - lastPlayerNameChangeTimestamp)) / (1000 * 60 * 60 * 24));
+                        showMessageModal('لا يمكن تغيير الاسم', `لا يمكنك تغيير اسمك إلا بعد مرور ${remainingTime} يوم(أيام) أخرى.`);
+                        return;
+                    }
+
                     playerName = newName;
-                    isNameSetPermanently = true;
+                    if (!isNameSetPermanently) { // Only set timestamp if it's the first time setting the name permanently
+                        isNameSetPermanently = true;
+                        lastPlayerNameChangeTimestamp = Date.now();
+                    } else { // If name is already set permanently, update timestamp for cooldown
+                        lastPlayerNameChangeTimestamp = Date.now();
+                    }
                     savePlayerData();
                     updatePlayerInfoDisplay();
                     showToast(`تم تعيين اسمك إلى ${playerName}!`, 'success');
@@ -2504,7 +2450,7 @@
                 if (anyActiveCooldown && !globalCooldownUpdater) {
                     startGlobalCooldownUpdater();
                 }
-            }, { onlyOnce: true });
+            }, { once: true });
         }
 
         function saveInnovationTypes() {
@@ -2543,7 +2489,7 @@
             const lockIcon = challengeMenuItem.querySelector('.lock-icon');
             const lockText = challengeMenuItem.querySelector('.lock-text');
             if (lockIcon && lockText) {
-                if (playerLevel < 3) { // Changed from 5 to 3
+                if (playerLevel < 3) {
                     challengeMenuItem.classList.add('locked-menu-item');
                     lockIcon.classList.remove('hidden');
                     lockText.classList.remove('hidden');
@@ -2565,9 +2511,10 @@
                 playerLevel = data.playerLevel || 0;
                 playerPoints = data.playerPoints || 0;
                 playerDollars = data.playerDollars || 0;
-                accumulatedDollars = data.accumulatedDollars || 0; // Load accumulated dollars
+                accumulatedDollars = data.accumulatedDollars || 0;
                 playerName = data.playerName || "تعيين اسم";
                 isNameSetPermanently = data.isNameSetPermanently || false;
+                lastPlayerNameChangeTimestamp = data.lastPlayerNameChangeTimestamp || 0; // Load new timestamp
                 xpForCurrentLevel = data.xpForCurrentLevel || 0;
                 xpThresholdForNextLevel = data.xpThresholdForNextLevel || baseXpThreshold;
                 globalAttackCooldownEndTime = data.globalAttackCooldownEndTime || 0;
@@ -2575,8 +2522,6 @@
             } else {
                 savePlayerData();
             }
-            updatePlayerInfoDisplay();
-            updateAccumulatedDollarsDisplay(); // Update display on load
         }
 
         function savePlayerData() {
@@ -2586,9 +2531,10 @@
                 playerLevel: playerLevel,
                 playerPoints: playerPoints,
                 playerDollars: playerDollars,
-                accumulatedDollars: accumulatedDollars, // Save accumulated dollars
+                accumulatedDollars: accumulatedDollars,
                 playerName: playerName,
                 isNameSetPermanently: isNameSetPermanently,
+                lastPlayerNameChangeTimestamp: lastPlayerNameChangeTimestamp, // Save new timestamp
                 xpForCurrentLevel: xpForCurrentLevel,
                 xpThresholdForNextLevel: xpThresholdForNextLevel,
                 globalAttackCooldownEndTime: globalAttackCooldownEndTime,
@@ -2602,17 +2548,15 @@
             const snapshot = await get(housesRef);
             if (snapshot.exists()) {
                 houses = snapshot.val();
-                // Ensure activeHouseIndex is valid, or default to the first unlocked house
                 const firstUnlockedIndex = houses.findIndex(h => h.unlocked);
                 if (firstUnlockedIndex !== -1) {
                     activeHouseIndex = firstUnlockedIndex;
                 } else {
-                    activeHouseIndex = 0; // Fallback to first house if none unlocked (shouldn't happen with initial data)
+                    activeHouseIndex = 0;
                 }
             } else {
                 saveHouses();
             }
-            renderHouses();
         }
 
         function saveHouses() {
@@ -2627,9 +2571,10 @@
             if (snapshot.exists()) {
                 playerInventory = snapshot.val();
             } else {
+                // Initialize playerInventory if it doesn't exist in Firebase
+                playerInventory = { reduceTime: 0 };
                 savePlayerInventory();
             }
-            updatePlayerInfoDisplay();
         }
 
         function savePlayerInventory() {
@@ -2643,7 +2588,7 @@
             onValue(cooldownsRef, (snapshot) => {
                 attackCooldowns = snapshot.val() || {};
                 renderChallengePlayers();
-            });
+            }, { once: true });
         }
 
         function saveAttackCooldowns() {
@@ -2651,30 +2596,14 @@
             set(ref(db, `artifacts/${appId}/users/${userId}/attackCooldowns`), attackCooldowns);
         }
 
-        async function loadAttackLog() {
-            // Personal attack logs are no longer rendered, but we still load the data structure
-            // for consistency if needed for other logic or future features.
-            if (!isFirebaseLoaded) return;
-            const attackLogRef = ref(db, `artifacts/${appId}/users/${userId}/attackLog`);
-            onValue(attackLogRef, (snapshot) => {
-                attackLog = snapshot.val() || { outgoing: {}, incoming: {} };
-                // No need to call renderAttackLog here as it now only handles global
-            });
-        }
-
-        function saveAttackLog() {
-            if (!isFirebaseLoaded) return;
-            set(ref(db, `artifacts/${appId}/users/${userId}/attackLog`), attackLog);
-        }
-
         async function migrateLocalStorageToFirebase() {
             const localStorageKeys = [
                 'playerXP', 'playerLevel', 'playerPoints', 'playerDollars',
-                'playerInventory', 'playerName', 'isNameSetPermanently',
+                'playerInventory', 'playerName', 'isNameSetPermanently', 'lastPlayerNameChangeTimestamp', // Added new timestamp
                 'xpForCurrentLevel', 'xpThresholdForNextLevel',
                 'houses', 'innovationTypes', 'tasks', 'lastDailyResetDate',
                 'globalAttackCooldownEndTime', 'attacksMadeInCurrentCooldown',
-                'accumulatedDollars' // Add accumulatedDollars to migration
+                'accumulatedDollars'
             ];
 
             let hasLocalStorageData = false;
@@ -2688,54 +2617,58 @@
             if (hasLocalStorageData) {
                 showMessageModal('نقل البيانات', 'جاري نقل بياناتك القديمة إلى السحابة. قد يستغرق هذا بضع لحظات.');
                 try {
-                    playerXP = parseInt(localStorage.getItem('playerXP') || '0');
-                    playerLevel = parseInt(localStorage.getItem('playerLevel') || '0');
-                    playerPoints = parseInt(localStorage.getItem('playerPoints') || '0');
-                    playerDollars = parseInt(localStorage.getItem('playerDollars') || '0');
-                    accumulatedDollars = parseInt(localStorage.getItem('accumulatedDollars') || '0'); // Migrate accumulated dollars
-                    playerName = localStorage.getItem('playerName') || "تعيين اسم";
-                    isNameSetPermanently = localStorage.getItem('isNameSetPermanently') === 'true';
-                    xpForCurrentLevel = parseInt(localStorage.getItem('xpForCurrentLevel') || '0');
-                    xpThresholdForNextLevel = parseInt(localStorage.getItem('xpThresholdForNextLevel') || `${baseXpThreshold}`);
-                    globalAttackCooldownEndTime = parseInt(localStorage.getItem('globalAttackCooldownEndTime') || '0');
-                    attacksMadeInCurrentCooldown = parseInt(localStorage.getItem('attacksMadeInCurrentCooldown') || '0');
+                    const migratedXP = parseInt(localStorage.getItem('playerXP') || '0');
+                    const migratedLevel = parseInt(localStorage.getItem('playerLevel') || '0');
+                    const migratedPoints = parseInt(localStorage.getItem('playerPoints') || '0');
+                    const migratedDollars = parseInt(localStorage.getItem('playerDollars') || '0');
+                    const migratedAccumulatedDollars = parseInt(localStorage.getItem('accumulatedDollars') || '0');
+                    const migratedPlayerName = localStorage.getItem('playerName') || "تعيين اسم";
+                    const migratedIsNameSetPermanently = localStorage.getItem('isNameSetPermanently') === 'true';
+                    const migratedLastPlayerNameChangeTimestamp = parseInt(localStorage.getItem('lastPlayerNameChangeTimestamp') || '0'); // Load new timestamp
+                    const migratedXpForCurrentLevel = parseInt(localStorage.getItem('xpForCurrentLevel') || '0');
+                    const migratedXpThresholdForNextLevel = parseInt(localStorage.getItem('xpThresholdForNextLevel') || `${baseXpThreshold}`);
+                    const migratedGlobalAttackCooldownEndTime = parseInt(localStorage.getItem('globalAttackCooldownEndTime') || '0');
+                    const migratedAttacksMadeInCurrentCooldown = parseInt(localStorage.getItem('attacksMadeInCurrentCooldown') || '0');
 
-                    const savedHouses = JSON.parse(localStorage.getItem('houses'));
-                    if (savedHouses) houses = savedHouses;
+                    const migratedHouses = JSON.parse(localStorage.getItem('houses'));
+                    const migratedInnovationTypes = JSON.parse(localStorage.getItem('innovationTypes'));
+                    const migratedPlayerInventory = JSON.parse(localStorage.getItem('playerInventory'));
+                    const migratedTasks = JSON.parse(localStorage.getItem('tasks'));
+                    const migratedLastDailyResetDate = localStorage.getItem('lastDailyResetDate');
 
-                    const savedInnovationTypes = JSON.parse(localStorage.getItem('innovationTypes'));
-                    if (savedInnovationTypes) {
-                        savedInnovationTypes.forEach(savedType => {
+                    playerXP = migratedXP;
+                    playerLevel = migratedLevel;
+                    playerPoints = migratedPoints;
+                    playerDollars = migratedDollars;
+                    accumulatedDollars = migratedAccumulatedDollars;
+                    playerName = migratedPlayerName;
+                    isNameSetPermanently = migratedIsNameSetPermanently;
+                    lastPlayerNameChangeTimestamp = migratedLastPlayerNameChangeTimestamp; // Assign new timestamp
+                    xpForCurrentLevel = migratedXpForCurrentLevel;
+                    xpThresholdForNextLevel = migratedXpThresholdForNextLevel;
+                    globalAttackCooldownEndTime = migratedGlobalAttackCooldownEndTime;
+                    attacksMadeInCurrentCooldown = migratedAttacksMadeInCurrentCooldown;
+
+                    if (migratedHouses) houses = migratedHouses;
+                    if (migratedInnovationTypes) {
+                        migratedInnovationTypes.forEach(savedType => {
                             const existingType = innovationTypes.find(type => type.id === savedType.id);
                             if (existingType) {
-                                if (savedType.cooldownTimeLeft !== undefined) {
-                                    existingType.cooldownEndTime = Date.now() + (savedType.cooldownTimeLeft * 1000);
-                                } else {
-                                    existingType.cooldownEndTime = savedType.cooldownEndTime || 0;
-                                }
+                                existingType.cooldownEndTime = savedType.cooldownEndTime || 0;
                             } else {
                                 if (savedType.id === 'innovation3') {
-                                    innovationTypes.push({
-                                        id: 'innovation3',
-                                        name: 'ابتكار 3',
-                                        cooldownEndTime: (savedType.cooldownTimeLeft !== undefined) ? (Date.now() + (savedType.cooldownTimeLeft * 1000)) : (savedType.cooldownEndTime || 0),
-                                        initialCooldown: 7 * 60,
-                                        colorClass: 'from-green-600 to-emerald-700'
-                                    });
+                                    innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: savedType.cooldownEndTime || 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700' });
                                 }
                             }
                         });
                     }
-
-                    const savedPlayerInventory = JSON.parse(localStorage.getItem('playerInventory'));
-                    if (savedPlayerInventory) playerInventory = savedPlayerInventory;
-
-                    const savedTasks = JSON.parse(localStorage.getItem('tasks'));
-                    if (savedTasks) {
-                        tasks.daily = savedTasks.daily;
-                        tasks.oneTime = savedTasks.oneTime;
+                    // Ensure playerInventory is initialized before assigning migrated data
+                    playerInventory = migratedPlayerInventory || { reduceTime: 0 };
+                    if (migratedTasks) {
+                        tasks.daily = migratedTasks.daily;
+                        tasks.oneTime = migratedTasks.oneTime;
                     }
-                    lastDailyResetDate = localStorage.getItem('lastDailyResetDate');
+                    lastDailyResetDate = migratedLastDailyResetDate;
 
                     await savePlayerData();
                     await saveHouses();
@@ -2743,7 +2676,6 @@
                     await savePlayerInventory();
                     await saveTasks();
                     await saveAttackCooldowns();
-                    await saveAttackLog();
 
                     localStorage.clear();
                     showMessageModal('نقل البيانات', 'تم نقل بياناتك بنجاح إلى السحابة!');
@@ -2838,75 +2770,68 @@
             });
         }
 
-        function listenForOnlineUsers() {
+        async function listenForOnlineUsers() {
             if (!isFirebaseLoaded) return;
             const playerProfilesRef = ref(db, `artifacts/${appId}/public/playerProfiles`);
             const onlineUsersRef = ref(db, `artifacts/${appId}/public/onlineUsers`);
 
-            // Fetch all player profiles first
-            get(playerProfilesRef).then(profilesSnapshot => {
-                const allPlayers = {};
-                profilesSnapshot.forEach(childSnapshot => {
-                    allPlayers[childSnapshot.key] = { ...childSnapshot.val(), isOnline: false };
-                });
+            const profilesSnapshot = await get(playerProfilesRef);
+            const allPlayers = {};
+            profilesSnapshot.forEach(childSnapshot => {
+                allPlayers[childSnapshot.key] = { ...childSnapshot.val(), isOnline: false };
+            });
 
-                // Then listen for online status changes
-                onValue(onlineUsersRef, (onlineSnapshot) => {
-                    if (!onlineUsersList) return;
-                    onlineUsersList.innerHTML = '';
-                    const now = Date.now();
+            onValue(onlineUsersRef, async (onlineSnapshot) => {
+                if (!onlineUsersList) return;
+                onlineUsersList.innerHTML = '';
+                const now = Date.now();
 
-                    // Update online status for all players
-                    for (const playerId in allPlayers) {
-                        allPlayers[playerId].isOnline = false; // Reset status
-                    }
+                for (const playerId in allPlayers) {
+                    allPlayers[playerId].isOnline = false;
+                }
 
-                    onlineSnapshot.forEach(childSnapshot => {
-                        const user = childSnapshot.val();
-                        const userUid = childSnapshot.key;
-                        if (user.lastOnline && (now - user.lastOnline < 60 * 1000)) { // Consider online if last seen within 60 seconds
-                            if (allPlayers[userUid]) {
-                                allPlayers[userUid].isOnline = true;
-                            }
+                onlineSnapshot.forEach(childSnapshot => {
+                    const user = childSnapshot.val();
+                    const userUid = childSnapshot.key;
+                    if (user.lastOnline && (now - user.lastOnline < 60 * 1000)) {
+                        if (allPlayers[userUid]) {
+                            allPlayers[userUid].isOnline = true;
                         }
-                    });
-
-                    const sortedPlayers = Object.keys(allPlayers).sort((a, b) => {
-                        // Sort by online status (online first), then by level, then by power, then by name
-                        const playerA = allPlayers[a];
-                        const playerB = allPlayers[b];
-
-                        if (playerA.isOnline && !playerB.isOnline) return -1;
-                        if (!playerA.isOnline && playerB.isOnline) return 1;
-
-                        if (playerB.level !== playerA.level) return playerB.level - playerA.level;
-                        if (playerB.totalPower !== playerA.totalPower) return playerB.totalPower - playerA.totalPower;
-                        return playerA.name.localeCompare(playerB.name);
-                    });
-
-                    if (sortedPlayers.length === 0) {
-                        onlineUsersList.innerHTML = '<p class="text-gray-300 text-center">لا يوجد لاعبون مسجلون حالياً.</p>';
-                    } else {
-                        sortedPlayers.forEach(uid => {
-                            const user = allPlayers[uid];
-                            if (uid === userId) return; // Don't list self here, power is shown separately
-
-                            const userElement = document.createElement('div');
-                            userElement.className = `online-user-item text-white ${user.isOnline ? '' : 'offline'}`;
-                            userElement.innerHTML = `
-                                <div class="user-info">
-                                    <p class="font-bold text-lg">${user.name}</p>
-                                    <p class="text-sm text-gray-300">المستوى: ${user.level}</p>
-                                    <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(user.totalPower)}</p>
-                                </div>
-                                <div class="status-dot"></div>
-                            `;
-                            onlineUsersList.appendChild(userElement);
-                        });
                     }
                 });
-            }).catch(error => {
-                console.error("Error fetching player profiles for online list:", error);
+
+                const sortedPlayers = Object.keys(allPlayers).sort((a, b) => {
+                    const playerA = allPlayers[a];
+                    const playerB = allPlayers[b];
+
+                    if (playerA.isOnline && !playerB.isOnline) return -1;
+                    if (!playerA.isOnline && playerB.isOnline) return 1;
+
+                    if (playerB.level !== playerA.level) return playerB.level - playerA.level;
+                    if (playerB.totalPower !== playerA.totalPower) return playerB.totalPower - playerA.totalPower;
+                    return playerA.name.localeCompare(playerB.name);
+                });
+
+                if (sortedPlayers.length === 0) {
+                    onlineUsersList.innerHTML = '<p class="text-gray-300 text-center">لا يوجد لاعبون مسجلون حالياً.</p>';
+                } else {
+                    sortedPlayers.forEach(uid => {
+                        const user = allPlayers[uid];
+                        if (uid === userId) return;
+
+                        const userElement = document.createElement('div');
+                        userElement.className = `online-user-item text-white ${user.isOnline ? '' : 'offline'}`;
+                        userElement.innerHTML = `
+                            <div class="user-info">
+                                <p class="font-bold text-lg">${user.name}</p>
+                                <p class="text-sm text-gray-300">المستوى: ${user.level}</p>
+                                <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(user.totalPower)}</p>
+                            </div>
+                            <div class="status-dot"></div>
+                        `;
+                        onlineUsersList.appendChild(userElement);
+                    });
+                }
             });
         }
 
@@ -2932,15 +2857,15 @@
                         const attackCooldownRemaining = getAttackCooldownRemaining(player.uid);
                         const isAttackReady = attackCooldownRemaining <= 0;
 
-                        // Calculate win/loss chance
-                        let winChancePercentage = 0;
-                        if (totalPlayerPower > player.totalPower) {
-                            winChancePercentage = 75; // 75% win chance if stronger
-                        } else if (totalPlayerPower < player.totalPower) {
-                            winChancePercentage = 25; // 25% win chance if weaker
-                        } else {
-                            winChancePercentage = 50; // 50% if equal
-                        }
+                        // Win chance calculation is removed as it's now a direct condition
+                        // let winChancePercentage = 0;
+                        // if (totalPlayerPower > player.totalPower) {
+                        //     winChancePercentage = 90;
+                        // } else if (totalPlayerPower < player.totalPower) {
+                        //     winChancePercentage = 10;
+                        // } else {
+                        //     winChancePercentage = 50;
+                        // }
 
                         const playerElement = document.createElement('div');
                         playerElement.className = 'challenge-player-item text-white';
@@ -2949,7 +2874,7 @@
                                 <p class="font-bold text-lg">${player.name}</p>
                                 <p class="text-sm text-gray-300">المستوى: ${player.level}</p>
                                 <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(player.totalPower)}</p>
-                                <p class="text-sm mt-1">فرصة الفوز: <span class="${winChancePercentage >= 50 ? 'text-green-400' : 'text-red-400'} font-bold">${winChancePercentage}%</span></p>
+                                <!-- Removed win chance display -->
                             </div>
                             <button data-target-id="${player.uid}" data-target-name="${player.name}" data-target-power="${player.totalPower}"
                                 class="attack-button ${isAttackReady && attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS ? '' : 'opacity-50 cursor-not-allowed'}" ${isAttackReady && attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS ? '' : 'disabled'}>
@@ -2970,7 +2895,7 @@
         function getAttackCooldownRemaining(targetId) {
             const lastAttackTime = attackCooldowns[targetId];
             if (!lastAttackTime) return 0;
-            const cooldownDuration = 30 * 60; // 30 minutes
+            const cooldownDuration = 30 * 60;
             const elapsed = (Date.now() - lastAttackTime) / 1000;
             return Math.max(0, Math.floor(cooldownDuration - elapsed));
         }
@@ -2986,10 +2911,10 @@
                 globalCooldownTimerDisplay.textContent = formatTime(remainingTime);
             } else {
                 globalAttackCooldownDisplay.classList.add('hidden');
-                attacksMadeInCurrentCooldown = 0; // Reset attacks if cooldown expired
-                savePlayerData(); // Save the reset
+                attacksMadeInCurrentCooldown = 0;
+                savePlayerData();
             }
-            renderChallengePlayers(); // Update buttons based on global cooldown
+            renderChallengePlayers();
         }
 
         function startGlobalAttackCooldownUpdater() {
@@ -3018,16 +2943,15 @@
                 return;
             }
 
-            let winChance = 0.25;
-            if (totalPlayerPower > targetPower) {
-                winChance = 0.75;
+            // New attack logic: win only if player's power is >= target's power + 3000
+            let didWin = false;
+            if (totalPlayerPower >= (targetPower + 3000)) {
+                didWin = true;
             }
 
-            const didWin = Math.random() < winChance;
             const pointsStolen = 50;
-            const dollarsStolen = 50;
+            const dollarsStolen = 100;
 
-            let outcomeMessage = '';
             let attackerPointsChange = 0;
             let attackerDollarsChange = 0;
             let defenderPointsChange = 0;
@@ -3036,13 +2960,11 @@
             if (didWin) {
                 attackerPointsChange = pointsStolen;
                 attackerDollarsChange = dollarsStolen;
-                outcomeMessage = 'فوز!';
-                showMessageModal('فوز!', `لقد هاجمت ${targetName} بنجاح وسرقت ${pointsStolen} نقطة و ${dollarsStolen}$!`);
+                showMessageModal('فوز!', `لقد هاجمت ${targetName} بنجاح وحصلت على ${pointsStolen} نقطة و ${dollarsStolen}$!`);
             } else {
                 attackerPointsChange = -pointsStolen;
-                attackerDollarsChange = -dollarsStolen;
-                outcomeMessage = 'خسارة!';
-                showMessageModal('خسارة!', `فشلت في الهجوم على ${targetName} وخسرت ${pointsStolen} نقطة و ${dollarsStolen}.`);
+                attackerDollarsChange = 0;
+                showMessageModal('خسارة!', `فشلت في الهجوم على ${targetName} وخسرت ${pointsStolen} نقطة.`);
             }
 
             playerPoints += attackerPointsChange;
@@ -3050,19 +2972,18 @@
             playerPoints = Math.max(0, playerPoints);
             playerDollars = Math.max(0, playerDollars);
 
-            // Visual effect for attack outcome
             const playerElement = event.target.closest('.challenge-player-item');
             if (playerElement) {
                 let overlay = playerElement.querySelector('.attack-outcome-overlay');
                 if (!overlay) {
                     overlay = document.createElement('div');
                     overlay.className = 'attack-outcome-overlay';
-                    playerElement.style.position = 'relative'; // Ensure parent is positioned for absolute overlay
+                    playerElement.style.position = 'relative';
                     playerElement.appendChild(overlay);
                 }
 
                 overlay.textContent = didWin ? 'فوز!' : 'خسارة!';
-                overlay.classList.remove('win', 'loss'); // Clear previous outcome
+                overlay.classList.remove('win', 'loss');
                 overlay.classList.add(didWin ? 'win' : 'loss');
                 overlay.classList.add('show');
 
@@ -3072,11 +2993,10 @@
                         if (overlay.parentNode) {
                             overlay.parentNode.removeChild(overlay);
                         }
-                    }, 300); // Match CSS transition duration
-                }, 1500); // Show for 1.5 seconds
+                    }, 300);
+                }, 1500);
             }
 
-            // Record outgoing attack
             push(ref(db, `artifacts/${appId}/users/${userId}/attackLog/outgoing`), {
                 targetId: targetId,
                 targetName: targetName,
@@ -3086,7 +3006,6 @@
                 dollarsChange: attackerDollarsChange
             }).catch(error => console.error("Error saving outgoing attack log:", error));
 
-            // Record incoming attack for target player
             const targetPlayerRef = ref(db, `artifacts/${appId}/users/${targetId}/playerData`);
             const targetAttackLogRef = ref(db, `artifacts/${appId}/users/${targetId}/attackLog/incoming`);
 
@@ -3123,7 +3042,6 @@
                 console.error("Error updating target player data:", error);
             });
 
-            // Record global attack
             push(ref(db, `artifacts/${appId}/public/globalAttackLog`), {
                 attackerId: userId,
                 attackerName: playerName,
@@ -3137,20 +3055,13 @@
             saveAttackCooldowns();
 
             attacksMadeInCurrentCooldown++;
-            if (attacksMadeInCurrentCooldown >= MAX_GLOBAL_ATTACKS && globalAttackCooldownEndTime === 0) { // Only set cooldown if not already active
+            if (attacksMadeInCurrentCooldown >= MAX_GLOBAL_ATTACKS && globalAttackCooldownEndTime === 0) {
                 globalAttackCooldownEndTime = Date.now() + (GLOBAL_ATTACK_COOLDOWN_DURATION * 1000);
             }
-            savePlayerData(); // Save global attack cooldown state
+            savePlayerData();
 
             updatePlayerInfoDisplay();
-            renderChallengePlayers(); // Re-render to update cooldowns and global attack count
-        }
-
-        function renderAttackLog() {
-            // Personal attack logs are no longer rendered
-            // outgoingAttacksList.innerHTML = '<p class="text-gray-400 text-center">لا توجد هجمات صادرة.</p>';
-            // incomingAttacksList.innerHTML = '<p class="text-gray-400 text-center">لا توجد هجمات واردة.</p>';
-            // Global attacks are handled by listenForGlobalAttackLog
+            renderChallengePlayers();
         }
 
         function listenForGlobalAttackLog() {
@@ -3162,7 +3073,7 @@
                 snapshot.forEach(childSnapshot => {
                     globalAttacks.push(childSnapshot.val());
                 });
-                globalAttacks.sort((a, b) => b.timestamp - a.timestamp); // Sort descending by timestamp
+                globalAttacks.sort((a, b) => b.timestamp - a.timestamp);
 
                 if (globalAttacks.length === 0) {
                     globalAttacksList.innerHTML = '<p class="text-gray-400 text-center">لا توجد هجمات عالمية حالياً.</p>';
@@ -3182,13 +3093,12 @@
             });
         }
 
-        // Dollar Collection Feature Functions
         function startDollarCollection() {
             if (dollarCollectionInterval) clearInterval(dollarCollectionInterval);
             dollarCollectionInterval = setInterval(() => {
-                accumulatedDollars += 1; // 1 dollar every 5 seconds
+                accumulatedDollars += 1;
                 updateAccumulatedDollarsDisplay();
-                savePlayerData(); // Save accumulated dollars
+                savePlayerData();
             }, 5000);
         }
 
@@ -3201,7 +3111,7 @@
         function collectDollars() {
             if (accumulatedDollars > 0) {
                 playerDollars += accumulatedDollars;
-                showToast(`لقد جمعت $${formatPower(accumulatedDollars)}!`, 'success');
+                showToast(`لقد جمعت $${formatDollars(accumulatedDollars)}!`, 'success');
                 accumulatedDollars = 0;
                 updatePlayerInfoDisplay();
                 updateAccumulatedDollarsDisplay();
@@ -3209,6 +3119,11 @@
             } else {
                 showToast('لا توجد دولارات لجمعها بعد.', 'info');
             }
+        }
+
+        // Helper function for formatting dollars (if needed, otherwise use formatPower)
+        function formatDollars(num) {
+            return formatPower(num); // Reusing formatPower for consistency
         }
 
         if (collectDollarsButton) {
@@ -3222,6 +3137,7 @@
                 authAttemptPromise = signInWithCustomToken(auth, initialAuthToken)
                     .catch(async (error) => {
                         if (error.code === 'auth/custom-token-mismatch') {
+                            showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول باستخدام الرمز المخصص. جاري المحاولة كمجهول.');
                             return signInAnonymously(auth).catch((anonError) => {
                                 showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.');
                                 return null;
@@ -3246,19 +3162,29 @@
                     isFirebaseLoaded = true;
 
                     try {
+                        // Load data from Firebase first
                         await loadPlayerData();
                         await loadHouses();
                         await loadInnovationTypes();
                         await loadPlayerInventory();
                         await loadTasks();
                         await loadAttackCooldowns();
-                        await loadAttackLog(); // Load personal attack log data (though not rendered)
+
+                        // Then attempt to migrate from localStorage if data exists there
+                        await migrateLocalStorageToFirebase();
+
+                        updatePlayerInfoDisplay();
+                        updateAccumulatedDollarsDisplay();
+                        renderHouses();
+                        updateInnovationButtonText();
+                        updateInnovationTimerDisplay();
+                        renderTasks();
+                        renderInventoryItems();
 
                         listenForChatMessages();
-                        // listenForOnlineUsers is called when navigating to online-view
                         startDailyResetTimer();
                         clearChatHistory();
-                        startDollarCollection(); // Start dollar collection
+                        startDollarCollection();
 
                         if (onlineStatusUpdater) clearInterval(onlineStatusUpdater);
                         onlineStatusUpdater = setInterval(updateOnlineStatus, 30 * 1000);
@@ -3285,10 +3211,6 @@
                                 }, 10);
                             }
                         }
-                        
-                        setTimeout(async () => {
-                            await migrateLocalStorageToFirebase();
-                        }, 1000);
 
                     } catch (e) {
                         console.error("Error during data loading/setup:", e);
