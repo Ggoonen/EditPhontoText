@@ -120,7 +120,6 @@
             animation: fadeInScale 0.3s ease-out forwards;
         }
         .store-item {
-            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -132,28 +131,46 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            text-align: center;
         }
         .store-item:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
         }
         .store-item img {
-            width: 6rem; /* Larger image */
-            height: 6rem;
+            width: 5rem; /* Smaller image for compact design */
+            height: 5rem;
             object-fit: contain;
+            margin-bottom: 0.5rem;
+        }
+        .store-item .item-title {
+            font-size: 1.1rem; /* Slightly smaller title */
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 0.25rem;
+        }
+        .store-item .item-description {
+            font-size: 0.8rem; /* Smaller description */
+            color: #a0aec0;
             margin-bottom: 0.75rem;
+            min-height: 2.4rem; /* Ensure consistent height for description */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .store-item .buy-button {
             background: #4a5568;
             color: #fff;
-            padding: 0.5rem 1rem;
-            border-radius: 0.75rem;
+            padding: 0.4rem 0.8rem; /* Smaller button */
+            border-radius: 0.6rem;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
             transition: background 0.2s ease-in-out;
-            margin-top: 1rem;
+            font-size: 0.9rem;
         }
         .store-item .buy-button:hover {
             background: #6366f1;
@@ -595,11 +612,11 @@
         }
         /* Smaller dollar collector styles */
         #dollar-collector {
-            padding: 0.5rem; /* Reduced padding */
-            border-radius: 0.5rem; /* Slightly smaller border radius */
+            padding: 0.5rem;
+            border-radius: 0.5rem;
             position: relative;
             overflow: hidden;
-            height: 6rem; /* Fixed height for consistent look */
+            height: 6rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -613,42 +630,88 @@
             width: 0%;
             transition: width 0.5s ease-out;
             z-index: 0;
-            border-radius: 0.5rem; /* Match parent */
+            border-radius: 0.5rem;
         }
         #dollar-collector h3 {
-            font-size: 0.875rem; /* Smaller font */
-            margin-bottom: 0.25rem; /* Reduced margin */
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
             position: relative;
             z-index: 1;
         }
         #dollar-collector .flex {
-            margin-bottom: 0.25rem; /* Reduced margin */
+            margin-bottom: 0.25rem;
             position: relative;
             z-index: 1;
             justify-content: center;
             align-items: center;
-            flex-wrap: wrap; /* Allow wrapping if needed */
+            flex-wrap: wrap;
         }
         #dollar-collector .flex > div {
             display: flex;
             align-items: center;
-            margin: 0 0.25rem; /* Small margin between items */
+            margin: 0 0.25rem;
         }
-        #dollar-collector .text-xl { /* Changed from text-2xl to text-xl */
-            font-size: 1.25rem; /* Reduced font size for dollars display */
+        #dollar-collector .text-xl {
+            font-size: 1.25rem;
         }
         #dollar-collector svg {
-            height: 1rem; /* Smaller icons */
+            height: 1rem;
             width: 1rem;
-            margin-left: 0.25rem; /* Smaller margin */
+            margin-left: 0.25rem;
         }
         #collect-dollars-button {
-            padding: 0.3rem 0.75rem; /* Reduced padding */
-            font-size: 0.75rem; /* Reduced font size */
+            padding: 0.3rem 0.75rem;
+            font-size: 0.75rem;
             position: relative;
             z-index: 1;
-            width: calc(100% - 1rem); /* Adjust width for padding */
-            margin: 0 0.5rem; /* Center button */
+            width: calc(100% - 1rem);
+            margin: 0 0.5rem;
+        }
+        #challenge-player-random-button {
+            background-color: #6366f1;
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            transition: background-color 0.2s;
+            width: 100%;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+        #challenge-player-random-button:hover {
+            background-color: #5a5fe0;
+        }
+        #challenge-player-random-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        #last-message-modal-content {
+            background: linear-gradient(135deg, #4a5568, #2d3748);
+            border: 2px solid #6366f1;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            padding: 2rem;
+            animation: fadeInScale 0.3s ease-out forwards;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+        }
+        #last-message-modal-content .chat-message {
+            background-color: #2d3748;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.5rem;
+            word-wrap: break-word;
+            max-width: 100%;
+            align-self: center;
+        }
+        #chat-view #chat-input-container {
+            display: flex; /* Always flex for layout */
+            flex-direction: column; /* Stack input and button */
+            gap: 0.5rem;
+            padding-top: 1rem;
+        }
+        #chat-view #chat-input-container.hidden {
+            display: none;
         }
     </style>
 </head>
@@ -764,9 +827,7 @@
                         <p class="text-gray-400 text-center">لا توجد هجمات عالمية حالياً.</p>
                     </div>
                 </div>
-                <button id="delete-account-button" class="bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-8 w-full">
-                    حذف الحساب
-                </button>
+                <!-- Removed delete-account-button -->
             </div>
         </div>
 
@@ -861,11 +922,11 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 view-content">
+            <div class="grid grid-cols-2 gap-4 view-content">
                 <div id="store-item-reduce-time" class="store-item">
                     <img src="https://f.top4top.io/p_3479ijdcl0.png" alt="Reduce Time">
-                    <span class="text-lg font-semibold text-white">تقليل وقت الابتكار</span>
-                    <span class="text-sm text-gray-300 text-center mt-1 mb-2">يقلل دقيقتين من وقت تهدئة الابتكار الحالي.</span>
+                    <span class="item-title">تقليل وقت الابتكار</span>
+                    <span class="item-description">يقلل دقيقتين من وقت تهدئة الابتكار الحالي.</span>
                     <button class="buy-button">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
@@ -875,8 +936,8 @@
                 </div>
                 <div id="store-item-convert-points" class="store-item">
                     <img src="https://i.top4top.io/s_34795cyi20.png" alt="Convert Points">
-                    <span class="text-lg font-semibold text-white">تحويل النقاط</span>
-                    <span class="text-sm text-gray-300 text-center mt-1 mb-2">يحول 500 نقطة إلى 100 دولار.</span>
+                    <span class="item-title">تحويل النقاط</span>
+                    <span class="item-description">يحول 500 نقطة إلى 100 دولار.</span>
                     <button class="buy-button">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
@@ -886,8 +947,8 @@
                 </div>
                 <div id="store-item-buy-innovation3" class="store-item">
                     <img src="https://f.top4top.io/s_34796x9520.png" alt="Buy Innovation 3">
-                    <span class="text-lg font-semibold text-white">شراء ابتكار ثالث</span>
-                    <span class="text-sm text-gray-300 text-center mt-1 mb-2">يفتح ابتكارًا جديدًا بشكل دائم.</span>
+                    <span class="item-title">شراء ابتكار ثالث</span>
+                    <span class="item-description">يفتح ابتكارًا جديدًا بشكل دائم.</span>
                     <button class="buy-button">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
@@ -905,11 +966,12 @@
                 </svg>
             </div>
             <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">تحدي اللاعبون</h1>
-            <div id="challenge-players-list" class="view-content flex flex-col gap-4">
-            </div>
-            <button id="refresh-challenge-players-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-auto w-full">
-                تحديث اللاعبين
+            <button id="challenge-player-random-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                تحدي لاعب عشوائي
             </button>
+            <div id="challenge-players-list" class="view-content flex flex-col gap-4">
+                <p class="text-gray-300 text-center">اضغط على "تحدي لاعب عشوائي" لبدء التحدي.</p>
+            </div>
         </div>
 
         <div id="chat-view" class="view transform translate-x-full">
@@ -919,11 +981,14 @@
                 </svg>
             </div>
             <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">اخبار التحديثات</h1>
-            <div id="chat-messages" class="view-content flex flex-col-reverse">
+            <div id="chat-messages" class="view-content flex flex-col-reverse justify-end">
                 <p class="text-gray-400 text-center">لا توجد تحديثات حالياً.</p>
             </div>
-            <div id="chat-input-container" class="flex p-4 bg-gray-800 rounded-b-3xl">
-                <input type="text" id="chat-input" placeholder="اكتب رسالتك..." class="flex-grow p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <button id="show-chat-input-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-4">
+                إرسال رسالة جديدة
+            </button>
+            <div id="chat-input-container" class="hidden flex-col p-4 bg-gray-800 rounded-b-3xl">
+                <input type="text" id="chat-input" placeholder="اكتب رسالتك..." class="flex-grow p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-2">
                 <button id="chat-send-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200 ease-in-out">
                     إرسال
                 </button>
@@ -947,9 +1012,9 @@
                 </div>
 
                 <div class="bg-gray-700 p-4 rounded-xl shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-100 mb-4">اللاعبون غير المتصلين (آخر 10 ساعات)</h2>
-                    <div id="recently-offline-players-list" class="flex flex-col gap-3">
-                        <p class="text-gray-400 text-center">لا يوجد لاعبون غير متصلين.</p>
+                    <h2 class="text-xl font-semibold text-gray-100 mb-4">جميع اللاعبين</h2>
+                    <div id="all-players-list" class="flex flex-col gap-3">
+                        <p class="text-gray-400 text-center">لا يوجد لاعبون مسجلون.</p>
                     </div>
                 </div>
             </div>
@@ -1045,6 +1110,18 @@
         </div>
     </div>
 
+    <div id="last-message-modal" class="modal-overlay hidden">
+        <div id="last-message-modal-content" class="text-center transform scale-95 opacity-0">
+            <h3 class="text-2xl font-bold text-gray-100 mb-4">آخر الأخبار</h3>
+            <div id="last-message-display" class="chat-message mb-6">
+                <p class="text-gray-400 text-center">لا توجد تحديثات حالياً.</p>
+            </div>
+            <button id="last-message-modal-close-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                حسناً
+            </button>
+        </div>
+    </div>
+
     <div id="auth-flow-modal" class="modal-overlay hidden">
         <div class="bg-gray-700 p-8 rounded-xl shadow-2xl text-center max-w-sm w-full transform scale-95 opacity-0">
             <h3 class="text-2xl font-bold text-gray-100 mb-4" id="auth-modal-title"></h3>
@@ -1086,28 +1163,6 @@
         </div>
     </div>
 
-    <div id="delete-confirm-modal" class="modal-overlay hidden">
-        <div class="message-modal-content text-center max-w-sm w-full transform scale-95 opacity-0">
-            <h3 class="text-2xl font-bold text-gray-100 mb-4">تأكيد حذف الحساب</h3>
-            <p class="text-gray-200 text-lg mb-6">هل أنت متأكد أنك تريد حذف حسابك؟ هذا الإجراء لا يمكن التراجع عنه.</p>
-            <div class="flex justify-center gap-4">
-                <button id="delete-confirm-yes" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
-                    نعم، احذف
-                </button>
-                <button id="delete-confirm-no" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
-                    إلغاء
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div id="reset-countdown-modal" class="modal-overlay hidden">
-        <div class="message-modal-content text-center max-w-sm w-full transform scale-95 opacity-0">
-            <h3 class="text-2xl font-bold text-gray-100 mb-4">جاري حذف الحساب...</h3>
-            <p class="text-gray-200 text-lg mb-6">سيتم إعادة تشغيل التطبيق في <span id="countdown-display" class="text-yellow-400 font-bold text-3xl">10</span> ثوانٍ.</p>
-        </div>
-    </div>
-
     <div id="toast-notification" class="fixed top-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-50">
     </div>
 
@@ -1121,8 +1176,7 @@
             createUserWithEmailAndPassword,
             signInWithEmailAndPassword,
             linkWithCredential,
-            EmailAuthProvider,
-            signOut
+            EmailAuthProvider
         } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
         import { getDatabase, ref, set, get, onValue, remove, push, serverTimestamp, query, orderByChild, limitToLast, onDisconnect } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
@@ -1146,6 +1200,7 @@
         let userId = 'anonymous';
         let isFirebaseLoaded = false;
         let totalPlayerPower = 0;
+        let authResolvedPromise = null; // Promise for initial auth state resolution
 
         const attackLogMenuItem = document.getElementById('attack-log-menu-item');
         const playMenuItem = document.getElementById('play-menu-item');
@@ -1204,7 +1259,10 @@
         const inventoryItemsList = document.getElementById('inventory-items-list');
         const inventoryCloseButton = document.getElementById('inventory-close-button');
 
-        // Removed updatesIcon and updatesModal as per request
+        const lastMessageModal = document.getElementById('last-message-modal');
+        const lastMessageDisplay = document.getElementById('last-message-display');
+        const lastMessageModalCloseButton = document.getElementById('last-message-modal-close-button');
+
 
         const authFlowModal = document.getElementById('auth-flow-modal');
         const authModalTitle = document.getElementById('auth-modal-title');
@@ -1224,12 +1282,7 @@
 
         const playerNameDisplay = document.getElementById('player-name-display');
 
-        const deleteAccountButton = document.getElementById('delete-account-button');
-        const deleteConfirmModal = document.getElementById('delete-confirm-modal');
-        const deleteConfirmYes = document.getElementById('delete-confirm-yes');
-        const deleteConfirmNo = document.getElementById('delete-confirm-no');
-        const resetCountdownModal = document.getElementById('reset-countdown-modal');
-        const countdownDisplay = document.getElementById('countdown-display');
+        // Removed deleteAccountButton and related modals/logic
 
         const storePlayerPointsDisplay = document.getElementById('store-player-points-display');
         const storePlayerDollarsDisplay = document.getElementById('store-player-dollars-display');
@@ -1244,15 +1297,15 @@
         const chatMessagesDiv = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
         const chatSendButton = document.getElementById('chat-send-button');
+        const showChatInputButton = document.getElementById('show-chat-input-button');
+        const chatInputContainer = document.getElementById('chat-input-container');
 
         const onlinePlayersListDiv = document.getElementById('online-players-list');
-        const recentlyOfflinePlayersListDiv = document.getElementById('recently-offline-players-list');
+        const allPlayersListDiv = document.getElementById('all-players-list'); // Changed from recentlyOfflinePlayersListDiv
 
         const challengePlayersList = document.getElementById('challenge-players-list');
         const globalAttacksList = document.getElementById('global-attacks-list');
-        const refreshChallengePlayersButton = document.getElementById('refresh-challenge-players-button');
-
-        // Removed globalAttackCooldownDisplay, attacksRemainingDisplay, globalCooldownTimerDisplay as per new challenge system
+        const challengePlayerRandomButton = document.getElementById('challenge-player-random-button'); // New button
 
         const accumulatedDollarsDisplay = document.getElementById('accumulated-dollars-display');
         const accumulatedPointsDisplay = document.getElementById('accumulated-points-display');
@@ -1270,7 +1323,7 @@
             { id: 6, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] }
         ];
         let activeHouseIndex = 0;
-        let globalCooldownUpdater = null; // Still used for innovation cooldowns
+        let globalCooldownUpdater = null;
         let onlineStatusUpdater = null;
         let dollarCollectionInterval = null;
 
@@ -1286,7 +1339,7 @@
         let isNameSetPermanently = false;
         let lastPlayerNameChangeTimestamp = 0;
         let attackCooldowns = {}; // Individual player cooldowns
-        let currentChallengePlayers = []; // Stores the 3 random players currently displayed
+        let currentChallengePlayer = null; // Stores the single random player currently displayed
 
         const NAME_CHANGE_COOLDOWN_DURATION = 3 * 24 * 60 * 60 * 1000;
         const ONLINE_ACTIVE_DURATION = 60 * 1000; // 1 minute for truly "online" status
@@ -1319,7 +1372,6 @@
         ];
         let currentInnovationTypeIndex = 0;
 
-        // Define storeItems object here to ensure it's accessible
         const storeItems = {
             reduceTime: {
                 name: 'تقليل وقت الابتكار',
@@ -1327,11 +1379,11 @@
                 image: 'https://f.top4top.io/p_3479ijdcl0.png',
                 cost: 200,
                 costType: 'dollars',
-                directUse: false, // This is an inventory item
+                directUse: false,
                 useEffect: (quantity) => {
                     const currentInnovation = innovationTypes[currentInnovationTypeIndex];
                     if (currentInnovation) {
-                        const timeReductionPerItem = 120; // 2 minutes
+                        const timeReductionPerItem = 120;
                         const cooldownRemaining = Math.max(0, Math.floor((currentInnovation.cooldownEndTime - Date.now()) / 1000));
                         const actualReduction = Math.min(cooldownRemaining, quantity * timeReductionPerItem);
                         currentInnovation.cooldownEndTime = Math.max(Date.now(), currentInnovation.cooldownEndTime - (actualReduction * 1000));
@@ -1349,7 +1401,7 @@
                 image: 'https://i.top4top.io/s_34795cyi20.png',
                 cost: 500,
                 costType: 'points',
-                directUse: true, // This item is used directly upon purchase
+                directUse: true,
                 useEffect: (quantity) => {
                     const dollarsGained = quantity * 100;
                     playerDollars += dollarsGained;
@@ -1364,14 +1416,14 @@
                 image: 'https://f.top4top.io/s_34796x9520.png',
                 cost: 3000,
                 costType: 'points',
-                directUse: true, // This item is used directly upon purchase
+                directUse: true,
                 useEffect: () => {
                     const innovation3 = innovationTypes.find(inv => inv.id === 'innovation3');
                     if (innovation3) {
                         innovation3.isOwned = true;
                         saveInnovationTypes();
                         updateInnovationButtonText();
-                        showMessageModal('تم الشراء', 'تم فتح الابتكار الثالث بنجاح!');
+                        showMessageModal('تم الشراء', 'تم فتح الابتكار الثالث بنجاح!', 'success');
                     }
                 }
             }
@@ -1476,35 +1528,36 @@
             const currentView = document.querySelector('.view.translate-x-0');
             const targetView = document.getElementById(targetViewId);
 
-            if (currentView === targetView) return;
+            if (!currentView || !targetView || currentView === targetView) return;
 
-            if (currentView) {
-                if (direction === 'right') {
-                    currentView.classList.add('-translate-x-full');
-                } else {
-                    currentView.classList.add('translate-x-full');
-                }
-                currentView.classList.remove('translate-x-0');
+            // Apply exit animation to current view
+            if (direction === 'right') {
+                currentView.classList.add('-translate-x-full');
+            } else {
+                currentView.classList.add('translate-x-full');
+            }
+            currentView.classList.remove('translate-x-0');
+            
+            // Prepare target view for entry animation
+            if (direction === 'right') {
+                targetView.classList.remove('-translate-x-full');
+                targetView.classList.add('translate-x-full');
+            } else {
+                targetView.classList.remove('translate-x-full');
+                targetView.classList.add('-translate-x-full');
             }
             
-            if (targetView) {
-                if (direction === 'right') {
-                    targetView.classList.remove('-translate-x-full');
-                    targetView.classList.add('translate-x-full');
-                } else {
-                    targetView.classList.remove('translate-x-full');
-                    targetView.classList.add('-translate-x-full');
+            // Trigger entry animation after a small delay to ensure exit animation starts
+            setTimeout(() => {
+                targetView.classList.remove('translate-x-full', '-translate-x-full');
+                targetView.classList.add('translate-x-0');
+                const targetViewContent = targetView.querySelector('.view-content');
+                if (targetViewContent) {
+                    targetViewContent.scrollTop = 0;
                 }
-                
-                setTimeout(() => {
-                    targetView.classList.remove('translate-x-full', '-translate-x-full');
-                    targetView.classList.add('translate-x-0');
-                    const targetViewContent = targetView.querySelector('.view-content');
-                    if (targetViewContent) {
-                        targetViewContent.scrollTop = 0;
-                    }
-                }, 10);
-            }
+            }, 10); // Small delay
+
+            // Specific view updates
             if (targetViewId === 'store-view') {
                 updatePlayerInfoDisplay();
             }
@@ -1512,14 +1565,13 @@
                 listenForOnlineUsers();
             }
             if (targetViewId === 'challenge-view') {
-                selectRandomChallengePlayers(); // Select new random players when entering challenge view
+                // Initial load of a random player when entering the view
+                selectRandomChallengePlayer();
             }
             if (targetViewId === 'attack-log-view') {
                 listenForGlobalAttackLog();
             }
-            if (targetViewId === 'chat-view') {
-                listenForLatestChatMessage(); // Only listen for the latest message
-            }
+            // No specific action for chat-view navigation, as it's now a modal from main menu
         }
 
         function getHouseImage(power) {
@@ -1577,14 +1629,13 @@
             }
         }
 
-        function showMessageModal(title, text, type = 'info') { // Added type parameter
+        function showMessageModal(title, text, type = 'info') {
             if (!messageModal || !messageModalTitle || !messageModalText) return;
 
             messageModal.classList.remove('hidden');
             messageModalTitle.innerHTML = title;
             messageModalText.innerHTML = text;
             
-            // Apply color based on type
             messageModal.querySelector('.message-modal-content').style.borderColor = 
                 type === 'error' ? '#ef4444' : (type === 'success' ? '#4CAF50' : '#6366f1');
 
@@ -1604,23 +1655,16 @@
                 navigateTo('challenge-view', 'right');
             });
         }
-        if (chatMenuItem) chatMenuItem.addEventListener('click', () => navigateTo('chat-view', 'right'));
+        if (chatMenuItem) chatMenuItem.addEventListener('click', () => {
+             // Show the last message modal directly
+            showLastMessageModal();
+        });
         if (onlineMenuItem) onlineMenuItem.addEventListener('click', () => navigateTo('online-view', 'right'));
         
-        document.addEventListener('click', (event) => {
-            if (event.target.closest('#back-to-main-from-attack-log')) {
+        document.querySelectorAll('[id^="back-to-main-from-"]').forEach(button => {
+            button.addEventListener('click', (event) => {
                 navigateTo('main-menu-view', 'left');
-            } else if (event.target.closest('#back-to-main-from-game')) {
-                navigateTo('main-menu-view', 'left');
-            } else if (event.target.closest('#back-to-main-from-store')) {
-                navigateTo('main-menu-view', 'left');
-            } else if (event.target.closest('#back-to-main-from-challenge')) {
-                navigateTo('main-menu-view', 'left');
-            } else if (event.target.closest('#back-to-main-from-chat')) {
-                navigateTo('main-menu-view', 'left');
-            } else if (event.target.closest('#back-to-main-from-online')) {
-                navigateTo('main-menu-view', 'left');
-            }
+            });
         });
 
         if (innovationPrevButton) innovationPrevButton.addEventListener('click', () => {
@@ -2187,9 +2231,6 @@
             return new Date(utc + saudiOffset);
         }
 
-        // Removed clearChatHistory as per request (no longer clearing chat daily)
-        // Removed updatesIcon and updatesCloseButton event listeners
-
         if (playerNameDisplay) {
             playerNameDisplay.addEventListener('click', () => {
                 showAuthFlowModal(true);
@@ -2325,69 +2366,7 @@
             });
         }
 
-        if (deleteAccountButton) {
-            deleteAccountButton.addEventListener('click', () => {
-                if (deleteConfirmModal) {
-                    deleteConfirmModal.classList.remove('hidden');
-                    setTimeout(() => {
-                        if (deleteConfirmModal.querySelector('div')) {
-                            deleteConfirmModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
-                            deleteConfirmModal.querySelector('div').classList.add('scale-100', 'opacity-100');
-                        }
-                    }, 10);
-                }
-            });
-        }
-
-        if (deleteConfirmYes) {
-            deleteConfirmYes.addEventListener('click', async () => {
-                if (!isFirebaseLoaded) {
-                    showMessageModal('خطأ', 'البيانات غير جاهزة للحذف.', 'error');
-                    return;
-                }
-                try {
-                    await remove(ref(db, `artifacts/${appId}/public/playerProfiles/${userId}`));
-                    await remove(ref(db, `artifacts/${appId}/public/onlineUsers/${userId}`));
-                    await remove(ref(db, `artifacts/${appId}/users/${userId}`));
-                    
-                    if (auth.currentUser) {
-                        await auth.currentUser.delete();
-                    }
-
-                    localStorage.clear();
-                    closeModal(deleteConfirmModal);
-                    if (resetCountdownModal && countdownDisplay) {
-                        resetCountdownModal.classList.remove('hidden');
-                        setTimeout(() => {
-                            if (resetCountdownModal.querySelector('div')) {
-                                resetCountdownModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
-                                resetCountdownModal.querySelector('div').classList.add('scale-100', 'opacity-100');
-                            }
-                        }, 10);
-
-                        let countdown = 10;
-                        countdownDisplay.textContent = countdown;
-                        const countdownInterval = setInterval(() => {
-                            countdown--;
-                            if (countdownDisplay) countdownDisplay.textContent = countdown;
-                            if (countdown <= 0) {
-                                clearInterval(countdownInterval);
-                                location.reload();
-                            }
-                        }, 1000);
-                    }
-                } catch (error) {
-                    console.error("Error deleting user data from Firebase:", error);
-                    showMessageModal('خطأ في الحذف', 'فشل حذف بيانات الحساب. يرجى المحاولة مرة أخرى.', 'error');
-                }
-            });
-        }
-
-        if (deleteConfirmNo) {
-            deleteConfirmNo.addEventListener('click', () => {
-                closeModal(deleteConfirmModal);
-            });
-        }
+        // Removed deleteAccountButton and related event listeners
 
         function loadInnovationTypes() {
             if (!isFirebaseLoaded) return;
@@ -2471,7 +2450,6 @@
                 playerName = data.playerName || "تعيين اسم";
                 isNameSetPermanently = data.isNameSetPermanently || false;
                 lastPlayerNameChangeTimestamp = data.lastPlayerNameChangeTimestamp || 0;
-                // Removed globalAttackCooldownEndTime, attacksMadeInCurrentCooldown, attackedTargetsInCooldown
             } else {
                 savePlayerData();
             }
@@ -2488,7 +2466,6 @@
                 playerName: playerName,
                 isNameSetPermanently: isNameSetPermanently,
                 lastPlayerNameChangeTimestamp: lastPlayerNameChangeTimestamp,
-                // Removed globalAttackCooldownEndTime, attacksMadeInCurrentCooldown, attackedTargetsInCooldown
             });
         }
 
@@ -2536,7 +2513,7 @@
             const cooldownsRef = ref(db, `artifacts/${appId}/users/${userId}/attackCooldowns`);
             onValue(cooldownsRef, (snapshot) => {
                 attackCooldowns = snapshot.val() || {};
-                renderChallengePlayers(); // Re-render challenge players when cooldowns change
+                // No need to re-render challenge players here, as it's handled by selectRandomChallengePlayer
             }, { once: true });
         }
 
@@ -2608,7 +2585,6 @@
                     await saveHouses();
                     await saveInnovationTypes();
                     await savePlayerInventory();
-                    // No need to save attackCooldowns from local storage, as they are managed live
 
                     localStorage.clear();
                     showMessageModal('نقل البيانات', 'تم نقل بياناتك بنجاح إلى السحابة!', 'success');
@@ -2619,27 +2595,26 @@
             }
         }
 
-        if (chatSendButton) {
-            chatSendButton.addEventListener('click', () => {
+        if (showChatInputButton) {
+            showChatInputButton.addEventListener('click', () => {
                 showPasswordInputModal((enteredPassword) => {
                     if (enteredPassword === CHAT_PASSWORD) {
-                        sendMessage();
+                        chatInputContainer.classList.remove('hidden');
+                        showChatInputButton.classList.add('hidden'); // Hide the "send new message" button
                     } else if (enteredPassword !== null) {
                         showMessageModal('خطأ', 'كلمة المرور غير صحيحة.', 'error');
                     }
                 });
             });
         }
+
+        if (chatSendButton) {
+            chatSendButton.addEventListener('click', sendMessage);
+        }
         if (chatInput) {
             chatInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
-                    showPasswordInputModal((enteredPassword) => {
-                        if (enteredPassword === CHAT_PASSWORD) {
-                            sendMessage();
-                        } else if (enteredPassword !== null) {
-                            showMessageModal('خطأ', 'كلمة المرور غير صحيحة.', 'error');
-                        }
-                    });
+                    sendMessage();
                 }
             });
         }
@@ -2661,40 +2636,51 @@
                 timestamp: serverTimestamp()
             }).then(() => {
                 chatInput.value = '';
+                chatInputContainer.classList.add('hidden'); // Hide input after sending
+                showChatInputButton.classList.remove('hidden'); // Show "send new message" button again
             }).catch(error => {
                 console.error("Error sending message:", error);
                 showMessageModal('خطأ', 'فشل إرسال الرسالة.', 'error');
             });
         }
 
-        function listenForLatestChatMessage() {
-            if (!isFirebaseLoaded) return;
-            // Query for the last message
+        function showLastMessageModal() {
+            if (!isFirebaseLoaded || !lastMessageModal || !lastMessageDisplay) return;
+
             const chatRef = query(ref(db, `artifacts/${appId}/public/chat`), orderByChild('timestamp'), limitToLast(1));
             onValue(chatRef, (snapshot) => {
-                if (!chatMessagesDiv) return;
-                chatMessagesDiv.innerHTML = ''; // Clear previous messages
                 let latestMessage = null;
                 snapshot.forEach(childSnapshot => {
                     latestMessage = childSnapshot.val();
                 });
 
                 if (latestMessage) {
-                    const messageElement = document.createElement('div');
-                    messageElement.className = `chat-message ${latestMessage.senderId === userId ? 'self' : ''}`;
-                    const date = latestMessage.timestamp ? new Date(latestMessage.timestamp) : new Date();
-                    messageElement.innerHTML = `
+                    lastMessageDisplay.innerHTML = `
                         <span class="chat-sender">${latestMessage.senderName}:</span>
                         <p class="text-gray-100">${latestMessage.message}</p>
                         <p class="text-xs text-gray-400 mt-1">القوة: ${formatPower(latestMessage.senderPower || 0)}</p>
-                        <span class="chat-timestamp">${date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span class="chat-timestamp">${new Date(latestMessage.timestamp).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</span>
                     `;
-                    chatMessagesDiv.appendChild(messageElement); // Append to show at the top (since flex-direction-reverse)
                 } else {
-                    chatMessagesDiv.innerHTML = '<p class="text-gray-400 text-center">لا توجد تحديثات حالياً.</p>';
+                    lastMessageDisplay.innerHTML = '<p class="text-gray-400 text-center">لا توجد تحديثات حالياً.</p>';
                 }
+
+                lastMessageModal.classList.remove('hidden');
+                setTimeout(() => {
+                    if (lastMessageModal.querySelector('div')) {
+                        lastMessageModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
+                        lastMessageModal.querySelector('div').classList.add('scale-100', 'opacity-100');
+                    }
+                }, 10);
+            }, { once: true }); // Listen once and then detach
+        }
+
+        if (lastMessageModalCloseButton) {
+            lastMessageModalCloseButton.addEventListener('click', () => {
+                closeModal(lastMessageModal);
             });
         }
+
 
         function updateOnlineStatus() {
             if (!isFirebaseLoaded || !userId || playerName === "تعيين اسم") return;
@@ -2713,47 +2699,45 @@
             if (!isFirebaseLoaded) return;
             
             if (onlinePlayersListDiv) onlinePlayersListDiv.innerHTML = '';
-            if (recentlyOfflinePlayersListDiv) recentlyOfflinePlayersListDiv.innerHTML = '';
+            if (allPlayersListDiv) allPlayersListDiv.innerHTML = '';
 
             const playerProfilesRef = ref(db, `artifacts/${appId}/public/playerProfiles`);
             const onlineUsersRef = ref(db, `artifacts/${appId}/public/onlineUsers`);
 
             const profilesSnapshot = await get(playerProfilesRef);
-            const allPlayers = {};
+            const allRegisteredPlayers = {};
             profilesSnapshot.forEach(childSnapshot => {
-                allPlayers[childSnapshot.key] = { ...childSnapshot.val(), isOnline: false, lastOnline: 0 };
+                allRegisteredPlayers[childSnapshot.key] = { uid: childSnapshot.key, ...childSnapshot.val(), isOnline: false, lastOnline: 0 };
             });
 
             onValue(onlineUsersRef, async (onlineSnapshot) => {
                 const now = Date.now();
 
                 const activeOnlinePlayers = [];
-                const allOfflinePlayers = [];
-
+                
+                // Update lastOnline status for players who are currently online
                 onlineSnapshot.forEach(childSnapshot => {
                     const user = childSnapshot.val();
                     const userUid = childSnapshot.key;
-                    if (allPlayers[userUid]) {
-                        allPlayers[userUid].lastOnline = user.lastOnline || 0;
+                    if (allRegisteredPlayers[userUid]) {
+                        allRegisteredPlayers[userUid].lastOnline = user.lastOnline || 0;
                         if (user.lastOnline && (now - user.lastOnline < ONLINE_ACTIVE_DURATION)) {
-                            allPlayers[userUid].isOnline = true;
+                            allRegisteredPlayers[userUid].isOnline = true;
                         }
                     }
                 });
 
-                for (const uid in allPlayers) {
-                    if (uid === userId) continue;
+                // Populate online and all players lists
+                const allPlayersSorted = [];
+                for (const uid in allRegisteredPlayers) {
+                    if (uid === userId) continue; // Exclude current user
 
-                    const player = allPlayers[uid];
-                    // Filter for online players
+                    const player = allRegisteredPlayers[uid];
+                    allPlayersSorted.push(player);
+
                     if (player.isOnline) {
                         activeOnlinePlayers.push(player);
-                    } 
-                    // Filter for recently offline players (within 10 hours)
-                    else if (player.lastOnline && (now - player.lastOnline < OFFLINE_RECENT_DURATION)) {
-                        allOfflinePlayers.push(player);
                     }
-                    // Players older than 10 hours are not displayed
                 }
 
                 activeOnlinePlayers.sort((a, b) => {
@@ -2761,7 +2745,13 @@
                     return a.name.localeCompare(b.name);
                 });
 
-                allOfflinePlayers.sort((a, b) => b.lastOnline - a.lastOnline);
+                allPlayersSorted.sort((a, b) => {
+                    // Sort by online status first, then by lastOnline, then by power
+                    if (a.isOnline && !b.isOnline) return -1;
+                    if (!a.isOnline && b.isOnline) return 1;
+                    if (b.lastOnline !== a.lastOnline) return b.lastOnline - a.lastOnline;
+                    return b.totalPower - a.totalPower;
+                });
                 
                 if (onlinePlayersListDiv) {
                     onlinePlayersListDiv.innerHTML = '';
@@ -2783,33 +2773,36 @@
                     }
                 }
 
-                if (recentlyOfflinePlayersListDiv) {
-                    recentlyOfflinePlayersListDiv.innerHTML = '';
-                    if (allOfflinePlayers.length === 0) {
-                        recentlyOfflinePlayersListDiv.innerHTML = '<p class="text-gray-400 text-center">لا يوجد لاعبون غير متصلين.</p>';
+                if (allPlayersListDiv) {
+                    allPlayersListDiv.innerHTML = '';
+                    if (allPlayersSorted.length === 0) {
+                        allPlayersListDiv.innerHTML = '<p class="text-gray-400 text-center">لا يوجد لاعبون مسجلون.</p>';
                     } else {
-                        allOfflinePlayers.forEach(user => {
-                            const userElement = document.createElement('div');
-                            userElement.className = `online-user-item text-white offline`;
-                            const lastOnlineText = user.lastOnline ? timeAgo(user.lastOnline) : 'غير معروف'; // Use timeAgo function
+                        allPlayersSorted.forEach(player => {
+                            const playerElement = document.createElement('div');
+                            playerElement.className = `online-user-item text-white ${player.isOnline ? '' : 'offline'}`;
+                            const lastOnlineText = player.isOnline ? 'متصل الآن' : (player.lastOnline ? timeAgo(player.lastOnline) : 'غير معروف');
 
-                            userElement.innerHTML = `
+                            playerElement.innerHTML = `
                                 <div class="user-info">
-                                    <p class="font-bold text-lg">${user.name}</p>
-                                    <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(user.totalPower)}</p>
-                                    <p class="text-xs text-gray-400 mt-1">آخر ظهور: ${lastOnlineText}</p>
+                                    <p class="font-bold text-lg">${player.name}</p>
+                                    <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(player.totalPower)}</p>
+                                    <p class="text-xs text-gray-400 mt-1">الحالة: ${lastOnlineText}</p>
                                 </div>
                                 <div class="status-dot"></div>
                             `;
-                            recentlyOfflinePlayersListDiv.appendChild(userElement);
+                            allPlayersListDiv.appendChild(playerElement);
                         });
                     }
                 }
             });
         }
 
-        async function selectRandomChallengePlayers() {
+        async function selectRandomChallengePlayer() {
             if (!isFirebaseLoaded || !challengePlayersList) return;
+
+            challengePlayersList.innerHTML = ''; // Clear previous player
+            currentChallengePlayer = null; // Reset current player
 
             const playerProfilesRef = ref(db, `artifacts/${appId}/public/playerProfiles`);
             const onlineUsersRef = ref(db, `artifacts/${appId}/public/onlineUsers`);
@@ -2849,64 +2842,71 @@
                 }
             }
 
-            // Shuffle eligible players and pick 3
-            for (let i = eligiblePlayers.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [eligiblePlayers[i], eligiblePlayers[j]] = [eligiblePlayers[j], eligiblePlayers[i]];
+            if (eligiblePlayers.length === 0) {
+                challengePlayersList.innerHTML = '<p class="text-gray-300 text-center">لا يوجد لاعبون متاحون للتحدي حالياً.</p>';
+                challengePlayerRandomButton.disabled = true;
+                challengePlayerRandomButton.textContent = 'لا يوجد لاعبون متاحون';
+                return;
             }
 
-            currentChallengePlayers = eligiblePlayers.slice(0, 3);
-            renderChallengePlayersList();
+            // Pick one random player
+            const randomIndex = Math.floor(Math.random() * eligiblePlayers.length);
+            currentChallengePlayer = eligiblePlayers[randomIndex];
+            renderCurrentChallengePlayer();
+            challengePlayerRandomButton.disabled = false;
+            challengePlayerRandomButton.textContent = 'تحدي لاعب عشوائي';
         }
 
-        function renderChallengePlayersList() {
-            if (!challengePlayersList) return;
+        function renderCurrentChallengePlayer() {
+            if (!challengePlayersList || !currentChallengePlayer) {
+                challengePlayersList.innerHTML = '<p class="text-gray-300 text-center">اضغط على "تحدي لاعب عشوائي" لبدء التحدي.</p>';
+                return;
+            }
 
-            challengePlayersList.innerHTML = '';
-            if (currentChallengePlayers.length === 0) {
-                challengePlayersList.innerHTML = '<p class="text-gray-300 text-center">لا يوجد لاعبون آخرون متاحون للتحدي حالياً.</p>';
-            } else {
-                currentChallengePlayers.forEach(player => {
-                    const attackCooldownRemaining = getAttackCooldownRemaining(player.uid);
-                    const isAttackReady = attackCooldownRemaining <= 0;
+            challengePlayersList.innerHTML = ''; // Clear previous
+            const player = currentChallengePlayer;
+            const attackCooldownRemaining = getAttackCooldownRemaining(player.uid);
+            const isAttackReady = attackCooldownRemaining <= 0;
 
-                    const canDefeat = totalPlayerPower >= (player.totalPower + 3000);
-                    const borderColorClass = canDefeat ? 'can-defeat' : 'cannot-defeat';
+            const canDefeat = totalPlayerPower >= (player.totalPower + 3000);
+            const borderColorClass = canDefeat ? 'can-defeat' : 'cannot-defeat';
 
-                    const playerElement = document.createElement('div');
-                    playerElement.className = `challenge-player-item text-white ${borderColorClass}`;
-                    playerElement.innerHTML = `
-                        <div class="player-info text-right">
-                            <p class="font-bold text-lg">${player.name}</p>
-                            <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(player.totalPower)}</p>
-                        </div>
-                        <button data-target-id="${player.uid}" data-target-name="${player.name}" data-target-power="${player.totalPower}"
-                            class="attack-button ${isAttackReady ? '' : 'opacity-50 cursor-not-allowed'}" ${isAttackReady ? '' : 'disabled'}>
-                            ${isAttackReady ? 'هجوم' : formatTime(attackCooldownRemaining)}
-                        </button>
-                    `;
-                    challengePlayersList.appendChild(playerElement);
-                });
+            const playerElement = document.createElement('div');
+            playerElement.className = `challenge-player-item text-white ${borderColorClass}`;
+            playerElement.innerHTML = `
+                <div class="player-info text-right">
+                    <p class="font-bold text-lg">${player.name}</p>
+                    <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(player.totalPower)}</p>
+                </div>
+                <button data-target-id="${player.uid}" data-target-name="${player.name}" data-target-power="${player.totalPower}"
+                    class="attack-button ${isAttackReady ? '' : 'opacity-50 cursor-not-allowed'}" ${isAttackReady ? '' : 'disabled'}>
+                    ${isAttackReady ? 'هجوم' : formatTime(attackCooldownRemaining)}
+                </button>
+            `;
+            challengePlayersList.appendChild(playerElement);
 
-                document.querySelectorAll('.attack-button').forEach(button => {
-                    button.removeEventListener('click', handleAttackClick);
-                    button.addEventListener('click', handleAttackClick);
-                });
+            const attackButton = playerElement.querySelector('.attack-button');
+            if (attackButton) {
+                attackButton.removeEventListener('click', handleAttackClick);
+                attackButton.addEventListener('click', handleAttackClick);
+            }
+
+            // Start a countdown for the displayed player if they are on cooldown
+            if (attackCooldownRemaining > 0) {
+                let countdownInterval = setInterval(() => {
+                    const remaining = getAttackCooldownRemaining(player.uid);
+                    if (remaining <= 0) {
+                        clearInterval(countdownInterval);
+                        renderCurrentChallengePlayer(); // Re-render to enable button
+                    } else {
+                        attackButton.textContent = formatTime(remaining);
+                    }
+                }, 1000);
             }
         }
 
-        if (refreshChallengePlayersButton) {
-            refreshChallengePlayersButton.addEventListener('click', () => {
-                selectRandomChallengePlayers();
-            });
-        }
-
-        function getAttackCooldownRemaining(targetId) {
-            const lastAttackTime = attackCooldowns[targetId];
-            if (!lastAttackTime) return 0;
-            const cooldownDuration = 5 * 60; // 5 minutes for individual cooldown
-            const elapsed = (Date.now() - lastAttackTime) / 1000;
-            return Math.max(0, Math.floor(cooldownDuration - elapsed));
+        if (challengePlayerRandomButton) {
+            challengePlayerRandomButton.addEventListener('click', selectRandomChallengePlayer);
         }
 
         async function handleAttackClick(event) {
@@ -2925,13 +2925,15 @@
             }
 
             let didWin = false;
+            // Win condition: your power is 3000 higher than target's
             if (totalPlayerPower >= (targetPower + 3000)) {
                 didWin = true;
             }
 
-            const pointsReward = 50;
-            const dollarsReward = 30;
-            const powerReward = 70;
+            // Random rewards between 100 and 200
+            const pointsReward = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
+            const dollarsReward = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
+            const powerReward = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
 
             let attackerPointsChange = 0;
             let attackerDollarsChange = 0;
@@ -2946,7 +2948,7 @@
                 attackerPowerChange = powerReward;
                 showMessageModal('فوز!', `لقد هاجمت ${targetName} بنجاح وحصلت على ${pointsReward} نقطة و ${dollarsReward}$ و ${powerReward} قوة!`, 'success');
             } else {
-                attackerPointsChange = -pointsReward;
+                attackerPointsChange = -pointsReward; // Lose points on loss
                 attackerDollarsChange = 0;
                 attackerPowerChange = 0;
                 showMessageModal('خسارة!', `فشلت في الهجوم على ${targetName} وخسرت ${pointsReward} نقطة.`, 'error');
@@ -3001,14 +3003,14 @@
             await get(targetPlayerRef).then(async snapshot => {
                 if (snapshot.exists()) {
                     const targetData = snapshot.val();
-                    if (didWin) {
+                    if (didWin) { // Defender loses resources if attacker wins
                         defenderPointsChange = -pointsReward;
                         defenderDollarsChange = -dollarsReward;
                         defenderPowerChange = -powerReward;
-                    } else {
-                        defenderPointsChange = 0;
-                        defenderDollarsChange = 0;
-                        defenderPowerChange = 0;
+                    } else { // Defender gains resources if attacker loses
+                        defenderPointsChange = pointsReward;
+                        defenderDollarsChange = dollarsReward;
+                        defenderPowerChange = powerReward;
                     }
 
                     const newTargetPoints = Math.max(0, (targetData.playerPoints || 0) + defenderPointsChange);
@@ -3068,7 +3070,7 @@
 
             updatePlayerInfoDisplay();
             renderHouses();
-            selectRandomChallengePlayers(); // Refresh the list of challenge players
+            selectRandomChallengePlayer(); // Refresh the list of challenge players with a new random player
         }
 
         function listenForGlobalAttackLog() {
@@ -3103,15 +3105,14 @@
         function startDollarCollection() {
             if (dollarCollectionInterval) clearInterval(dollarCollectionInterval);
             dollarCollectionInterval = setInterval(() => {
-                // Increment each accumulated resource, capping at MAX_ACCUMULATION
                 accumulatedDollars = Math.min(MAX_ACCUMULATION, accumulatedDollars + ACCUMULATION_RATE);
                 accumulatedPoints = Math.min(MAX_ACCUMULATION, accumulatedPoints + ACCUMULATION_RATE);
                 accumulatedPower = Math.min(MAX_ACCUMULATION, accumulatedPower + ACCUMULATION_RATE);
                 
-                updateAccumulatedDollarsDisplay(); // Update display for all three
-                updateDollarCollectorVisuals(); // Update the progress bar
+                updateAccumulatedDollarsDisplay();
+                updateDollarCollectorVisuals();
                 savePlayerData();
-            }, 5 * 1000); // Every 5 seconds
+            }, 5 * 1000);
         }
 
         function updateAccumulatedDollarsDisplay() {
@@ -3128,7 +3129,6 @@
 
         function updateDollarCollectorVisuals() {
             if (dollarCollectorProgressBar) {
-                // Calculate progress based on the highest accumulated value relative to MAX_ACCUMULATION
                 const maxCurrentAccumulation = Math.max(accumulatedDollars, accumulatedPoints, accumulatedPower);
                 const percentage = (maxCurrentAccumulation / MAX_ACCUMULATION) * 100;
                 dollarCollectorProgressBar.style.width = `${percentage}%`;
@@ -3149,7 +3149,7 @@
 
                 updatePlayerInfoDisplay();
                 updateAccumulatedDollarsDisplay();
-                updateDollarCollectorVisuals(); // Reset progress bar
+                updateDollarCollectorVisuals();
                 renderHouses();
                 savePlayerData();
                 saveHouses();
@@ -3198,79 +3198,65 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            let authAttemptPromise;
-            if (initialAuthToken) {
-                authAttemptPromise = signInWithCustomToken(auth, initialAuthToken)
-                    .catch(async (error) => {
-                        console.warn("Custom token sign-in failed, attempting anonymous:", error);
-                        return signInAnonymously(auth).catch((anonError) => {
-                            console.error("Anonymous sign-in failed:", anonError);
-                            showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.', 'error');
-                            return null;
-                        });
-                    });
-            } else {
-                authAttemptPromise = signInAnonymously(auth).catch((error) => {
-                    console.error("Anonymous sign-in failed:", error);
-                    showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.', 'error');
-                    return null;
-                });
-            }
+            authResolvedPromise = new Promise((resolve) => {
+                const unsubscribe = onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        isFirebaseLoaded = true;
+                        console.log("Firebase Auth State: User is signed in:", userId);
 
-            await authAttemptPromise;
+                        try {
+                            await loadPlayerData();
+                            await loadHouses();
+                            await loadInnovationTypes();
+                            await loadPlayerInventory();
+                            await loadAttackCooldowns();
 
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    userId = user.uid;
-                    isFirebaseLoaded = true;
+                            // This migration should only happen once per user, on their first successful login after the update
+                            await migrateLocalStorageToFirebase();
 
-                    try {
-                        await loadPlayerData();
-                        await loadHouses();
-                        await loadInnovationTypes();
-                        await loadPlayerInventory();
-                        await loadAttackCooldowns();
+                            updatePlayerInfoDisplay();
+                            updateAccumulatedDollarsDisplay();
+                            updateDollarCollectorVisuals();
+                            renderHouses();
+                            updateInnovationButtonText();
+                            updateInnovationTimerDisplay();
+                            renderInventoryItems();
+                            // listenForLatestChatMessage(); // This is now triggered by chat menu item click
+                            startDollarCollection();
+                            startOnlineStatusUpdater();
+                            
+                            if (!isNameSetPermanently && (!playerName || playerName === "تعيين اسم")) {
+                                showAuthFlowModal(false);
+                            }
 
-                        await migrateLocalStorageToFirebase();
-
-                        updatePlayerInfoDisplay();
-                        updateAccumulatedDollarsDisplay();
-                        updateDollarCollectorVisuals();
-                        renderHouses();
-                        updateInnovationButtonText();
-                        updateInnovationTimerDisplay();
-                        renderInventoryItems();
-
-                        // No longer listen for full chat history, only latest message for updates
-                        // clearChatHistory(); // No longer clearing chat daily
-                        startDollarCollection();
-
-                        if (onlineStatusUpdater) clearInterval(onlineStatusUpdater);
-                        onlineStatusUpdater = setInterval(updateOnlineStatus, 30 * 1000);
-                        updateOnlineStatus();
-
-                        const onlineRef = ref(db, `artifacts/${appId}/public/onlineUsers/${userId}`);
-                        onDisconnect(onlineRef).remove().catch(error => {
-                            console.error("Could not establish onDisconnect for online status:", error);
-                        });
-
-                        let anyActiveCooldown = innovationTypes.some(type => type.cooldownEndTime > Date.now());
-                        if (anyActiveCooldown && !globalCooldownUpdater) {
-                            startGlobalCooldownUpdater();
+                        } catch (e) {
+                            console.error("Error during data loading/setup:", e);
+                            showMessageModal('خطأ في التحميل', 'حدث خطأ أثناء تحميل بياناتك. يرجى تحديث الصفحة.', 'error');
                         }
-
-                        if (!isNameSetPermanently && (!playerName || playerName === "تعيين اسم")) {
-                            showAuthFlowModal(false);
+                        unsubscribe(); // Unsubscribe after initial load to prevent re-triggering
+                        resolve();
+                    } else {
+                        console.log("Firebase Auth State: No user. Attempting anonymous or custom token sign-in.");
+                        try {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                            } else {
+                                await signInAnonymously(auth);
+                            }
+                            // The onAuthStateChanged listener will fire again with the new user
+                        } catch (error) {
+                            console.error("Initial sign-in attempt failed:", error);
+                            showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول. يرجى تحديث الصفحة.', 'error');
+                            unsubscribe(); // Unsubscribe to prevent infinite loop on failure
+                            resolve(); // Resolve even on failure to unblock DOMContentLoaded
                         }
-
-                    } catch (e) {
-                        console.error("Error during data loading/setup:", e);
-                        showMessageModal('خطأ في التحميل', 'حدث خطأ أثناء تحميل بياناتك. يرجى تحديث الصفحة.', 'error');
                     }
-                } else {
-                    console.log("Firebase Auth State Changed: No user signed in.");
-                }
+                });
             });
+
+            await authResolvedPromise;
+            console.log("Initial authentication and data load complete.");
         });
     </script>
 </body>
