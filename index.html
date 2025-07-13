@@ -556,12 +556,6 @@
         .global-attack-log-entry.loss {
             border-right: 3px solid #ef4444;
         }
-        .global-attack-log-entry .timestamp {
-            font-size: 0.7rem;
-            color: #94a3b8;
-            margin-left: 0.5rem;
-            flex-shrink: 0;
-        }
         .attack-outcome-overlay {
             position: absolute;
             top: 0;
@@ -921,9 +915,9 @@
                 </div>
 
                 <div class="bg-gray-700 p-4 rounded-xl shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-100 mb-4">اللاعبون غير المتصلين مؤخراً (آخر 10)</h2>
+                    <h2 class="text-xl font-semibold text-gray-100 mb-4">اللاعبون غير المتصلين</h2>
                     <div id="recently-offline-players-list" class="flex flex-col gap-3">
-                        <p class="text-gray-400 text-center">لا يوجد لاعبون غير متصلين مؤخراً.</p>
+                        <p class="text-gray-400 text-center">لا يوجد لاعبون غير متصلين.</p>
                     </div>
                 </div>
             </div>
@@ -1299,7 +1293,8 @@
 
         const innovationTypes = [
             { id: 'innovation1', name: 'ابتكار 1', cooldownEndTime: 0, initialCooldown: 5 * 60, colorClass: 'from-purple-600 to-indigo-700' },
-            { id: 'innovation2', name: 'ابتكار 2', cooldownEndTime: 0, initialCooldown: 10 * 60, colorClass: 'from-orange-600 to-amber-700' }
+            { id: 'innovation2', name: 'ابتكار 2', cooldownEndTime: 0, initialCooldown: 10 * 60, colorClass: 'from-orange-600 to-amber-700' },
+            { id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: false } // Added isOwned
         ];
         let currentInnovationTypeIndex = 0;
 
@@ -1349,10 +1344,9 @@
                 costType: 'points',
                 image: 'https://f.top4top.io/s_34796x9520.png',
                 useEffect: (quantity = 1) => {
-                    const innovationId = 'innovation3';
-                    const innovationExists = innovationTypes.some(inv => inv.id === innovationId);
-                    if (!innovationExists) {
-                        innovationTypes.push({ id: innovationId, name: 'ابتكار 3', cooldownEndTime: 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700' });
+                    const innovationToBuy = innovationTypes.find(inv => inv.id === 'innovation3');
+                    if (innovationToBuy && !innovationToBuy.isOwned) {
+                        innovationToBuy.isOwned = true;
                         saveInnovationTypes();
                         updateInnovationButtonText();
                         showMessageModal('تم الشراء', 'تم فتح الابتكار الثالث بنجاح!');
@@ -1564,7 +1558,7 @@
             if (!housesContainer) return;
 
             housesContainer.innerHTML = '';
-            houses.forEach((house, index) => {
+            houses.forEach( (house, index) => {
                 const houseElement = document.createElement('div');
                 const houseImageUrl = getHouseImage(house.power);
                 houseElement.className = `house-container ${!house.unlocked ? 'locked-house' : ''} cursor-pointer`;
@@ -1672,6 +1666,20 @@
             innovationButtonText.innerHTML = `<span>تفعيل ${currentType.name}</span><span class="price-display"><span>مجاني</span></span>`;
             
             const cooldownRemaining = Math.max(0, Math.floor((currentType.cooldownEndTime - Date.now()) / 1000));
+            
+            // Check if innovation3 is owned and if it's the current innovation
+            if (currentType.id === 'innovation3' && !currentType.isOwned) {
+                innovationButton.disabled = true;
+                innovationButton.classList.add('opacity-50', 'cursor-not-allowed');
+                innovationButtonText.innerHTML = `<span>شراء ${currentType.name}</span><span class="price-display">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
+                    </svg>
+                    <span>3000</span>
+                </span>`; // Show purchase price
+                return; // Exit function if not owned
+            }
+
             if (cooldownRemaining > 0) {
                 innovationButton.disabled = true;
                 innovationButton.classList.add('opacity-50', 'cursor-not-allowed');
@@ -1700,12 +1708,31 @@
 
         if (innovationButton) {
             innovationButton.addEventListener('click', () => {
+                const currentInnovation = innovationTypes[currentInnovationTypeIndex];
+
+                // Handle purchase of innovation3 if not owned
+                if (currentInnovation.id === 'innovation3' && !currentInnovation.isOwned) {
+                    const item = storeItems['buyInnovation3'];
+                    if (playerPoints >= item.cost) {
+                        playerPoints -= item.cost;
+                        currentInnovation.isOwned = true;
+                        saveInnovationTypes();
+                        updatePlayerInfoDisplay();
+                        updateInnovationButtonText(); // Update button to show "Activate"
+                        showMessageModal('تم الشراء', 'تم فتح الابتكار الثالث بنجاح!');
+                        trackTaskProgress('buy_store', 1); // Track as store purchase
+                    } else {
+                        showMessageModal('فشل الشراء', `ليس لديك نقاط كافية لشراء هذا الابتكار. تحتاج ${item.cost} نقطة.`);
+                    }
+                    return; // Exit after handling purchase
+                }
+
+                // Existing innovation activation logic
                 if (!houses[activeHouseIndex].unlocked) {
                     showMessageModal('بيت مقفول', 'لا يمكنك استخدام الابتكار على بيت مقفول. يرجى اختيار بيت مفتوح.');
                     return;
                 }
 
-                const currentInnovation = innovationTypes[currentInnovationTypeIndex];
                 const cooldownRemaining = Math.max(0, Math.floor((currentInnovation.cooldownEndTime - Date.now()) / 1000));
 
                 if (cooldownRemaining > 0) {
@@ -1964,7 +1991,21 @@
                 document.getElementById('quantity-selection').classList.remove('hidden');
             }
 
-            if (item.levelRequirement && playerLevel < item.levelRequirement) {
+            let isItemOwned = false;
+            if (itemId === 'buyInnovation3') {
+                const innovation3 = innovationTypes.find(inv => inv.id === 'innovation3');
+                if (innovation3 && innovation3.isOwned) {
+                    isItemOwned = true;
+                }
+            }
+
+            if (isItemOwned) {
+                if (storeDetailConfirmButton) {
+                    storeDetailConfirmButton.disabled = true;
+                    storeDetailConfirmButton.textContent = 'مملوك';
+                    storeDetailConfirmButton.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            } else if (item.levelRequirement && playerLevel < item.levelRequirement) {
                 if (storeDetailConfirmButton) {
                     storeDetailConfirmButton.disabled = true;
                     storeDetailConfirmButton.textContent = `يتطلب مستوى ${item.levelRequirement}`;
@@ -2519,9 +2560,12 @@
                         const existingType = innovationTypes.find(type => type.id === savedType.id);
                         if (existingType) {
                             existingType.cooldownEndTime = savedType.cooldownEndTime || 0;
+                            if (savedType.id === 'innovation3') { // Load isOwned for innovation3
+                                existingType.isOwned = savedType.isOwned || false;
+                            }
                         } else {
                             if (savedType.id === 'innovation3') {
-                                innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: savedType.cooldownEndTime || 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700' });
+                                innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: savedType.cooldownEndTime || 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: savedType.isOwned || false });
                             }
                         }
                     });
@@ -2539,10 +2583,16 @@
 
         function saveInnovationTypes() {
             if (!isFirebaseLoaded) return;
-            set(ref(db, `artifacts/${appId}/users/${userId}/innovationTypes`), innovationTypes.map(type => ({
-                id: type.id,
-                cooldownEndTime: type.cooldownEndTime
-            })));
+            set(ref(db, `artifacts/${appId}/users/${userId}/innovationTypes`), innovationTypes.map(type => {
+                const savedData = {
+                    id: type.id,
+                    cooldownEndTime: type.cooldownEndTime
+                };
+                if (type.id === 'innovation3') { // Save isOwned for innovation3
+                    savedData.isOwned = type.isOwned;
+                }
+                return savedData;
+            }));
         }
 
         function startGlobalCooldownUpdater() {
@@ -2743,9 +2793,12 @@
                             const existingType = innovationTypes.find(type => type.id === savedType.id);
                             if (existingType) {
                                 existingType.cooldownEndTime = savedType.cooldownEndTime || 0;
+                                if (savedType.id === 'innovation3') {
+                                    existingType.isOwned = savedType.isOwned || false;
+                                }
                             } else {
                                 if (savedType.id === 'innovation3') {
-                                    innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: savedType.cooldownEndTime || 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700' });
+                                    innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: savedType.cooldownEndTime || 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: savedType.isOwned || false });
                                 }
                             }
                         });
@@ -2893,10 +2946,9 @@
                 const now = Date.now();
 
                 const activeOnlinePlayers = [];
-                const recentOfflinePlayers = [];
+                const allOfflinePlayers = []; // Renamed from recentOfflinePlayers to reflect "all"
 
                 // Update online status and lastOnline from the 'onlineUsers' node
-                // And populate the activeOnlinePlayers list
                 onlineSnapshot.forEach(childSnapshot => {
                     const user = childSnapshot.val();
                     const userUid = childSnapshot.key;
@@ -2905,21 +2957,22 @@
                         // Check for active online status (within 1 minute)
                         if (user.lastOnline && (now - user.lastOnline < ONLINE_ACTIVE_DURATION)) {
                             allPlayers[userUid].isOnline = true;
-                            if (userUid !== userId) { // Don't add current user to the list
-                                activeOnlinePlayers.push(allPlayers[userUid]);
-                            }
                         }
                     }
                 });
 
-                // Populate the recentOfflinePlayers list
+                // Separate players into active online and all offline
                 for (const uid in allPlayers) {
                     if (uid === userId) continue; // Skip current user
 
                     const player = allPlayers[uid];
-                    // If not actively online AND was online recently (within 10 hours)
-                    if (!player.isOnline && player.lastOnline && (now - player.lastOnline < OFFLINE_RECENT_DURATION)) {
-                        recentOfflinePlayers.push(player);
+                    if (player.isOnline) {
+                        activeOnlinePlayers.push(player);
+                    } else {
+                        // If not actively online, add to allOfflinePlayers.
+                        // We rely on playerProfiles having the name/level/power.
+                        // The lastOnline timestamp will come from onlineUsers if available, otherwise 0.
+                        allOfflinePlayers.push(player);
                     }
                 }
 
@@ -2930,10 +2983,9 @@
                     return a.name.localeCompare(b.name);
                 });
 
-                // Sort recent offline players by lastOnline (descending) and take top 10
-                recentOfflinePlayers.sort((a, b) => b.lastOnline - a.lastOnline);
-                const top10RecentOffline = recentOfflinePlayers.slice(0, 10);
-
+                // Sort all offline players by lastOnline (descending)
+                allOfflinePlayers.sort((a, b) => b.lastOnline - a.lastOnline);
+                
                 // Render active online players
                 if (onlinePlayersListDiv) {
                     onlinePlayersListDiv.innerHTML = ''; // Clear previous content
@@ -2956,20 +3008,24 @@
                     }
                 }
 
-                // Render top 10 recent offline players
+                // Render all offline players
                 if (recentlyOfflinePlayersListDiv) {
                     recentlyOfflinePlayersListDiv.innerHTML = ''; // Clear previous content
-                    if (top10RecentOffline.length === 0) {
-                        recentlyOfflinePlayersListDiv.innerHTML = '<p class="text-gray-400 text-center">لا يوجد لاعبون غير متصلين مؤخراً.</p>';
+                    if (allOfflinePlayers.length === 0) {
+                        recentlyOfflinePlayersListDiv.innerHTML = '<p class="text-gray-400 text-center">لا يوجد لاعبون غير متصلين.</p>';
                     } else {
-                        top10RecentOffline.forEach(user => {
+                        allOfflinePlayers.forEach(user => {
                             const userElement = document.createElement('div');
                             userElement.className = `online-user-item text-white offline`;
+                            const lastOnlineTime = user.lastOnline ? new Date(user.lastOnline).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'غير معروف';
+                            const lastOnlineDate = user.lastOnline ? new Date(user.lastOnline).toLocaleDateString('ar-SA') : '';
+
                             userElement.innerHTML = `
                                 <div class="user-info">
                                     <p class="font-bold text-lg">${user.name}</p>
                                     <p class="text-sm text-gray-300">المستوى: ${user.level}</p>
                                     <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(user.totalPower)}</p>
+                                    <p class="text-xs text-gray-400 mt-1">آخر ظهور: ${lastOnlineTime} ${lastOnlineDate}</p>
                                 </div>
                                 <div class="status-dot"></div>
                             `;
