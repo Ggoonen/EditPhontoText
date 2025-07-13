@@ -1090,8 +1090,6 @@
         const totalPowerDisplay = document.getElementById('total-power-display');
         const popupCloseButton = document.getElementById('popup-close-button');
 
-        // Removed level-related elements: levelInfoIcon, levelUpToast, currentLevelDisplay, levelPointsRewardDisplay, levelDollarsRewardDisplay
-
         const gameInfoIcon = document.getElementById('game-info-icon');
         const houseInfoModal = document.getElementById('house-info-modal');
         const houseUpgradeRewardsList = document.getElementById('house-upgrade-rewards-list');
@@ -1128,8 +1126,6 @@
         const inventoryModal = document.getElementById('inventory-modal');
         const inventoryItemsList = document.getElementById('inventory-items-list');
         const inventoryCloseButton = document.getElementById('inventory-close-button');
-
-        // Removed tasks-related elements: tasksIcon, tasksModal, tasksCloseButton, dailyTasksList, oneTimeTasksList, dailyTasksTimerDisplay
 
         const updatesIcon = document.getElementById('updates-icon');
         const updatesModal = document.getElementById('updates-modal');
@@ -1186,15 +1182,15 @@
         ];
         let activeHouseIndex = 0;
         let globalCooldownUpdater = null;
-        // Removed dailyResetTimerInterval
         let onlineStatusUpdater = null;
         let globalAttackCooldownInterval = null;
         let dollarCollectionInterval = null;
 
-        // Removed playerXP, playerLevel, xpForCurrentLevel, xpThresholdForNextLevel, baseXpThreshold
         let playerPoints = 0;
         let playerDollars = 0;
         let accumulatedDollars = 0;
+        let accumulatedPoints = 0; // New: Accumulated points from collection
+        let accumulatedPower = 0;  // New: Accumulated power from collection
         let playerName = "تعيين اسم";
         let isNameSetPermanently = false;
         let lastPlayerNameChangeTimestamp = 0;
@@ -1202,11 +1198,11 @@
         let attackedTargetsInCooldown = [];
         let globalAttackCooldownEndTime = 0;
         let attacksMadeInCurrentCooldown = 0;
-        const MAX_GLOBAL_ATTACKS = 3;
-        const GLOBAL_ATTACK_COOLDOWN_DURATION = 60 * 60; // 1 hour in seconds
-        const NAME_CHANGE_COOLDOWN_DURATION = 3 * 24 * 60 * 60 * 1000; // 3 days in milliseconds
-        const ONLINE_ACTIVE_DURATION = 60 * 1000; // 1 minute for active online status
-        const OFFLINE_RECENT_DURATION = 10 * 60 * 60 * 1000; // 10 hours for recent offline status
+        const MAX_GLOBAL_ATTACKS = 5; // Changed from 3 to 5
+        const GLOBAL_ATTACK_COOLDOWN_DURATION = 10 * 60; // Changed from 60 minutes to 10 minutes
+        const NAME_CHANGE_COOLDOWN_DURATION = 3 * 24 * 60 * 60 * 1000;
+        const ONLINE_ACTIVE_DURATION = 60 * 1000;
+        const OFFLINE_RECENT_DURATION = 10 * 60 * 60 * 1000;
 
         let playerInventory = { reduceTime: 0 };
 
@@ -1229,70 +1225,13 @@
         ];
 
         const innovationTypes = [
-            { id: 'innovation1', name: 'ابتكار 1', cooldownEndTime: 0, initialCooldown: 5 * 60, colorClass: 'from-purple-600 to-indigo-700' },
-            { id: 'innovation2', name: 'ابتكار 2', cooldownEndTime: 0, initialCooldown: 10 * 60, colorClass: 'from-orange-600 to-amber-700' },
-            { id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: false }
+            { id: 'innovation1', name: 'ابتكار 1', cooldownEndTime: 0, initialCooldown: 4 * 60, colorClass: 'from-purple-600 to-indigo-700' }, // Changed to 4 minutes
+            { id: 'innovation2', name: 'ابتكار 2', cooldownEndTime: 0, initialCooldown: 4 * 60, colorClass: 'from-orange-600 to-amber-700' }, // Changed to 4 minutes
+            { id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: 0, initialCooldown: 4 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: false } // Changed to 4 minutes
         ];
         let currentInnovationTypeIndex = 0;
 
-        const storeItems = {
-            'reduceTime': {
-                name: 'تقليل وقت الابتكار',
-                description: 'يقلل الوقت المتبقي للابتكار الحالي بمقدار دقيقتين.',
-                cost: 200,
-                costType: 'dollars',
-                image: 'https://f.top4top.io/p_3479ijdcl0.png',
-                useEffect: (quantity = 1) => {
-                    const timeReductionPerItem = 120;
-                    const totalTimeReduction = timeReductionPerItem * quantity;
-                    const currentInnovation = innovationTypes[currentInnovationTypeIndex];
-                    if (currentInnovation && currentInnovation.cooldownEndTime > Date.now()) {
-                        currentInnovation.cooldownEndTime = Math.max(Date.now(), currentInnovation.cooldownEndTime - (totalTimeReduction * 1000));
-                        updateInnovationTimerDisplay();
-                        showMessageModal('تم الاستخدام', `تم تقليل وقت الابتكار بمقدار ${quantity * 2} دقائق. الوقت المتبقي: ${formatTime(Math.max(0, Math.floor((currentInnovation.cooldownEndTime - Date.now()) / 1000)))}`);
-                    } else {
-                        showMessageModal('لا يوجد مؤقت', 'لا يوجد ابتكار قيد الانتظار حالياً.');
-                    }
-                    saveInnovationTypes();
-                }
-            },
-            'convertPoints': {
-                name: 'تحويل النقاط',
-                description: 'يحول 500 نقطة إلى 200-600 دولار.',
-                cost: 500,
-                costType: 'points',
-                image: 'https://i.top4top.io/s_34795cyi20.png',
-                useEffect: (quantity = 1) => {
-                    const dollarsGain = (Math.floor(Math.random() * (600 - 200 + 1)) + 200) * quantity;
-                    playerDollars += dollarsGain;
-                    updatePlayerInfoDisplay();
-                    showMessageModal('تم التحويل', `لقد حصلت على ${formatPower(dollarsGain)}$!`);
-                },
-                directUse: true
-            },
-            'buyInnovation3': {
-                name: 'شراء ابتكار ثالث',
-                description: 'يفتح ابتكارًا جديدًا بمدة تهدئة 7 دقائق.',
-                cost: 3000,
-                costType: 'points',
-                image: 'https://f.top4top.io/s_34796x9520.png',
-                useEffect: (quantity = 1) => {
-                    const innovationToBuy = innovationTypes.find(inv => inv.id === 'innovation3');
-                    if (innovationToBuy && !innovationToBuy.isOwned) {
-                        innovationToBuy.isOwned = true;
-                        saveInnovationTypes();
-                        updateInnovationButtonText();
-                        showMessageModal('تم الشراء', 'تم فتح الابتكار الثالث بنجاح!');
-                    } else {
-                        showMessageModal('موجود بالفعل', 'لقد قمت بفتح هذا الابتكار بالفعل.');
-                    }
-                },
-                directUse: true
-            }
-        };
-
-        // Removed tasks object and lastDailyResetDate
-        let lastChatClearDate = null; // Still needed for chat history clear
+        let lastChatClearDate = null;
 
         function formatPower(num) {
             if (num >= 10000) {
@@ -1347,11 +1286,8 @@
             return total;
         }
 
-        // Removed updatePlayerXP function
-
         function updatePlayerInfoDisplay() {
             calculateTotalPower();
-            // Removed player-xp-display, player-level-display
             if (document.getElementById('player-points-display')) document.getElementById('player-points-display').textContent = formatPower(playerPoints);
             if (document.getElementById('player-dollars-display')) document.getElementById('player-dollars-display').textContent = `$${formatPower(playerDollars)}`;
             if (inventoryCountDisplay) inventoryCountDisplay.textContent = playerInventory.reduceTime;
@@ -1361,8 +1297,6 @@
             if (playerTotalPowerDisplayGame) playerTotalPowerDisplayGame.textContent = formatPower(totalPlayerPower);
             if (playerTotalPowerDisplayOnline) playerTotalPowerDisplayOnline.textContent = formatPower(totalPlayerPower);
 
-            // Removed XP progress bar updates
-            
             if (storePlayerPointsDisplay) storePlayerPointsDisplay.textContent = formatPower(playerPoints);
             if (storePlayerDollarsDisplay) storePlayerDollarsDisplay.textContent = `$${formatPower(playerDollars)}`;
             if (storePlayerTotalPowerDisplay) storePlayerTotalPowerDisplay.textContent = formatPower(totalPlayerPower);
@@ -1370,7 +1304,6 @@
             if (isFirebaseLoaded && userId && playerName !== "تعيين اسم") {
                 set(ref(db, `artifacts/${appId}/public/playerProfiles/${userId}`), {
                     name: playerName,
-                    // Removed level
                     totalPower: totalPlayerPower
                 });
             }
@@ -1499,7 +1432,6 @@
         if (playMenuItem) playMenuItem.addEventListener('click', () => navigateTo('game-view', 'right'));
         if (storeMenuItem) storeMenuItem.addEventListener('click', () => navigateTo('store-view', 'right'));
         if (challengeMenuItem) {
-            // Challenge menu item is always unlocked now
             challengeMenuItem.addEventListener('click', () => {
                 navigateTo('challenge-view', 'right');
             });
@@ -1634,8 +1566,6 @@
                 renderHouses();
                 saveHouses();
 
-                // Removed XP gain from innovation
-
                 if (powerIncreaseDisplay) powerIncreaseDisplay.textContent = formatPower(powerIncrease);
                 if (totalPowerDisplay) totalPowerDisplay.textContent = formatPower(currentHouse.power);
                 
@@ -1674,8 +1604,6 @@
                 closeModal(popupModal);
             });
         }
-
-        // Removed levelInfoIcon and its event listener
 
         if (gameInfoIcon) {
             gameInfoIcon.addEventListener('click', () => {
@@ -1871,7 +1799,7 @@
                     storeDetailConfirmButton.textContent = 'مملوك';
                     storeDetailConfirmButton.classList.add('opacity-50', 'cursor-not-allowed');
                 }
-            } else { // Removed level requirement check
+            } else {
                 if (storeDetailConfirmButton) {
                     storeDetailConfirmButton.disabled = false;
                     storeDetailConfirmButton.textContent = 'تأكيد الشراء';
@@ -1918,7 +1846,6 @@
                         updatePlayerInfoDisplay();
                         savePlayerData();
                         savePlayerInventory();
-                        // Removed task tracking for store purchases
                     } else {
                         showMessageModal('فشل الشراء', `ليس لديك ${item.costType === 'dollars' ? 'دولارات' : 'نقاط'} كافية لشراء ${quantityToBuy} من هذا العنصر.`);
                     }
@@ -2092,9 +2019,6 @@
             return new Date(utc + saudiOffset);
         }
 
-        // Removed getTimeUntilNextSaudiMidnight and startDailyResetTimer
-        // Removed resetDailyTasks function
-
         function clearChatHistory() {
             if (!isFirebaseLoaded) return;
             const chatClearRef = ref(db, `artifacts/${appId}/public/chatManagement/lastChatClearDate`);
@@ -2116,8 +2040,6 @@
                 }
             }, { once: true });
         }
-
-        // Removed loadTasks, saveTasks, renderTasks, trackTaskProgress, handleClaimTaskClick, claimTask
 
         if (updatesIcon) {
             updatesIcon.addEventListener('click', () => {
@@ -2275,7 +2197,7 @@
                             }
                         } else {
                             if (savedType.id === 'innovation3') {
-                                innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: savedType.cooldownEndTime || 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: savedType.isOwned || false });
+                                innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: savedType.cooldownEndTime || 0, initialCooldown: 4 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: savedType.isOwned || false });
                             }
                         }
                     });
@@ -2328,18 +2250,17 @@
             }, 1000);
         }
 
-        // Removed updateChallengeMenuItemLock as level requirement is removed
-
         async function loadPlayerData() {
             if (!isFirebaseLoaded) return;
             const playerRef = ref(db, `artifacts/${appId}/users/${userId}/playerData`);
             const snapshot = await get(playerRef);
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                // Removed playerXP, playerLevel, xpForCurrentLevel, xpThresholdForNextLevel
                 playerPoints = data.playerPoints || 0;
                 playerDollars = data.playerDollars || 0;
                 accumulatedDollars = data.accumulatedDollars || 0;
+                accumulatedPoints = data.accumulatedPoints || 0; // Load accumulated points
+                accumulatedPower = data.accumulatedPower || 0;   // Load accumulated power
                 playerName = data.playerName || "تعيين اسم";
                 isNameSetPermanently = data.isNameSetPermanently || false;
                 lastPlayerNameChangeTimestamp = data.lastPlayerNameChangeTimestamp || 0;
@@ -2354,10 +2275,11 @@
         function savePlayerData() {
             if (!isFirebaseLoaded) return;
             set(ref(db, `artifacts/${appId}/users/${userId}/playerData`), {
-                // Removed playerXP, playerLevel, xpForCurrentLevel, xpThresholdForNextLevel
                 playerPoints: playerPoints,
                 playerDollars: playerDollars,
                 accumulatedDollars: accumulatedDollars,
+                accumulatedPoints: accumulatedPoints, // Save accumulated points
+                accumulatedPower: accumulatedPower,   // Save accumulated power
                 playerName: playerName,
                 isNameSetPermanently: isNameSetPermanently,
                 lastPlayerNameChangeTimestamp: lastPlayerNameChangeTimestamp,
@@ -2422,13 +2344,11 @@
 
         async function migrateLocalStorageToFirebase() {
             const localStorageKeys = [
-                // Removed playerXP, playerLevel, xpForCurrentLevel, xpThresholdForNextLevel
                 'playerPoints', 'playerDollars',
                 'playerInventory', 'playerName', 'isNameSetPermanently', 'lastPlayerNameChangeTimestamp',
                 'houses', 'innovationTypes',
-                // Removed tasks, lastDailyResetDate
                 'globalAttackCooldownEndTime', 'attacksMadeInCurrentCooldown', 'attackedTargetsInCooldown',
-                'accumulatedDollars'
+                'accumulatedDollars', 'accumulatedPoints', 'accumulatedPower' // Added new accumulated variables
             ];
 
             let hasLocalStorageData = false;
@@ -2442,10 +2362,11 @@
             if (hasLocalStorageData) {
                 showMessageModal('نقل البيانات', 'جاري نقل بياناتك القديمة إلى السحابة. قد يستغرق هذا بضع لحظات.');
                 try {
-                    // Removed migratedXP, migratedLevel, migratedXpForCurrentLevel, migratedXpThresholdForNextLevel
                     const migratedPoints = parseInt(localStorage.getItem('playerPoints') || '0');
                     const migratedDollars = parseInt(localStorage.getItem('playerDollars') || '0');
                     const migratedAccumulatedDollars = parseInt(localStorage.getItem('accumulatedDollars') || '0');
+                    const migratedAccumulatedPoints = parseInt(localStorage.getItem('accumulatedPoints') || '0'); // Migrate new accumulated variables
+                    const migratedAccumulatedPower = parseInt(localStorage.getItem('accumulatedPower') || '0');     // Migrate new accumulated variables
                     const migratedPlayerName = localStorage.getItem('playerName') || "تعيين اسم";
                     const migratedIsNameSetPermanently = localStorage.getItem('isNameSetPermanently') === 'true';
                     const migratedLastPlayerNameChangeTimestamp = parseInt(localStorage.getItem('lastPlayerNameChangeTimestamp') || '0');
@@ -2456,12 +2377,12 @@
                     const migratedHouses = JSON.parse(localStorage.getItem('houses'));
                     const migratedInnovationTypes = JSON.parse(localStorage.getItem('innovationTypes'));
                     const migratedPlayerInventory = JSON.parse(localStorage.getItem('playerInventory'));
-                    // Removed migratedTasks, migratedLastDailyResetDate
 
-                    // Removed playerXP, playerLevel, xpForCurrentLevel, xpThresholdForNextLevel assignments
                     playerPoints = migratedPoints;
                     playerDollars = migratedDollars;
                     accumulatedDollars = migratedAccumulatedDollars;
+                    accumulatedPoints = migratedAccumulatedPoints; // Assign new accumulated variables
+                    accumulatedPower = migratedAccumulatedPower;   // Assign new accumulated variables
                     playerName = migratedPlayerName;
                     isNameSetPermanently = migratedIsNameSetPermanently;
                     lastPlayerNameChangeTimestamp = migratedLastPlayerNameChangeTimestamp;
@@ -2480,19 +2401,17 @@
                                 }
                             } else {
                                 if (savedType.id === 'innovation3') {
-                                    innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: savedType.cooldownEndTime || 0, initialCooldown: 7 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: savedType.isOwned || false });
+                                    innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: savedType.cooldownEndTime || 0, initialCooldown: 4 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: savedType.isOwned || false });
                                 }
                             }
                         });
                     }
                     playerInventory = migratedPlayerInventory || { reduceTime: 0 };
-                    // Removed tasks and lastDailyResetDate migration
 
                     await savePlayerData();
                     await saveHouses();
                     await saveInnovationTypes();
                     await savePlayerInventory();
-                    // Removed saveTasks
                     await saveAttackCooldowns();
 
                     localStorage.clear();
@@ -2503,8 +2422,6 @@
                 }
             }
         }
-
-        // Removed setInterval for random XP gain
 
         if (chatSendButton) {
             chatSendButton.addEventListener('click', () => {
@@ -2543,7 +2460,6 @@
             push(chatRef, {
                 senderId: userId,
                 senderName: playerName,
-                // Removed senderLevel
                 senderPower: totalPlayerPower,
                 message: messageText,
                 timestamp: serverTimestamp()
@@ -2591,7 +2507,6 @@
             const onlineRef = ref(db, `artifacts/${appId}/public/onlineUsers/${userId}`);
             set(onlineRef, {
                 name: playerName,
-                // Removed level
                 totalPower: totalPlayerPower,
                 lastOnline: serverTimestamp()
             }).catch(error => {
@@ -2643,7 +2558,6 @@
                 }
 
                 activeOnlinePlayers.sort((a, b) => {
-                    // Removed level sorting
                     if (b.totalPower !== a.totalPower) return b.totalPower - a.totalPower;
                     return a.name.localeCompare(b.name);
                 });
@@ -2728,7 +2642,6 @@
                         playerElement.innerHTML = `
                             <div class="player-info text-right">
                                 <p class="font-bold text-lg">${player.name}</p>
-                                <!-- Removed level display -->
                                 <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(player.totalPower)}</p>
                             </div>
                             <button data-target-id="${player.uid}" data-target-name="${player.name}" data-target-power="${player.totalPower}"
@@ -2750,7 +2663,7 @@
         function getAttackCooldownRemaining(targetId) {
             const lastAttackTime = attackCooldowns[targetId];
             if (!lastAttackTime) return 0;
-            const cooldownDuration = 30 * 60; // 30 minutes for individual cooldown
+            const cooldownDuration = 5 * 60; // Changed from 30 minutes to 5 minutes for individual cooldown
             const elapsed = (Date.now() - lastAttackTime) / 1000;
             return Math.max(0, Math.floor(cooldownDuration - elapsed));
         }
@@ -2809,28 +2722,35 @@
                 didWin = true;
             }
 
-            const pointsStolen = 50;
-            const dollarsStolen = 100;
+            const pointsReward = 50; // New: Points reward for attack
+            const dollarsReward = 30; // Changed from 100 to 30
+            const powerReward = 70;   // New: Power reward for attack
 
             let attackerPointsChange = 0;
             let attackerDollarsChange = 0;
+            let attackerPowerChange = 0; // New: Attacker power change
             let defenderPointsChange = 0;
             let defenderDollarsChange = 0;
+            let defenderPowerChange = 0; // New: Defender power change
 
             if (didWin) {
-                attackerPointsChange = pointsStolen;
-                attackerDollarsChange = dollarsStolen;
-                showMessageModal('فوز!', `لقد هاجمت ${targetName} بنجاح وحصلت على ${pointsStolen} نقطة و ${dollarsStolen}$!`);
+                attackerPointsChange = pointsReward;
+                attackerDollarsChange = dollarsReward;
+                attackerPowerChange = powerReward;
+                showMessageModal('فوز!', `لقد هاجمت ${targetName} بنجاح وحصلت على ${pointsReward} نقطة و ${dollarsReward}$ و ${powerReward} قوة!`);
             } else {
-                attackerPointsChange = -pointsStolen;
+                attackerPointsChange = -pointsReward;
                 attackerDollarsChange = 0;
-                showMessageModal('خسارة!', `فشلت في الهجوم على ${targetName} وخسرت ${pointsStolen} نقطة.`);
+                attackerPowerChange = 0; // No power gain on loss
+                showMessageModal('خسارة!', `فشلت في الهجوم على ${targetName} وخسرت ${pointsReward} نقطة.`);
             }
 
             playerPoints += attackerPointsChange;
             playerDollars += attackerDollarsChange;
+            houses[activeHouseIndex].power += attackerPowerChange; // Add power to active house
             playerPoints = Math.max(0, playerPoints);
             playerDollars = Math.max(0, playerDollars);
+            houses[activeHouseIndex].power = Math.max(1, houses[activeHouseIndex].power); // Ensure house power doesn't go below 1
 
             const playerElement = event.target.closest('.challenge-player-item');
             if (playerElement) {
@@ -2863,30 +2783,48 @@
                 timestamp: serverTimestamp(),
                 outcome: didWin ? 'win' : 'loss',
                 pointsChange: attackerPointsChange,
-                dollarsChange: attackerDollarsChange
+                dollarsChange: attackerDollarsChange,
+                powerChange: attackerPowerChange // Log power change
             }).catch(error => console.error("Error saving outgoing attack log:", error));
 
             const targetPlayerRef = ref(db, `artifacts/${appId}/users/${targetId}/playerData`);
+            const targetHousesRef = ref(db, `artifacts/${appId}/users/${targetId}/houses`); // Reference to target's houses
             const targetAttackLogRef = ref(db, `artifacts/${appId}/users/${targetId}/attackLog/incoming`);
 
-            await get(targetPlayerRef).then(snapshot => {
+            await get(targetPlayerRef).then(async snapshot => {
                 if (snapshot.exists()) {
                     const targetData = snapshot.val();
                     if (didWin) {
-                        defenderPointsChange = -pointsStolen;
-                        defenderDollarsChange = -dollarsStolen;
+                        defenderPointsChange = -pointsReward;
+                        defenderDollarsChange = -dollarsReward;
+                        defenderPowerChange = -powerReward; // Defender loses power
                     } else {
                         defenderPointsChange = 0;
                         defenderDollarsChange = 0;
+                        defenderPowerChange = 0; // Defender doesn't lose power if attacker loses
                     }
 
                     const newTargetPoints = Math.max(0, (targetData.playerPoints || 0) + defenderPointsChange);
                     const newTargetDollars = Math.max(0, (targetData.playerDollars || 0) + defenderDollarsChange);
+                    
                     set(targetPlayerRef, {
                         ...targetData,
                         playerPoints: newTargetPoints,
                         playerDollars: newTargetDollars
                     });
+
+                    // Update target's active house power
+                    await get(targetHousesRef).then(houseSnapshot => {
+                        if (houseSnapshot.exists()) {
+                            const targetHouses = houseSnapshot.val();
+                            const targetActiveHouseIndex = targetHouses.findIndex(h => h.unlocked); // Assuming first unlocked is active
+                            if (targetActiveHouseIndex !== -1) {
+                                targetHouses[targetActiveHouseIndex].power = Math.max(1, (targetHouses[targetActiveHouseIndex].power || 0) + defenderPowerChange);
+                                set(targetHousesRef, targetHouses);
+                            }
+                        }
+                    }).catch(error => console.error("Error updating target house data:", error));
+
 
                     push(targetAttackLogRef, {
                         attackerId: userId,
@@ -2894,7 +2832,8 @@
                         timestamp: serverTimestamp(),
                         outcome: didWin ? 'loss' : 'win',
                         pointsChange: defenderPointsChange,
-                        dollarsChange: defenderDollarsChange
+                        dollarsChange: defenderDollarsChange,
+                        powerChange: defenderPowerChange // Log defender's power change
                     }).catch(error => console.error("Error saving incoming attack log:", error));
 
                 }
@@ -2920,7 +2859,7 @@
                 globalAttackCooldownEndTime = Date.now() + (GLOBAL_ATTACK_COOLDOWN_DURATION * 1000);
             }
             savePlayerData();
-
+            renderHouses(); // Re-render houses to reflect power change
             updatePlayerInfoDisplay();
             renderChallengePlayers();
         }
@@ -2957,10 +2896,17 @@
         function startDollarCollection() {
             if (dollarCollectionInterval) clearInterval(dollarCollectionInterval);
             dollarCollectionInterval = setInterval(() => {
-                accumulatedDollars += 1;
-                updateAccumulatedDollarsDisplay();
+                const dollarsGain = Math.floor(Math.random() * (20 - 4 + 1)) + 4;
+                const pointsGain = Math.floor(Math.random() * (20 - 4 + 1)) + 4;
+                const powerGain = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
+
+                accumulatedDollars += dollarsGain;
+                accumulatedPoints += pointsGain;
+                accumulatedPower += powerGain;
+                
+                updateAccumulatedDollarsDisplay(); // Only updates dollar display, but data is accumulated
                 savePlayerData();
-            }, 5000);
+            }, 60 * 1000); // Changed to 1 minute (60 seconds)
         }
 
         function updateAccumulatedDollarsDisplay() {
@@ -2970,15 +2916,24 @@
         }
 
         function collectDollars() {
-            if (accumulatedDollars > 0) {
+            if (accumulatedDollars > 0 || accumulatedPoints > 0 || accumulatedPower > 0) {
                 playerDollars += accumulatedDollars;
-                showToast(`لقد جمعت $${formatDollars(accumulatedDollars)}!`, 'success');
+                playerPoints += accumulatedPoints;
+                houses[activeHouseIndex].power += accumulatedPower; // Add accumulated power to active house
+                
+                showToast(`لقد جمعت $${formatDollars(accumulatedDollars)} و ${formatPower(accumulatedPoints)} نقطة و ${formatPower(accumulatedPower)} قوة!`, 'success');
+                
                 accumulatedDollars = 0;
+                accumulatedPoints = 0;
+                accumulatedPower = 0;
+
                 updatePlayerInfoDisplay();
                 updateAccumulatedDollarsDisplay();
+                renderHouses(); // Re-render houses to reflect power gain
                 savePlayerData();
+                saveHouses(); // Save houses after power update
             } else {
-                showToast('لا توجد دولارات لجمعها بعد.', 'info');
+                showToast('لا توجد مكافآت لجمعها بعد.', 'info');
             }
         }
 
@@ -3025,7 +2980,6 @@
                         await loadHouses();
                         await loadInnovationTypes();
                         await loadPlayerInventory();
-                        // Removed loadTasks
                         await loadAttackCooldowns();
 
                         await migrateLocalStorageToFirebase();
@@ -3035,11 +2989,9 @@
                         renderHouses();
                         updateInnovationButtonText();
                         updateInnovationTimerDisplay();
-                        // Removed renderTasks
                         renderInventoryItems();
 
                         listenForChatMessages();
-                        // Removed startDailyResetTimer
                         clearChatHistory();
                         startDollarCollection();
 
