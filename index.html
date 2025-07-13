@@ -781,7 +781,7 @@
                         <span class="price-display">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
-                            </svg>
+                        </svg>
                             <span>مجاني</span>
                         </span>
                     </span>
@@ -911,8 +911,23 @@
                 </svg>
             </div>
             <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">اونلاين</h1>
-            <div id="online-users-list" class="view-content flex flex-col gap-4">
+            
+            <div class="view-content">
+                <div class="bg-gray-700 p-4 rounded-xl mb-6 shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-100 mb-4">اللاعبون المتصلون</h2>
+                    <div id="online-players-list" class="flex flex-col gap-3">
+                        <p class="text-gray-400 text-center">لا يوجد لاعبون متصلون حالياً.</p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-700 p-4 rounded-xl shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-100 mb-4">اللاعبون غير المتصلين مؤخراً (آخر 10)</h2>
+                    <div id="recently-offline-players-list" class="flex flex-col gap-3">
+                        <p class="text-gray-400 text-center">لا يوجد لاعبون غير متصلين مؤخراً.</p>
+                    </div>
+                </div>
             </div>
+
             <div id="online-player-total-power-display" class="text-gray-200 text-lg text-center mt-4">
                 قوتك الإجمالية: <span class="font-bold text-red-400" id="player-total-power-display-online">0</span>
             </div>
@@ -1209,7 +1224,9 @@
         const chatInput = document.getElementById('chat-input');
         const chatSendButton = document.getElementById('chat-send-button');
 
-        const onlineUsersList = document.getElementById('online-users-list');
+        // New elements for online view sections
+        const onlinePlayersListDiv = document.getElementById('online-players-list');
+        const recentlyOfflinePlayersListDiv = document.getElementById('recently-offline-players-list');
 
         const challengePlayersList = document.getElementById('challenge-players-list');
         const globalAttacksList = document.getElementById('global-attacks-list');
@@ -1617,7 +1634,7 @@
         }
         // Changed chat menu item text and added password logic
         if (chatMenuItem) chatMenuItem.addEventListener('click', () => navigateTo('chat-view', 'right'));
-        if (onlineMenuItem) onlineMenuItem.addEventListener('click', () => listenForOnlineUsers()); // Direct call to listenForOnlineUsers
+        if (onlineMenuItem) onlineMenuItem.addEventListener('click', () => navigateTo('online-view', 'right'));
         
         document.addEventListener('click', (event) => {
             if (event.target.closest('#back-to-main-from-attack-log')) {
@@ -2857,7 +2874,10 @@
 
         async function listenForOnlineUsers() {
             if (!isFirebaseLoaded) return;
-            navigateTo('online-view', 'right'); // Ensure we navigate to the online view
+            
+            // Clear both lists before populating
+            if (onlinePlayersListDiv) onlinePlayersListDiv.innerHTML = '';
+            if (recentlyOfflinePlayersListDiv) recentlyOfflinePlayersListDiv.innerHTML = '';
 
             const playerProfilesRef = ref(db, `artifacts/${appId}/public/playerProfiles`);
             const onlineUsersRef = ref(db, `artifacts/${appId}/public/onlineUsers`);
@@ -2870,14 +2890,13 @@
             });
 
             onValue(onlineUsersRef, async (onlineSnapshot) => {
-                if (!onlineUsersList) return;
-                onlineUsersList.innerHTML = '';
                 const now = Date.now();
 
                 const activeOnlinePlayers = [];
                 const recentOfflinePlayers = [];
 
                 // Update online status and lastOnline from the 'onlineUsers' node
+                // And populate the activeOnlinePlayers list
                 onlineSnapshot.forEach(childSnapshot => {
                     const user = childSnapshot.val();
                     const userUid = childSnapshot.key;
@@ -2886,18 +2905,20 @@
                         // Check for active online status (within 1 minute)
                         if (user.lastOnline && (now - user.lastOnline < ONLINE_ACTIVE_DURATION)) {
                             allPlayers[userUid].isOnline = true;
+                            if (userUid !== userId) { // Don't add current user to the list
+                                activeOnlinePlayers.push(allPlayers[userUid]);
+                            }
                         }
                     }
                 });
 
-                // Separate players into active online and recent offline
+                // Populate the recentOfflinePlayers list
                 for (const uid in allPlayers) {
                     if (uid === userId) continue; // Skip current user
 
                     const player = allPlayers[uid];
-                    if (player.isOnline) {
-                        activeOnlinePlayers.push(player);
-                    } else if (player.lastOnline && (now - player.lastOnline < OFFLINE_RECENT_DURATION)) {
+                    // If not actively online AND was online recently (within 10 hours)
+                    if (!player.isOnline && player.lastOnline && (now - player.lastOnline < OFFLINE_RECENT_DURATION)) {
                         recentOfflinePlayers.push(player);
                     }
                 }
@@ -2913,39 +2934,48 @@
                 recentOfflinePlayers.sort((a, b) => b.lastOnline - a.lastOnline);
                 const top10RecentOffline = recentOfflinePlayers.slice(0, 10);
 
-                // Combine and render
-                if (activeOnlinePlayers.length === 0 && top10RecentOffline.length === 0) {
-                    onlineUsersList.innerHTML = '<p class="text-gray-300 text-center">لا يوجد لاعبون متصلون حالياً أو كانوا متصلين مؤخراً.</p>';
-                } else {
-                    // Render active online players
-                    activeOnlinePlayers.forEach(user => {
-                        const userElement = document.createElement('div');
-                        userElement.className = `online-user-item text-white`;
-                        userElement.innerHTML = `
-                            <div class="user-info">
-                                <p class="font-bold text-lg">${user.name}</p>
-                                <p class="text-sm text-gray-300">المستوى: ${user.level}</p>
-                                <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(user.totalPower)}</p>
-                            </div>
-                            <div class="status-dot"></div>
-                        `;
-                        onlineUsersList.appendChild(userElement);
-                    });
+                // Render active online players
+                if (onlinePlayersListDiv) {
+                    onlinePlayersListDiv.innerHTML = ''; // Clear previous content
+                    if (activeOnlinePlayers.length === 0) {
+                        onlinePlayersListDiv.innerHTML = '<p class="text-gray-400 text-center">لا يوجد لاعبون متصلون حالياً.</p>';
+                    } else {
+                        activeOnlinePlayers.forEach(user => {
+                            const userElement = document.createElement('div');
+                            userElement.className = `online-user-item text-white`;
+                            userElement.innerHTML = `
+                                <div class="user-info">
+                                    <p class="font-bold text-lg">${user.name}</p>
+                                    <p class="text-sm text-gray-300">المستوى: ${user.level}</p>
+                                    <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(user.totalPower)}</p>
+                                </div>
+                                <div class="status-dot"></div>
+                            `;
+                            onlinePlayersListDiv.appendChild(userElement);
+                        });
+                    }
+                }
 
-                    // Render top 10 recent offline players
-                    top10RecentOffline.forEach(user => {
-                        const userElement = document.createElement('div');
-                        userElement.className = `online-user-item text-white offline`; // Add offline class for styling
-                        userElement.innerHTML = `
-                            <div class="user-info">
-                                <p class="font-bold text-lg">${user.name}</p>
-                                <p class="text-sm text-gray-300">المستوى: ${user.level}</p>
-                                <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(user.totalPower)}</p>
-                            </div>
-                            <div class="status-dot"></div>
-                        `;
-                        onlineUsersList.appendChild(userElement);
-                    });
+                // Render top 10 recent offline players
+                if (recentlyOfflinePlayersListDiv) {
+                    recentlyOfflinePlayersListDiv.innerHTML = ''; // Clear previous content
+                    if (top10RecentOffline.length === 0) {
+                        recentlyOfflinePlayersListDiv.innerHTML = '<p class="text-gray-400 text-center">لا يوجد لاعبون غير متصلين مؤخراً.</p>';
+                    } else {
+                        top10RecentOffline.forEach(user => {
+                            const userElement = document.createElement('div');
+                            userElement.className = `online-user-item text-white offline`;
+                            userElement.innerHTML = `
+                                <div class="user-info">
+                                    <p class="font-bold text-lg">${user.name}</p>
+                                    <p class="text-sm text-gray-300">المستوى: ${user.level}</p>
+                                    <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(user.totalPower)}</p>
+                                </div>
+                                <div class="status-dot"></div>
+                            `;
+                            recentlyOfflinePlayersListDiv.appendChild(userElement);
+                        });
+                    }
                 }
             });
         }
