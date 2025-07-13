@@ -638,7 +638,6 @@
                         <span class="text-base" id="player-total-power-display-main">0</span>
                     </div>
                 </div>
-                <!-- Removed XP/Level display and progress bar -->
             </div>
 
             <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">القائمة الرئيسية</h1>
@@ -678,15 +677,14 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h2v-2a3 3 0 00-3-3H8a3 3 0 00-3 3v2H3m10-9a4 4 0 11-8 0 4 4 0 018 0zM7 10h.01M12 12h.01M17 12h.01M12 15h.01M12 18h.01M12 21h.01" />
                     </svg>
                     <span class="text-lg font-semibold">تحدي اللاعبون</span>
-                    <!-- Removed lock icon and text as level requirement is removed -->
                 </div>
             </div>
             <div id="dollar-collector" class="bg-gray-700 p-3 rounded-xl shadow-md text-center mt-auto">
                 <h3 class="text-base font-semibold text-gray-100 mb-1">دولارات متراكمة</h3>
                 <div class="flex items-center justify-center gap-1 mb-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
-                    </svg>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
+                        </svg>
                     <span class="text-xl font-bold text-green-300" id="accumulated-dollars-display">$0</span>
                 </div>
                 <button id="collect-dollars-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-4 rounded-lg shadow-md transition duration-200 ease-in-out w-full text-sm">
@@ -916,8 +914,6 @@
         </div>
     </div>
 
-    <!-- Removed level-up-toast -->
-
     <div id="house-info-modal" class="modal-overlay hidden">
         <div class="bg-gray-700 p-8 rounded-xl shadow-2xl text-center max-w-sm w-full transform scale-95 opacity-0 transition-all duration-300 ease-out">
             <h3 class="text-2xl font-bold text-gray-100 mb-4">معلومات البيت والترقيات</h3>
@@ -992,8 +988,6 @@
         </div>
     </div>
 
-    <!-- Removed tasks-modal -->
-
     <div id="updates-modal" class="modal-overlay hidden">
         <div class="bg-gray-700 p-8 rounded-xl shadow-2xl text-center max-w-sm w-full transform scale-95 opacity-0 transition-all duration-300 ease-out">
             <h3 class="text-2xl font-bold text-gray-100 mb-4">إضافات التحديث</h3>
@@ -1004,16 +998,42 @@
         </div>
     </div>
 
-    <div id="set-name-modal" class="modal-overlay hidden">
+    <div id="auth-flow-modal" class="modal-overlay hidden">
         <div class="bg-gray-700 p-8 rounded-xl shadow-2xl text-center max-w-sm w-full transform scale-95 opacity-0">
-            <h3 class="text-2xl font-bold text-gray-100 mb-4">تعيين اسم اللاعب</h3>
-            <input type="text" id="player-name-input" class="w-full p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="أدخل اسمك هنا..." maxlength="15">
-            <div class="flex justify-center gap-4">
-                <button id="set-name-confirm-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
-                    تأكيد
+            <h3 class="text-2xl font-bold text-gray-100 mb-4" id="auth-modal-title"></h3>
+            
+            <div id="set-name-section">
+                <input type="text" id="player-name-input" class="w-full p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="أدخل اسمك هنا..." maxlength="15">
+                <div class="flex justify-center gap-4">
+                    <button id="set-name-confirm-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                        تأكيد الاسم
+                    </button>
+                    <button id="set-name-continue-guest-button" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                        المتابعة كضيف
+                    </button>
+                </div>
+                <p class="text-gray-400 mt-4">أو سجل دخول/أنشئ حساب لحفظ تقدمك:</p>
+                <button id="show-email-auth-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-2 w-full">
+                    تسجيل دخول / إنشاء حساب
                 </button>
-                <button id="set-name-cancel-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                <button id="auth-flow-cancel-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-2 w-full hidden">
                     إلغاء
+                </button>
+            </div>
+
+            <div id="email-auth-section" class="hidden">
+                <input type="email" id="auth-email-input" class="w-full p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="البريد الإلكتروني">
+                <input type="password" id="auth-password-input" class="w-full p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="كلمة المرور" maxlength="20">
+                <div class="flex justify-center gap-4">
+                    <button id="auth-signup-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                        إنشاء حساب
+                    </button>
+                    <button id="auth-signin-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                        تسجيل دخول
+                    </button>
+                </div>
+                <button id="back-to-name-section-button" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-4 w-full">
+                    العودة
                 </button>
             </div>
         </div>
@@ -1046,7 +1066,16 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged,
+            createUserWithEmailAndPassword, // New import
+            signInWithEmailAndPassword,     // New import
+            linkWithCredential,             // New import
+            EmailAuthProvider               // New import
+        } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
         import { getDatabase, ref, set, get, onValue, remove, push, serverTimestamp, query, orderByChild, limitToLast, onDisconnect } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
         const firebaseConfig = {
@@ -1131,11 +1160,24 @@
         const updatesModal = document.getElementById('updates-modal');
         const updatesCloseButton = document.getElementById('updates-close-button');
 
-        const playerNameDisplay = document.getElementById('player-name-display');
-        const setNameModal = document.getElementById('set-name-modal');
+        // Renamed from setNameModal to authFlowModal to reflect new purpose
+        const authFlowModal = document.getElementById('auth-flow-modal');
+        const authModalTitle = document.getElementById('auth-modal-title');
+        const setNameSection = document.getElementById('set-name-section');
+        const emailAuthSection = document.getElementById('email-auth-section');
         const playerNameInput = document.getElementById('player-name-input');
         const setNameConfirmButton = document.getElementById('set-name-confirm-button');
-        const setNameCancelButton = document.getElementById('set-name-cancel-button');
+        const setNameContinueGuestButton = document.getElementById('set-name-continue-guest-button');
+        const showEmailAuthButton = document.getElementById('show-email-auth-button');
+        const authFlowCancelButton = document.getElementById('auth-flow-cancel-button'); // New cancel button for auth flow
+
+        const authEmailInput = document.getElementById('auth-email-input');
+        const authPasswordInput = document.getElementById('auth-password-input');
+        const authSignupButton = document.getElementById('auth-signup-button');
+        const authSigninButton = document.getElementById('auth-signin-button');
+        const backToNameSectionButton = document.getElementById('back-to-name-section-button');
+
+        const playerNameDisplay = document.getElementById('player-name-display'); // Still refers to the display element
 
         const deleteAccountButton = document.getElementById('delete-account-button');
         const deleteConfirmModal = document.getElementById('delete-confirm-modal');
@@ -1189,17 +1231,17 @@
         let playerPoints = 0;
         let playerDollars = 0;
         let accumulatedDollars = 0;
-        let accumulatedPoints = 0; // New: Accumulated points from collection
-        let accumulatedPower = 0;  // New: Accumulated power from collection
+        let accumulatedPoints = 0;
+        let accumulatedPower = 0;
         let playerName = "تعيين اسم";
-        let isNameSetPermanently = false;
+        let isNameSetPermanently = false; // Indicates if the player has chosen a permanent name or is just a guest
         let lastPlayerNameChangeTimestamp = 0;
         let attackCooldowns = {};
         let attackedTargetsInCooldown = [];
         let globalAttackCooldownEndTime = 0;
         let attacksMadeInCurrentCooldown = 0;
-        const MAX_GLOBAL_ATTACKS = 5; // Changed from 3 to 5
-        const GLOBAL_ATTACK_COOLDOWN_DURATION = 10 * 60; // Changed from 60 minutes to 10 minutes
+        const MAX_GLOBAL_ATTACKS = 5;
+        const GLOBAL_ATTACK_COOLDOWN_DURATION = 10 * 60; // 10 minutes
         const NAME_CHANGE_COOLDOWN_DURATION = 3 * 24 * 60 * 60 * 1000;
         const ONLINE_ACTIVE_DURATION = 60 * 1000;
         const OFFLINE_RECENT_DURATION = 10 * 60 * 60 * 1000;
@@ -1225,9 +1267,9 @@
         ];
 
         const innovationTypes = [
-            { id: 'innovation1', name: 'ابتكار 1', cooldownEndTime: 0, initialCooldown: 4 * 60, colorClass: 'from-purple-600 to-indigo-700' }, // Changed to 4 minutes
-            { id: 'innovation2', name: 'ابتكار 2', cooldownEndTime: 0, initialCooldown: 4 * 60, colorClass: 'from-orange-600 to-amber-700' }, // Changed to 4 minutes
-            { id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: 0, initialCooldown: 4 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: false } // Changed to 4 minutes
+            { id: 'innovation1', name: 'ابتكار 1', cooldownEndTime: 0, initialCooldown: 4 * 60, colorClass: 'from-purple-600 to-indigo-700' },
+            { id: 'innovation2', name: 'ابتكار 2', cooldownEndTime: 0, initialCooldown: 4 * 60, colorClass: 'from-orange-600 to-amber-700' },
+            { id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: 0, initialCooldown: 4 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: false }
         ];
         let currentInnovationTypeIndex = 0;
 
@@ -1267,6 +1309,8 @@
                 toastNotification.classList.add('bg-green-600');
             } else if (type === 'info') {
                 toastNotification.classList.add('bg-blue-600');
+            } else if (type === 'error') {
+                toastNotification.classList.add('bg-red-600');
             }
             toastNotification.classList.remove('opacity-0');
             toastNotification.classList.add('opacity-100');
@@ -1301,6 +1345,7 @@
             if (storePlayerDollarsDisplay) storePlayerDollarsDisplay.textContent = `$${formatPower(playerDollars)}`;
             if (storePlayerTotalPowerDisplay) storePlayerTotalPowerDisplay.textContent = formatPower(totalPlayerPower);
 
+            // Update public profile with player's total power
             if (isFirebaseLoaded && userId && playerName !== "تعيين اسم") {
                 set(ref(db, `artifacts/${appId}/public/playerProfiles/${userId}`), {
                     name: playerName,
@@ -1518,7 +1563,7 @@
             innovationButton.addEventListener('click', () => {
                 const currentInnovation = innovationTypes[currentInnovationTypeIndex];
 
-                if (currentInnovation.id === 'innovation3' && !currentInnovation.isOwned) {
+                if (currentInnovation.id === 'innovation3' && !currentType.isOwned) { // Changed currentInnovation.isOwned to currentType.isOwned
                     const item = storeItems['buyInnovation3'];
                     if (playerPoints >= item.cost) {
                         playerPoints -= item.cost;
@@ -2061,8 +2106,21 @@
             });
         }
 
+        // --- New Auth Flow Logic ---
         if (playerNameDisplay) {
             playerNameDisplay.addEventListener('click', () => {
+                showAuthFlowModal(true); // true means it's a "link account" scenario
+            });
+        }
+
+        if (setNameConfirmButton) {
+            setNameConfirmButton.addEventListener('click', async () => {
+                const newName = playerNameInput.value.trim();
+                if (newName === '') {
+                    showMessageModal('خطأ', 'الاسم لا يمكن أن يكون فارغاً.');
+                    return;
+                }
+
                 if (isNameSetPermanently && (Date.now() - lastPlayerNameChangeTimestamp < NAME_CHANGE_COOLDOWN_DURATION)) {
                     const remainingTimeMs = NAME_CHANGE_COOLDOWN_DURATION - (Date.now() - lastPlayerNameChangeTimestamp);
                     const remainingDays = Math.ceil(remainingTimeMs / (1000 * 60 * 60 * 24));
@@ -2070,57 +2128,129 @@
                     return;
                 }
 
-                if (setNameModal && playerNameInput) {
-                    setNameModal.classList.remove('hidden');
-                    playerNameInput.value = playerName === "تعيين اسم" ? "" : playerName;
-                    setTimeout(() => {
-                        if (setNameModal.querySelector('div')) {
-                            setNameModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
-                            setNameModal.querySelector('div').classList.add('scale-100', 'opacity-100');
-                        }
-                    }, 10);
-                }
+                playerName = newName;
+                isNameSetPermanently = true; // Mark as permanently set
+                lastPlayerNameChangeTimestamp = Date.now();
+                savePlayerData();
+                updatePlayerInfoDisplay();
+                showToast(`تم تعيين اسمك إلى ${playerName}!`, 'success');
+                closeModal(authFlowModal);
             });
         }
 
-        if (setNameConfirmButton) {
-            setNameConfirmButton.addEventListener('click', () => {
-                if (!playerNameInput) return;
-                const newName = playerNameInput.value.trim();
-                if (newName !== '') {
-                    if (isNameSetPermanently && (Date.now() - lastPlayerNameChangeTimestamp < NAME_CHANGE_COOLDOWN_DURATION)) {
-                        const remainingTimeMs = NAME_CHANGE_COOLDOWN_DURATION - (Date.now() - lastPlayerNameChangeTimestamp);
-                        const remainingDays = Math.ceil(remainingTimeMs / (1000 * 60 * 60 * 24));
-                        showMessageModal('لا يمكن تغيير الاسم', `لا يمكنك تغيير اسمك إلا بعد مرور ${remainingDays} يوم(أيام) أخرى.`);
-                        return;
-                    }
+        if (setNameContinueGuestButton) {
+            setNameContinueGuestButton.addEventListener('click', () => {
+                // If user chooses to continue as guest, just close the modal
+                // Their anonymous UID and data will persist until browser data is cleared
+                closeModal(authFlowModal);
+                showToast('تستمر كضيف. قد تفقد بياناتك إذا مسحت بيانات المتصفح.', 'info');
+            });
+        }
 
-                    playerName = newName;
-                    if (!isNameSetPermanently) {
-                        isNameSetPermanently = true;
+        if (showEmailAuthButton) {
+            showEmailAuthButton.addEventListener('click', () => {
+                setNameSection.classList.add('hidden');
+                emailAuthSection.classList.remove('hidden');
+                authModalTitle.textContent = "تسجيل الدخول / إنشاء حساب";
+                authFlowCancelButton.classList.remove('hidden'); // Show cancel button for email auth
+            });
+        }
+
+        if (backToNameSectionButton) {
+            backToNameSectionButton.addEventListener('click', () => {
+                emailAuthSection.classList.add('hidden');
+                setNameSection.classList.remove('hidden');
+                authModalTitle.textContent = "تعيين اسم اللاعب";
+                authFlowCancelButton.classList.add('hidden'); // Hide cancel button
+            });
+        }
+
+        if (authFlowCancelButton) {
+            authFlowCancelButton.addEventListener('click', () => {
+                closeModal(authFlowModal);
+            });
+        }
+
+        if (authSignupButton) {
+            authSignupButton.addEventListener('click', async () => {
+                const email = authEmailInput.value.trim();
+                const password = authPasswordInput.value.trim();
+
+                if (!email || !password) {
+                    showMessageModal('خطأ', 'البريد الإلكتروني وكلمة المرور مطلوبان.');
+                    return;
+                }
+                if (password.length < 6) {
+                    showMessageModal('خطأ', 'يجب أن تكون كلمة المرور 6 أحرف على الأقل.');
+                    return;
+                }
+
+                try {
+                    if (auth.currentUser && auth.currentUser.isAnonymous) {
+                        // Link anonymous account to a new email/password account
+                        const credential = EmailAuthProvider.credential(email, password);
+                        await linkWithCredential(auth.currentUser, credential);
+                        isNameSetPermanently = true; // Mark as permanently set
                         lastPlayerNameChangeTimestamp = Date.now();
+                        savePlayerData(); // Save the updated player data including isNameSetPermanently
+                        showToast('تم ربط حسابك المجهول بحساب جديد!', 'success');
                     } else {
+                        // Create a brand new email/password account
+                        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                        userId = userCredential.user.uid; // Update userId to the new permanent UID
+                        // Reset player data for the new user, or load if they had anonymous data that needs to be migrated
+                        // For simplicity, we'll assume a fresh start or migration will handle previous data.
+                        // If this is a brand new user, their data will be initialized in loadPlayerData.
+                        isNameSetPermanently = true; // Mark as permanently set
                         lastPlayerNameChangeTimestamp = Date.now();
+                        savePlayerData();
+                        showToast('تم إنشاء حساب جديد وتسجيل الدخول!', 'success');
                     }
-                    savePlayerData();
-                    updatePlayerInfoDisplay();
-                    showToast(`تم تعيين اسمك إلى ${playerName}!`, 'success');
-                    closeModal(setNameModal);
-                } else {
-                    showMessageModal('خطأ', 'الاسم لا يمكن أن يكون فارغاً.');
+                    closeModal(authFlowModal);
+                    // onAuthStateChanged will handle loading data for the new user
+                } catch (error) {
+                    console.error("Error signing up:", error);
+                    let errorMessage = 'فشل إنشاء الحساب.';
+                    if (error.code === 'auth/email-already-in-use') {
+                        errorMessage = 'هذا البريد الإلكتروني مستخدم بالفعل.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'صيغة البريد الإلكتروني غير صحيحة.';
+                    } else if (error.code === 'auth/weak-password') {
+                        errorMessage = 'كلمة المرور ضعيفة جداً.';
+                    }
+                    showMessageModal('خطأ', errorMessage);
                 }
             });
         }
 
-        if (setNameCancelButton) {
-            setNameCancelButton.addEventListener('click', () => {
-                if (!isNameSetPermanently) {
-                    closeModal(setNameModal);
-                } else {
-                    closeModal(setNameModal);
+        if (authSigninButton) {
+            authSigninButton.addEventListener('click', async () => {
+                const email = authEmailInput.value.trim();
+                const password = authPasswordInput.value.trim();
+
+                if (!email || !password) {
+                    showMessageModal('خطأ', 'البريد الإلكتروني وكلمة المرور مطلوبان.');
+                    return;
+                }
+
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                    closeModal(authFlowModal);
+                    showToast('تم تسجيل الدخول بنجاح!', 'success');
+                    // onAuthStateChanged will handle loading data for the signed-in user
+                } catch (error) {
+                    console.error("Error signing in:", error);
+                    let errorMessage = 'فشل تسجيل الدخول.';
+                    if (error.code === 'auth/invalid-credential') { // Common for wrong email/password
+                        errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+                    } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                        errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+                    }
+                    showMessageModal('خطأ', errorMessage);
                 }
             });
         }
+        // --- End New Auth Flow Logic ---
 
         if (deleteAccountButton) {
             deleteAccountButton.addEventListener('click', () => {
@@ -2143,11 +2273,17 @@
                     return;
                 }
                 try {
+                    // Delete user data from Realtime Database
                     await remove(ref(db, `artifacts/${appId}/public/playerProfiles/${userId}`));
                     await remove(ref(db, `artifacts/${appId}/public/onlineUsers/${userId}`));
                     await remove(ref(db, `artifacts/${appId}/users/${userId}`));
                     
-                    localStorage.clear();
+                    // Delete the user from Firebase Authentication
+                    if (auth.currentUser) {
+                        await auth.currentUser.delete();
+                    }
+
+                    localStorage.clear(); // Clear any remaining local storage data
                     closeModal(deleteConfirmModal);
                     if (resetCountdownModal && countdownDisplay) {
                         resetCountdownModal.classList.remove('hidden');
@@ -2165,7 +2301,7 @@
                             if (countdownDisplay) countdownDisplay.textContent = countdown;
                             if (countdown <= 0) {
                                 clearInterval(countdownInterval);
-                                location.reload();
+                                location.reload(); // Reload the page to restart the app
                             }
                         }, 1000);
                     }
@@ -2259,8 +2395,8 @@
                 playerPoints = data.playerPoints || 0;
                 playerDollars = data.playerDollars || 0;
                 accumulatedDollars = data.accumulatedDollars || 0;
-                accumulatedPoints = data.accumulatedPoints || 0; // Load accumulated points
-                accumulatedPower = data.accumulatedPower || 0;   // Load accumulated power
+                accumulatedPoints = data.accumulatedPoints || 0;
+                accumulatedPower = data.accumulatedPower || 0;
                 playerName = data.playerName || "تعيين اسم";
                 isNameSetPermanently = data.isNameSetPermanently || false;
                 lastPlayerNameChangeTimestamp = data.lastPlayerNameChangeTimestamp || 0;
@@ -2268,6 +2404,7 @@
                 attacksMadeInCurrentCooldown = data.attacksMadeInCurrentCooldown || 0;
                 attackedTargetsInCooldown = data.attackedTargetsInCooldown || [];
             } else {
+                // If no data exists, initialize and save default data
                 savePlayerData();
             }
         }
@@ -2278,8 +2415,8 @@
                 playerPoints: playerPoints,
                 playerDollars: playerDollars,
                 accumulatedDollars: accumulatedDollars,
-                accumulatedPoints: accumulatedPoints, // Save accumulated points
-                accumulatedPower: accumulatedPower,   // Save accumulated power
+                accumulatedPoints: accumulatedPoints,
+                accumulatedPower: accumulatedPower,
                 playerName: playerName,
                 isNameSetPermanently: isNameSetPermanently,
                 lastPlayerNameChangeTimestamp: lastPlayerNameChangeTimestamp,
@@ -2348,7 +2485,7 @@
                 'playerInventory', 'playerName', 'isNameSetPermanently', 'lastPlayerNameChangeTimestamp',
                 'houses', 'innovationTypes',
                 'globalAttackCooldownEndTime', 'attacksMadeInCurrentCooldown', 'attackedTargetsInCooldown',
-                'accumulatedDollars', 'accumulatedPoints', 'accumulatedPower' // Added new accumulated variables
+                'accumulatedDollars', 'accumulatedPoints', 'accumulatedPower'
             ];
 
             let hasLocalStorageData = false;
@@ -2365,8 +2502,8 @@
                     const migratedPoints = parseInt(localStorage.getItem('playerPoints') || '0');
                     const migratedDollars = parseInt(localStorage.getItem('playerDollars') || '0');
                     const migratedAccumulatedDollars = parseInt(localStorage.getItem('accumulatedDollars') || '0');
-                    const migratedAccumulatedPoints = parseInt(localStorage.getItem('accumulatedPoints') || '0'); // Migrate new accumulated variables
-                    const migratedAccumulatedPower = parseInt(localStorage.getItem('accumulatedPower') || '0');     // Migrate new accumulated variables
+                    const migratedAccumulatedPoints = parseInt(localStorage.getItem('accumulatedPoints') || '0');
+                    const migratedAccumulatedPower = parseInt(localStorage.getItem('accumulatedPower') || '0');
                     const migratedPlayerName = localStorage.getItem('playerName') || "تعيين اسم";
                     const migratedIsNameSetPermanently = localStorage.getItem('isNameSetPermanently') === 'true';
                     const migratedLastPlayerNameChangeTimestamp = parseInt(localStorage.getItem('lastPlayerNameChangeTimestamp') || '0');
@@ -2381,8 +2518,8 @@
                     playerPoints = migratedPoints;
                     playerDollars = migratedDollars;
                     accumulatedDollars = migratedAccumulatedDollars;
-                    accumulatedPoints = migratedAccumulatedPoints; // Assign new accumulated variables
-                    accumulatedPower = migratedAccumulatedPower;   // Assign new accumulated variables
+                    accumulatedPoints = migratedAccumulatedPoints;
+                    accumulatedPower = migratedAccumulatedPower;
                     playerName = migratedPlayerName;
                     isNameSetPermanently = migratedIsNameSetPermanently;
                     lastPlayerNameChangeTimestamp = migratedLastPlayerNameChangeTimestamp;
@@ -2663,7 +2800,7 @@
         function getAttackCooldownRemaining(targetId) {
             const lastAttackTime = attackCooldowns[targetId];
             if (!lastAttackTime) return 0;
-            const cooldownDuration = 5 * 60; // Changed from 30 minutes to 5 minutes for individual cooldown
+            const cooldownDuration = 5 * 60; // 5 minutes for individual cooldown
             const elapsed = (Date.now() - lastAttackTime) / 1000;
             return Math.max(0, Math.floor(cooldownDuration - elapsed));
         }
@@ -2722,16 +2859,16 @@
                 didWin = true;
             }
 
-            const pointsReward = 50; // New: Points reward for attack
-            const dollarsReward = 30; // Changed from 100 to 30
-            const powerReward = 70;   // New: Power reward for attack
+            const pointsReward = 50;
+            const dollarsReward = 30;
+            const powerReward = 70;
 
             let attackerPointsChange = 0;
             let attackerDollarsChange = 0;
-            let attackerPowerChange = 0; // New: Attacker power change
+            let attackerPowerChange = 0;
             let defenderPointsChange = 0;
             let defenderDollarsChange = 0;
-            let defenderPowerChange = 0; // New: Defender power change
+            let defenderPowerChange = 0;
 
             if (didWin) {
                 attackerPointsChange = pointsReward;
@@ -2741,16 +2878,16 @@
             } else {
                 attackerPointsChange = -pointsReward;
                 attackerDollarsChange = 0;
-                attackerPowerChange = 0; // No power gain on loss
+                attackerPowerChange = 0;
                 showMessageModal('خسارة!', `فشلت في الهجوم على ${targetName} وخسرت ${pointsReward} نقطة.`);
             }
 
             playerPoints += attackerPointsChange;
             playerDollars += attackerDollarsChange;
-            houses[activeHouseIndex].power += attackerPowerChange; // Add power to active house
+            houses[activeHouseIndex].power += attackerPowerChange;
             playerPoints = Math.max(0, playerPoints);
             playerDollars = Math.max(0, playerDollars);
-            houses[activeHouseIndex].power = Math.max(1, houses[activeHouseIndex].power); // Ensure house power doesn't go below 1
+            houses[activeHouseIndex].power = Math.max(1, houses[activeHouseIndex].power);
 
             const playerElement = event.target.closest('.challenge-player-item');
             if (playerElement) {
@@ -2784,11 +2921,11 @@
                 outcome: didWin ? 'win' : 'loss',
                 pointsChange: attackerPointsChange,
                 dollarsChange: attackerDollarsChange,
-                powerChange: attackerPowerChange // Log power change
+                powerChange: attackerPowerChange
             }).catch(error => console.error("Error saving outgoing attack log:", error));
 
             const targetPlayerRef = ref(db, `artifacts/${appId}/users/${targetId}/playerData`);
-            const targetHousesRef = ref(db, `artifacts/${appId}/users/${targetId}/houses`); // Reference to target's houses
+            const targetHousesRef = ref(db, `artifacts/${appId}/users/${targetId}/houses`);
             const targetAttackLogRef = ref(db, `artifacts/${appId}/users/${targetId}/attackLog/incoming`);
 
             await get(targetPlayerRef).then(async snapshot => {
@@ -2797,11 +2934,11 @@
                     if (didWin) {
                         defenderPointsChange = -pointsReward;
                         defenderDollarsChange = -dollarsReward;
-                        defenderPowerChange = -powerReward; // Defender loses power
+                        defenderPowerChange = -powerReward;
                     } else {
                         defenderPointsChange = 0;
                         defenderDollarsChange = 0;
-                        defenderPowerChange = 0; // Defender doesn't lose power if attacker loses
+                        defenderPowerChange = 0;
                     }
 
                     const newTargetPoints = Math.max(0, (targetData.playerPoints || 0) + defenderPointsChange);
@@ -2813,11 +2950,10 @@
                         playerDollars: newTargetDollars
                     });
 
-                    // Update target's active house power
                     await get(targetHousesRef).then(houseSnapshot => {
                         if (houseSnapshot.exists()) {
                             const targetHouses = houseSnapshot.val();
-                            const targetActiveHouseIndex = targetHouses.findIndex(h => h.unlocked); // Assuming first unlocked is active
+                            const targetActiveHouseIndex = targetHouses.findIndex(h => h.unlocked);
                             if (targetActiveHouseIndex !== -1) {
                                 targetHouses[targetActiveHouseIndex].power = Math.max(1, (targetHouses[targetActiveHouseIndex].power || 0) + defenderPowerChange);
                                 set(targetHousesRef, targetHouses);
@@ -2833,7 +2969,7 @@
                         outcome: didWin ? 'loss' : 'win',
                         pointsChange: defenderPointsChange,
                         dollarsChange: defenderDollarsChange,
-                        powerChange: defenderPowerChange // Log defender's power change
+                        powerChange: defenderPowerChange
                     }).catch(error => console.error("Error saving incoming attack log:", error));
 
                 }
@@ -2859,7 +2995,7 @@
                 globalAttackCooldownEndTime = Date.now() + (GLOBAL_ATTACK_COOLDOWN_DURATION * 1000);
             }
             savePlayerData();
-            renderHouses(); // Re-render houses to reflect power change
+            renderHouses();
             updatePlayerInfoDisplay();
             renderChallengePlayers();
         }
@@ -2904,9 +3040,9 @@
                 accumulatedPoints += pointsGain;
                 accumulatedPower += powerGain;
                 
-                updateAccumulatedDollarsDisplay(); // Only updates dollar display, but data is accumulated
+                updateAccumulatedDollarsDisplay();
                 savePlayerData();
-            }, 60 * 1000); // Changed to 1 minute (60 seconds)
+            }, 60 * 1000); // 1 minute (60 seconds)
         }
 
         function updateAccumulatedDollarsDisplay() {
@@ -2919,7 +3055,7 @@
             if (accumulatedDollars > 0 || accumulatedPoints > 0 || accumulatedPower > 0) {
                 playerDollars += accumulatedDollars;
                 playerPoints += accumulatedPoints;
-                houses[activeHouseIndex].power += accumulatedPower; // Add accumulated power to active house
+                houses[activeHouseIndex].power += accumulatedPower;
                 
                 showToast(`لقد جمعت $${formatDollars(accumulatedDollars)} و ${formatPower(accumulatedPoints)} نقطة و ${formatPower(accumulatedPower)} قوة!`, 'success');
                 
@@ -2929,9 +3065,9 @@
 
                 updatePlayerInfoDisplay();
                 updateAccumulatedDollarsDisplay();
-                renderHouses(); // Re-render houses to reflect power gain
+                renderHouses();
                 savePlayerData();
-                saveHouses(); // Save houses after power update
+                saveHouses();
             } else {
                 showToast('لا توجد مكافآت لجمعها بعد.', 'info');
             }
@@ -2945,24 +3081,56 @@
             collectDollarsButton.addEventListener('click', collectDollars);
         }
 
+        // Function to show the auth flow modal
+        function showAuthFlowModal(isLinkingExistingAccount = false) {
+            if (!authFlowModal || !authModalTitle || !setNameSection || !emailAuthSection || !playerNameInput) return;
+
+            setNameSection.classList.remove('hidden');
+            emailAuthSection.classList.add('hidden'); // Start with name section visible
+
+            if (isLinkingExistingAccount) {
+                authModalTitle.textContent = "ربط الحساب";
+                playerNameInput.value = playerName === "تعيين اسم" ? "" : playerName;
+                setNameConfirmButton.textContent = "تأكيد الاسم";
+                setNameContinueGuestButton.classList.add('hidden'); // Hide guest option when linking
+                authFlowCancelButton.classList.remove('hidden'); // Allow cancelling the linking process
+                showEmailAuthButton.textContent = "ربط بحساب بريد إلكتروني";
+            } else {
+                authModalTitle.textContent = "تعيين اسم اللاعب";
+                playerNameInput.value = playerName === "تعيين اسم" ? "" : playerName;
+                setNameConfirmButton.textContent = "تأكيد الاسم";
+                setNameContinueGuestButton.classList.remove('hidden'); // Show guest option on initial load
+                authFlowCancelButton.classList.add('hidden'); // Hide cancel button on initial load
+                showEmailAuthButton.textContent = "تسجيل دخول / إنشاء حساب";
+            }
+
+            authFlowModal.classList.remove('hidden');
+            setTimeout(() => {
+                if (authFlowModal.querySelector('div')) {
+                    authFlowModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
+                    authFlowModal.querySelector('div').classList.add('scale-100', 'opacity-100');
+                }
+            }, 10);
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             let authAttemptPromise;
+            // First, try to sign in with custom token if available (from Canvas environment)
             if (initialAuthToken) {
                 authAttemptPromise = signInWithCustomToken(auth, initialAuthToken)
                     .catch(async (error) => {
-                        if (error.code === 'auth/custom-token-mismatch') {
-                            showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول باستخدام الرمز المخصص. جاري المحاولة كمجهول.');
-                            return signInAnonymously(auth).catch((anonError) => {
-                                showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.');
-                                return null;
-                            });
-                        } else {
-                            showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول. يرجى تحديث الصفحة.');
+                        console.warn("Custom token sign-in failed, attempting anonymous:", error);
+                        // Fallback to anonymous if custom token fails
+                        return signInAnonymously(auth).catch((anonError) => {
+                            console.error("Anonymous sign-in failed:", anonError);
+                            showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.');
                             return null;
-                        }
+                        });
                     });
             } else {
+                // If no custom token, try anonymous sign-in
                 authAttemptPromise = signInAnonymously(auth).catch((error) => {
+                    console.error("Anonymous sign-in failed:", error);
                     showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.');
                     return null;
                 });
@@ -2982,7 +3150,7 @@
                         await loadPlayerInventory();
                         await loadAttackCooldowns();
 
-                        await migrateLocalStorageToFirebase();
+                        await migrateLocalStorageToFirebase(); // This will migrate old local data to Firebase
 
                         updatePlayerInfoDisplay();
                         updateAccumulatedDollarsDisplay();
@@ -3009,16 +3177,9 @@
                             startGlobalCooldownUpdater();
                         }
 
+                        // Show auth modal if player name is not set permanently
                         if (!isNameSetPermanently && (!playerName || playerName === "تعيين اسم")) {
-                            if (setNameModal) {
-                                setNameModal.classList.remove('hidden');
-                                setTimeout(() => {
-                                    if (setNameModal.querySelector('div')) {
-                                        setNameModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
-                                        setNameModal.querySelector('div').classList.add('scale-100', 'opacity-100');
-                                    }
-                                }, 10);
-                            }
+                            showAuthFlowModal(false); // Not a linking scenario, initial setup
                         }
 
                     } catch (e) {
@@ -3027,6 +3188,9 @@
                     }
                 } else {
                     console.log("Firebase Auth State Changed: No user signed in.");
+                    // If no user is signed in (e.g., after deleting account), ensure UI is clean
+                    // and potentially prompt for sign-in/sign-up.
+                    // For now, reload will handle it.
                 }
             });
         });
