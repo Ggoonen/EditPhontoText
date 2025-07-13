@@ -121,23 +121,29 @@
         }
         .store-item {
             width: 100%;
-            aspect-ratio: 1 / 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             background: #2d3748;
             border-radius: 1.5rem;
             padding: 1rem;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
         .store-item:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
         }
-        .buy-button {
+        .store-item img {
+            width: 6rem; /* Larger image */
+            height: 6rem;
+            object-fit: contain;
+            margin-bottom: 0.75rem;
+        }
+        .store-item .buy-button {
             background: #4a5568;
             color: #fff;
             padding: 0.5rem 1rem;
@@ -147,8 +153,9 @@
             justify-content: center;
             font-weight: 600;
             transition: background 0.2s ease-in-out;
+            margin-top: 1rem;
         }
-        .buy-button:hover {
+        .store-item .buy-button:hover {
             background: #6366f1;
         }
         .house-container {
@@ -432,8 +439,9 @@
             flex-grow: 1;
             overflow-y: auto;
             display: flex;
-            flex-direction: column-reverse;
+            flex-direction: column-reverse; /* To show latest message at bottom */
             padding-bottom: 1rem;
+            justify-content: flex-end; /* Align content to bottom */
         }
         .chat-message {
             background-color: #2d3748;
@@ -587,51 +595,67 @@
         }
         /* Smaller dollar collector styles */
         #dollar-collector {
-            padding: 0.75rem;
-            border-radius: 0.75rem;
-            position: relative; /* Added for progress bar positioning */
-            overflow: hidden; /* Hide overflow of progress bar */
-        }
-        #dollar-collector h3 {
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
-        }
-        #dollar-collector .flex {
-            margin-bottom: 0.5rem;
-            position: relative; /* Ensure text is above progress */
-            z-index: 1;
-        }
-        #dollar-collector .text-2xl {
-            font-size: 1.5rem;
-        }
-        #collect-dollars-button {
-            padding: 0.5rem 1rem;
-            font-size: 0.875rem;
-            position: relative; /* Ensure button is above progress */
-            z-index: 1;
+            padding: 0.5rem; /* Reduced padding */
+            border-radius: 0.5rem; /* Slightly smaller border radius */
+            position: relative;
+            overflow: hidden;
+            height: 6rem; /* Fixed height for consistent look */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         #dollar-collector-progress {
             position: absolute;
             top: 0;
             left: 0;
             height: 100%;
-            background: linear-gradient(to right, #22c55e, #16a34a); /* Green gradient */
+            background: linear-gradient(to right, #22c55e, #16a34a);
             width: 0%;
             transition: width 0.5s ease-out;
-            z-index: 0; /* Behind content */
-            border-radius: 0.75rem; /* Match parent */
+            z-index: 0;
+            border-radius: 0.5rem; /* Match parent */
+        }
+        #dollar-collector h3 {
+            font-size: 0.875rem; /* Smaller font */
+            margin-bottom: 0.25rem; /* Reduced margin */
+            position: relative;
+            z-index: 1;
+        }
+        #dollar-collector .flex {
+            margin-bottom: 0.25rem; /* Reduced margin */
+            position: relative;
+            z-index: 1;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping if needed */
+        }
+        #dollar-collector .flex > div {
+            display: flex;
+            align-items: center;
+            margin: 0 0.25rem; /* Small margin between items */
+        }
+        #dollar-collector .text-xl { /* Changed from text-2xl to text-xl */
+            font-size: 1.25rem; /* Reduced font size for dollars display */
+        }
+        #dollar-collector svg {
+            height: 1rem; /* Smaller icons */
+            width: 1rem;
+            margin-left: 0.25rem; /* Smaller margin */
+        }
+        #collect-dollars-button {
+            padding: 0.3rem 0.75rem; /* Reduced padding */
+            font-size: 0.75rem; /* Reduced font size */
+            position: relative;
+            z-index: 1;
+            width: calc(100% - 1rem); /* Adjust width for padding */
+            margin: 0 0.5rem; /* Center button */
         }
     </style>
 </head>
 <body oncontextmenu="return false;" ondragstart="return false;">
     <div class="w-full max-w-md mx-auto h-screen relative overflow-hidden rounded-3xl shadow-2xl bg-gray-800">
         <div id="main-menu-view" class="view transform translate-x-0">
-            <div id="updates-icon" class="absolute top-4 right-4 text-gray-400 hover:text-gray-200 cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-            </div>
-            <!-- Removed tasks-icon -->
+            <!-- Removed updates-icon (exclamation mark icon) -->
 
             <div class="bg-gray-700 p-4 rounded-xl mb-6 shadow-md text-center">
                 <h2 class="text-xl font-bold text-gray-100 mb-3" id="player-name-display">تعيين اسم</h2>
@@ -696,24 +720,30 @@
                     <span class="text-lg font-semibold">تحدي اللاعبون</span>
                 </div>
             </div>
-            <div id="dollar-collector" class="bg-gray-700 p-3 rounded-xl shadow-md text-center mt-auto">
+            <div id="dollar-collector" class="bg-gray-700 rounded-xl shadow-md mt-auto">
                 <div id="dollar-collector-progress"></div>
-                <h3 class="text-base font-semibold text-gray-100 mb-1">دولارات متراكمة</h3>
-                <div class="flex items-center justify-center gap-1 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <h3 class="font-semibold text-gray-100 text-center relative z-10 pt-2">موارد متراكمة</h3>
+                <div class="flex relative z-10 pb-2">
+                    <div class="flex items-center text-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
                         </svg>
-                    <span class="text-xl font-bold text-green-300" id="accumulated-dollars-display">$0</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
-                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
-                    </svg>
-                    <span class="text-xl font-bold text-yellow-300" id="accumulated-points-display">0</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <span class="text-xl font-bold text-red-300" id="accumulated-power-display">0</span>
+                        <span class="text-xl font-bold text-green-300" id="accumulated-dollars-display">$0</span>
+                    </div>
+                    <div class="flex items-center text-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="text-xl font-bold text-yellow-300" id="accumulated-points-display">0</span>
+                    </div>
+                    <div class="flex items-center text-gray-200">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <span class="text-xl font-bold text-red-300" id="accumulated-power-display">0</span>
+                    </div>
                 </div>
-                <button id="collect-dollars-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-4 rounded-lg shadow-md transition duration-200 ease-in-out w-full text-sm">
+                <button id="collect-dollars-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-4 rounded-lg shadow-md transition duration-200 ease-in-out">
                     استلام الموارد
                 </button>
             </div>
@@ -831,12 +861,12 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 view-content">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 view-content">
                 <div id="store-item-reduce-time" class="store-item">
-                    
+                    <img src="https://f.top4top.io/p_3479ijdcl0.png" alt="Reduce Time">
                     <span class="text-lg font-semibold text-white">تقليل وقت الابتكار</span>
-                    <span class="text-sm text-gray-300 mt-1">يقلل دقيقتين</span>
-                    <button class="buy-button mt-4">
+                    <span class="text-sm text-gray-300 text-center mt-1 mb-2">يقلل دقيقتين من وقت تهدئة الابتكار الحالي.</span>
+                    <button class="buy-button">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
                         </svg>
@@ -844,10 +874,10 @@
                     </button>
                 </div>
                 <div id="store-item-convert-points" class="store-item">
-                    
+                    <img src="https://i.top4top.io/s_34795cyi20.png" alt="Convert Points">
                     <span class="text-lg font-semibold text-white">تحويل النقاط</span>
-                    <span class="text-sm text-gray-300 mt-1">يحول النقاط إلى دولارات</span>
-                    <button class="buy-button mt-4">
+                    <span class="text-sm text-gray-300 text-center mt-1 mb-2">يحول 500 نقطة إلى 100 دولار.</span>
+                    <button class="buy-button">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
                         </svg>
@@ -855,10 +885,10 @@
                     </button>
                 </div>
                 <div id="store-item-buy-innovation3" class="store-item">
-                    
+                    <img src="https://f.top4top.io/s_34796x9520.png" alt="Buy Innovation 3">
                     <span class="text-lg font-semibold text-white">شراء ابتكار ثالث</span>
-                    <span class="text-sm text-gray-300 mt-1">يفتح ابتكارًا جديدًا</span>
-                    <button class="buy-button mt-4">
+                    <span class="text-sm text-gray-300 text-center mt-1 mb-2">يفتح ابتكارًا جديدًا بشكل دائم.</span>
+                    <button class="buy-button">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
                         </svg>
@@ -875,11 +905,11 @@
                 </svg>
             </div>
             <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">تحدي اللاعبون</h1>
-            <div id="global-attack-cooldown-display" class="text-gray-300 text-lg text-center mb-6 hidden">
-                يمكنك الهجوم <span id="attacks-remaining-display" class="font-bold text-yellow-400">0</span> مرات. وقت التهدئة العالمي: <span id="global-cooldown-timer-display" class="font-bold">0:00</span>
-            </div>
             <div id="challenge-players-list" class="view-content flex flex-col gap-4">
             </div>
+            <button id="refresh-challenge-players-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-auto w-full">
+                تحديث اللاعبين
+            </button>
         </div>
 
         <div id="chat-view" class="view transform translate-x-full">
@@ -890,6 +920,7 @@
             </div>
             <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">اخبار التحديثات</h1>
             <div id="chat-messages" class="view-content flex flex-col-reverse">
+                <p class="text-gray-400 text-center">لا توجد تحديثات حالياً.</p>
             </div>
             <div id="chat-input-container" class="flex p-4 bg-gray-800 rounded-b-3xl">
                 <input type="text" id="chat-input" placeholder="اكتب رسالتك..." class="flex-grow p-3 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -916,7 +947,7 @@
                 </div>
 
                 <div class="bg-gray-700 p-4 rounded-xl shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-100 mb-4">اللاعبون غير المتصلين</h2>
+                    <h2 class="text-xl font-semibold text-gray-100 mb-4">اللاعبون غير المتصلين (آخر 10 ساعات)</h2>
                     <div id="recently-offline-players-list" class="flex flex-col gap-3">
                         <p class="text-gray-400 text-center">لا يوجد لاعبون غير متصلين.</p>
                     </div>
@@ -1014,16 +1045,6 @@
         </div>
     </div>
 
-    <div id="updates-modal" class="modal-overlay hidden">
-        <div class="bg-gray-700 p-8 rounded-xl shadow-2xl text-center max-w-sm w-full transform scale-95 opacity-0 transition-all duration-300 ease-out">
-            <h3 class="text-2xl font-bold text-gray-100 mb-4">إضافات التحديث</h3>
-            <p class="text-gray-200 text-lg mb-6">تم اضافة سجل الهجوم رقم التحديث ١.٢</p>
-            <button id="updates-close-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
-                حسناً
-            </button>
-        </div>
-    </div>
-
     <div id="auth-flow-modal" class="modal-overlay hidden">
         <div class="bg-gray-700 p-8 rounded-xl shadow-2xl text-center max-w-sm w-full transform scale-95 opacity-0">
             <h3 class="text-2xl font-bold text-gray-100 mb-4" id="auth-modal-title"></h3>
@@ -1101,7 +1122,7 @@
             signInWithEmailAndPassword,
             linkWithCredential,
             EmailAuthProvider,
-            signOut // Added signOut for potential future use or debugging
+            signOut
         } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
         import { getDatabase, ref, set, get, onValue, remove, push, serverTimestamp, query, orderByChild, limitToLast, onDisconnect } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
@@ -1183,9 +1204,7 @@
         const inventoryItemsList = document.getElementById('inventory-items-list');
         const inventoryCloseButton = document.getElementById('inventory-close-button');
 
-        const updatesIcon = document.getElementById('updates-icon');
-        const updatesModal = document.getElementById('updates-modal');
-        const updatesCloseButton = document.getElementById('updates-close-button');
+        // Removed updatesIcon and updatesModal as per request
 
         const authFlowModal = document.getElementById('auth-flow-modal');
         const authModalTitle = document.getElementById('auth-modal-title');
@@ -1231,15 +1250,14 @@
 
         const challengePlayersList = document.getElementById('challenge-players-list');
         const globalAttacksList = document.getElementById('global-attacks-list');
+        const refreshChallengePlayersButton = document.getElementById('refresh-challenge-players-button');
 
-        const globalAttackCooldownDisplay = document.getElementById('global-attack-cooldown-display');
-        const attacksRemainingDisplay = document.getElementById('attacks-remaining-display');
-        const globalCooldownTimerDisplay = document.getElementById('global-cooldown-timer-display');
+        // Removed globalAttackCooldownDisplay, attacksRemainingDisplay, globalCooldownTimerDisplay as per new challenge system
 
         const accumulatedDollarsDisplay = document.getElementById('accumulated-dollars-display');
-        const accumulatedPointsDisplay = document.getElementById('accumulated-points-display'); // New display for accumulated points
-        const accumulatedPowerDisplay = document.getElementById('accumulated-power-display');   // New display for accumulated power
-        const dollarCollectorProgressBar = document.getElementById('dollar-collector-progress'); // New progress bar element
+        const accumulatedPointsDisplay = document.getElementById('accumulated-points-display');
+        const accumulatedPowerDisplay = document.getElementById('accumulated-power-display');
+        const dollarCollectorProgressBar = document.getElementById('dollar-collector-progress');
         const collectDollarsButton = document.getElementById('collect-dollars-button');
 
 
@@ -1252,9 +1270,8 @@
             { id: 6, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] }
         ];
         let activeHouseIndex = 0;
-        let globalCooldownUpdater = null;
+        let globalCooldownUpdater = null; // Still used for innovation cooldowns
         let onlineStatusUpdater = null;
-        let globalAttackCooldownInterval = null;
         let dollarCollectionInterval = null;
 
         let playerPoints = 0;
@@ -1262,21 +1279,18 @@
         let accumulatedDollars = 0;
         let accumulatedPoints = 0;
         let accumulatedPower = 0;
-        const MAX_ACCUMULATION = 150; // Max for dollars, points, and power
-        const ACCUMULATION_RATE = 3; // Amount gained every 5 seconds
+        const MAX_ACCUMULATION = 150;
+        const ACCUMULATION_RATE = 3;
 
         let playerName = "تعيين اسم";
         let isNameSetPermanently = false;
         let lastPlayerNameChangeTimestamp = 0;
-        let attackCooldowns = {};
-        let attackedTargetsInCooldown = [];
-        let globalAttackCooldownEndTime = 0;
-        let attacksMadeInCurrentCooldown = 0;
-        const MAX_GLOBAL_ATTACKS = 5;
-        const GLOBAL_ATTACK_COOLDOWN_DURATION = 10 * 60; // 10 minutes
+        let attackCooldowns = {}; // Individual player cooldowns
+        let currentChallengePlayers = []; // Stores the 3 random players currently displayed
+
         const NAME_CHANGE_COOLDOWN_DURATION = 3 * 24 * 60 * 60 * 1000;
         const ONLINE_ACTIVE_DURATION = 60 * 1000; // 1 minute for truly "online" status
-        const OFFLINE_RECENT_DURATION = 10 * 60 * 60 * 1000; // 10 hours for "recently offline" display
+        const OFFLINE_RECENT_DURATION = 10 * 60 * 60 * 1000; // 10 hours for "recently offline" display and challenge eligibility
 
         let playerInventory = { reduceTime: 0 };
 
@@ -1304,8 +1318,6 @@
             { id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: 0, initialCooldown: 4 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: false }
         ];
         let currentInnovationTypeIndex = 0;
-
-        let lastChatClearDate = null;
 
         // Define storeItems object here to ensure it's accessible
         const storeItems = {
@@ -1373,11 +1385,10 @@
         }
 
         function formatTime(seconds) {
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
+            const minutes = Math.floor(seconds / 60);
             const remainingSeconds = seconds % 60;
             const pad = (num) => num < 10 ? '0' + num : num;
-            return `${pad(hours)}:${pad(minutes)}:${pad(remainingSeconds)}`;
+            return `${pad(minutes)}:${pad(remainingSeconds)}`;
         }
 
         function timeAgo(timestamp) {
@@ -1501,13 +1512,13 @@
                 listenForOnlineUsers();
             }
             if (targetViewId === 'challenge-view') {
-                renderChallengePlayers();
-                startGlobalAttackCooldownUpdater();
-            } else {
-                clearInterval(globalAttackCooldownInterval);
+                selectRandomChallengePlayers(); // Select new random players when entering challenge view
             }
             if (targetViewId === 'attack-log-view') {
                 listenForGlobalAttackLog();
+            }
+            if (targetViewId === 'chat-view') {
+                listenForLatestChatMessage(); // Only listen for the latest message
             }
         }
 
@@ -1566,12 +1577,17 @@
             }
         }
 
-        function showMessageModal(title, text) {
+        function showMessageModal(title, text, type = 'info') { // Added type parameter
             if (!messageModal || !messageModalTitle || !messageModalText) return;
 
             messageModal.classList.remove('hidden');
             messageModalTitle.innerHTML = title;
             messageModalText.innerHTML = text;
+            
+            // Apply color based on type
+            messageModal.querySelector('.message-modal-content').style.borderColor = 
+                type === 'error' ? '#ef4444' : (type === 'success' ? '#4CAF50' : '#6366f1');
+
             setTimeout(() => {
                 if (messageModal.querySelector('.message-modal-content')) {
                     messageModal.querySelector('.message-modal-content').classList.remove('scale-95', 'opacity-0');
@@ -1670,7 +1686,7 @@
             innovationButton.addEventListener('click', () => {
                 const currentInnovation = innovationTypes[currentInnovationTypeIndex];
 
-                if (currentInnovation.id === 'innovation3' && !currentInnovation.isOwned) { // Corrected from currentType.isOwned
+                if (currentInnovation.id === 'innovation3' && !currentInnovation.isOwned) {
                     const item = storeItems['buyInnovation3'];
                     if (playerPoints >= item.cost) {
                         playerPoints -= item.cost;
@@ -1678,22 +1694,22 @@
                         saveInnovationTypes();
                         updatePlayerInfoDisplay();
                         updateInnovationButtonText();
-                        showMessageModal('تم الشراء', 'تم فتح الابتكار الثالث بنجاح!');
+                        showMessageModal('تم الشراء', 'تم فتح الابتكار الثالث بنجاح!', 'success');
                     } else {
-                        showMessageModal('فشل الشراء', `ليس لديك نقاط كافية لشراء هذا الابتكار. تحتاج ${item.cost} نقطة.`);
+                        showMessageModal('فشل الشراء', `ليس لديك نقاط كافية لشراء هذا الابتكار. تحتاج ${item.cost} نقطة.`, 'error');
                     }
                     return;
                 }
 
                 if (!houses[activeHouseIndex].unlocked) {
-                    showMessageModal('بيت مقفول', 'لا يمكنك استخدام الابتكار على بيت مقفول. يرجى اختيار بيت مفتوح.');
+                    showMessageModal('بيت مقفول', 'لا يمكنك استخدام الابتكار على بيت مقفول. يرجى اختيار بيت مفتوح.', 'info');
                     return;
                 }
 
                 const cooldownRemaining = Math.max(0, Math.floor((currentInnovation.cooldownEndTime - Date.now()) / 1000));
 
                 if (cooldownRemaining > 0) {
-                    showMessageModal('الابتكار قيد الانتظار', `هذا الابتكار لا يزال في فترة التهدئة. الوقت المتبقي: ${formatTime(cooldownRemaining)}`);
+                    showMessageModal('الابتكار قيد الانتظار', `هذا الابتكار لا يزال في فترة التهدئة. الوقت المتبقي: ${formatTime(cooldownRemaining)}`, 'info');
                     return;
                 }
 
@@ -1735,7 +1751,7 @@
                     const nextHouseIndex = houses.findIndex(h => h.id === currentHouse.id + 1);
                     if (nextHouseIndex !== -1 && !houses[nextHouseIndex].unlocked) {
                         houses[nextHouseIndex].unlocked = true;
-                        showMessageModal('بيت جديد مفتوح!', `تهانينا! لقد فتحت البيت رقم ${houses[nextHouseIndex].id}!`);
+                        showMessageModal('بيت جديد مفتوح!', `تهانينا! لقد فتحت البيت رقم ${houses[nextHouseIndex].id}!`, 'success');
                     }
                 }
                 renderHouses();
@@ -1993,13 +2009,13 @@
                             item.useEffect(quantityToBuy);
                         } else {
                             playerInventory[itemId] += quantityToBuy;
-                            showMessageModal('نجاح الشراء', `لقد اشتريت ${quantityToBuy} من ${item.name}. لديك الآن ${playerInventory[itemId]} في حقيبتك.`);
+                            showMessageModal('نجاح الشراء', `لقد اشتريت ${quantityToBuy} من ${item.name}. لديك الآن ${playerInventory[itemId]} في حقيبتك.`, 'success');
                         }
                         updatePlayerInfoDisplay();
                         savePlayerData();
                         savePlayerInventory();
                     } else {
-                        showMessageModal('فشل الشراء', `ليس لديك ${item.costType === 'dollars' ? 'دولارات' : 'نقاط'} كافية لشراء ${quantityToBuy} من هذا العنصر.`);
+                        showMessageModal('فشل الشراء', `ليس لديك ${item.costType === 'dollars' ? 'دولارات' : 'نقاط'} كافية لشراء ${quantityToBuy} من هذا العنصر.`, 'error');
                     }
                     closeModal(storeDetailModal);
                 };
@@ -2144,7 +2160,7 @@
             const quantityToUse = parseInt(quantityDisplay.textContent, 10);
 
             if (isNaN(quantityToUse) || quantityToUse < 1) {
-                showMessageModal('خطأ', 'الكمية غير صالحة.');
+                showMessageModal('خطأ', 'الكمية غير صالحة.', 'error');
                 return;
             }
 
@@ -2158,7 +2174,7 @@
                 closeModal(inventoryModal);
                 navigateTo('game-view');
             } else {
-                showMessageModal('لا يوجد عناصر', `ليس لديك ${quantityToUse} من هذا العنصر. لديك فقط ${playerInventory[itemId]}.`);
+                showMessageModal('لا يوجد عناصر', `ليس لديك ${quantityToUse} من هذا العنصر. لديك فقط ${playerInventory[itemId]}.`, 'error');
             }
         }
 
@@ -2171,47 +2187,8 @@
             return new Date(utc + saudiOffset);
         }
 
-        function clearChatHistory() {
-            if (!isFirebaseLoaded) return;
-            const chatClearRef = ref(db, `artifacts/${appId}/public/chatManagement/lastChatClearDate`);
-            onValue(chatClearRef, (snapshot) => {
-                const storedLastClearDate = snapshot.val();
-                const now = getSaudiTime();
-                const todaySaudiDate = now.toDateString();
-
-                if (storedLastClearDate !== todaySaudiDate) {
-                    const chatRef = ref(db, `artifacts/${appId}/public/chat`);
-                    remove(chatRef)
-                        .then(() => {
-                            set(chatClearRef, todaySaudiDate);
-                            showToast('تم مسح سجل الدردشة!', 'info');
-                        })
-                        .catch(error => {
-                            console.error("Error clearing chat history:", error);
-                        });
-                }
-            }, { once: true });
-        }
-
-        if (updatesIcon) {
-            updatesIcon.addEventListener('click', () => {
-                if (updatesModal) {
-                    updatesModal.classList.remove('hidden');
-                    setTimeout(() => {
-                        if (updatesModal.querySelector('div')) {
-                            updatesModal.querySelector('div').classList.remove('scale-95', 'opacity-0');
-                            updatesModal.querySelector('div').classList.add('scale-100', 'opacity-100');
-                        }
-                    }, 10);
-                }
-            });
-        }
-
-        if (updatesCloseButton) {
-            updatesCloseButton.addEventListener('click', () => {
-                closeModal(updatesModal);
-            });
-        }
+        // Removed clearChatHistory as per request (no longer clearing chat daily)
+        // Removed updatesIcon and updatesCloseButton event listeners
 
         if (playerNameDisplay) {
             playerNameDisplay.addEventListener('click', () => {
@@ -2223,14 +2200,14 @@
             setNameConfirmButton.addEventListener('click', async () => {
                 const newName = playerNameInput.value.trim();
                 if (!newName) {
-                    showMessageModal('خطأ', 'الاسم لا يمكن أن يكون فارغاً.');
+                    showMessageModal('خطأ', 'الاسم لا يمكن أن يكون فارغاً.', 'error');
                     return;
                 }
 
                 if (isNameSetPermanently && (Date.now() - lastPlayerNameChangeTimestamp < NAME_CHANGE_COOLDOWN_DURATION)) {
                     const remainingTimeMs = NAME_CHANGE_COOLDOWN_DURATION - (Date.now() - lastPlayerNameChangeTimestamp);
                     const remainingDays = Math.ceil(remainingTimeMs / (1000 * 60 * 60 * 24));
-                    showMessageModal('لا يمكن تغيير الاسم', `لا يمكنك تغيير اسمك إلا بعد مرور ${remainingDays} يوم(أيام) أخرى.`);
+                    showMessageModal('لا يمكن تغيير الاسم', `لا يمكنك تغيير اسمك إلا بعد مرور ${remainingDays} يوم(أيام) أخرى.`, 'info');
                     return;
                 }
 
@@ -2281,11 +2258,11 @@
                 const password = authPasswordInput.value.trim();
 
                 if (!email || !password) {
-                    showMessageModal('خطأ', 'البريد الإلكتروني وكلمة المرور مطلوبان.');
+                    showMessageModal('خطأ', 'البريد الإلكتروني وكلمة المرور مطلوبان.', 'error');
                     return;
                 }
                 if (password.length < 6) {
-                    showMessageModal('خطأ', 'يجب أن تكون كلمة المرور 6 أحرف على الأقل.');
+                    showMessageModal('خطأ', 'يجب أن تكون كلمة المرور 6 أحرف على الأقل.', 'error');
                     return;
                 }
 
@@ -2316,7 +2293,7 @@
                     } else if (error.code === 'auth/weak-password') {
                         errorMessage = 'كلمة المرور ضعيفة جداً.';
                     }
-                    showMessageModal('خطأ', errorMessage, 'error'); // Use error type for toast
+                    showMessageModal('خطأ', errorMessage, 'error');
                 }
             });
         }
@@ -2327,7 +2304,7 @@
                 const password = authPasswordInput.value.trim();
 
                 if (!email || !password) {
-                    showMessageModal('خطأ', 'البريد الإلكتروني وكلمة المرور مطلوبان.');
+                    showMessageModal('خطأ', 'البريد الإلكتروني وكلمة المرور مطلوبان.', 'error');
                     return;
                 }
 
@@ -2343,7 +2320,7 @@
                     } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                         errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
                     }
-                    showMessageModal('خطأ', errorMessage, 'error'); // Use error type for toast
+                    showMessageModal('خطأ', errorMessage, 'error');
                 }
             });
         }
@@ -2365,7 +2342,7 @@
         if (deleteConfirmYes) {
             deleteConfirmYes.addEventListener('click', async () => {
                 if (!isFirebaseLoaded) {
-                    showMessageModal('خطأ', 'البيانات غير جاهزة للحذف.');
+                    showMessageModal('خطأ', 'البيانات غير جاهزة للحذف.', 'error');
                     return;
                 }
                 try {
@@ -2401,7 +2378,7 @@
                     }
                 } catch (error) {
                     console.error("Error deleting user data from Firebase:", error);
-                    showMessageModal('خطأ في الحذف', 'فشل حذف بيانات الحساب. يرجى المحاولة مرة أخرى.');
+                    showMessageModal('خطأ في الحذف', 'فشل حذف بيانات الحساب. يرجى المحاولة مرة أخرى.', 'error');
                 }
             });
         }
@@ -2426,7 +2403,7 @@
                                 existingType.isOwned = savedType.isOwned || false;
                             }
                         } else {
-                            if (savedType.id === 'innovation3') { // Ensure new innovation3 is added if not present
+                            if (savedType.id === 'innovation3') {
                                 innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: savedType.cooldownEndTime || 0, initialCooldown: 4 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: savedType.isOwned || false });
                             }
                         }
@@ -2494,11 +2471,9 @@
                 playerName = data.playerName || "تعيين اسم";
                 isNameSetPermanently = data.isNameSetPermanently || false;
                 lastPlayerNameChangeTimestamp = data.lastPlayerNameChangeTimestamp || 0;
-                globalAttackCooldownEndTime = data.globalAttackCooldownEndTime || 0;
-                attacksMadeInCurrentCooldown = data.attacksMadeInCurrentCooldown || 0;
-                attackedTargetsInCooldown = data.attackedTargetsInCooldown || [];
+                // Removed globalAttackCooldownEndTime, attacksMadeInCurrentCooldown, attackedTargetsInCooldown
             } else {
-                savePlayerData(); // Initialize and save default data if not found
+                savePlayerData();
             }
         }
 
@@ -2513,9 +2488,7 @@
                 playerName: playerName,
                 isNameSetPermanently: isNameSetPermanently,
                 lastPlayerNameChangeTimestamp: lastPlayerNameChangeTimestamp,
-                globalAttackCooldownEndTime: globalAttackCooldownEndTime,
-                attacksMadeInCurrentCooldown: attacksMadeInCurrentCooldown,
-                attackedTargetsInCooldown: attackedTargetsInCooldown
+                // Removed globalAttackCooldownEndTime, attacksMadeInCurrentCooldown, attackedTargetsInCooldown
             });
         }
 
@@ -2532,7 +2505,7 @@
                     activeHouseIndex = 0;
                 }
             } else {
-                saveHouses(); // Initialize and save default houses if not found
+                saveHouses();
             }
         }
 
@@ -2549,7 +2522,7 @@
                 playerInventory = snapshot.val();
             } else {
                 playerInventory = { reduceTime: 0 };
-                savePlayerInventory(); // Initialize and save default inventory if not found
+                savePlayerInventory();
             }
         }
 
@@ -2563,7 +2536,7 @@
             const cooldownsRef = ref(db, `artifacts/${appId}/users/${userId}/attackCooldowns`);
             onValue(cooldownsRef, (snapshot) => {
                 attackCooldowns = snapshot.val() || {};
-                renderChallengePlayers();
+                renderChallengePlayers(); // Re-render challenge players when cooldowns change
             }, { once: true });
         }
 
@@ -2577,7 +2550,6 @@
                 'playerPoints', 'playerDollars',
                 'playerInventory', 'playerName', 'isNameSetPermanently', 'lastPlayerNameChangeTimestamp',
                 'houses', 'innovationTypes',
-                'globalAttackCooldownEndTime', 'attacksMadeInCurrentCooldown', 'attackedTargetsInCooldown',
                 'accumulatedDollars', 'accumulatedPoints', 'accumulatedPower'
             ];
 
@@ -2600,9 +2572,6 @@
                     const migratedPlayerName = localStorage.getItem('playerName') || "تعيين اسم";
                     const migratedIsNameSetPermanently = localStorage.getItem('isNameSetPermanently') === 'true';
                     const migratedLastPlayerNameChangeTimestamp = parseInt(localStorage.getItem('lastPlayerNameChangeTimestamp') || '0');
-                    const migratedGlobalAttackCooldownEndTime = parseInt(localStorage.getItem('globalAttackCooldownEndTime') || '0');
-                    const migratedAttacksMadeInCurrentCooldown = parseInt(localStorage.getItem('attacksMadeInCurrentCooldown') || '0');
-                    const migratedAttackedTargetsInCooldown = JSON.parse(localStorage.getItem('attackedTargetsInCooldown') || '[]');
 
                     const migratedHouses = JSON.parse(localStorage.getItem('houses'));
                     const migratedInnovationTypes = JSON.parse(localStorage.getItem('innovationTypes'));
@@ -2616,9 +2585,6 @@
                     playerName = migratedPlayerName;
                     isNameSetPermanently = migratedIsNameSetPermanently;
                     lastPlayerNameChangeTimestamp = migratedLastPlayerNameChangeTimestamp;
-                    globalAttackCooldownEndTime = migratedGlobalAttackCooldownEndTime;
-                    attacksMadeInCurrentCooldown = migratedAttacksMadeInCurrentCooldown;
-                    attackedTargetsInCooldown = migratedAttackedTargetsInCooldown;
 
                     if (migratedHouses) houses = migratedHouses;
                     if (migratedInnovationTypes) {
@@ -2642,13 +2608,13 @@
                     await saveHouses();
                     await saveInnovationTypes();
                     await savePlayerInventory();
-                    await saveAttackCooldowns();
+                    // No need to save attackCooldowns from local storage, as they are managed live
 
                     localStorage.clear();
-                    showMessageModal('نقل البيانات', 'تم نقل بياناتك بنجاح إلى السحابة!');
+                    showMessageModal('نقل البيانات', 'تم نقل بياناتك بنجاح إلى السحابة!', 'success');
                 } catch (error) {
                     console.error("Error migrating data:", error);
-                    showMessageModal('خطأ في النقل', 'فشل نقل البيانات. يرجى تحديث الصفحة والمحاولة مرة أخرى.');
+                    showMessageModal('خطأ في النقل', 'فشل نقل البيانات. يرجى تحديث الصفحة والمحاولة مرة أخرى.', 'error');
                 }
             }
         }
@@ -2659,7 +2625,7 @@
                     if (enteredPassword === CHAT_PASSWORD) {
                         sendMessage();
                     } else if (enteredPassword !== null) {
-                        showMessageModal('خطأ', 'كلمة المرور غير صحيحة.');
+                        showMessageModal('خطأ', 'كلمة المرور غير صحيحة.', 'error');
                     }
                 });
             });
@@ -2671,7 +2637,7 @@
                         if (enteredPassword === CHAT_PASSWORD) {
                             sendMessage();
                         } else if (enteredPassword !== null) {
-                            showMessageModal('خطأ', 'كلمة المرور غير صحيحة.');
+                            showMessageModal('خطأ', 'كلمة المرور غير صحيحة.', 'error');
                         }
                     });
                 }
@@ -2680,7 +2646,7 @@
 
         function sendMessage() {
             if (!isFirebaseLoaded || !userId || !playerName || playerName === "تعيين اسم") {
-                showMessageModal('خطأ', 'يجب تسجيل الدخول وتعيين اسم اللاعب قبل الدردشة.');
+                showMessageModal('خطأ', 'يجب تسجيل الدخول وتعيين اسم اللاعب قبل الدردشة.', 'error');
                 return;
             }
             const messageText = chatInput.value.trim();
@@ -2697,37 +2663,36 @@
                 chatInput.value = '';
             }).catch(error => {
                 console.error("Error sending message:", error);
-                showMessageModal('خطأ', 'فشل إرسال الرسالة.');
+                showMessageModal('خطأ', 'فشل إرسال الرسالة.', 'error');
             });
         }
 
-        function listenForChatMessages() {
+        function listenForLatestChatMessage() {
             if (!isFirebaseLoaded) return;
-            const chatRef = ref(db, `artifacts/${appId}/public/chat`);
+            // Query for the last message
+            const chatRef = query(ref(db, `artifacts/${appId}/public/chat`), orderByChild('timestamp'), limitToLast(1));
             onValue(chatRef, (snapshot) => {
                 if (!chatMessagesDiv) return;
-                chatMessagesDiv.innerHTML = '';
-                const messages = [];
+                chatMessagesDiv.innerHTML = ''; // Clear previous messages
+                let latestMessage = null;
                 snapshot.forEach(childSnapshot => {
-                    const message = childSnapshot.val();
-                    messages.push(message);
+                    latestMessage = childSnapshot.val();
                 });
 
-                messages.sort((a, b) => a.timestamp - b.timestamp);
-
-                messages.forEach(message => {
+                if (latestMessage) {
                     const messageElement = document.createElement('div');
-                    messageElement.className = `chat-message ${message.senderId === userId ? 'self' : ''}`;
-                    const date = message.timestamp ? new Date(message.timestamp) : new Date();
+                    messageElement.className = `chat-message ${latestMessage.senderId === userId ? 'self' : ''}`;
+                    const date = latestMessage.timestamp ? new Date(latestMessage.timestamp) : new Date();
                     messageElement.innerHTML = `
-                        <span class="chat-sender">${message.senderName}:</span>
-                        <p class="text-gray-100">${message.message}</p>
-                        <p class="text-xs text-gray-400 mt-1">القوة: ${formatPower(message.senderPower || 0)}</p>
+                        <span class="chat-sender">${latestMessage.senderName}:</span>
+                        <p class="text-gray-100">${latestMessage.message}</p>
+                        <p class="text-xs text-gray-400 mt-1">القوة: ${formatPower(latestMessage.senderPower || 0)}</p>
                         <span class="chat-timestamp">${date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' })}</span>
                     `;
-                    chatMessagesDiv.prepend(messageElement);
-                });
-                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+                    chatMessagesDiv.appendChild(messageElement); // Append to show at the top (since flex-direction-reverse)
+                } else {
+                    chatMessagesDiv.innerHTML = '<p class="text-gray-400 text-center">لا توجد تحديثات حالياً.</p>';
+                }
             });
         }
 
@@ -2788,6 +2753,7 @@
                     else if (player.lastOnline && (now - player.lastOnline < OFFLINE_RECENT_DURATION)) {
                         allOfflinePlayers.push(player);
                     }
+                    // Players older than 10 hours are not displayed
                 }
 
                 activeOnlinePlayers.sort((a, b) => {
@@ -2842,8 +2808,7 @@
             });
         }
 
-
-        async function renderChallengePlayers() {
+        async function selectRandomChallengePlayers() {
             if (!isFirebaseLoaded || !challengePlayersList) return;
 
             const playerProfilesRef = ref(db, `artifacts/${appId}/public/playerProfiles`);
@@ -2854,40 +2819,56 @@
                 get(onlineUsersRef)
             ]);
 
-            const allPlayers = {};
+            const allPlayersData = {};
             profilesSnapshot.forEach(childSnapshot => {
-                allPlayers[childSnapshot.key] = { ...childSnapshot.val(), lastOnline: 0 };
+                allPlayersData[childSnapshot.key] = { uid: childSnapshot.key, ...childSnapshot.val(), lastOnline: 0 };
             });
 
             onlineSnapshot.forEach(childSnapshot => {
                 const user = childSnapshot.val();
                 const userUid = childSnapshot.key;
-                if (allPlayers[userUid]) {
-                    allPlayers[userUid].lastOnline = user.lastOnline || 0;
+                if (allPlayersData[userUid]) {
+                    allPlayersData[userUid].lastOnline = user.lastOnline || 0;
                 }
             });
 
-            challengePlayersList.innerHTML = '';
-            const playersToChallenge = [];
+            const eligiblePlayers = [];
             const now = Date.now();
 
-            for (const uid in allPlayers) {
-                if (uid === userId) continue; // Don't show self
+            for (const uid in allPlayersData) {
+                if (uid === userId) continue; // Exclude current player
 
-                const player = allPlayers[uid];
-                // Only show players online in the last 10 hours
+                const player = allPlayersData[uid];
+                // Only consider players who were online in the last 10 hours
                 if (player.lastOnline && (now - player.lastOnline < OFFLINE_RECENT_DURATION)) {
-                    playersToChallenge.push(player);
+                    // Exclude players currently on cooldown for the current user
+                    const cooldownRemaining = getAttackCooldownRemaining(player.uid);
+                    if (cooldownRemaining <= 0) {
+                        eligiblePlayers.push(player);
+                    }
                 }
             }
 
-            if (playersToChallenge.length === 0) {
+            // Shuffle eligible players and pick 3
+            for (let i = eligiblePlayers.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [eligiblePlayers[i], eligiblePlayers[j]] = [eligiblePlayers[j], eligiblePlayers[i]];
+            }
+
+            currentChallengePlayers = eligiblePlayers.slice(0, 3);
+            renderChallengePlayersList();
+        }
+
+        function renderChallengePlayersList() {
+            if (!challengePlayersList) return;
+
+            challengePlayersList.innerHTML = '';
+            if (currentChallengePlayers.length === 0) {
                 challengePlayersList.innerHTML = '<p class="text-gray-300 text-center">لا يوجد لاعبون آخرون متاحون للتحدي حالياً.</p>';
             } else {
-                playersToChallenge.forEach(player => {
+                currentChallengePlayers.forEach(player => {
                     const attackCooldownRemaining = getAttackCooldownRemaining(player.uid);
                     const isAttackReady = attackCooldownRemaining <= 0;
-                    const hasAttackedThisCooldown = attackedTargetsInCooldown.includes(player.uid);
 
                     const canDefeat = totalPlayerPower >= (player.totalPower + 3000);
                     const borderColorClass = canDefeat ? 'can-defeat' : 'cannot-defeat';
@@ -2900,8 +2881,8 @@
                             <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(player.totalPower)}</p>
                         </div>
                         <button data-target-id="${player.uid}" data-target-name="${player.name}" data-target-power="${player.totalPower}"
-                            class="attack-button ${isAttackReady && attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS && !hasAttackedThisCooldown ? '' : 'opacity-50 cursor-not-allowed'}" ${isAttackReady && attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS && !hasAttackedThisCooldown ? '' : 'disabled'}>
-                            ${isAttackReady ? (attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS ? (hasAttackedThisCooldown ? 'تم الهجوم' : 'هجوم') : 'تهدئة عالمية') : formatTime(attackCooldownRemaining)}
+                            class="attack-button ${isAttackReady ? '' : 'opacity-50 cursor-not-allowed'}" ${isAttackReady ? '' : 'disabled'}>
+                            ${isAttackReady ? 'هجوم' : formatTime(attackCooldownRemaining)}
                         </button>
                     `;
                     challengePlayersList.appendChild(playerElement);
@@ -2914,6 +2895,12 @@
             }
         }
 
+        if (refreshChallengePlayersButton) {
+            refreshChallengePlayersButton.addEventListener('click', () => {
+                selectRandomChallengePlayers();
+            });
+        }
+
         function getAttackCooldownRemaining(targetId) {
             const lastAttackTime = attackCooldowns[targetId];
             if (!lastAttackTime) return 0;
@@ -2922,52 +2909,18 @@
             return Math.max(0, Math.floor(cooldownDuration - elapsed));
         }
 
-        function updateGlobalAttackCooldownDisplay() {
-            if (!globalAttackCooldownDisplay || !attacksRemainingDisplay || !globalCooldownTimerDisplay) return;
-
-            const remainingTime = Math.max(0, Math.floor((globalAttackCooldownEndTime - Date.now()) / 1000));
-
-            if (remainingTime > 0) {
-                globalAttackCooldownDisplay.classList.remove('hidden');
-                attacksRemainingDisplay.textContent = MAX_GLOBAL_ATTACKS - attacksMadeInCurrentCooldown;
-                globalCooldownTimerDisplay.textContent = formatTime(remainingTime);
-            } else {
-                globalAttackCooldownDisplay.classList.add('hidden');
-                attacksMadeInCurrentCooldown = 0;
-                attackedTargetsInCooldown = [];
-                savePlayerData();
-            }
-            renderChallengePlayers();
-        }
-
-        function startGlobalAttackCooldownUpdater() {
-            clearInterval(globalAttackCooldownInterval);
-            globalAttackCooldownInterval = setInterval(updateGlobalAttackCooldownDisplay, 1000);
-            updateGlobalAttackCooldownDisplay();
-        }
-
         async function handleAttackClick(event) {
             const targetId = event.target.dataset.targetId;
             const targetName = event.target.dataset.targetName;
             const targetPower = parseInt(event.target.dataset.targetPower, 10);
 
             if (!targetId || !targetName || isNaN(targetPower)) {
-                showMessageModal('خطأ', 'بيانات اللاعب المستهدف غير صالحة.');
+                showMessageModal('خطأ', 'بيانات اللاعب المستهدف غير صالحة.', 'error');
                 return;
             }
 
             if (getAttackCooldownRemaining(targetId) > 0) {
-                showMessageModal('مؤقت التهدئة', `لا يمكنك الهجوم على ${targetName} الآن. يرجى الانتظار: ${formatTime(getAttackCooldownRemaining(targetId))}`);
-                return;
-            }
-
-            if (attacksMadeInCurrentCooldown >= MAX_GLOBAL_ATTACKS) {
-                showMessageModal('تهدئة الهجوم العالمي', `لقد وصلت إلى الحد الأقصى للهجمات (${MAX_GLOBAL_ATTACKS}) في فترة التهدئة الحالية. يرجى الانتظار: ${formatTime(Math.max(0, Math.floor((globalAttackCooldownEndTime - Date.now()) / 1000)))}`);
-                return;
-            }
-
-            if (attackedTargetsInCooldown.includes(targetId)) {
-                showMessageModal('تم الهجوم بالفعل', `لقد هاجمت هذا اللاعب بالفعل خلال فترة التهدئة الحالية.`);
+                showMessageModal('مؤقت التهدئة', `لا يمكنك الهجوم على ${targetName} الآن. يرجى الانتظار: ${formatTime(getAttackCooldownRemaining(targetId))}`, 'info');
                 return;
             }
 
@@ -2991,12 +2944,12 @@
                 attackerPointsChange = pointsReward;
                 attackerDollarsChange = dollarsReward;
                 attackerPowerChange = powerReward;
-                showMessageModal('فوز!', `لقد هاجمت ${targetName} بنجاح وحصلت على ${pointsReward} نقطة و ${dollarsReward}$ و ${powerReward} قوة!`);
+                showMessageModal('فوز!', `لقد هاجمت ${targetName} بنجاح وحصلت على ${pointsReward} نقطة و ${dollarsReward}$ و ${powerReward} قوة!`, 'success');
             } else {
                 attackerPointsChange = -pointsReward;
                 attackerDollarsChange = 0;
                 attackerPowerChange = 0;
-                showMessageModal('خسارة!', `فشلت في الهجوم على ${targetName} وخسرت ${pointsReward} نقطة.`);
+                showMessageModal('خسارة!', `فشلت في الهجوم على ${targetName} وخسرت ${pointsReward} نقطة.`, 'error');
             }
 
             playerPoints += attackerPointsChange;
@@ -3070,11 +3023,18 @@
                     await get(targetHousesRef).then(houseSnapshot => {
                         if (houseSnapshot.exists()) {
                             const targetHouses = houseSnapshot.val();
-                            const targetActiveHouseIndex = targetHouses.findIndex(h => h.unlocked);
-                            if (targetActiveHouseIndex !== -1) {
-                                targetHouses[targetActiveHouseIndex].power = Math.max(1, (targetHouses[targetActiveHouseIndex].power || 0) + defenderPowerChange);
-                                set(targetHousesRef, targetHouses);
-                            }
+                            // Find the house with the highest power for the defender to apply power change
+                            let defenderActiveHouseIndex = 0;
+                            let maxPower = 0;
+                            targetHouses.forEach((h, idx) => {
+                                if (h.power > maxPower) {
+                                    maxPower = h.power;
+                                    defenderActiveHouseIndex = idx;
+                                }
+                            });
+
+                            targetHouses[defenderActiveHouseIndex].power = Math.max(1, (targetHouses[defenderActiveHouseIndex].power || 0) + defenderPowerChange);
+                            set(targetHousesRef, targetHouses);
                         }
                     }).catch(error => console.error("Error updating target house data:", error));
 
@@ -3103,18 +3063,12 @@
                 timestamp: serverTimestamp()
             }).catch(error => console.error("Error saving global attack log:", error));
 
-            attackCooldowns[targetId] = Date.now();
-            attackedTargetsInCooldown.push(targetId);
+            attackCooldowns[targetId] = Date.now(); // Set individual cooldown
             saveAttackCooldowns();
 
-            attacksMadeInCurrentCooldown++;
-            if (attacksMadeInCurrentCooldown >= MAX_GLOBAL_ATTACKS && globalAttackCooldownEndTime === 0) {
-                globalAttackCooldownEndTime = Date.now() + (GLOBAL_ATTACK_COOLDOWN_DURATION * 1000);
-            }
-            savePlayerData();
-            renderHouses();
             updatePlayerInfoDisplay();
-            renderChallengePlayers();
+            renderHouses();
+            selectRandomChallengePlayers(); // Refresh the list of challenge players
         }
 
         function listenForGlobalAttackLog() {
@@ -3251,14 +3205,14 @@
                         console.warn("Custom token sign-in failed, attempting anonymous:", error);
                         return signInAnonymously(auth).catch((anonError) => {
                             console.error("Anonymous sign-in failed:", anonError);
-                            showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.');
+                            showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.', 'error');
                             return null;
                         });
                     });
             } else {
                 authAttemptPromise = signInAnonymously(auth).catch((error) => {
                     console.error("Anonymous sign-in failed:", error);
-                    showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.');
+                    showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.', 'error');
                     return null;
                 });
             }
@@ -3281,14 +3235,14 @@
 
                         updatePlayerInfoDisplay();
                         updateAccumulatedDollarsDisplay();
-                        updateDollarCollectorVisuals(); // Initial update for visuals
+                        updateDollarCollectorVisuals();
                         renderHouses();
                         updateInnovationButtonText();
                         updateInnovationTimerDisplay();
                         renderInventoryItems();
 
-                        listenForChatMessages();
-                        clearChatHistory();
+                        // No longer listen for full chat history, only latest message for updates
+                        // clearChatHistory(); // No longer clearing chat daily
                         startDollarCollection();
 
                         if (onlineStatusUpdater) clearInterval(onlineStatusUpdater);
@@ -3311,7 +3265,7 @@
 
                     } catch (e) {
                         console.error("Error during data loading/setup:", e);
-                        showMessageModal('خطأ في التحميل', 'حدث خطأ أثناء تحميل بياناتك. يرجى تحديث الصفحة.');
+                        showMessageModal('خطأ في التحميل', 'حدث خطأ أثناء تحميل بياناتك. يرجى تحديث الصفحة.', 'error');
                     }
                 } else {
                     console.log("Firebase Auth State Changed: No user signed in.");
