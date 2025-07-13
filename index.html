@@ -587,22 +587,39 @@
         }
         /* Smaller dollar collector styles */
         #dollar-collector {
-            padding: 0.75rem; /* Reduced padding */
-            border-radius: 0.75rem; /* Slightly smaller border radius */
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            position: relative; /* Added for progress bar positioning */
+            overflow: hidden; /* Hide overflow of progress bar */
         }
         #dollar-collector h3 {
-            font-size: 1rem; /* Reduced font size */
-            margin-bottom: 0.5rem; /* Reduced margin */
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
         }
         #dollar-collector .flex {
-            margin-bottom: 0.5rem; /* Reduced margin */
+            margin-bottom: 0.5rem;
+            position: relative; /* Ensure text is above progress */
+            z-index: 1;
         }
         #dollar-collector .text-2xl {
-            font-size: 1.5rem; /* Reduced font size for dollars display */
+            font-size: 1.5rem;
         }
         #collect-dollars-button {
-            padding: 0.5rem 1rem; /* Reduced padding */
-            font-size: 0.875rem; /* Reduced font size */
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            position: relative; /* Ensure button is above progress */
+            z-index: 1;
+        }
+        #dollar-collector-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(to right, #22c55e, #16a34a); /* Green gradient */
+            width: 0%;
+            transition: width 0.5s ease-out;
+            z-index: 0; /* Behind content */
+            border-radius: 0.75rem; /* Match parent */
         }
     </style>
 </head>
@@ -680,15 +697,24 @@
                 </div>
             </div>
             <div id="dollar-collector" class="bg-gray-700 p-3 rounded-xl shadow-md text-center mt-auto">
+                <div id="dollar-collector-progress"></div>
                 <h3 class="text-base font-semibold text-gray-100 mb-1">دولارات متراكمة</h3>
                 <div class="flex items-center justify-center gap-1 mb-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
                         </svg>
                     <span class="text-xl font-bold text-green-300" id="accumulated-dollars-display">$0</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-xl font-bold text-yellow-300" id="accumulated-points-display">0</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span class="text-xl font-bold text-red-300" id="accumulated-power-display">0</span>
                 </div>
                 <button id="collect-dollars-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1.5 px-4 rounded-lg shadow-md transition duration-200 ease-in-out w-full text-sm">
-                    استلام الدولارات
+                    استلام الموارد
                 </button>
             </div>
         </div>
@@ -807,7 +833,7 @@
 
             <div class="grid grid-cols-2 gap-4 view-content">
                 <div id="store-item-reduce-time" class="store-item">
-                    <img src="https://f.top4top.io/p_3479ijdcl0.png" alt="Reduce Time" class="h-16 w-16 mb-2 object-contain">
+                    
                     <span class="text-lg font-semibold text-white">تقليل وقت الابتكار</span>
                     <span class="text-sm text-gray-300 mt-1">يقلل دقيقتين</span>
                     <button class="buy-button mt-4">
@@ -818,7 +844,7 @@
                     </button>
                 </div>
                 <div id="store-item-convert-points" class="store-item">
-                    <img src="https://i.top4top.io/s_34795cyi20.png" alt="Convert Points" class="h-16 w-16 mb-2 object-contain">
+                    
                     <span class="text-lg font-semibold text-white">تحويل النقاط</span>
                     <span class="text-sm text-gray-300 mt-1">يحول النقاط إلى دولارات</span>
                     <button class="buy-button mt-4">
@@ -829,7 +855,7 @@
                     </button>
                 </div>
                 <div id="store-item-buy-innovation3" class="store-item">
-                    <img src="https://f.top4top.io/s_34796x9520.png" alt="Buy Innovation 3" class="h-16 w-16 mb-2 object-contain">
+                    
                     <span class="text-lg font-semibold text-white">شراء ابتكار ثالث</span>
                     <span class="text-sm text-gray-300 mt-1">يفتح ابتكارًا جديدًا</span>
                     <button class="buy-button mt-4">
@@ -1071,10 +1097,11 @@
             signInAnonymously, 
             signInWithCustomToken, 
             onAuthStateChanged,
-            createUserWithEmailAndPassword, // New import
-            signInWithEmailAndPassword,     // New import
-            linkWithCredential,             // New import
-            EmailAuthProvider               // New import
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            linkWithCredential,
+            EmailAuthProvider,
+            signOut // Added signOut for potential future use or debugging
         } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
         import { getDatabase, ref, set, get, onValue, remove, push, serverTimestamp, query, orderByChild, limitToLast, onDisconnect } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
 
@@ -1160,7 +1187,6 @@
         const updatesModal = document.getElementById('updates-modal');
         const updatesCloseButton = document.getElementById('updates-close-button');
 
-        // Renamed from setNameModal to authFlowModal to reflect new purpose
         const authFlowModal = document.getElementById('auth-flow-modal');
         const authModalTitle = document.getElementById('auth-modal-title');
         const setNameSection = document.getElementById('set-name-section');
@@ -1169,7 +1195,7 @@
         const setNameConfirmButton = document.getElementById('set-name-confirm-button');
         const setNameContinueGuestButton = document.getElementById('set-name-continue-guest-button');
         const showEmailAuthButton = document.getElementById('show-email-auth-button');
-        const authFlowCancelButton = document.getElementById('auth-flow-cancel-button'); // New cancel button for auth flow
+        const authFlowCancelButton = document.getElementById('auth-flow-cancel-button');
 
         const authEmailInput = document.getElementById('auth-email-input');
         const authPasswordInput = document.getElementById('auth-password-input');
@@ -1177,7 +1203,7 @@
         const authSigninButton = document.getElementById('auth-signin-button');
         const backToNameSectionButton = document.getElementById('back-to-name-section-button');
 
-        const playerNameDisplay = document.getElementById('player-name-display'); // Still refers to the display element
+        const playerNameDisplay = document.getElementById('player-name-display');
 
         const deleteAccountButton = document.getElementById('delete-account-button');
         const deleteConfirmModal = document.getElementById('delete-confirm-modal');
@@ -1211,6 +1237,9 @@
         const globalCooldownTimerDisplay = document.getElementById('global-cooldown-timer-display');
 
         const accumulatedDollarsDisplay = document.getElementById('accumulated-dollars-display');
+        const accumulatedPointsDisplay = document.getElementById('accumulated-points-display'); // New display for accumulated points
+        const accumulatedPowerDisplay = document.getElementById('accumulated-power-display');   // New display for accumulated power
+        const dollarCollectorProgressBar = document.getElementById('dollar-collector-progress'); // New progress bar element
         const collectDollarsButton = document.getElementById('collect-dollars-button');
 
 
@@ -1233,8 +1262,11 @@
         let accumulatedDollars = 0;
         let accumulatedPoints = 0;
         let accumulatedPower = 0;
+        const MAX_ACCUMULATION = 150; // Max for dollars, points, and power
+        const ACCUMULATION_RATE = 3; // Amount gained every 5 seconds
+
         let playerName = "تعيين اسم";
-        let isNameSetPermanently = false; // Indicates if the player has chosen a permanent name or is just a guest
+        let isNameSetPermanently = false;
         let lastPlayerNameChangeTimestamp = 0;
         let attackCooldowns = {};
         let attackedTargetsInCooldown = [];
@@ -1243,8 +1275,8 @@
         const MAX_GLOBAL_ATTACKS = 5;
         const GLOBAL_ATTACK_COOLDOWN_DURATION = 10 * 60; // 10 minutes
         const NAME_CHANGE_COOLDOWN_DURATION = 3 * 24 * 60 * 60 * 1000;
-        const ONLINE_ACTIVE_DURATION = 60 * 1000;
-        const OFFLINE_RECENT_DURATION = 10 * 60 * 60 * 1000;
+        const ONLINE_ACTIVE_DURATION = 60 * 1000; // 1 minute for truly "online" status
+        const OFFLINE_RECENT_DURATION = 10 * 60 * 60 * 1000; // 10 hours for "recently offline" display
 
         let playerInventory = { reduceTime: 0 };
 
@@ -1275,6 +1307,64 @@
 
         let lastChatClearDate = null;
 
+        // Define storeItems object here to ensure it's accessible
+        const storeItems = {
+            reduceTime: {
+                name: 'تقليل وقت الابتكار',
+                description: 'يقلل دقيقتين من وقت تهدئة الابتكار الحالي.',
+                image: 'https://f.top4top.io/p_3479ijdcl0.png',
+                cost: 200,
+                costType: 'dollars',
+                directUse: false, // This is an inventory item
+                useEffect: (quantity) => {
+                    const currentInnovation = innovationTypes[currentInnovationTypeIndex];
+                    if (currentInnovation) {
+                        const timeReductionPerItem = 120; // 2 minutes
+                        const cooldownRemaining = Math.max(0, Math.floor((currentInnovation.cooldownEndTime - Date.now()) / 1000));
+                        const actualReduction = Math.min(cooldownRemaining, quantity * timeReductionPerItem);
+                        currentInnovation.cooldownEndTime = Math.max(Date.now(), currentInnovation.cooldownEndTime - (actualReduction * 1000));
+                        saveInnovationTypes();
+                        updateInnovationTimerDisplay();
+                        showToast(`تم تقليل وقت التهدئة بـ ${actualReduction / 60} دقيقة!`, 'success');
+                    } else {
+                        showToast('لا يوجد ابتكار نشط لتقليل وقته.', 'info');
+                    }
+                }
+            },
+            convertPoints: {
+                name: 'تحويل النقاط',
+                description: 'يحول 500 نقطة إلى 100 دولار.',
+                image: 'https://i.top4top.io/s_34795cyi20.png',
+                cost: 500,
+                costType: 'points',
+                directUse: true, // This item is used directly upon purchase
+                useEffect: (quantity) => {
+                    const dollarsGained = quantity * 100;
+                    playerDollars += dollarsGained;
+                    updatePlayerInfoDisplay();
+                    savePlayerData();
+                    showToast(`تم تحويل ${quantity * 500} نقطة إلى ${dollarsGained}$!`, 'success');
+                }
+            },
+            buyInnovation3: {
+                name: 'شراء ابتكار ثالث',
+                description: 'يفتح الابتكار الثالث بشكل دائم.',
+                image: 'https://f.top4top.io/s_34796x9520.png',
+                cost: 3000,
+                costType: 'points',
+                directUse: true, // This item is used directly upon purchase
+                useEffect: () => {
+                    const innovation3 = innovationTypes.find(inv => inv.id === 'innovation3');
+                    if (innovation3) {
+                        innovation3.isOwned = true;
+                        saveInnovationTypes();
+                        updateInnovationButtonText();
+                        showMessageModal('تم الشراء', 'تم فتح الابتكار الثالث بنجاح!');
+                    }
+                }
+            }
+        };
+
         function formatPower(num) {
             if (num >= 10000) {
                 return (num / 1000).toFixed(1) + 'k';
@@ -1288,6 +1378,24 @@
             const remainingSeconds = seconds % 60;
             const pad = (num) => num < 10 ? '0' + num : num;
             return `${pad(hours)}:${pad(minutes)}:${pad(remainingSeconds)}`;
+        }
+
+        function timeAgo(timestamp) {
+            const now = Date.now();
+            const seconds = Math.floor((now - timestamp) / 1000);
+
+            if (seconds < 60) {
+                return `منذ ${seconds} ثانية`;
+            } else if (seconds < 3600) {
+                const minutes = Math.floor(seconds / 60);
+                return `منذ ${minutes} دقيقة`;
+            } else if (seconds < 86400) {
+                const hours = Math.floor(seconds / 3600);
+                return `منذ ${hours} ساعة`;
+            } else {
+                const days = Math.floor(seconds / 86400);
+                return `منذ ${days} يوم`;
+            }
         }
 
         function closeModal(modalElement) {
@@ -1345,7 +1453,6 @@
             if (storePlayerDollarsDisplay) storePlayerDollarsDisplay.textContent = `$${formatPower(playerDollars)}`;
             if (storePlayerTotalPowerDisplay) storePlayerTotalPowerDisplay.textContent = formatPower(totalPlayerPower);
 
-            // Update public profile with player's total power
             if (isFirebaseLoaded && userId && playerName !== "تعيين اسم") {
                 set(ref(db, `artifacts/${appId}/public/playerProfiles/${userId}`), {
                     name: playerName,
@@ -1563,7 +1670,7 @@
             innovationButton.addEventListener('click', () => {
                 const currentInnovation = innovationTypes[currentInnovationTypeIndex];
 
-                if (currentInnovation.id === 'innovation3' && !currentType.isOwned) { // Changed currentInnovation.isOwned to currentType.isOwned
+                if (currentInnovation.id === 'innovation3' && !currentInnovation.isOwned) { // Corrected from currentType.isOwned
                     const item = storeItems['buyInnovation3'];
                     if (playerPoints >= item.cost) {
                         playerPoints -= item.cost;
@@ -2106,17 +2213,16 @@
             });
         }
 
-        // --- New Auth Flow Logic ---
         if (playerNameDisplay) {
             playerNameDisplay.addEventListener('click', () => {
-                showAuthFlowModal(true); // true means it's a "link account" scenario
+                showAuthFlowModal(true);
             });
         }
 
         if (setNameConfirmButton) {
             setNameConfirmButton.addEventListener('click', async () => {
                 const newName = playerNameInput.value.trim();
-                if (newName === '') {
+                if (!newName) {
                     showMessageModal('خطأ', 'الاسم لا يمكن أن يكون فارغاً.');
                     return;
                 }
@@ -2129,7 +2235,7 @@
                 }
 
                 playerName = newName;
-                isNameSetPermanently = true; // Mark as permanently set
+                isNameSetPermanently = true;
                 lastPlayerNameChangeTimestamp = Date.now();
                 savePlayerData();
                 updatePlayerInfoDisplay();
@@ -2140,8 +2246,6 @@
 
         if (setNameContinueGuestButton) {
             setNameContinueGuestButton.addEventListener('click', () => {
-                // If user chooses to continue as guest, just close the modal
-                // Their anonymous UID and data will persist until browser data is cleared
                 closeModal(authFlowModal);
                 showToast('تستمر كضيف. قد تفقد بياناتك إذا مسحت بيانات المتصفح.', 'info');
             });
@@ -2152,7 +2256,7 @@
                 setNameSection.classList.add('hidden');
                 emailAuthSection.classList.remove('hidden');
                 authModalTitle.textContent = "تسجيل الدخول / إنشاء حساب";
-                authFlowCancelButton.classList.remove('hidden'); // Show cancel button for email auth
+                authFlowCancelButton.classList.remove('hidden');
             });
         }
 
@@ -2161,7 +2265,7 @@
                 emailAuthSection.classList.add('hidden');
                 setNameSection.classList.remove('hidden');
                 authModalTitle.textContent = "تعيين اسم اللاعب";
-                authFlowCancelButton.classList.add('hidden'); // Hide cancel button
+                authFlowCancelButton.classList.add('hidden');
             });
         }
 
@@ -2187,27 +2291,21 @@
 
                 try {
                     if (auth.currentUser && auth.currentUser.isAnonymous) {
-                        // Link anonymous account to a new email/password account
                         const credential = EmailAuthProvider.credential(email, password);
                         await linkWithCredential(auth.currentUser, credential);
-                        isNameSetPermanently = true; // Mark as permanently set
+                        isNameSetPermanently = true;
                         lastPlayerNameChangeTimestamp = Date.now();
-                        savePlayerData(); // Save the updated player data including isNameSetPermanently
+                        savePlayerData();
                         showToast('تم ربط حسابك المجهول بحساب جديد!', 'success');
                     } else {
-                        // Create a brand new email/password account
                         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                        userId = userCredential.user.uid; // Update userId to the new permanent UID
-                        // Reset player data for the new user, or load if they had anonymous data that needs to be migrated
-                        // For simplicity, we'll assume a fresh start or migration will handle previous data.
-                        // If this is a brand new user, their data will be initialized in loadPlayerData.
-                        isNameSetPermanently = true; // Mark as permanently set
+                        userId = userCredential.user.uid;
+                        isNameSetPermanently = true;
                         lastPlayerNameChangeTimestamp = Date.now();
                         savePlayerData();
                         showToast('تم إنشاء حساب جديد وتسجيل الدخول!', 'success');
                     }
                     closeModal(authFlowModal);
-                    // onAuthStateChanged will handle loading data for the new user
                 } catch (error) {
                     console.error("Error signing up:", error);
                     let errorMessage = 'فشل إنشاء الحساب.';
@@ -2218,7 +2316,7 @@
                     } else if (error.code === 'auth/weak-password') {
                         errorMessage = 'كلمة المرور ضعيفة جداً.';
                     }
-                    showMessageModal('خطأ', errorMessage);
+                    showMessageModal('خطأ', errorMessage, 'error'); // Use error type for toast
                 }
             });
         }
@@ -2237,20 +2335,18 @@
                     await signInWithEmailAndPassword(auth, email, password);
                     closeModal(authFlowModal);
                     showToast('تم تسجيل الدخول بنجاح!', 'success');
-                    // onAuthStateChanged will handle loading data for the signed-in user
                 } catch (error) {
                     console.error("Error signing in:", error);
                     let errorMessage = 'فشل تسجيل الدخول.';
-                    if (error.code === 'auth/invalid-credential') { // Common for wrong email/password
+                    if (error.code === 'auth/invalid-credential') {
                         errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
                     } else if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
                         errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
                     }
-                    showMessageModal('خطأ', errorMessage);
+                    showMessageModal('خطأ', errorMessage, 'error'); // Use error type for toast
                 }
             });
         }
-        // --- End New Auth Flow Logic ---
 
         if (deleteAccountButton) {
             deleteAccountButton.addEventListener('click', () => {
@@ -2273,17 +2369,15 @@
                     return;
                 }
                 try {
-                    // Delete user data from Realtime Database
                     await remove(ref(db, `artifacts/${appId}/public/playerProfiles/${userId}`));
                     await remove(ref(db, `artifacts/${appId}/public/onlineUsers/${userId}`));
                     await remove(ref(db, `artifacts/${appId}/users/${userId}`));
                     
-                    // Delete the user from Firebase Authentication
                     if (auth.currentUser) {
                         await auth.currentUser.delete();
                     }
 
-                    localStorage.clear(); // Clear any remaining local storage data
+                    localStorage.clear();
                     closeModal(deleteConfirmModal);
                     if (resetCountdownModal && countdownDisplay) {
                         resetCountdownModal.classList.remove('hidden');
@@ -2301,7 +2395,7 @@
                             if (countdownDisplay) countdownDisplay.textContent = countdown;
                             if (countdown <= 0) {
                                 clearInterval(countdownInterval);
-                                location.reload(); // Reload the page to restart the app
+                                location.reload();
                             }
                         }, 1000);
                     }
@@ -2332,7 +2426,7 @@
                                 existingType.isOwned = savedType.isOwned || false;
                             }
                         } else {
-                            if (savedType.id === 'innovation3') {
+                            if (savedType.id === 'innovation3') { // Ensure new innovation3 is added if not present
                                 innovationTypes.push({ id: 'innovation3', name: 'ابتكار 3', cooldownEndTime: savedType.cooldownEndTime || 0, initialCooldown: 4 * 60, colorClass: 'from-green-600 to-emerald-700', isOwned: savedType.isOwned || false });
                             }
                         }
@@ -2404,8 +2498,7 @@
                 attacksMadeInCurrentCooldown = data.attacksMadeInCurrentCooldown || 0;
                 attackedTargetsInCooldown = data.attackedTargetsInCooldown || [];
             } else {
-                // If no data exists, initialize and save default data
-                savePlayerData();
+                savePlayerData(); // Initialize and save default data if not found
             }
         }
 
@@ -2439,7 +2532,7 @@
                     activeHouseIndex = 0;
                 }
             } else {
-                saveHouses();
+                saveHouses(); // Initialize and save default houses if not found
             }
         }
 
@@ -2456,7 +2549,7 @@
                 playerInventory = snapshot.val();
             } else {
                 playerInventory = { reduceTime: 0 };
-                savePlayerInventory();
+                savePlayerInventory(); // Initialize and save default inventory if not found
             }
         }
 
@@ -2687,9 +2780,12 @@
                     if (uid === userId) continue;
 
                     const player = allPlayers[uid];
+                    // Filter for online players
                     if (player.isOnline) {
                         activeOnlinePlayers.push(player);
-                    } else {
+                    } 
+                    // Filter for recently offline players (within 10 hours)
+                    else if (player.lastOnline && (now - player.lastOnline < OFFLINE_RECENT_DURATION)) {
                         allOfflinePlayers.push(player);
                     }
                 }
@@ -2729,14 +2825,13 @@
                         allOfflinePlayers.forEach(user => {
                             const userElement = document.createElement('div');
                             userElement.className = `online-user-item text-white offline`;
-                            const lastOnlineTime = user.lastOnline ? new Date(user.lastOnline).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : 'غير معروف';
-                            const lastOnlineDate = user.lastOnline ? new Date(user.lastOnline).toLocaleDateString('ar-SA') : '';
+                            const lastOnlineText = user.lastOnline ? timeAgo(user.lastOnline) : 'غير معروف'; // Use timeAgo function
 
                             userElement.innerHTML = `
                                 <div class="user-info">
                                     <p class="font-bold text-lg">${user.name}</p>
                                     <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(user.totalPower)}</p>
-                                    <p class="text-xs text-gray-400 mt-1">آخر ظهور: ${lastOnlineTime} ${lastOnlineDate}</p>
+                                    <p class="text-xs text-gray-400 mt-1">آخر ظهور: ${lastOnlineText}</p>
                                 </div>
                                 <div class="status-dot"></div>
                             `;
@@ -2748,53 +2843,75 @@
         }
 
 
-        function renderChallengePlayers() {
+        async function renderChallengePlayers() {
             if (!isFirebaseLoaded || !challengePlayersList) return;
 
             const playerProfilesRef = ref(db, `artifacts/${appId}/public/playerProfiles`);
-            onValue(playerProfilesRef, (snapshot) => {
-                challengePlayersList.innerHTML = '';
-                const players = [];
-                snapshot.forEach(childSnapshot => {
-                    const player = childSnapshot.val();
-                    const playerUid = childSnapshot.key;
-                    if (playerUid !== userId) {
-                        players.push({ uid: playerUid, ...player });
-                    }
-                });
+            const onlineUsersRef = ref(db, `artifacts/${appId}/public/onlineUsers`);
 
-                if (players.length === 0) {
-                    challengePlayersList.innerHTML = '<p class="text-gray-300 text-center">لا يوجد لاعبون آخرون متاحون للتحدي حالياً.</p>';
-                } else {
-                    players.forEach(player => {
-                        const attackCooldownRemaining = getAttackCooldownRemaining(player.uid);
-                        const isAttackReady = attackCooldownRemaining <= 0;
-                        const hasAttackedThisCooldown = attackedTargetsInCooldown.includes(player.uid);
+            const [profilesSnapshot, onlineSnapshot] = await Promise.all([
+                get(playerProfilesRef),
+                get(onlineUsersRef)
+            ]);
 
-                        const canDefeat = totalPlayerPower >= (player.totalPower + 3000);
-                        const borderColorClass = canDefeat ? 'can-defeat' : 'cannot-defeat';
+            const allPlayers = {};
+            profilesSnapshot.forEach(childSnapshot => {
+                allPlayers[childSnapshot.key] = { ...childSnapshot.val(), lastOnline: 0 };
+            });
 
-                        const playerElement = document.createElement('div');
-                        playerElement.className = `challenge-player-item text-white ${borderColorClass}`;
-                        playerElement.innerHTML = `
-                            <div class="player-info text-right">
-                                <p class="font-bold text-lg">${player.name}</p>
-                                <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(player.totalPower)}</p>
-                            </div>
-                            <button data-target-id="${player.uid}" data-target-name="${player.name}" data-target-power="${player.totalPower}"
-                                class="attack-button ${isAttackReady && attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS && !hasAttackedThisCooldown ? '' : 'opacity-50 cursor-not-allowed'}" ${isAttackReady && attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS && !hasAttackedThisCooldown ? '' : 'disabled'}>
-                                ${isAttackReady ? (attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS ? (hasAttackedThisCooldown ? 'تم الهجوم' : 'هجوم') : 'تهدئة عالمية') : formatTime(attackCooldownRemaining)}
-                            </button>
-                        `;
-                        challengePlayersList.appendChild(playerElement);
-                    });
-
-                    document.querySelectorAll('.attack-button').forEach(button => {
-                        button.removeEventListener('click', handleAttackClick);
-                        button.addEventListener('click', handleAttackClick);
-                    });
+            onlineSnapshot.forEach(childSnapshot => {
+                const user = childSnapshot.val();
+                const userUid = childSnapshot.key;
+                if (allPlayers[userUid]) {
+                    allPlayers[userUid].lastOnline = user.lastOnline || 0;
                 }
             });
+
+            challengePlayersList.innerHTML = '';
+            const playersToChallenge = [];
+            const now = Date.now();
+
+            for (const uid in allPlayers) {
+                if (uid === userId) continue; // Don't show self
+
+                const player = allPlayers[uid];
+                // Only show players online in the last 10 hours
+                if (player.lastOnline && (now - player.lastOnline < OFFLINE_RECENT_DURATION)) {
+                    playersToChallenge.push(player);
+                }
+            }
+
+            if (playersToChallenge.length === 0) {
+                challengePlayersList.innerHTML = '<p class="text-gray-300 text-center">لا يوجد لاعبون آخرون متاحون للتحدي حالياً.</p>';
+            } else {
+                playersToChallenge.forEach(player => {
+                    const attackCooldownRemaining = getAttackCooldownRemaining(player.uid);
+                    const isAttackReady = attackCooldownRemaining <= 0;
+                    const hasAttackedThisCooldown = attackedTargetsInCooldown.includes(player.uid);
+
+                    const canDefeat = totalPlayerPower >= (player.totalPower + 3000);
+                    const borderColorClass = canDefeat ? 'can-defeat' : 'cannot-defeat';
+
+                    const playerElement = document.createElement('div');
+                    playerElement.className = `challenge-player-item text-white ${borderColorClass}`;
+                    playerElement.innerHTML = `
+                        <div class="player-info text-right">
+                            <p class="font-bold text-lg">${player.name}</p>
+                            <p class="text-sm text-gray-300">القوة الإجمالية: ${formatPower(player.totalPower)}</p>
+                        </div>
+                        <button data-target-id="${player.uid}" data-target-name="${player.name}" data-target-power="${player.totalPower}"
+                            class="attack-button ${isAttackReady && attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS && !hasAttackedThisCooldown ? '' : 'opacity-50 cursor-not-allowed'}" ${isAttackReady && attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS && !hasAttackedThisCooldown ? '' : 'disabled'}>
+                            ${isAttackReady ? (attacksMadeInCurrentCooldown < MAX_GLOBAL_ATTACKS ? (hasAttackedThisCooldown ? 'تم الهجوم' : 'هجوم') : 'تهدئة عالمية') : formatTime(attackCooldownRemaining)}
+                        </button>
+                    `;
+                    challengePlayersList.appendChild(playerElement);
+                });
+
+                document.querySelectorAll('.attack-button').forEach(button => {
+                    button.removeEventListener('click', handleAttackClick);
+                    button.addEventListener('click', handleAttackClick);
+                });
+            }
         }
 
         function getAttackCooldownRemaining(targetId) {
@@ -3032,22 +3149,35 @@
         function startDollarCollection() {
             if (dollarCollectionInterval) clearInterval(dollarCollectionInterval);
             dollarCollectionInterval = setInterval(() => {
-                const dollarsGain = Math.floor(Math.random() * (20 - 4 + 1)) + 4;
-                const pointsGain = Math.floor(Math.random() * (20 - 4 + 1)) + 4;
-                const powerGain = Math.floor(Math.random() * (15 - 1 + 1)) + 1;
-
-                accumulatedDollars += dollarsGain;
-                accumulatedPoints += pointsGain;
-                accumulatedPower += powerGain;
+                // Increment each accumulated resource, capping at MAX_ACCUMULATION
+                accumulatedDollars = Math.min(MAX_ACCUMULATION, accumulatedDollars + ACCUMULATION_RATE);
+                accumulatedPoints = Math.min(MAX_ACCUMULATION, accumulatedPoints + ACCUMULATION_RATE);
+                accumulatedPower = Math.min(MAX_ACCUMULATION, accumulatedPower + ACCUMULATION_RATE);
                 
-                updateAccumulatedDollarsDisplay();
+                updateAccumulatedDollarsDisplay(); // Update display for all three
+                updateDollarCollectorVisuals(); // Update the progress bar
                 savePlayerData();
-            }, 60 * 1000); // 1 minute (60 seconds)
+            }, 5 * 1000); // Every 5 seconds
         }
 
         function updateAccumulatedDollarsDisplay() {
             if (accumulatedDollarsDisplay) {
                 accumulatedDollarsDisplay.textContent = `$${formatPower(accumulatedDollars)}`;
+            }
+            if (accumulatedPointsDisplay) {
+                accumulatedPointsDisplay.textContent = formatPower(accumulatedPoints);
+            }
+            if (accumulatedPowerDisplay) {
+                accumulatedPowerDisplay.textContent = formatPower(accumulatedPower);
+            }
+        }
+
+        function updateDollarCollectorVisuals() {
+            if (dollarCollectorProgressBar) {
+                // Calculate progress based on the highest accumulated value relative to MAX_ACCUMULATION
+                const maxCurrentAccumulation = Math.max(accumulatedDollars, accumulatedPoints, accumulatedPower);
+                const percentage = (maxCurrentAccumulation / MAX_ACCUMULATION) * 100;
+                dollarCollectorProgressBar.style.width = `${percentage}%`;
             }
         }
 
@@ -3065,6 +3195,7 @@
 
                 updatePlayerInfoDisplay();
                 updateAccumulatedDollarsDisplay();
+                updateDollarCollectorVisuals(); // Reset progress bar
                 renderHouses();
                 savePlayerData();
                 saveHouses();
@@ -3081,26 +3212,25 @@
             collectDollarsButton.addEventListener('click', collectDollars);
         }
 
-        // Function to show the auth flow modal
         function showAuthFlowModal(isLinkingExistingAccount = false) {
             if (!authFlowModal || !authModalTitle || !setNameSection || !emailAuthSection || !playerNameInput) return;
 
             setNameSection.classList.remove('hidden');
-            emailAuthSection.classList.add('hidden'); // Start with name section visible
+            emailAuthSection.classList.add('hidden');
 
             if (isLinkingExistingAccount) {
                 authModalTitle.textContent = "ربط الحساب";
                 playerNameInput.value = playerName === "تعيين اسم" ? "" : playerName;
                 setNameConfirmButton.textContent = "تأكيد الاسم";
-                setNameContinueGuestButton.classList.add('hidden'); // Hide guest option when linking
-                authFlowCancelButton.classList.remove('hidden'); // Allow cancelling the linking process
+                setNameContinueGuestButton.classList.add('hidden');
+                authFlowCancelButton.classList.remove('hidden');
                 showEmailAuthButton.textContent = "ربط بحساب بريد إلكتروني";
             } else {
                 authModalTitle.textContent = "تعيين اسم اللاعب";
                 playerNameInput.value = playerName === "تعيين اسم" ? "" : playerName;
                 setNameConfirmButton.textContent = "تأكيد الاسم";
-                setNameContinueGuestButton.classList.remove('hidden'); // Show guest option on initial load
-                authFlowCancelButton.classList.add('hidden'); // Hide cancel button on initial load
+                setNameContinueGuestButton.classList.remove('hidden');
+                authFlowCancelButton.classList.add('hidden');
                 showEmailAuthButton.textContent = "تسجيل دخول / إنشاء حساب";
             }
 
@@ -3115,12 +3245,10 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             let authAttemptPromise;
-            // First, try to sign in with custom token if available (from Canvas environment)
             if (initialAuthToken) {
                 authAttemptPromise = signInWithCustomToken(auth, initialAuthToken)
                     .catch(async (error) => {
                         console.warn("Custom token sign-in failed, attempting anonymous:", error);
-                        // Fallback to anonymous if custom token fails
                         return signInAnonymously(auth).catch((anonError) => {
                             console.error("Anonymous sign-in failed:", anonError);
                             showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.');
@@ -3128,7 +3256,6 @@
                         });
                     });
             } else {
-                // If no custom token, try anonymous sign-in
                 authAttemptPromise = signInAnonymously(auth).catch((error) => {
                     console.error("Anonymous sign-in failed:", error);
                     showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول المجهول. يرجى تحديث الصفحة.');
@@ -3150,10 +3277,11 @@
                         await loadPlayerInventory();
                         await loadAttackCooldowns();
 
-                        await migrateLocalStorageToFirebase(); // This will migrate old local data to Firebase
+                        await migrateLocalStorageToFirebase();
 
                         updatePlayerInfoDisplay();
                         updateAccumulatedDollarsDisplay();
+                        updateDollarCollectorVisuals(); // Initial update for visuals
                         renderHouses();
                         updateInnovationButtonText();
                         updateInnovationTimerDisplay();
@@ -3177,9 +3305,8 @@
                             startGlobalCooldownUpdater();
                         }
 
-                        // Show auth modal if player name is not set permanently
                         if (!isNameSetPermanently && (!playerName || playerName === "تعيين اسم")) {
-                            showAuthFlowModal(false); // Not a linking scenario, initial setup
+                            showAuthFlowModal(false);
                         }
 
                     } catch (e) {
@@ -3188,9 +3315,6 @@
                     }
                 } else {
                     console.log("Firebase Auth State Changed: No user signed in.");
-                    // If no user is signed in (e.g., after deleting account), ensure UI is clean
-                    // and potentially prompt for sign-in/sign-up.
-                    // For now, reload will handle it.
                 }
             });
         });
