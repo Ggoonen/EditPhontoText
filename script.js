@@ -180,10 +180,10 @@ const storeDetailTitle = document.getElementById('store-detail-title');
 const storeDetailDescription = document.getElementById('store-detail-description');
 const storeDetailQuantityMinus = document.getElementById('store-detail-quantity-minus');
 const storeDetailQuantityDisplay = document.getElementById('store-detail-quantity-display');
-const storeDetailQuantityPlus = document.getElementById('store-detail-quantity-plus');
 const storeDetailTotalCost = document.getElementById('store-detail-total-cost');
 const storeDetailConfirmButton = document.getElementById('store-detail-confirm-button');
 const storeDetailCancelButton = document.getElementById('store-detail-cancel-button');
+const storeDetailQuantityPlus = document.getElementById('store-detail-quantity-plus'); // تأكد من وجود هذا العنصر
 
 // عناصر Inventory Modal
 const inventoryModal = document.getElementById('inventory-modal');
@@ -200,7 +200,7 @@ const authSignupButton = document.getElementById('auth-signup-button');
 const authSigninButton = document.getElementById('auth-signin-button');
 const showEmailAuthButton = document.getElementById('show-email-auth-button');
 const backToNameSectionButton = document.getElementById('back-to-name-section-button');
-const setNameConfirmButton = document.getElementById('set-name-confirm-button');
+const setNameConfirmButtonAuth = document.getElementById('set-name-confirm-button'); // تم تغيير الاسم لتجنب التعارض
 const setNameContinueGuestButton = document.getElementById('set-name-continue-guest-button');
 const authFlowCancelButton = document.getElementById('auth-flow-cancel-button'); // زر الإلغاء في مودال المصادقة
 
@@ -228,12 +228,19 @@ function showView(viewId) {
 // إظهار نافذة منبثقة (مودال)
 function showModal(modalElement) {
     modalElement.classList.add('visible');
-    modalElement.querySelector('.popup-content, .message-modal-content, div:first-of-type').classList.add('scale-100', 'opacity-100');
+    // تأكد من أن العنصر الداخلي هو الذي يتحرك ويتغير شفافيته
+    const innerContent = modalElement.querySelector('.popup-content, .message-modal-content, div:first-of-type > div:first-of-type');
+    if (innerContent) {
+        innerContent.classList.add('scale-100', 'opacity-100');
+    }
 }
 
 // إخفاء نافذة منبثقة (مودال)
 function hideModal(modalElement) {
-    modalElement.querySelector('.popup-content, .message-modal-content, div:first-of-type').classList.remove('scale-100', 'opacity-100');
+    const innerContent = modalElement.querySelector('.popup-content, .message-modal-content, div:first-of-type > div:first-of-type');
+    if (innerContent) {
+        innerContent.classList.remove('scale-100', 'opacity-100');
+    }
     modalElement.classList.remove('visible');
 }
 
@@ -309,6 +316,7 @@ function renderInventoryCount() {
 onAuthStateChanged(auth, (user) => {
     if (user) {
         userId = user.uid; // تعيين معرف المستخدم
+        console.log("User authenticated:", userId);
         loadPlayerData(); // تحميل بيانات اللاعب
         loadHouses(); // تحميل بيانات البيوت
         loadGlobalAttacks(); // تحميل سجل الهجمات العالمية
@@ -324,6 +332,7 @@ onAuthStateChanged(auth, (user) => {
             .then(() => {
                 // إذا كان تسجيل الدخول المجهول ناجحاً، سيتم تشغيل onAuthStateChanged مرة أخرى
                 // وإذا لم يكن المستخدم جديداً، سيتم تحميل بياناته
+                console.log("Signed in anonymously.");
             })
             .catch((error) => {
                 console.error("Error signing in anonymously: ", error);
@@ -334,113 +343,144 @@ onAuthStateChanged(auth, (user) => {
 
 // وظائف حفظ وتحميل البيانات من/إلى Firebase
 function savePlayerData() {
-    if (userId) {
-        set(ref(database, 'users/' + userId + '/data'), {
-            playerName: playerName,
-            dollars: dollars,
-            points: points,
-            totalPower: totalPower,
-            innovationLevel: innovationLevel,
-            innovationCost: innovationCost,
-            innovationPowerIncrease: innovationPowerIncrease,
-            accumulatedDollars: accumulatedDollars,
-            accumulatedPoints: accumulatedPoints,
-            accumulatedPower: accumulatedPower,
-            lastCollectTime: lastCollectTime,
-            isNameSetPermanently: isNameSetPermanently,
-            lastPlayerNameChangeTimestamp: lastPlayerNameChangeTimestamp,
-            nameChangeCount: nameChangeCount,
-            lastOnline: Date.now() // تحديث وقت آخر اتصال
-        }).then(() => {
-            console.log("Player data saved successfully!");
-        }).catch((error) => {
-            console.error("Error saving player data: ", error);
-            showToast('فشل حفظ البيانات.', 'error');
-        });
+    if (!userId) {
+        console.warn("Cannot save player data: userId is null.");
+        return;
     }
+    set(ref(database, 'users/' + userId + '/data'), {
+        playerName: playerName,
+        dollars: dollars,
+        points: points,
+        totalPower: totalPower,
+        innovationLevel: innovationLevel,
+        innovationCost: innovationCost,
+        innovationPowerIncrease: innovationPowerIncrease,
+        accumulatedDollars: accumulatedDollars,
+        accumulatedPoints: accumulatedPoints,
+        accumulatedPower: accumulatedPower,
+        lastCollectTime: lastCollectTime,
+        isNameSetPermanently: isNameSetPermanently,
+        lastPlayerNameChangeTimestamp: lastPlayerNameChangeTimestamp,
+        nameChangeCount: nameChangeCount,
+        lastOnline: Date.now() // تحديث وقت آخر اتصال
+    }).then(() => {
+        console.log("Player data saved successfully!");
+    }).catch((error) => {
+        console.error("Error saving player data: ", error);
+        showToast('فشل حفظ البيانات.', 'error');
+    });
 }
 
 function loadPlayerData() {
-    if (userId) {
-        get(ref(database, 'users/' + userId + '/data')).then((snapshot) => {
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                playerName = data.playerName || "لاعب جديد";
-                dollars = data.dollars || 0;
-                points = data.points || 0;
-                totalPower = data.totalPower || 0;
-                innovationLevel = data.innovationLevel || 1;
-                innovationCost = data.innovationCost || 100;
-                innovationPowerIncrease = data.innovationPowerIncrease || 10;
-                accumulatedDollars = data.accumulatedDollars || 0;
-                accumulatedPoints = data.accumulatedPoints || 0;
-                accumulatedPower = data.accumulatedPower || 0;
-                lastCollectTime = data.lastCollectTime || 0;
-                isNameSetPermanently = data.isNameSetPermanently || false;
-                lastPlayerNameChangeTimestamp = data.lastPlayerNameChangeTimestamp || 0;
-                nameChangeCount = data.nameChangeCount || 0;
-            } else {
-                // إذا لم يتم العثور على بيانات، هذا يعني مستخدم جديد
-                showAuthFlowModal("أهلاً بك أيها المغامر الجديد!", "يرجى تعيين اسمك أو تسجيل الدخول لحفظ تقدمك.");
-                savePlayerData(); // حفظ البيانات الافتراضية للمستخدم الجديد
-            }
-            updateUI(); // تحديث واجهة المستخدم بعد التحميل
-        }).catch((error) => {
-            console.error("Error loading player data: ", error);
-            showToast('فشل تحميل البيانات.', 'error');
-        });
+    if (!userId) {
+        console.warn("Cannot load player data: userId is null.");
+        return;
     }
+    get(ref(database, 'users/' + userId + '/data')).then((snapshot) => {
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            playerName = data.playerName || "لاعب جديد";
+            dollars = data.dollars || 0;
+            points = data.points || 0;
+            totalPower = data.totalPower || 0;
+            innovationLevel = data.innovationLevel || 1;
+            innovationCost = data.innovationCost || 100;
+            innovationPowerIncrease = data.innovationPowerIncrease || 10;
+            accumulatedDollars = data.accumulatedDollars || 0;
+            accumulatedPoints = data.accumulatedPoints || 0;
+            accumulatedPower = data.accumulatedPower || 0;
+            lastCollectTime = data.lastCollectTime || 0;
+            isNameSetPermanently = data.isNameSetPermanently || false;
+            lastPlayerNameChangeTimestamp = data.lastPlayerNameChangeTimestamp || 0;
+            nameChangeCount = data.nameChangeCount || 0;
+            console.log("Player data loaded:", data);
+        } else {
+            console.log("No player data found. This is a new user or data was reset.");
+            // إذا لم يتم العثور على بيانات، هذا يعني مستخدم جديد
+            // يتم استدعاء showAuthFlowModal فقط إذا لم يكن الاسم قد تم تعيينه بشكل دائم
+            if (!isNameSetPermanently) {
+                showAuthFlowModal("أهلاً بك أيها المغامر الجديد!", "يرجى تعيين اسمك أو تسجيل الدخول لحفظ تقدمك.");
+            }
+            savePlayerData(); // حفظ البيانات الافتراضية للمستخدم الجديد
+        }
+        updateUI(); // تحديث واجهة المستخدم بعد التحميل
+    }).catch((error) => {
+        console.error("Error loading player data: ", error);
+        showToast('فشل تحميل البيانات.', 'error');
+    });
 }
 
 function saveHouses() {
-    if (userId) {
-        set(ref(database, 'users/' + userId + '/houses'), houses)
-            .then(() => console.log("Houses saved successfully"))
-            .catch(error => console.error("Error saving houses: ", error));
-        set(ref(database, 'users/' + userId + '/currentHouseIndex'), currentHouseIndex)
-            .then(() => console.log("Current house index saved successfully"))
-            .catch(error => console.error("Error saving current house index: ", error));
+    if (!userId) {
+        console.warn("Cannot save houses: userId is null.");
+        return;
     }
+    set(ref(database, 'users/' + userId + '/houses'), houses)
+        .then(() => console.log("Houses saved successfully"))
+        .catch(error => console.error("Error saving houses: ", error));
+    set(ref(database, 'users/' + userId + '/currentHouseIndex'), currentHouseIndex)
+        .then(() => console.log("Current house index saved successfully"))
+        .catch(error => console.error("Error saving current house index: ", error));
 }
 
 function loadHouses() {
-    if (userId) {
-        get(ref(database, 'users/' + userId + '/houses')).then((snapshot) => {
-            if (snapshot.exists()) {
-                const loadedHouses = snapshot.val();
-                // التأكد من أن جميع البيوت المحملة تحتوي على الخصائص المطلوبة
-                if (Array.isArray(loadedHouses) && loadedHouses.length === houses.length) {
-                    houses = loadedHouses.map((loadedHouse, index) => ({
-                        ...houses[index], // الاحتفاظ بالخصائص الافتراضية مثل الاسم والصورة
-                        ...loadedHouse, // دمج البيانات المحملة
-                        rewardedThresholds: loadedHouse.rewardedThresholds || [] // التأكد من وجود rewardedThresholds
-                    }));
-                } else {
-                    saveHouses(); // حفظ البيوت الافتراضية إذا كانت البيانات غير متطابقة
-                }
-            } else {
-                saveHouses(); // حفظ البيوت الافتراضية إذا لم يتم العثور عليها
-            }
-        }).then(() => {
-            return get(ref(database, 'users/' + userId + '/currentHouseIndex'));
-        }).then((snapshot) => {
-            if (snapshot.exists()) {
-                currentHouseIndex = snapshot.val();
-                if (currentHouseIndex >= houses.length || currentHouseIndex < 0) {
-                    currentHouseIndex = 0; // إعادة تعيين إذا كان الفهرس غير صالح
-                }
-            } else {
-                currentHouseIndex = 0;
-            }
-            updateUI(); // تحديث واجهة المستخدم بعد تحميل البيوت والفهرس النشط
-        }).catch((error) => {
-            console.error("Error loading houses: ", error);
-            showToast('فشل تحميل معلومات البيوت.', 'error');
-        });
+    if (!userId) {
+        console.warn("Cannot load houses: userId is null.");
+        return;
     }
+    get(ref(database, 'users/' + userId + '/houses')).then((snapshot) => {
+        if (snapshot.exists()) {
+            const loadedHouses = snapshot.val();
+            console.log("Loaded houses raw:", loadedHouses);
+            // التأكد من أن جميع البيوت المحملة تحتوي على الخصائص المطلوبة
+            if (Array.isArray(loadedHouses) && loadedHouses.length === houses.length) {
+                houses = loadedHouses.map((loadedHouse, index) => {
+                    // دمج البيانات المحملة مع الخصائص الافتراضية لضمان عدم فقدان أي شيء
+                    return {
+                        ...houses[index], // الاحتفاظ بالخصائص الافتراضية مثل الاسم والصورة
+                        ...loadedHouse, // دمج البيانات المحملة من Firebase
+                        rewardedThresholds: loadedHouse.rewardedThresholds || [] // التأكد من وجود rewardedThresholds كـ array
+                    };
+                });
+                console.log("Houses merged:", houses);
+            } else {
+                console.warn("Loaded houses structure is incorrect, resetting to default.");
+                // إذا كانت البيانات غير متطابقة، قم بإعادة تعيينها إلى الافتراضي وحفظها
+                houses = [
+                    { id: 1, name: "البيت الأول", power: 1, unlocked: true, threshold: 25000, rewardedThresholds: [], img: "https://f.top4top.io/p_3479z75z10.png" },
+                    { id: 2, name: "البيت الثاني", power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [], img: "https://i.top4top.io/p_34791336l0.png" },
+                    { id: 3, name: "البيت الثالث", power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [], img: "https://k.top4top.io/p_3479f6o0n0.png" },
+                    { id: 4, name: "البيت الرابع", power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [], img: "https://l.top4top.io/p_347900b1w0.png" }
+                ];
+                saveHouses();
+            }
+        } else {
+            console.log("No house data found. Saving default houses.");
+            saveHouses(); // حفظ البيوت الافتراضية إذا لم يتم العثور عليها
+        }
+    }).then(() => {
+        return get(ref(database, 'users/' + userId + '/currentHouseIndex'));
+    }).then((snapshot) => {
+        if (snapshot.exists()) {
+            currentHouseIndex = snapshot.val();
+            if (currentHouseIndex >= houses.length || currentHouseIndex < 0) {
+                currentHouseIndex = 0; // إعادة تعيين إذا كان الفهرس غير صالح
+            }
+            console.log("Current house index loaded:", currentHouseIndex);
+        } else {
+            currentHouseIndex = 0;
+            console.log("No current house index found. Setting to 0.");
+        }
+        updateUI(); // تحديث واجهة المستخدم بعد تحميل البيوت والفهرس النشط
+    }).catch((error) => {
+        console.error("Error loading houses or index: ", error);
+        showToast('فشل تحميل معلومات البيوت.', 'error');
+    });
 }
 
+
 function saveGlobalAttacks() {
+    // Keep only the latest MAX_GLOBAL_ATTACKS
     if (globalAttacks.length > MAX_GLOBAL_ATTACKS) {
         globalAttacks = globalAttacks.slice(0, MAX_GLOBAL_ATTACKS);
     }
@@ -481,36 +521,44 @@ function renderGlobalAttacks() {
 }
 
 function saveInventory() {
-    if (userId) {
-        set(ref(database, 'users/' + userId + '/inventory'), inventory)
-            .then(() => console.log("Inventory saved successfully"))
-            .catch(error => console.error("Error saving inventory: ", error));
+    if (!userId) {
+        console.warn("Cannot save inventory: userId is null.");
+        return;
     }
+    set(ref(database, 'users/' + userId + '/inventory'), inventory)
+        .then(() => console.log("Inventory saved successfully"))
+        .catch(error => console.error("Error saving inventory: ", error));
 }
 
 function loadInventory() {
-    if (userId) {
-        get(ref(database, 'users/' + userId + '/inventory')).then((snapshot) => {
-            if (snapshot.exists()) {
-                inventory = snapshot.val() || [];
-            } else {
-                inventory = [];
-            }
-            renderInventoryCount();
-        }).catch((error) => {
-            console.error("Error loading inventory: ", error);
-        });
+    if (!userId) {
+        console.warn("Cannot load inventory: userId is null.");
+        return;
     }
+    get(ref(database, 'users/' + userId + '/inventory')).then((snapshot) => {
+        if (snapshot.exists()) {
+            inventory = snapshot.val() || [];
+            console.log("Inventory loaded:", inventory);
+        } else {
+            inventory = [];
+            console.log("No inventory data found.");
+        }
+        renderInventoryCount();
+    }).catch((error) => {
+        console.error("Error loading inventory: ", error);
+    });
 }
 
 // تحديث حالة الاتصال بالإنترنت للمستخدم الحالي
 function updateOnlineStatus(isOnline) {
-    if (userId) {
-        update(ref(database, 'users/' + userId + '/data'), {
-            isOnline: isOnline,
-            lastOnline: Date.now()
-        }).catch(error => console.error("Error updating online status: ", error));
+    if (!userId) {
+        console.warn("Cannot update online status: userId is null.");
+        return;
     }
+    update(ref(database, 'users/' + userId + '/data'), {
+        isOnline: isOnline,
+        lastOnline: Date.now()
+    }).catch(error => console.error("Error updating online status: ", error));
 }
 
 // حدث عند إغلاق أو تحديث الصفحة: تحديث حالة الاتصال إلى "غير متصل"
@@ -648,6 +696,7 @@ function activateInnovation() {
 // وظائف Store View
 const storeItems = {
     'reduce-time': {
+        id: 'reduce-time',
         title: 'تقليل وقت الابتكار',
         description: 'يقلل من وقت انتظار الابتكار التالي بنسبة 10%.',
         cost: 200,
@@ -665,6 +714,7 @@ const storeItems = {
         }
     },
     'convert-points': {
+        id: 'convert-points',
         title: 'تحويل النقاط',
         description: 'يحول 500 نقطة إلى 250 دولار.',
         cost: 500,
@@ -681,6 +731,7 @@ const storeItems = {
         }
     },
     'buy-innovation3': {
+        id: 'buy-innovation3',
         title: 'شراء ابتكار ثالث',
         description: 'يزيد مستوى الابتكار لديك بشكل كبير.',
         cost: 3000,
@@ -696,17 +747,21 @@ const storeItems = {
 
 function openStoreDetailModal(itemId) {
     currentStoreItem = storeItems[itemId];
-    if (!currentStoreItem) return;
+    if (!currentStoreItem) {
+        console.error("Store item not found:", itemId);
+        return;
+    }
 
     storeDetailImage.src = currentStoreItem.img;
     storeDetailTitle.textContent = currentStoreItem.title;
     storeDetailDescription.textContent = currentStoreItem.description;
-    currentStoreQuantity = 1;
+    currentStoreQuantity = 1; // إعادة تعيين الكمية عند فتح المودال
     updateStoreDetailCost();
     showModal(storeDetailModal);
 }
 
 function updateStoreDetailCost() {
+    if (!currentStoreItem) return;
     const cost = currentStoreItem.cost * currentStoreQuantity;
     const currencySymbol = currentStoreItem.currency === 'dollars' ? '$' : '';
     storeDetailTotalCost.textContent = `${currencySymbol}${cost.toLocaleString()}`;
@@ -739,7 +794,7 @@ function confirmPurchase() {
         hideModal(storeDetailModal);
         updateUI();
         savePlayerData();
-        saveInventory();
+        saveInventory(); // تأكد من حفظ المخزون بعد الشراء
     } else {
         showToast('موارد غير كافية للشراء.', 'error');
     }
@@ -782,7 +837,7 @@ function selectRandomChallengePlayer() {
                         <h4 class="text-lg font-semibold text-white">${player.name}</h4>
                         <p class="text-sm text-gray-300">القوة: <span class="font-bold text-red-400">${player.totalPower.toLocaleString()}</span></p>
                     </div>
-                    <button data-player-uid="${player.uid}" class="attack-button bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200 ease-in-out">
+                    <button data-player-uid="${player.uid}" data-player-name="${player.name}" data-player-power="${player.totalPower}" class="attack-button bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200 ease-in-out">
                         هجوم
                     </button>
                 `;
@@ -898,6 +953,11 @@ function fetchAllPlayers() {
                     isOnline: player.isOnline,
                     lastOnline: player.lastOnline || 0
                 };
+                // فلترة اللاعبين غير المتصلين ذوي القوة الأقل من 3000
+                if (!player.isOnline && player.totalPower < 3000) {
+                    continue; // تخطي هذا اللاعب من قائمة جميع اللاعبين
+                }
+
                 if (player.isOnline) {
                     onlinePlayers.push(playerInfo);
                 } else {
@@ -955,39 +1015,53 @@ function redeemCode() {
         return;
     }
 
-    const codeData = REDEEM_CODES[code];
-    if (!codeData) {
-        redeemStatusMessage.textContent = 'رمز غير صالح.';
-        redeemStatusMessage.className = 'redeem-status error';
-        return;
-    }
+    // جلب بيانات الرمز من Firebase
+    get(ref(database, 'redeemCodes/' + code)).then(snapshot => {
+        let codeData = snapshot.val();
 
-    if (codeData.usedBy.includes(userId)) {
-        redeemStatusMessage.textContent = 'لقد استخدمت هذا الرمز بالفعل.';
-        redeemStatusMessage.className = 'redeem-status error';
-        return;
-    }
-
-    dollars += codeData.dollars || 0;
-    points += codeData.points || 0;
-    totalPower += codeData.power || 0;
-
-    codeData.usedBy.push(userId); // تسجيل المستخدم الذي استخدم الرمز
-    update(ref(database, 'redeemCodes/' + code), codeData) // تحديث الرمز في Firebase
-        .then(() => {
-            redeemStatusMessage.textContent = 'تم تفعيل الرمز بنجاح!';
-            redeemStatusMessage.className = 'redeem-status success';
-            showToast('تم تفعيل الرمز بنجاح!', 'success');
-            updateUI();
-            savePlayerData();
-        })
-        .catch(error => {
-            console.error("Error updating redeem code usage: ", error);
-            redeemStatusMessage.textContent = 'حدث خطأ أثناء تفعيل الرمز.';
+        if (!codeData) {
+            redeemStatusMessage.textContent = 'رمز غير صالح.';
             redeemStatusMessage.className = 'redeem-status error';
-            showToast('حدث خطأ أثناء تفعيل الرمز.', 'error');
-        });
+            return;
+        }
+
+        // التأكد من أن usedBy هو مصفوفة
+        if (!codeData.usedBy || !Array.isArray(codeData.usedBy)) {
+            codeData.usedBy = [];
+        }
+
+        if (codeData.usedBy.includes(userId)) {
+            redeemStatusMessage.textContent = 'لقد استخدمت هذا الرمز بالفعل.';
+            redeemStatusMessage.className = 'redeem-status error';
+            return;
+        }
+
+        dollars += codeData.dollars || 0;
+        points += codeData.points || 0;
+        totalPower += codeData.power || 0;
+
+        codeData.usedBy.push(userId); // تسجيل المستخدم الذي استخدم الرمز
+        set(ref(database, 'redeemCodes/' + code), codeData) // تحديث الرمز في Firebase
+            .then(() => {
+                redeemStatusMessage.textContent = 'تم تفعيل الرمز بنجاح!';
+                redeemStatusMessage.className = 'redeem-status success';
+                showToast('تم تفعيل الرمز بنجاح!', 'success');
+                updateUI();
+                savePlayerData();
+            })
+            .catch(error => {
+                console.error("Error updating redeem code usage: ", error);
+                redeemStatusMessage.textContent = 'حدث خطأ أثناء تفعيل الرمز.';
+                redeemStatusMessage.className = 'redeem-status error';
+                showToast('حدث خطأ أثناء تفعيل الرمز.', 'error');
+            });
+    }).catch(error => {
+        console.error("Error fetching redeem code: ", error);
+        redeemStatusMessage.textContent = 'حدث خطأ في جلب بيانات الرمز.';
+        redeemStatusMessage.className = 'redeem-status error';
+    });
 }
+
 
 // وظائف Inventory Modal
 function renderInventoryItems() {
@@ -1010,14 +1084,21 @@ function renderInventoryItems() {
 
 function useInventoryItem(itemId) {
     const itemIndex = inventory.findIndex(item => item.id === itemId);
-    if (itemIndex === -1) return;
+    if (itemIndex === -1) {
+        showToast('العنصر غير موجود في حقيبتك.', 'error');
+        return;
+    }
 
     const item = inventory[itemIndex];
 
+    // منطق استخدام العناصر
     if (itemId === 'reduce-time') {
-        // تقليل وقت الابتكار
-        innovationTimerRemaining = Math.max(0, innovationTimerRemaining - 60); // مثال: تقليل دقيقة
-        showToast('تم تقليل وقت الابتكار!', 'info');
+        // تقليل وقت الابتكار (يفترض وجود مؤقت ابتكار)
+        // إذا كان لديك مؤقت ابتكار، قم بتعديله هنا
+        // innovationTimerRemaining = Math.max(0, innovationTimerRemaining - 60); // مثال: تقليل دقيقة
+        showToast('تم تقليل وقت الابتكار (إذا كان المؤقت نشطًا)!', 'info');
+    } else if (itemId === 'some-other-item') {
+        // منطق لعناصر أخرى
     }
     // أضف المزيد من منطق استخدام العناصر هنا
 
@@ -1044,11 +1125,35 @@ function showAuthFlowModal(title, message) {
 function handleSetNameConfirm() {
     const newName = playerNameInput.value.trim();
     if (newName && newName.length >= 3 && newName.length <= 15) {
+        const oldPlayerName = playerName;
         playerName = newName;
-        isNameSetPermanently = true; // يعتبر الاسم مؤكداً إذا تم تعيينه هنا
-        lastPlayerNameChangeTimestamp = Date.now();
-        nameChangeCount++; // زيادة عدد مرات تغيير الاسم
-        showToast(`تم تعيين اسمك إلى ${playerName}.`, 'success');
+
+        const now = Date.now();
+        const timeSinceLastChange = now - lastPlayerNameChangeTimestamp;
+
+        if (isNameSetPermanently && nameChangeCount >= MAX_NAME_CHANGES) {
+            showToast('لقد وصلت إلى الحد الأقصى لتغيير الاسم.', 'error');
+            return;
+        }
+
+        if (isNameSetPermanently && (now - lastPlayerNameChangeTimestamp < NAME_CHANGE_COOLDOWN_DURATION)) {
+            const remainingTimeMs = NAME_CHANGE_COOLDOWN_DURATION - (now - lastPlayerNameChangeTimestamp);
+            const remainingDays = Math.ceil(remainingTimeMs / (1000 * 60 * 60 * 24));
+            showToast(`لا يمكنك تغيير اسمك إلا بعد مرور ${remainingDays} يوم(أيام) أخرى.`, 'error');
+            return;
+        }
+
+        if (playerName !== oldPlayerName) {
+            if (isNameSetPermanently) { // إذا كان الاسم قد تم تعيينه مسبقًا (ليس أول مرة)
+                nameChangeCount++;
+            }
+            isNameSetPermanently = true;
+            lastPlayerNameChangeTimestamp = Date.now();
+            showToast(`تم تعيين اسمك إلى ${playerName}.`, 'success');
+        } else {
+            showToast('لم يتغير الاسم.', 'info');
+        }
+
         hideModal(authFlowModal);
         updateUI();
         savePlayerData();
@@ -1056,6 +1161,7 @@ function handleSetNameConfirm() {
         showToast('اسم غير صالح. يجب أن يكون بين 3 و 15 حرفاً.', 'error');
     }
 }
+
 
 function handleContinueGuest() {
     isNameSetPermanently = false; // التأكد من أنه ضيف
@@ -1082,9 +1188,9 @@ function handleEmailSignup() {
             nameChangeCount++; // زيادة عدد مرات تغيير الاسم
             showToast('تم إنشاء الحساب وتسجيل الدخول بنجاح!', 'success');
             hideModal(authFlowModal);
-            updateUI();
-            savePlayerData(); // حفظ البيانات الآن تحت المستخدم الجديد
-            loadHouses(); // تحميل البيوت للمستخدم الجديد
+            // إعادة تحميل جميع البيانات للمستخدم الجديد المسجل
+            loadPlayerData();
+            loadHouses();
             loadGlobalAttacks();
             loadInventory();
             listenForPlayerUpdates();
@@ -1114,9 +1220,9 @@ function handleEmailSignin() {
             isNameSetPermanently = true; // الاسم يعتبر دائم الآن
             showToast('تم تسجيل الدخول بنجاح!', 'success');
             hideModal(authFlowModal);
-            updateUI();
-            savePlayerData(); // حفظ البيانات الآن تحت المستخدم الجديد
-            loadHouses(); // تحميل البيوت للمستخدم الجديد
+            // إعادة تحميل جميع البيانات للمستخدم الذي سجل الدخول
+            loadPlayerData();
+            loadHouses();
             loadGlobalAttacks();
             loadInventory();
             listenForPlayerUpdates();
@@ -1180,13 +1286,17 @@ innovationNextButton.addEventListener('click', () => {
 
 innovationButton.addEventListener('click', activateInnovation);
 gameInfoIcon.addEventListener('click', () => {
-    houseInfoModal.querySelector('div:first-of-type').classList.remove('scale-100', 'opacity-100'); // Reset animation
-    houseInfoModal.classList.remove('visible'); // Hide first to reset
+    // إعادة تعيين حالة المودال قبل إظهاره لضمان عمل الانتقال
+    const innerContent = houseInfoModal.querySelector('div:first-of-type > div:first-of-type');
+    if (innerContent) {
+        innerContent.classList.remove('scale-100', 'opacity-100');
+    }
+    houseInfoModal.classList.remove('visible');
     
     houseUpgradeRewardsList.innerHTML = '';
+    const currentHouse = houses[currentHouseIndex]; // تأكد من استخدام البيت الحالي
     HOUSE_UPGRADE_REWARDS.forEach(reward => {
         const li = document.createElement('li');
-        const currentHouse = houses[currentHouseIndex];
         const isRewarded = currentHouse.rewardedThresholds.includes(reward.threshold);
         li.className = `mb-1 ${isRewarded ? 'text-green-400 line-through' : 'text-gray-200'}`;
         li.innerHTML = `وصول قوة البيت إلى ${reward.threshold.toLocaleString()}: +$${reward.dollars.toLocaleString()}، +${reward.points.toLocaleString()} نقطة`;
@@ -1220,9 +1330,8 @@ challengePlayersList.addEventListener('click', (event) => {
     const attackBtn = event.target.closest('.attack-button');
     if (attackBtn) {
         const opponentUid = attackBtn.dataset.playerUid;
-        const opponentCard = attackBtn.closest('.player-card');
-        const opponentName = opponentCard.querySelector('h4').textContent.split('(')[0].trim(); // استخراج الاسم فقط
-        const opponentPower = parseInt(opponentCard.querySelector('.font-bold.text-red-400').textContent.replace(/,/g, ''));
+        const opponentName = attackBtn.dataset.playerName; // استخدام dataset مباشرة
+        const opponentPower = parseInt(attackBtn.dataset.playerPower); // استخدام dataset مباشرة
         
         handleAttack(opponentUid, opponentName, opponentPower);
     }
@@ -1252,7 +1361,7 @@ inventoryItemsList.addEventListener('click', (event) => {
 });
 
 // أحداث Auth Flow Modal
-setNameConfirmButton.addEventListener('click', handleSetNameConfirm);
+setNameConfirmButtonAuth.addEventListener('click', handleSetNameConfirm); // استخدام الاسم الجديد
 setNameContinueGuestButton.addEventListener('click', handleContinueGuest);
 showEmailAuthButton.addEventListener('click', () => {
     setNameSection.classList.add('hidden');
@@ -1274,4 +1383,3 @@ authFlowCancelButton.addEventListener('click', () => hideModal(authFlowModal));
 setInterval(() => {
     updateOnlineStatus(true);
 }, 60 * 1000); // كل دقيقة
-
