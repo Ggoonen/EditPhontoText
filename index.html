@@ -16,6 +16,10 @@
             flex-direction: column;
             min-height: 10vh;
             overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
         body::-webkit-scrollbar {
             display: none;
@@ -849,6 +853,59 @@
             font-size: 0.9rem;
             color: #a0aec0;
         }
+        .attack-player-item {
+            background-color: #21262d;
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid #30363d;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .attack-player-item .player-info {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+            flex-grow: 1;
+        }
+        .attack-player-item .player-info h3 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #e2e8f0;
+        }
+        .attack-player-item .player-info p {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        .attack-player-item .player-info p i {
+            font-size: 1rem;
+        }
+        .attack-player-item .attack-btn-wrapper {
+            margin-left: 15px;
+            flex-shrink: 0;
+        }
+        .attack-player-btn {
+            @apply px-4 py-2 rounded-full font-bold text-sm transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg;
+            background: linear-gradient(to bottom, #3b82f6, #2563eb);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+            min-width: 80px;
+            text-align: center;
+        }
+        .attack-player-btn:disabled {
+            background: linear-gradient(to bottom, #6b7280, #4b5563);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
     </style>
 </head>
 <body class="bg-gray-900 min-h-screen flex flex-col">
@@ -939,7 +996,7 @@
                 <div class="ship-item-card">
                     <div class="icon-container">
                         <i class="fas fa-ship"></i>
-                        <img id="ship1IconImg" src="" alt="Image of Ship Icon" class="w-full h-full object-contain" style="display: none;">
+                        <img id="ship1IconImg" src="" alt="Image of Ship Icon" class="w-full h-full object-contain" style="display: none;" draggable="false">
                     </div>
                     <div class="info-container">
                         <h3>السفينة الأساسية</h3>
@@ -958,7 +1015,7 @@
                 <div id="ship2Container" class="ship-item-card opacity-50 pointer-events-none">
                     <div class="icon-container">
                         <i class="fas fa-ship text-gray-500"></i>
-                        <img id="ship2IconImg" src="" alt="Image of Ship Icon" style="display: none;">
+                        <img id="ship2IconImg" src="" alt="Image of Ship Icon" style="display: none;" draggable="false">
                     </div>
                     <div class="info-container">
                         <h3 class="text-gray-400">السفينة الثانية</h3>
@@ -977,7 +1034,7 @@
                 <div id="ship3Container" class="ship-item-card opacity-50 pointer-events-none">
                     <div class="icon-container">
                         <i class="fas fa-ship text-gray-500"></i>
-                        <img id="ship3IconImg" src="" alt="Image of Ship Icon" style="display: none;">
+                        <img id="ship3IconImg" src="" alt="Image of Ship Icon" style="display: none;" draggable="false">
                     </div>
                     <div class="info-container">
                         <h3 class="text-gray-400">السفينة الثالثة</h3>
@@ -1117,17 +1174,9 @@
                 <i class="fas fa-arrow-right text-3xl"></i>
             </button>
             <h2 class="text-3xl font-bold text-center mb-6 text-gray-100">الهجوم</h2>
-            <div class="flex flex-col items-center justify-center space-y-4">
-                <div class="bg-gray-800 p-4 rounded-xl w-full text-center">
-                    <h3 class="text-xl font-bold mb-2">خصمك الحالي:</h3>
-                    <p id="attackOpponentName" class="text-yellow-300 text-2xl font-semibold">جارٍ البحث عن خصم...</p>
-                    <p id="attackOpponentPower" class="text-gray-400 text-lg"></p>
-                </div>
-                <button id="attackBtn" class="btn btn-primary w-full max-w-xs" disabled>هجوم</button>
-                <button id="nextOpponentBtn" class="btn btn-secondary w-full max-w-xs">خصم عشوائي آخر</button>
-                <p id="attackCooldownDisplay" class="text-sm text-gray-400 mt-2">جاهز للهجوم!</p>
-                <p class="text-center text-sm text-gray-500 mt-4">الفوز يمنحك 200-800 دولار وفرصة 15% للحصول على مفتاح. الخسارة لا تكلفك شيئاً.</p>
+            <div id="attackablePlayersList" class="space-y-3">
             </div>
+            <p class="text-center text-sm text-gray-500 mt-4">الفوز يمنحك 200-800 دولار وفرصة 15% للحصول على مفتاح. الخسارة لا تكلفك شيئاً.</p>
         </section>
 
         <section id="onlinePlayersSection" class="hidden p-6 rounded-xl shadow-xl w-full max-w-2xl text-gray-100 section-container">
@@ -1237,6 +1286,7 @@
 
         const INITIAL_SHIP_MAX_POWER = 10000;
         const UPGRADE_COOLDOWN_MS = 3 * 60 * 1000;
+        const ATTACK_COOLDOWN_PER_OPPONENT_MS = 7 * 60 * 1000;
 
         let ship1 = { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
         let ship2 = { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
@@ -1296,8 +1346,7 @@
         let animationFrameId;
         let lastFrameTime = 0;
 
-        let currentOpponent = null;
-        let attackCooldownEndTime = 0;
+        let attackCooldowns = {}; 
 
         let playerPowerEl;
         let playerMoneyEl;
@@ -1394,11 +1443,7 @@
         let onlinePlayersListEl;
         let offlinePlayersListEl;
         let challengeLogListEl;
-        let attackCooldownDisplayEl;
-        let attackOpponentNameEl;
-        let attackOpponentPowerEl;
-        let attackBtnEl;
-        let nextOpponentBtnEl;
+        let attackablePlayersListEl;
 
         const shipFormsData = [
             { levelRange: '1 - 1000', iconType: 'font-awesome', iconClass: 'fas fa-ship', imgSrc: '' },
@@ -1440,7 +1485,7 @@
                     ship1 = data.ship1 || { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
                     ship2 = data.ship2 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
                     ship3 = data.ship3 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
-                    attackCooldownEndTime = data.attackCooldownEndTime || 0; 
+                    attackCooldowns = data.attackCooldowns || {}; 
                     rouletteCooldownEndTime = data.rouletteCooldownEndTime || 0;
 
                     if (typeof ship1.maxPower === 'undefined') ship1.maxPower = INITIAL_SHIP_MAX_POWER;
@@ -1452,8 +1497,7 @@
                     updateResourceCircle();
                     updateResourceButtonState();
                     updateRouletteCooldownUI();
-                    updateAttackCooldownUI();
-
+                    
                     if (fleetName && fleetName !== "أسطولي العظيم") {
                         showSection('mainMenu');
                     }
@@ -1476,7 +1520,7 @@
                     ship1: ship1,
                     ship2: ship2,
                     ship3: ship3,
-                    attackCooldownEndTime: attackCooldownEndTime,
+                    attackCooldowns: attackCooldowns, 
                     rouletteCooldownEndTime: rouletteCooldownEndTime
                 };
                 localStorage.setItem('playerData', JSON.stringify(dataToStore));
@@ -1565,7 +1609,7 @@
                     ship1 = data.ship1 || { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
                     ship2 = data.ship2 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
                     ship3 = data.ship3 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
-                    attackCooldownEndTime = data.attackCooldownEndTime || 0; 
+                    attackCooldowns = data.attackCooldowns || {}; 
                     rouletteCooldownEndTime = data.rouletteCooldownEndTime || 0;
 
                     if (typeof ship1.maxPower === 'undefined') ship1.maxPower = INITIAL_SHIP_MAX_POWER;
@@ -1583,7 +1627,7 @@
                         ship1: ship1,
                         ship2: ship2,
                         ship3: ship3,
-                        attackCooldownEndTime: 0,
+                        attackCooldowns: {},
                         rouletteCooldownEndTime: 0
                     });
                     playerMoney = 100;
@@ -1595,7 +1639,6 @@
                 updateResourceCircle();
                 updateResourceButtonState();
                 updateRouletteCooldownUI();
-                updateAttackCooldownUI();
                 saveDataToLocalStorage();
 
                 if (fleetName === null || fleetName === "أسطولي العظيم") {
@@ -1623,7 +1666,7 @@
                     ship1: ship1,
                     ship2: ship2,
                     ship3: ship3,
-                    attackCooldownEndTime: attackCooldownEndTime,
+                    attackCooldowns: attackCooldowns, 
                     rouletteCooldownEndTime: rouletteCooldownEndTime
                 });
                 saveDataToLocalStorage();
@@ -1665,6 +1708,9 @@
                     }
                 }
                 updateOnlinePlayersUI(allPlayers);
+                if (document.getElementById('attackSection').classList.contains('animate-fade-in-up')) {
+                    renderAttackablePlayers(allPlayers);
+                }
             }, (error) => {
             });
 
@@ -1730,10 +1776,10 @@
                     li.innerHTML = `
                         <span class="font-bold text-green-400">${player.fleetName}</span>
                         <span class="text-sm text-gray-300 ml-2">
-                            <i class="fas fa-fist-raised text-red-500 ml-1"></i>${formatNumber(strongestPower)}
+                            <i class="fas fa-fist-raised text-red-500 ml-1"></i> ${formatNumber(strongestPower)}
                         </span>
                         <span class="text-sm text-gray-300 ml-2">
-                            <i class="fas fa-ship text-blue-400 ml-1"></i>${unlockedShipsCount}
+                            <i class="fas fa-ship text-blue-400 ml-1"></i> ${unlockedShipsCount}
                         </span>
                     `;
                     onlinePlayersListEl.appendChild(li);
@@ -1751,10 +1797,10 @@
                     li.innerHTML = `
                         <span class="font-bold text-gray-400">${player.fleetName}</span>
                         <span class="text-sm text-gray-500 ml-2">
-                            <i class="fas fa-fist-raised text-red-500 ml-1"></i>${formatNumber(strongestPower)}
+                            <i class="fas fa-fist-raised text-red-500 ml-1"></i> ${formatNumber(strongestPower)}
                         </span>
                         <span class="text-sm text-gray-500 ml-2">
-                            <i class="fas fa-ship text-blue-400 ml-1"></i>${unlockedShipsCount}
+                            <i class="fas fa-ship text-blue-400 ml-1"></i> ${unlockedShipsCount}
                         </span>
                     `;
                     offlinePlayersListEl.appendChild(li);
@@ -1816,56 +1862,62 @@
             });
         }
 
-        async function selectRandomOpponent() {
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أو الانتظار حتى يتم تحميل بيانات المستخدم.");
+        function renderAttackablePlayers(allPlayers) {
+            if (!attackablePlayersListEl || !userId) return;
+
+            attackablePlayersListEl.innerHTML = '';
+            const otherPlayers = allPlayers.filter(p => p.userId !== userId);
+
+            if (otherPlayers.length === 0) {
+                attackablePlayersListEl.innerHTML = '<p class="text-center text-gray-400">لا يوجد لاعبون آخرون للهجوم عليهم حالياً.</p>';
                 return;
             }
 
-            try {
-                const playersRef = ref(db, `artifacts/${appId}/public/onlinePlayers`);
-                const snapshot = await get(playersRef);
-                const data = snapshot.val();
-                const allPlayers = [];
-                if (data) {
-                    for (const key in data) {
-                        const playerData = data[key];
-                        if (playerData.userId !== userId) {
-                            allPlayers.push(playerData);
-                        }
-                    }
-                }
+            otherPlayers.forEach(opponent => {
+                const li = document.createElement('div');
+                li.className = 'attack-player-item';
 
-                if (allPlayers.length === 0) {
-                    window.showMessage("لا يوجد لاعبون آخرون للهجوم عليهم حالياً.");
-                    attackOpponentNameEl.textContent = 'لا يوجد خصم';
-                    attackOpponentPowerEl.textContent = '';
-                    attackBtnEl.disabled = true;
-                    return;
-                }
+                const strongestPower = Math.max(opponent.ship1Power || 0, opponent.ship2Power || 0, opponent.ship3Power || 0);
+                const unlockedShipsCount = (opponent.ship2Unlocked ? 1 : 0) + (opponent.ship3Unlocked ? 1 : 0) + 1;
 
-                const randomIndex = Math.floor(Math.random() * allPlayers.length);
-                currentOpponent = allPlayers[randomIndex];
-                attackOpponentNameEl.textContent = currentOpponent.fleetName;
-                attackOpponentPowerEl.textContent = `القوة: ${formatNumber(currentOpponent.power)}`;
-                attackBtnEl.disabled = false;
-            } catch (error) {
-                window.showMessage("حدث خطأ أثناء اختيار خصم. يرجى المحاولة لاحقاً.");
-            }
+                const cooldownRemaining = (attackCooldowns[opponent.userId] || 0) - Date.now();
+                const isOnCooldown = cooldownRemaining > 0;
+                const buttonText = isOnCooldown ? formatTime(cooldownRemaining) : 'هجوم';
+                const buttonDisabled = isOnCooldown ? 'disabled' : '';
+
+                li.innerHTML = `
+                    <div class="player-info">
+                        <h3>${opponent.fleetName}</h3>
+                        <p>
+                            <i class="fas fa-fist-raised text-red-500"></i> ${formatNumber(strongestPower)}
+                            <i class="fas fa-ship text-blue-400"></i> ${unlockedShipsCount}
+                        </p>
+                    </div>
+                    <div class="attack-btn-wrapper">
+                        <button class="attack-player-btn" data-opponent-id="${opponent.userId}" ${buttonDisabled}>
+                            ${buttonText}
+                        </button>
+                    </div>
+                `;
+                attackablePlayersListEl.appendChild(li);
+
+                const attackButton = li.querySelector('.attack-player-btn');
+                attackButton.addEventListener('click', () => performAttack(opponent));
+            });
         }
 
-        async function performAttack() {
-            if (!currentOpponent) {
+        async function performAttack(opponent) {
+            if (!opponent) {
                 window.showMessage("الرجاء اختيار خصم أولاً.");
                 return;
             }
-            if (Date.now() < attackCooldownEndTime) {
-                window.showMessage(`لا يمكنك الهجوم الآن. يرجى الانتظار ${formatTime(attackCooldownEndTime - Date.now())}.`);
+            if ((attackCooldowns[opponent.userId] || 0) > Date.now()) {
+                window.showMessage(`لا يمكنك مهاجمة ${opponent.fleetName} الآن. يرجى الانتظار ${formatTime(attackCooldowns[opponent.userId] - Date.now())}.`);
                 return;
             }
 
             let win = false;
-            if (playerPower > currentOpponent.power) {
+            if (playerPower > opponent.power) {
                 win = Math.random() < 0.6; 
             } else {
                 win = Math.random() < 0.4; 
@@ -1891,6 +1943,8 @@
 
             window.showMessage(resultText);
             updatePlayerStats();
+
+            attackCooldowns[opponent.userId] = Date.now() + ATTACK_COOLDOWN_PER_OPPONENT_MS;
             await saveUserData();
 
             try {
@@ -1898,40 +1952,32 @@
                 await push(attackLogRef, {
                     attackerId: userId,
                     attackerFleetName: fleetName,
-                    defenderId: currentOpponent.userId,
-                    defenderFleetName: currentOpponent.fleetName,
+                    defenderId: opponent.userId,
+                    defenderFleetName: opponent.fleetName,
                     result: win ? 'win' : 'loss',
                     winnings: winnings,
                     timestamp: Date.now()
                 });
             } catch (error) {
             }
-
-            attackCooldownEndTime = Date.now() + (5 * 60 * 1000);
-            updateAttackCooldownUI();
-            attackBtnEl.disabled = true;
-            await saveUserData();
-            selectRandomOpponent();
         }
 
-        function updateAttackCooldownUI() {
-            if (!attackCooldownDisplayEl || !attackBtnEl) return;
+        function updateAttackCooldownsUI() {
+            if (document.getElementById('attackSection').classList.contains('animate-fade-in-up')) {
+                const attackButtons = attackablePlayersListEl.querySelectorAll('.attack-player-btn');
+                attackButtons.forEach(button => {
+                    const opponentId = button.dataset.opponentId;
+                    const cooldownRemaining = (attackCooldowns[opponentId] || 0) - Date.now();
+                    const isOnCooldown = cooldownRemaining > 0;
 
-            const currentTime = Date.now();
-            const remainingTime = attackCooldownEndTime - currentTime;
-
-            if (remainingTime > 0) {
-                attackCooldownDisplayEl.textContent = `الهجوم متاح بعد: ${formatTime(remainingTime)}`;
-                attackBtnEl.disabled = true;
-                attackBtnEl.textContent = 'في انتظار';
-                attackBtnEl.classList.remove('btn-primary');
-                attackBtnEl.classList.add('btn-secondary');
-            } else {
-                attackCooldownDisplayEl.textContent = 'جاهز للهجوم!';
-                attackBtnEl.disabled = false;
-                attackBtnEl.textContent = 'هجوم';
-                attackBtnEl.classList.remove('btn-secondary');
-                attackBtnEl.classList.add('btn-primary');
+                    if (isOnCooldown) {
+                        button.disabled = true;
+                        button.textContent = formatTime(cooldownRemaining);
+                    } else {
+                        button.disabled = false;
+                        button.textContent = 'هجوم';
+                    }
+                });
             }
         }
 
@@ -1946,7 +1992,7 @@
                 if (form.iconType === 'font-awesome') {
                     iconHtml = `<i class="${form.iconClass} text-blue-400"></i>`;
                 } else {
-                    iconHtml = `<img src="${form.imgSrc}" alt="Image of Ship Form" onerror="this.onerror=null;this.src='https://placehold.co/50x50/21262d/e2e8f0?text=Error';" />`;
+                    iconHtml = `<img src="${form.imgSrc}" alt="Image of Ship Form" onerror="this.onerror=null;this.src='https://placehold.co/50x50/21262d/e2e8f0?text=Error';" draggable="false" />`;
                 }
 
                 itemDiv.innerHTML = `
@@ -1981,6 +2027,9 @@
                 fleetStarIconEl.classList.add('hidden');
             }
             saveUserData();
+            if (userId) {
+                updateOnlineStatus(true); 
+            }
         }
 
         function formatTime(ms) {
@@ -2101,7 +2150,7 @@
                 ship === ship1 ? ship1PowerEl : (ship === ship2 ? ship2PowerEl : ship3PowerEl),
                 ship === ship1 ? ship1LevelEl : (ship === ship2 ? ship2LevelEl : ship3LevelEl),
                 ship === ship1 ? ship1ProgressEl : (ship === ship2 ? ship2ProgressEl : ship3ProgressEl),
-                ship === ship1 ? upgradeShip1Btn : (ship === ship2 ? upgradeShip2Btn : upgradeShip3Btn),
+                ship === ship1 ? upgradeShip1Btn : (ship === ship2 ? upgradeShip2Btn : upgrade3Btn),
                 ship === ship1 ? null : (ship === ship2 ? ship2Container : ship3Container),
                 ship === ship1 ? ship1CooldownDisplay : (ship === ship2 ? ship2CooldownDisplay : ship3CooldownDisplay),
                 ship === ship1 ? ship1MaxPowerEl : (ship === ship2 ? ship2MaxPowerEl : ship3MaxPowerEl),
@@ -2394,7 +2443,21 @@
                 populateShipFormsList();
             }
             if (sectionId === 'attackSection') {
-                selectRandomOpponent();
+                if (db) {
+                    const playersRef = ref(db, `artifacts/${appId}/public/onlinePlayers`);
+                    get(playersRef).then(snapshot => {
+                        const data = snapshot.val();
+                        const allPlayers = [];
+                        if (data) {
+                            for (const key in data) {
+                                allPlayers.push(data[key]);
+                            }
+                        }
+                        renderAttackablePlayers(allPlayers);
+                    }).catch(error => {
+                        window.showMessage("حدث خطأ أثناء تحميل قائمة اللاعبين للهجوم.");
+                    });
+                }
             }
         }
 
@@ -2574,8 +2637,6 @@
         function handleConfirmShipExpansionClick() { confirmShipExpansion(); }
         function handleStartGameClick() { startPlaneGame(); }
         function handleCashOutClick() { cashOut(); }
-        function handleSelectRandomOpponentClick() { selectRandomOpponent(); }
-        function handlePerformAttackClick() { performAttack(); }
 
         document.addEventListener('DOMContentLoaded', async () => {
             playerPowerEl = document.getElementById('playerPower');
@@ -2670,11 +2731,7 @@
             onlinePlayersListEl = document.getElementById('onlinePlayersList');
             offlinePlayersListEl = document.getElementById('offlinePlayersList');
             challengeLogListEl = document.getElementById('challengeLogList');
-            attackCooldownDisplayEl = document.getElementById('attackCooldownDisplay');
-            attackOpponentNameEl = document.getElementById('attackOpponentName');
-            attackOpponentPowerEl = document.getElementById('attackOpponentPower');
-            attackBtnEl = document.getElementById('attackBtn');
-            nextOpponentBtnEl = document.getElementById('nextOpponentBtn');
+            attackablePlayersListEl = document.getElementById('attackablePlayersList');
 
 
             upgradeShip1Btn.addEventListener('click', handleUpgradeShip1Click);
@@ -2686,8 +2743,6 @@
             document.getElementById('confirmShipExpansionBtn').addEventListener('click', handleConfirmShipExpansionClick); 
             startGameBtn.addEventListener('click', handleStartGameClick);
             cashOutBtn.addEventListener('click', handleCashOutClick);
-            attackBtnEl.addEventListener('click', handlePerformAttackClick); 
-            nextOpponentBtnEl.addEventListener('click', handleSelectRandomOpponentClick); 
 
             loginBtn.addEventListener('click', loginUser);
             registerBtn.addEventListener('click', registerUser);
@@ -2697,13 +2752,17 @@
             setInterval(autoAccumulateResources, RESOURCE_ACCUMULATION_INTERVAL_MS);
             setInterval(updateResourceButtonState, 1000); 
             setInterval(updateRouletteCooldownUI, 1000); 
-            setInterval(updateAttackCooldownUI, 1000); 
+            setInterval(updateAttackCooldownsUI, 1000); 
 
             const loadedFromLocal = loadDataFromLocalStorage();
             if (!loadedFromLocal) {
                 authModal.style.display = 'flex';
             }
             await initializeFirebase();
+
+            document.addEventListener('contextmenu', event => event.preventDefault());
+            document.addEventListener('dragstart', event => event.preventDefault());
+            document.addEventListener('selectstart', event => event.preventDefault());
         });
 
         window.addEventListener('beforeunload', async () => {
