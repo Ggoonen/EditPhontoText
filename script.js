@@ -1,23 +1,25 @@
+// استيراد وحدات Firebase الضرورية
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js';
 import { getDatabase, ref, set, get, onValue, update } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js';
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js';
 
-// تهيئة Firebase
+// تهيئة Firebase - تم استبدال القيم بقيم مشروعك السابقة
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY", // استبدل هذا بمفتاح API الخاص بك
-    authDomain: "YOUR_AUTH_DOMAIN", // استبدل هذا بنطاق المصادقة الخاص بك
-    databaseURL: "YOUR_DATABASE_URL", // استبدل هذا بعنوان URL لقاعدة البيانات الخاصة بك
-    projectId: "YOUR_PROJECT_ID", // استبدل هذا بمعرف المشروع الخاص بك
-    storageBucket: "YOUR_STORAGE_BUCKET", // استبدل هذا بسلة التخزين الخاصة بك
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID", // استبدل هذا بمعرف مرسل الرسائل الخاص بك
-    appId: "YOUR_APP_ID" // استبدل هذا بمعرف التطبيق الخاص بك
+    apiKey: "AIzaSyAgmDkMKcfMG3r_16t_6rcjZQJOUFVpVOo",
+    authDomain: "kingb7ar-935b8.firebaseapp.com",
+    databaseURL: "https://kingb7ar-935b8-default-rtdb.firebaseio.com",
+    projectId: "kingb7ar-935b8",
+    storageBucket: "kingb7ar-935b8.firebaseapp.com", // تم تصحيح هذا المسار
+    messagingSenderId: "157617641483",
+    appId: "1:157617641483:web:f8a0e51c1cd1bc4199cf0e"
 };
 
+// تهيئة تطبيق Firebase وقاعدة البيانات والمصادقة
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth(app);
 
-// المتغيرات العامة
+// المتغيرات العامة للعبة
 let userId = null;
 let playerName = "لاعب جديد";
 let dollars = 0;
@@ -29,34 +31,34 @@ let innovationPowerIncrease = 10;
 let accumulatedDollars = 0;
 let accumulatedPoints = 0;
 let accumulatedPower = 0;
-let lastCollectTime = 0; // Timestamp of last collection
-const COLLECT_COOLDOWN_DURATION = 1 * 60 * 1000; // 1 minute in milliseconds
-let collectCountdownInterval = null;
+let lastCollectTime = 0; // وقت آخر عملية جمع للموارد
+const COLLECT_COOLDOWN_DURATION = 1 * 60 * 1000; // مدة تهدئة جمع الموارد: دقيقة واحدة (بالمللي ثانية)
+let collectCountdownInterval = null; // معرف مؤقت العد التنازلي لجمع الموارد
 
-let isNameSetPermanently = false;
-let lastPlayerNameChangeTimestamp = 0;
-const NAME_CHANGE_COOLDOWN_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
-let nameChangeCount = 0; // New: Track name changes
-const MAX_NAME_CHANGES = 3; // New: Max allowed name changes
+let isNameSetPermanently = false; // هل تم تعيين الاسم بشكل دائم (عبر تسجيل الدخول مثلاً)
+let lastPlayerNameChangeTimestamp = 0; // وقت آخر تغيير للاسم
+const NAME_CHANGE_COOLDOWN_DURATION = 30 * 24 * 60 * 60 * 1000; // مدة تهدئة تغيير الاسم: 30 يوماً (بالمللي ثانية)
+let nameChangeCount = 0; // عدد مرات تغيير الاسم
+const MAX_NAME_CHANGES = 3; // الحد الأقصى لعدد مرات تغيير الاسم
 
-let activeHouseIndex = 0; // Index of the currently active house
-let houses = [
-    { id: 1, power: 1, unlocked: true, threshold: 25000, rewardedThresholds: [] }, // Max power for this house to unlock next
+let activeHouseIndex = 0; // فهرس البيت النشط حالياً
+let houses = [ // تعريف البيوت الأربعة
+    { id: 1, power: 1, unlocked: true, threshold: 25000, rewardedThresholds: [] }, // البيت الأول مفتوح دائماً، يتطلب 25000 لفتح التالي
     { id: 2, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] },
     { id: 3, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] },
     { id: 4, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] }
 ];
 
-let challengeState = 'ATTACK_READY'; // 'ATTACK_READY', 'COOLDOWN'
-let currentChallengePlayer = null;
-let challengeTimerRemaining = 0; // in seconds
-let challengeTimerInterval = null;
-let challengeLog = []; // { opponentName, result (win/lose), playerPower, opponentPower }
+let challengeState = 'ATTACK_READY'; // حالة نظام التحدي: 'ATTACK_READY' (جاهز للهجوم)، 'COOLDOWN' (في فترة تهدئة)
+let currentChallengePlayer = null; // اللاعب المستهدف في التحدي الحالي
+let challengeTimerRemaining = 0; // الوقت المتبقي في مؤقت التحدي (بالثواني)
+let challengeTimerInterval = null; // معرف مؤقت التحدي
+let challengeLog = []; // سجل التحديات: { opponentName, result (win/lose), playerPower, opponentPower }
 
-let notifications = []; // { message, type (success, error, info), timestamp }
-const MAX_NOTIFICATIONS = 5;
+let notifications = []; // قائمة الإشعارات: { message, type (success, error, info), timestamp }
+const MAX_NOTIFICATIONS = 5; // الحد الأقصى لعدد الإشعارات المعروضة
 
-// العناصر من DOM
+// الحصول على عناصر DOM (واجهة المستخدم)
 const loadingOverlay = document.getElementById('loading-overlay');
 const appDiv = document.getElementById('app');
 
@@ -111,7 +113,7 @@ const messageModalOkButton = document.getElementById('message-modal-ok');
 
 const notificationsList = document.getElementById('notifications-list');
 
-// عناصر التنقل (views)
+// عناصر التنقل (Views)
 const navDashboard = document.getElementById('nav-dashboard');
 const navInnovation = document.getElementById('nav-innovation');
 const navChallenge = document.getElementById('nav-challenge');
@@ -130,49 +132,54 @@ const allPlayersView = document.getElementById('all-players-view');
 const rankingList = document.getElementById('ranking-list');
 const allPlayersList = document.getElementById('all-players-list');
 
-// وظائف عامة
+// وظائف عامة للتحكم في واجهة المستخدم
 function showView(viewId) {
+    // إخفاء جميع العروض
     document.querySelectorAll('.view').forEach(view => {
         view.classList.add('hidden');
         view.classList.remove('active');
     });
+    // إظهار العرض المطلوب
     const activeView = document.getElementById(viewId);
     if (activeView) {
         activeView.classList.remove('hidden');
         activeView.classList.add('active');
-        // تحديثات خاصة لكل عرض
+        // تحديثات خاصة لكل عرض عند إظهاره
         if (viewId === 'ranking-view') {
             fetchRanking();
         } else if (viewId === 'all-players-view') {
             fetchAllPlayers();
         } else if (viewId === 'challenge-view') {
-            startChallengeFlow(); // Start or resume challenge flow when entering view
+            startChallengeFlow(); // بدء أو استئناف تدفق التحدي عند الدخول للعرض
         }
     }
     sidebar.classList.remove('open'); // إغلاق الشريط الجانبي بعد اختيار العرض
 }
 
+// عرض رسالة في نافذة منبثقة (مودال)
 function showMessageModal(title, message, type = 'info') {
     messageModalTitle.textContent = title;
     messageModalBody.textContent = message;
-    // يمكنك إضافة تنسيقات بناءً على النوع (type) هنا
+    // يمكنك إضافة تنسيقات بناءً على النوع (type) هنا (مثلاً، تغيير لون الحدود)
     messageModal.classList.remove('hidden');
 }
 
+// إضافة إشعار جديد
 function addNotification(message, type = 'info') {
     const timestamp = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-    notifications.unshift({ message, type, timestamp }); // Add to the beginning
+    notifications.unshift({ message, type, timestamp }); // إضافة الإشعار في بداية القائمة (الأحدث أولاً)
 
-    // Keep only the latest MAX_NOTIFICATIONS
+    // الاحتفاظ بآخر عدد محدد من الإشعارات فقط
     if (notifications.length > MAX_NOTIFICATIONS) {
         notifications = notifications.slice(0, MAX_NOTIFICATIONS);
     }
-    renderNotifications();
-    saveNotifications(); // Save to Firebase
+    renderNotifications(); // إعادة رسم الإشعارات
+    saveNotifications(); // حفظ الإشعارات في Firebase
 }
 
+// عرض الإشعارات في واجهة المستخدم
 function renderNotifications() {
-    notificationsList.innerHTML = '';
+    notificationsList.innerHTML = ''; // مسح القائمة الحالية
     if (notifications.length === 0) {
         notificationsList.innerHTML = '<p class="text-gray-400">لا توجد إشعارات حالياً.</p>';
         return;
@@ -193,6 +200,7 @@ function renderNotifications() {
     });
 }
 
+// تحديث جميع عناصر واجهة المستخدم بالقيم الحالية للمتغيرات
 function updateUI() {
     playerNameDisplay.textContent = playerName;
     playerDollarsDisplay.textContent = dollars.toLocaleString();
@@ -206,48 +214,51 @@ function updateUI() {
     currentInnovationPowerDisplay.textContent = innovationLevel.toLocaleString();
     innovationCostDisplay.textContent = innovationCost.toLocaleString();
     currentHousePowerDisplay.textContent = houses[activeHouseIndex].power.toLocaleString();
-    updateNextHouseInfo();
+    updateNextHouseInfo(); // تحديث معلومات البيت التالي
 
     accumulatedDollarsDisplay.textContent = `$${Math.floor(accumulatedDollars).toLocaleString()}`;
     accumulatedPointsDisplay.textContent = Math.floor(accumulatedPoints).toLocaleString();
     accumulatedPowerDisplay.textContent = Math.floor(accumulatedPower).toLocaleString();
 
-    updateCollectButtonState();
-    renderHousesProgress();
-    renderNotifications(); // Render notifications on UI update
+    updateCollectButtonState(); // تحديث حالة زر جمع الموارد
+    renderHousesProgress(); // إعادة رسم تقدم البيوت
+    renderNotifications(); // إعادة رسم الإشعارات
 }
 
+// تحديث حالة زر جمع الموارد (نشط/معطل بناءً على المؤقت)
 function updateCollectButtonState() {
     const now = Date.now();
     if (now - lastCollectTime < COLLECT_COOLDOWN_DURATION) {
         collectDollarsButton.disabled = true;
         collectDollarsButton.classList.add('opacity-50', 'cursor-not-allowed');
         collectTimerDisplay.style.display = 'block';
-        startCollectCountdown();
+        startCollectCountdown(); // بدء العد التنازلي إذا كان الزر معطلاً
     } else {
         collectDollarsButton.disabled = false;
         collectDollarsButton.classList.remove('opacity-50', 'cursor-not-allowed');
         collectTimerDisplay.style.display = 'none';
-        stopCollectCountdown();
+        stopCollectCountdown(); // إيقاف العد التنازلي إذا كان الزر نشطاً
     }
 }
 
+// بدء العد التنازلي لزر جمع الموارد
 function startCollectCountdown() {
-    if (collectCountdownInterval) clearInterval(collectCountdownInterval);
+    if (collectCountdownInterval) clearInterval(collectCountdownInterval); // مسح أي مؤقت سابق
     collectCountdownInterval = setInterval(() => {
         const now = Date.now();
         const timeLeftMs = COLLECT_COOLDOWN_DURATION - (now - lastCollectTime);
         if (timeLeftMs <= 0) {
-            clearInterval(collectCountdownInterval);
-            updateCollectButtonState();
+            clearInterval(collectCountdownInterval); // إيقاف المؤقت عند الانتهاء
+            updateCollectButtonState(); // تحديث حالة الزر
             return;
         }
         const minutes = Math.floor(timeLeftMs / (1000 * 60));
         const seconds = Math.floor((timeLeftMs % (1000 * 60)) / 1000);
         collectCountdownDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }, 1000);
+    }, 1000); // تحديث كل ثانية
 }
 
+// إيقاف العد التنازلي لزر جمع الموارد
 function stopCollectCountdown() {
     if (collectCountdownInterval) {
         clearInterval(collectCountdownInterval);
@@ -255,6 +266,7 @@ function stopCollectCountdown() {
     }
 }
 
+// تحديث معلومات البيت التالي المطلوب فتحه
 function updateNextHouseInfo() {
     const currentHouse = houses[activeHouseIndex];
     const nextHouseIndex = activeHouseIndex + 1;
@@ -263,30 +275,30 @@ function updateNextHouseInfo() {
         const nextHouse = houses[nextHouseIndex];
         nextHouseThresholdDisplay.textContent = nextHouse.threshold.toLocaleString();
     } else {
-        nextHouseThresholdDisplay.textContent = 'لا يوجد بيت قادم';
+        nextHouseThresholdDisplay.textContent = 'لا يوجد بيت قادم'; // إذا كانت جميع البيوت مفتوحة
     }
 }
 
+// رسم تقدم البيوت في واجهة المستخدم
 function renderHousesProgress() {
-    housesProgressContainer.innerHTML = '';
+    housesProgressContainer.innerHTML = ''; // مسح المحتوى الحالي
     houses.forEach((house, index) => {
-        const isCurrent = (index === activeHouseIndex);
-        const isUnlocked = house.unlocked;
-        const progress = Math.min(100, (house.power / house.threshold) * 100);
-        const barColor = isUnlocked ? 'bg-green-500' : 'bg-gray-500';
-        const textColor = isUnlocked ? 'text-green-300' : 'text-gray-300';
-        const borderColor = isCurrent ? 'border-2 border-indigo-400' : 'border border-gray-600';
+        const isCurrent = (index === activeHouseIndex); // هل هذا هو البيت النشط؟
+        const isUnlocked = house.unlocked; // هل البيت مفتوح؟
+        const progress = Math.min(100, (house.power / house.threshold) * 100); // حساب نسبة التقدم
+        const barColor = isUnlocked ? 'bg-green-500' : 'bg-gray-500'; // لون شريط التقدم
+        const textColor = isUnlocked ? 'text-green-300' : 'text-gray-300'; // لون النص
+        const borderColor = isCurrent ? 'border-2 border-indigo-400' : 'border border-gray-600'; // لون الحدود
 
         const houseDiv = document.createElement('div');
         houseDiv.className = `flex flex-col p-2 rounded-lg ${borderColor} mb-3 transition duration-300 ease-in-out`;
         if (isCurrent) {
-            houseDiv.classList.add('bg-gray-600');
+            houseDiv.classList.add('bg-gray-600'); // خلفية مختلفة للبيت النشط
         } else if (isUnlocked) {
             houseDiv.classList.add('bg-gray-700');
         } else {
-            houseDiv.classList.add('bg-gray-800', 'opacity-75');
+            houseDiv.classList.add('bg-gray-800', 'opacity-75'); // خلفية معتمة للبيوت المغلقة
         }
-
 
         houseDiv.innerHTML = `
             <div class="flex justify-between items-center mb-1">
@@ -305,22 +317,22 @@ function renderHousesProgress() {
     });
 }
 
-// دمج وإعدادات Firebase
+// دمج وإعدادات Firebase: تتم المصادقة وتحميل البيانات الأولية هنا
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        userId = user.uid;
-        loadPlayerData();
-        loadHouses();
-        loadChallengeLog();
-        loadNotifications();
-        listenForPlayerUpdates(); // Start listening for other players' updates
-        listenForOnlineUsers(); // Start listening for all online/offline users
-        startAccumulationLoop(); // Start accumulating resources
-        updateOnlineStatus(true); // Set user online
-        appDiv.classList.remove('hidden');
-        loadingOverlay.classList.add('hidden');
-        showView('dashboard-view'); // عرض لوحة القيادة بعد التحميل
+        userId = user.uid; // تعيين معرف المستخدم
+        loadPlayerData(); // تحميل بيانات اللاعب
+        loadHouses(); // تحميل بيانات البيوت
+        loadChallengeLog(); // تحميل سجل التحديات
+        loadNotifications(); // تحميل الإشعارات
+        listenForPlayerUpdates(); // بدء الاستماع لتحديثات اللاعبين الآخرين (للترتيب وقائمة اللاعبين)
+        updateOnlineStatus(true); // تعيين حالة المستخدم كـ "متصل"
+        startAccumulationLoop(); // بدء حلقة تراكم الموارد
+        appDiv.classList.remove('hidden'); // إظهار واجهة التطبيق
+        loadingOverlay.classList.add('hidden'); // إخفاء شاشة التحميل
+        showView('dashboard-view'); // عرض لوحة القيادة كأول شاشة
     } else {
+        // إذا لم يكن هناك مستخدم مسجل الدخول، حاول تسجيل الدخول كمستخدم مجهول
         signInAnonymously(auth)
             .catch((error) => {
                 console.error("Error signing in anonymously: ", error);
@@ -329,7 +341,7 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// وظائف حفظ وتحميل البيانات
+// وظائف حفظ وتحميل البيانات من/إلى Firebase
 function savePlayerData() {
     if (userId) {
         set(ref(database, 'users/' + userId + '/data'), {
@@ -345,11 +357,11 @@ function savePlayerData() {
             lastCollectTime: lastCollectTime,
             isNameSetPermanently: isNameSetPermanently,
             lastPlayerNameChangeTimestamp: lastPlayerNameChangeTimestamp,
-            nameChangeCount: nameChangeCount, // Save name change count
-            lastOnline: Date.now() // Update last online timestamp
+            nameChangeCount: nameChangeCount, // حفظ عدد مرات تغيير الاسم
+            lastOnline: Date.now() // تحديث وقت آخر اتصال
         }).then(() => {
             console.log("Player data saved successfully!");
-            // addNotification('تم حفظ بياناتك بنجاح.', 'success'); // Optional: show notification on save
+            // addNotification('تم حفظ بياناتك بنجاح.', 'success'); // اختياري: إظهار إشعار عند الحفظ
         }).catch((error) => {
             console.error("Error saving player data: ", error);
             showMessageModal('خطأ', 'فشل حفظ البيانات. يرجى التحقق من اتصالك.', 'error');
@@ -374,11 +386,11 @@ function loadPlayerData() {
                 lastCollectTime = data.lastCollectTime || 0;
                 isNameSetPermanently = data.isNameSetPermanently || false;
                 lastPlayerNameChangeTimestamp = data.lastPlayerNameChangeTimestamp || 0;
-                nameChangeCount = data.nameChangeCount || 0; // Load name change count
+                nameChangeCount = data.nameChangeCount || 0; // تحميل عدد مرات تغيير الاسم
             } else {
-                savePlayerData();
+                savePlayerData(); // حفظ البيانات الافتراضية إذا لم يتم العثور على بيانات
             }
-            updateUI();
+            updateUI(); // تحديث واجهة المستخدم بعد التحميل
         }).catch((error) => {
             console.error("Error loading player data: ", error);
             showMessageModal('خطأ', 'فشل تحميل البيانات. يرجى التحقق من اتصالك.', 'error');
@@ -402,7 +414,7 @@ function loadHouses() {
         get(ref(database, 'users/' + userId + '/houses')).then((snapshot) => {
             if (snapshot.exists()) {
                 houses = snapshot.val();
-                // Ensure houses array has exactly 4 elements. If not, reset or adjust.
+                // التأكد من أن مصفوفة البيوت تحتوي على 4 عناصر بالضبط. إذا لم يكن كذلك، قم بإعادة تعيينها أو تعديلها.
                 if (!Array.isArray(houses) || houses.length !== 4) {
                     houses = [
                         { id: 1, power: 1, unlocked: true, threshold: 25000, rewardedThresholds: [] },
@@ -410,20 +422,20 @@ function loadHouses() {
                         { id: 3, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] },
                         { id: 4, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] }
                     ];
-                    saveHouses(); // Save the corrected structure
+                    saveHouses(); // حفظ الهيكل الصحيح
                 } else {
-                    // Ensure all houses have required properties (e.g., rewardedThresholds)
+                    // التأكد من أن جميع البيوت تحتوي على الخصائص المطلوبة (مثل rewardedThresholds)
                     houses.forEach(house => {
                         if (!house.rewardedThresholds) {
                             house.rewardedThresholds = [];
                         }
                         if (typeof house.threshold === 'undefined') {
-                            house.threshold = 25000; // Default threshold if missing
+                            house.threshold = 25000; // عتبة افتراضية إذا كانت مفقودة
                         }
                     });
                 }
             } else {
-                saveHouses(); // Save default houses if not found
+                saveHouses(); // حفظ البيوت الافتراضية إذا لم يتم العثور عليها
             }
         }).then(() => {
             return get(ref(database, 'users/' + userId + '/activeHouseIndex'));
@@ -431,12 +443,12 @@ function loadHouses() {
             if (snapshot.exists()) {
                 activeHouseIndex = snapshot.val();
                 if (activeHouseIndex >= houses.length || activeHouseIndex < 0) {
-                    activeHouseIndex = 0; // Reset if invalid
+                    activeHouseIndex = 0; // إعادة تعيين إذا كان الفهرس غير صالح
                 }
             } else {
                 activeHouseIndex = 0;
             }
-            updateUI(); // Update UI after loading houses and active index
+            updateUI(); // تحديث واجهة المستخدم بعد تحميل البيوت والفهرس النشط
         }).catch((error) => {
             console.error("Error loading houses: ", error);
             showMessageModal('خطأ', 'فشل تحميل معلومات البيوت. يرجى التحقق من اتصالك.', 'error');
@@ -506,7 +518,7 @@ function loadNotifications() {
     }
 }
 
-// تحديث حالة الاتصال بالإنترنت
+// تحديث حالة الاتصال بالإنترنت للمستخدم الحالي
 function updateOnlineStatus(isOnline) {
     if (userId) {
         update(ref(database, 'users/' + userId + '/data'), {
@@ -516,32 +528,28 @@ function updateOnlineStatus(isOnline) {
     }
 }
 
-// حدث عند إغلاق أو تحديث الصفحة
+// حدث عند إغلاق أو تحديث الصفحة: تحديث حالة الاتصال إلى "غير متصل"
 window.addEventListener('beforeunload', () => {
     updateOnlineStatus(false);
-    // You might want to save data here as well, but Firebase's `onDisconnect` is better for true online status
-    // savePlayerData();
 });
 
-// listener for online/offline status (not for specific user but for all)
-// this is important for global player list and ranking
+// الاستماع لتحديثات بيانات اللاعبين الآخرين (للتصنيفات وقوائم اللاعبين)
 function listenForPlayerUpdates() {
     onValue(ref(database, 'users'), (snapshot) => {
-        // This listener will trigger whenever any user data changes
-        // It's used to update the ranking and all players lists.
-        // The actual logic for updating UI for these lists is in fetchRanking and fetchAllPlayers
+        // هذا المستمع سيتم تشغيله كلما تغيرت بيانات أي مستخدم
+        // يستخدم لتحديث قوائم الترتيب وجميع اللاعبين
         console.log("Firebase users data updated. Refreshing rankings/players.");
-        // We call fetch functions here to refresh data
-        fetchRanking();
-        fetchAllPlayers();
+        fetchRanking(); // تحديث الترتيب
+        fetchAllPlayers(); // تحديث قائمة جميع اللاعبين
     }, (error) => {
         console.error("Error listening for user updates: ", error);
     });
 }
 
-// وظائف اللعبة الرئيسية
+// وظائف اللعبة الرئيسية: جمع الموارد
 function collectDollars() {
     const now = Date.now();
+    // التحقق من مؤقت التهدئة
     if (now - lastCollectTime < COLLECT_COOLDOWN_DURATION) {
         const timeLeftMs = COLLECT_COOLDOWN_DURATION - (now - lastCollectTime);
         const minutes = Math.floor(timeLeftMs / (1000 * 60));
@@ -550,103 +558,105 @@ function collectDollars() {
         return;
     }
 
+    // إضافة الموارد المتراكمة إلى رصيد اللاعب
     dollars += Math.floor(accumulatedDollars);
     points += Math.floor(accumulatedPoints);
     totalPower += Math.floor(accumulatedPower);
     addNotification(`تم استلام $${Math.floor(accumulatedDollars).toLocaleString()} و ${Math.floor(accumulatedPoints).toLocaleString()} نقطة و ${Math.floor(accumulatedPower).toLocaleString()} قوة!`, 'success');
 
+    // إعادة تعيين الموارد المتراكمة
     accumulatedDollars = 0;
     accumulatedPoints = 0;
     accumulatedPower = 0;
-    lastCollectTime = now;
+    lastCollectTime = now; // تحديث وقت آخر عملية جمع
 
-    updateUI();
-    savePlayerData();
+    updateUI(); // تحديث واجهة المستخدم
+    savePlayerData(); // حفظ بيانات اللاعب
 }
 
+// بدء حلقة تراكم الموارد (تزيد الموارد تلقائياً بمرور الوقت)
 function startAccumulationLoop() {
     setInterval(() => {
-        const incomeRate = 1 + (innovationLevel * 0.1); // Base + 10% per innovation level
-        const powerIncomeRate = 0.1 + (innovationLevel * 0.01); // Smaller power gain
+        const incomeRate = 1 + (innovationLevel * 0.1); // معدل الدخل الأساسي + مكافأة من مستوى الابتكار
+        const powerIncomeRate = 0.1 + (innovationLevel * 0.01); // معدل اكتساب القوة (أقل)
         const currentHouse = houses[activeHouseIndex];
-        const houseBonus = currentHouse.power * 0.01; // 1% of current house power as bonus
+        const houseBonus = currentHouse.power * 0.01; // مكافأة من قوة البيت الحالي (1%)
 
-        accumulatedDollars += (incomeRate + houseBonus) / 60; // accumulate per second for a minute
+        accumulatedDollars += (incomeRate + houseBonus) / 60; // تتراكم كل ثانية (مقسمة على 60 لتكون معدل دقيقة)
         accumulatedPoints += (incomeRate + houseBonus) / 60;
         accumulatedPower += (powerIncomeRate + houseBonus / 10) / 60;
 
-        updateUI(); // Update UI more frequently to show accumulation
+        updateUI(); // تحديث واجهة المستخدم بشكل متكرر لعرض التراكم
     }, 1000); // كل ثانية
 }
 
+// معالج حدث زر الابتكار
 innovationButton.addEventListener('click', () => {
     if (dollars >= innovationCost) {
-        dollars -= innovationCost;
-        innovationLevel++;
-        totalPower += innovationPowerIncrease; // Increase player's total power
-        innovationCost = Math.floor(innovationCost * 1.5); // Increase cost for next innovation
-        innovationPowerIncrease = Math.floor(innovationPowerIncrease * 1.1); // Increase power gain
+        dollars -= innovationCost; // خصم التكلفة
+        innovationLevel++; // زيادة مستوى الابتكار
+        totalPower += innovationPowerIncrease; // زيادة القوة الإجمالية للاعب
+        innovationCost = Math.floor(innovationCost * 1.5); // زيادة تكلفة الابتكار التالي
+        innovationPowerIncrease = Math.floor(innovationPowerIncrease * 1.1); // زيادة مكافأة القوة من الابتكار
 
-        // Increase current house's power
-        houses[activeHouseIndex].power += 100; // Each innovation adds 100 power to current house
+        // زيادة قوة البيت الحالي
+        houses[activeHouseIndex].power += 100; // كل ابتكار يضيف 100 قوة للبيت الحالي
 
         addNotification(`تم تطوير القوة الرئيسية. أصبحت قوتك ${totalPower.toLocaleString()}!`, 'success');
 
-        // New house unlock logic: current house must reach its threshold (25000)
+        // منطق فتح البيت الجديد: يجب أن يصل البيت الحالي إلى عتبة 25000 قوة
         const currentHouse = houses[activeHouseIndex];
         const nextHouseIndex = activeHouseIndex + 1;
         if (nextHouseIndex < houses.length && !houses[nextHouseIndex].unlocked) {
             if (currentHouse.power >= currentHouse.threshold) {
-                houses[nextHouseIndex].unlocked = true;
+                houses[nextHouseIndex].unlocked = true; // فتح البيت التالي
                 showMessageModal('بيت جديد مفتوح!', `تهانينا! لقد فتحت البيت رقم ${houses[nextHouseIndex].id}!`, 'success');
-                // Automatically switch to the new house? Or let player do it?
-                // For now, don't auto-switch, player manually activates.
+                // حالياً، لا يتم التبديل التلقائي للبيت الجديد، يتركه للاعب ليقوم بذلك يدوياً.
             }
         }
 
-        // Check for house power rewards
-        const rewardedThresholdsForHouse = [250, 500, 1000, 2000, 4000, 8000, 15000, 20000]; // Example thresholds for rewards
+        // التحقق من مكافآت قوة البيت
+        const rewardedThresholdsForHouse = [250, 500, 1000, 2000, 4000, 8000, 15000, 20000]; // عتبات أمثلة للمكافآت
         rewardedThresholdsForHouse.forEach(threshold => {
             if (currentHouse.power >= threshold && !currentHouse.rewardedThresholds.includes(threshold)) {
-                // Give reward for reaching this threshold
+                // إعطاء مكافأة للوصول إلى هذه العتبة
                 const rewardDollars = threshold * 5;
                 const rewardPoints = threshold * 2;
                 dollars += rewardDollars;
                 points += rewardPoints;
                 addNotification(`لقد وصلت قوة البيت ${currentHouse.id} إلى ${threshold.toLocaleString()}! حصلت على $${rewardDollars.toLocaleString()} و ${rewardPoints.toLocaleString()} نقطة مكافأة!`, 'success');
-                currentHouse.rewardedThresholds.push(threshold); // Mark as rewarded
+                currentHouse.rewardedThresholds.push(threshold); // وضع علامة على أنها مكافأة تم منحها
             }
         });
-
 
     } else {
         showMessageModal('مال غير كافٍ', 'ليس لديك مال كافٍ للابتكار!', 'error');
     }
-    updateUI();
-    savePlayerData();
-    saveHouses();
+    updateUI(); // تحديث واجهة المستخدم
+    savePlayerData(); // حفظ بيانات اللاعب
+    saveHouses(); // حفظ بيانات البيوت
 });
 
-// وظائف التحدي
+// وظائف نظام التحدي
 function startChallengeFlow() {
-    stopChallengeTimer();
-    challengeState = 'ATTACK_READY'; // No PREPARING state
-    challengePlayersList.innerHTML = '<p class="text-gray-300 text-center">جاري تحميل لاعب...</p>';
-    selectRandomChallengePlayer();
+    stopChallengeTimer(); // إيقاف أي مؤقت تحدي سابق
+    challengeState = 'ATTACK_READY'; // تعيين الحالة إلى "جاهز للهجوم" مباشرة
+    challengePlayersList.innerHTML = '<p class="text-gray-300 text-center">جاري تحميل لاعب...</p>'; // رسالة تحميل
+    selectRandomChallengePlayer(); // اختيار لاعب عشوائي جديد
 }
 
 function selectRandomChallengePlayer() {
-    // Fetch a list of players from Firebase, excluding self and highly powerful players
+    // جلب قائمة اللاعبين من Firebase، باستثناء اللاعب الحالي
     get(ref(database, 'users')).then((snapshot) => {
         const allPlayersData = snapshot.val();
         const eligiblePlayers = [];
 
         for (const uid in allPlayersData) {
-            if (uid === userId) continue; // Skip self
+            if (uid === userId) continue; // تخطي اللاعب الحالي
 
             const player = allPlayersData[uid].data;
             if (player && player.totalPower && player.playerName) {
-                // Only select players within a reasonable power range (e.g., +/- 50% of player's power)
+                // اختيار اللاعبين ضمن نطاق قوة معقول (مثلاً، +/- 50% من قوة اللاعب)
                 const minPower = totalPower * 0.5;
                 const maxPower = totalPower * 1.5;
 
@@ -662,11 +672,11 @@ function selectRandomChallengePlayer() {
 
         if (eligiblePlayers.length > 0) {
             const randomIndex = Math.floor(Math.random() * eligiblePlayers.length);
-            currentChallengePlayer = eligiblePlayers[randomIndex];
+            currentChallengePlayer = eligiblePlayers[randomIndex]; // تعيين اللاعب المستهدف
 
-            challengeState = 'ATTACK_READY'; // Always ready to attack immediately
-            challengeTimerRemaining = 0; // No prep time
-            renderCurrentChallengePlayer();
+            challengeState = 'ATTACK_READY'; // جاهز للهجوم فوراً
+            challengeTimerRemaining = 0; // لا يوجد وقت استعداد
+            renderCurrentChallengePlayer(); // رسم اللاعب المستهدف
         } else {
             challengeStatusDisplay.textContent = 'لا يوجد خصوم متاحون حاليًا.';
             targetPlayerCard.classList.add('hidden');
@@ -696,8 +706,8 @@ function renderCurrentChallengePlayer() {
         targetPlayerCard.classList.add('hidden');
         attackButton.classList.add('hidden');
         cooldownTimerDisplay.classList.remove('hidden');
-        challengeResultDisplay.classList.remove('hidden'); // Keep result visible during cooldown
-        // Timer update handled by startChallengeTimer
+        challengeResultDisplay.classList.remove('hidden'); // إبقاء نتيجة التحدي مرئية أثناء فترة التهدئة
+        // تحديث المؤقت يتم بواسطة startChallengeTimer
     } else {
         challengeStatusDisplay.textContent = 'جاري البحث عن خصم...';
         targetPlayerCard.classList.add('hidden');
@@ -707,20 +717,20 @@ function renderCurrentChallengePlayer() {
 }
 
 function startChallengeTimer() {
-    if (challengeTimerInterval) clearInterval(challengeTimerInterval);
+    if (challengeTimerInterval) clearInterval(challengeTimerInterval); // مسح أي مؤقت سابق
     challengeTimerInterval = setInterval(() => {
-        challengeTimerRemaining--;
+        challengeTimerRemaining--; // تقليل الوقت المتبقي
         const minutes = Math.floor(challengeTimerRemaining / 60);
         const seconds = challengeTimerRemaining % 60;
         timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
         if (challengeTimerRemaining <= 0) {
-            clearInterval(challengeTimerInterval);
+            clearInterval(challengeTimerInterval); // إيقاف المؤقت عند الانتهاء
             if (challengeState === 'COOLDOWN') {
-                startChallengeFlow(); // Get a new player after cooldown
+                startChallengeFlow(); // جلب لاعب جديد بعد انتهاء التهدئة
             }
         }
-    }, 1000);
+    }, 1000); // تحديث كل ثانية
 }
 
 function stopChallengeTimer() {
@@ -730,6 +740,7 @@ function stopChallengeTimer() {
     }
 }
 
+// معالج حدث زر الهجوم
 function handleAttackClick() {
     if (challengeState === 'ATTACK_READY' && currentChallengePlayer) {
         const playerStrength = totalPower;
@@ -741,15 +752,15 @@ function handleAttackClick() {
         let playerPointsGained = 0;
         let playerPowerGained = 0;
 
-        // Simple win/loss logic: higher power wins more often
+        // منطق بسيط للفوز/الخسارة: القوة الأعلى تفوز غالباً
         const winChance = playerStrength / (playerStrength + opponentStrength);
         const isWin = Math.random() < winChance;
 
         if (isWin) {
             result = 'win';
-            playerDollarsGained = Math.floor(opponentStrength * 0.1); // Gain 10% of opponent's power as dollars
-            playerPointsGained = Math.floor(opponentStrength * 0.05); // Gain 5% as points
-            playerPowerGained = Math.floor(opponentStrength * 0.01); // Gain 1% as power
+            playerDollarsGained = Math.floor(opponentStrength * 0.1); // كسب 10% من قوة الخصم كدولارات
+            playerPointsGained = Math.floor(opponentStrength * 0.05); // كسب 5% كنقاط
+            playerPowerGained = Math.floor(opponentStrength * 0.01); // كسب 1% كقوة
             dollars += playerDollarsGained;
             points += playerPointsGained;
             totalPower += playerPowerGained;
@@ -758,9 +769,9 @@ function handleAttackClick() {
             challengeResultDisplay.textContent = 'فوز!';
         } else {
             result = 'lose';
-            // Slight penalties for losing, or just no gain
-            const penaltyDollars = Math.floor(dollars * 0.05); // Lose 5% of dollars
-            const penaltyPoints = Math.floor(points * 0.02); // Lose 2% of points
+            // عقوبات بسيطة للخسارة، أو عدم كسب أي شيء
+            const penaltyDollars = Math.floor(dollars * 0.05); // خسارة 5% من الدولارات
+            const penaltyPoints = Math.floor(points * 0.02); // خسارة 2% من النقاط
             dollars = Math.max(0, dollars - penaltyDollars);
             points = Math.max(0, points - penaltyPoints);
             message = `لقد خسرت في التحدي ضد ${currentChallengePlayer.name}. خسرت $${penaltyDollars.toLocaleString()} و ${penaltyPoints.toLocaleString()} نقطة.`;
@@ -769,28 +780,29 @@ function handleAttackClick() {
         }
 
         addNotification(message, isWin ? 'success' : 'error');
+        // إضافة نتيجة التحدي إلى السجل
         challengeLog.unshift({
             opponentName: currentChallengePlayer.name,
             result: result,
             playerPower: playerStrength,
             opponentPower: opponentStrength
         });
-        if (challengeLog.length > 10) challengeLog.pop(); // Keep log to last 10 entries
+        if (challengeLog.length > 10) challengeLog.pop(); // الاحتفاظ بآخر 10 إدخالات فقط في السجل
 
-        savePlayerData();
-        saveChallengeLog();
-        updateUI();
-        renderChallengeLog();
+        savePlayerData(); // حفظ بيانات اللاعب المحدثة
+        saveChallengeLog(); // حفظ سجل التحديات
+        updateUI(); // تحديث واجهة المستخدم
+        renderChallengeLog(); // إعادة رسم سجل التحديات
 
-        // Start cooldown after attack (win or lose)
+        // بدء فترة التهدئة بعد الهجوم (سواء فوز أو خسارة)
         challengeState = 'COOLDOWN';
-        challengeTimerRemaining = 2 * 60; // 2 minutes post-attack cooldown
-        renderCurrentChallengePlayer();
-        startChallengeTimer();
+        challengeTimerRemaining = 2 * 60; // مؤقت تهدئة لمدة دقيقتين بعد الهجوم
+        renderCurrentChallengePlayer(); // تحديث عرض اللاعب المستهدف (ليظهر المؤقت)
+        startChallengeTimer(); // بدء مؤقت التهدئة
     }
 }
 
-// وظائف الترتيب
+// وظائف الترتيب (Ranking)
 function fetchRanking() {
     get(ref(database, 'users')).then((snapshot) => {
         const allPlayersData = snapshot.val();
@@ -803,14 +815,14 @@ function fetchRanking() {
                     uid: uid,
                     name: player.playerName,
                     totalPower: player.totalPower,
-                    isOnline: player.isOnline // Include online status
+                    isOnline: player.isOnline // تضمين حالة الاتصال
                 });
             }
         }
 
-        players.sort((a, b) => b.totalPower - a.totalPower); // Sort by totalPower descending
+        players.sort((a, b) => b.totalPower - a.totalPower); // ترتيب اللاعبين حسب القوة الإجمالية تنازلياً
 
-        rankingList.innerHTML = ''; // Clear current list
+        rankingList.innerHTML = ''; // مسح القائمة الحالية
 
         if (players.length === 0) {
             rankingList.innerHTML = '<tr><td colspan="3" class="py-2 px-4 text-center text-gray-400">لا يوجد لاعبون في الترتيب حالياً.</td></tr>';
@@ -819,11 +831,11 @@ function fetchRanking() {
 
         players.forEach((player, index) => {
             const row = document.createElement('tr');
-            const rankClass = (index === 0) ? 'text-yellow-400 font-bold' :
-                             (index === 1) ? 'text-gray-300 font-semibold' :
-                             (index === 2) ? 'text-amber-500 font-semibold' :
-                             'text-gray-300';
-            const highlightClass = (player.uid === userId) ? 'bg-indigo-700' : (index % 2 === 0 ? 'bg-gray-700' : 'bg-gray-600');
+            const rankClass = (index === 0) ? 'text-yellow-400 font-bold' : // المركز الأول
+                             (index === 1) ? 'text-gray-300 font-semibold' : // المركز الثاني
+                             (index === 2) ? 'text-amber-500 font-semibold' : // المركز الثالث
+                             'text-gray-300'; // باقي المراكز
+            const highlightClass = (player.uid === userId) ? 'bg-indigo-700' : (index % 2 === 0 ? 'bg-gray-700' : 'bg-gray-600'); // تمييز اللاعب الحالي
 
             row.className = `${highlightClass} hover:bg-gray-500 transition duration-150 ease-in-out`;
             row.innerHTML = `
@@ -839,28 +851,23 @@ function fetchRanking() {
     });
 }
 
-// وظائف جميع اللاعبين
+// وظائف جميع اللاعبين (All Players)
 function fetchAllPlayers() {
     get(ref(database, 'users')).then((snapshot) => {
         const allPlayersData = snapshot.val();
         const allPlayersSorted = [];
 
         for (const uid in allPlayersData) {
-            if (uid === userId) continue;
+            if (uid === userId) continue; // تخطي اللاعب الحالي
 
             const player = allPlayersData[uid].data;
-            
-            // هذه الأسطر كانت تقوم بفلترة اللاعبين غير المتصلين ذوي القوة المنخفضة. تم إزالتها لعرض الجميع.
-            // if (!player.isOnline && player.totalPower < 3000) {
-            //     continue; // Skip this player for the all players list
-            // }
-
+            // لا توجد فلترة هنا، يتم عرض جميع اللاعبين بغض النظر عن حالة الاتصال أو القوة
             allPlayersSorted.push(player);
         }
 
-        allPlayersSorted.sort((a, b) => b.totalPower - a.totalPower); // Sort by totalPower descending
+        allPlayersSorted.sort((a, b) => b.totalPower - a.totalPower); // ترتيب اللاعبين حسب القوة الإجمالية تنازلياً
 
-        allPlayersList.innerHTML = ''; // Clear current list
+        allPlayersList.innerHTML = ''; // مسح القائمة الحالية
 
         if (allPlayersSorted.length === 0) {
             allPlayersList.innerHTML = '<p class="text-gray-400 col-span-full text-center">لا يوجد لاعبون لعرضهم حالياً.</p>';
@@ -871,7 +878,7 @@ function fetchAllPlayers() {
             const playerCard = document.createElement('div');
             const onlineStatusClass = player.isOnline ? 'bg-green-500' : 'bg-red-500';
             const onlineStatusText = player.isOnline ? 'متصل' : 'غير متصل';
-            const bgColor = player.isOnline ? 'bg-gray-700' : 'bg-gray-800'; // Different background for offline
+            const bgColor = player.isOnline ? 'bg-gray-700' : 'bg-gray-800'; // خلفية مختلفة للمتصلين وغير المتصلين
 
             playerCard.className = `${bgColor} p-4 rounded-lg shadow-md flex items-center space-x-4 space-x-reverse`;
             playerCard.innerHTML = `
@@ -893,12 +900,14 @@ function fetchAllPlayers() {
 // معالجات الأحداث (Event Listeners)
 collectDollarsButton.addEventListener('click', collectDollars);
 
+// معالج حدث زر الإعدادات لفتح المودال
 settingsButton.addEventListener('click', () => {
     settingsModal.classList.remove('hidden');
-    playerNameInput.value = playerName;
+    playerNameInput.value = playerName; // وضع الاسم الحالي في حقل الإدخال
     const now = Date.now();
     const timeSinceLastChange = now - lastPlayerNameChangeTimestamp;
 
+    // منطق التحكم في تغيير الاسم
     if (isNameSetPermanently && nameChangeCount >= MAX_NAME_CHANGES) {
         nameChangeCooldownMessage.textContent = `لقد وصلت إلى الحد الأقصى لتغيير الاسم (${MAX_NAME_CHANGES} مرات).`;
         nameChangeCooldownMessage.classList.remove('hidden');
@@ -918,59 +927,65 @@ settingsButton.addEventListener('click', () => {
     }
 });
 
+// معالج حدث زر إغلاق مودال الإعدادات
 closeSettingsModalButton.addEventListener('click', () => {
     settingsModal.classList.add('hidden');
 });
 
+// معالج حدث زر "موافق" في مودال الرسائل
 messageModalOkButton.addEventListener('click', () => {
     messageModal.classList.add('hidden');
 });
 
+// معالج حدث زر إغلاق مودال الرسائل
 closeMessageModalButton.addEventListener('click', () => {
     messageModal.classList.add('hidden');
 });
 
+// معالج حدث زر تأكيد تغيير الاسم
 setNameConfirmButton.addEventListener('click', () => {
     const newName = playerNameInput.value.trim();
-    if (newName && newName.length >= 3 && newName.length <= 20) {
+    if (newName && newName.length >= 3 && newName.length <= 20) { // التحقق من طول الاسم
         const oldPlayerName = playerName;
         playerName = newName;
 
         const now = Date.now();
         const timeSinceLastChange = now - lastPlayerNameChangeTimestamp;
 
+        // إعادة فحص شروط تغيير الاسم (للتأكد مرة أخرى)
         if (isNameSetPermanently && nameChangeCount >= MAX_NAME_CHANGES) {
             showMessageModal('لا يمكن تغيير الاسم', `لقد وصلت إلى الحد الأقصى لتغيير الاسم (${MAX_NAME_CHANGES} مرات).`, 'info');
             return;
         }
 
         if (isNameSetPermanently && (Date.now() - lastPlayerNameChangeTimestamp < NAME_CHANGE_COOLDOWN_DURATION)) {
-            const remainingTimeMs = NAME_CHANGE_COOLDOWN_DURATION - (Date.now() - lastPlayerNameChangeTimestamp);
+            const remainingTimeMs = NAME_CHANGE_COOLDOWN_DURATION - (now - lastPlayerNameChangeTimestamp);
             const remainingDays = Math.ceil(remainingTimeMs / (1000 * 60 * 60 * 24));
             showMessageModal('لا يمكن تغيير الاسم', `لا يمكنك تغيير اسمك إلا بعد مرور ${remainingDays} يوم(أيام) أخرى.`, 'info');
             return;
         }
 
-        // Only increment count if name actually changed AND it was set permanently before
+        // زيادة عدد مرات تغيير الاسم فقط إذا تغير الاسم بالفعل وكان قد تم تعيينه بشكل دائم من قبل
         if (playerName !== oldPlayerName) {
             if (isNameSetPermanently) {
                 nameChangeCount++;
             }
-            isNameSetPermanently = true;
-            lastPlayerNameChangeTimestamp = Date.now();
+            isNameSetPermanently = true; // وضع علامة على أن الاسم تم تعيينه بشكل دائم
+            lastPlayerNameChangeTimestamp = Date.now(); // تحديث وقت آخر تغيير للاسم
             addNotification(`تم تغيير اسمك إلى ${playerName}.`, 'success');
         } else {
             addNotification('لم يتغير الاسم.', 'info');
         }
 
-        updateUI();
-        savePlayerData();
-        settingsModal.classList.add('hidden');
+        updateUI(); // تحديث واجهة المستخدم
+        savePlayerData(); // حفظ بيانات اللاعب
+        settingsModal.classList.add('hidden'); // إغلاق مودال الإعدادات
     } else {
         showMessageModal('اسم غير صالح', 'يجب أن يكون الاسم بين 3 و 20 حرفاً.', 'error');
     }
 });
 
+// معالج حدث زر حفظ اللعبة
 saveGameButton.addEventListener('click', () => {
     savePlayerData();
     saveHouses();
@@ -979,6 +994,7 @@ saveGameButton.addEventListener('click', () => {
     showMessageModal('حفظ اللعبة', 'تم حفظ بياناتك بنجاح!', 'success');
 });
 
+// معالج حدث زر تحميل اللعبة
 loadGameButton.addEventListener('click', () => {
     loadPlayerData();
     loadHouses();
@@ -987,8 +1003,11 @@ loadGameButton.addEventListener('click', () => {
     showMessageModal('تحميل اللعبة', 'تم تحميل بياناتك بنجاح!', 'success');
 });
 
+// معالج حدث زر إعادة تعيين اللعبة
 resetGameButton.addEventListener('click', () => {
+    // تأكيد من المستخدم قبل إعادة التعيين
     if (confirm('هل أنت متأكد أنك تريد إعادة تعيين اللعبة؟ ستفقد كل تقدمك!')) {
+        // إعادة تعيين جميع المتغيرات إلى قيمها الافتراضية
         dollars = 0;
         points = 0;
         totalPower = 0;
@@ -1002,18 +1021,18 @@ resetGameButton.addEventListener('click', () => {
         playerName = "لاعب جديد";
         isNameSetPermanently = false;
         lastPlayerNameChangeTimestamp = 0;
-        nameChangeCount = 0; // Reset name change count
+        nameChangeCount = 0; // إعادة تعيين عدد مرات تغيير الاسم
         activeHouseIndex = 0;
-        houses = [
+        houses = [ // إعادة تعيين البيوت إلى حالتها الافتراضية
             { id: 1, power: 1, unlocked: true, threshold: 25000, rewardedThresholds: [] },
             { id: 2, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] },
             { id: 3, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] },
             { id: 4, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] }
         ];
-        challengeLog = [];
-        notifications = [];
+        challengeLog = []; // مسح سجل التحديات
+        notifications = []; // مسح الإشعارات
 
-        // Clear data from Firebase
+        // مسح البيانات من Firebase أيضاً
         if (userId) {
             set(ref(database, 'users/' + userId + '/data'), null);
             set(ref(database, 'users/' + userId + '/houses'), null);
@@ -1021,25 +1040,25 @@ resetGameButton.addEventListener('click', () => {
             set(ref(database, 'users/' + userId + '/notifications'), null);
         }
 
-        updateUI();
-        renderChallengeLog();
-        renderNotifications();
+        updateUI(); // تحديث واجهة المستخدم
+        renderChallengeLog(); // إعادة رسم سجل التحديات
+        renderNotifications(); // إعادة رسم الإشعارات
         showMessageModal('إعادة تعيين', 'تمت إعادة تعيين اللعبة بنجاح!', 'info');
-        settingsModal.classList.add('hidden');
+        settingsModal.classList.add('hidden'); // إغلاق مودال الإعدادات
     }
 });
 
-// Sidebar toggle
-sidebar.classList.remove('-translate-x-full'); // Ensure it's hidden initially by CSS
+// تبديل الشريط الجانبي (Sidebar)
+sidebar.classList.remove('-translate-x-full'); // التأكد من إخفائه مبدئياً بواسطة CSS
 settingsButton.addEventListener('click', () => {
-    sidebar.classList.toggle('open');
+    sidebar.classList.toggle('open'); // تبديل كلاس 'open' لإظهار/إخفاء الشريط
 });
 
 closeSidebarButton.addEventListener('click', () => {
-    sidebar.classList.remove('open');
+    sidebar.classList.remove('open'); // إغلاق الشريط الجانبي
 });
 
-// Navigation links
+// روابط التنقل بين العروض المختلفة
 navDashboard.addEventListener('click', () => showView('dashboard-view'));
 navInnovation.addEventListener('click', () => showView('innovation-view'));
 navChallenge.addEventListener('click', () => showView('challenge-view'));
@@ -1048,9 +1067,10 @@ navRanking.addEventListener('click', () => showView('ranking-view'));
 navMarket.addEventListener('click', () => showView('market-view'));
 navAllPlayers.addEventListener('click', () => showView('all-players-view'));
 
+// معالج حدث زر الهجوم في نظام التحدي
 attackButton.addEventListener('click', handleAttackClick);
 
-// Keep user online status updated
+// تحديث حالة اتصال المستخدم بالإنترنت بشكل دوري (كل دقيقة)
 setInterval(() => {
     updateOnlineStatus(true);
-}, 60 * 1000); // كل دقيقةyl
+}, 60 * 1000); // كل دقيقة
