@@ -958,7 +958,7 @@
                 <div id="ship2Container" class="ship-item-card opacity-50 pointer-events-none">
                     <div class="icon-container">
                         <i class="fas fa-ship text-gray-500"></i>
-                        <img id="ship2IconImg" src="" alt="Ship Icon" style="display: none;">
+                        <img id="ship2IconImg" src="" alt="Image of Ship Icon" style="display: none;">
                     </div>
                     <div class="info-container">
                         <h3 class="text-gray-400">السفينة الثانية</h3>
@@ -977,7 +977,7 @@
                 <div id="ship3Container" class="ship-item-card opacity-50 pointer-events-none">
                     <div class="icon-container">
                         <i class="fas fa-ship text-gray-500"></i>
-                        <img id="ship3IconImg" src="" alt="Ship Icon" style="display: none;">
+                        <img id="ship3IconImg" src="" alt="Image of Ship Icon" style="display: none;">
                     </div>
                     <div class="info-container">
                         <h3 class="text-gray-400">السفينة الثالثة</h3>
@@ -1212,9 +1212,9 @@
             authDomain: "mygame-7c747.firebaseapp.com",
             databaseURL: "https://mygame-7c747-default-rtdb.firebaseio.com",
             projectId: "mygame-7c747",
+            appId: "1:191691681571:web:8dbc3991cb550b5e026696",
             storageBucket: "mygame-7c747.firebasestorage.app",
             messagingSenderId: "191691681571",
-            appId: "1:191691681571:web:8dbc3991cb550b5e026696",
             measurementId: "G-XDP3YKZGH3"
         };
 
@@ -1427,6 +1427,65 @@
             messageModal.style.display = 'none';
         }
 
+        function loadDataFromLocalStorage() {
+            try {
+                const storedData = localStorage.getItem('playerData');
+                if (storedData) {
+                    const data = JSON.parse(storedData);
+                    playerMoney = data.money || 0;
+                    playerKeys = data.keys || 0;
+                    fleetName = data.fleetName || null;
+                    isGoldenNameActive = data.isGoldenNameActive || false;
+                    isStarIconActive = data.isStarIconActive || false;
+                    ship1 = data.ship1 || { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+                    ship2 = data.ship2 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+                    ship3 = data.ship3 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+                    attackCooldownEndTime = data.attackCooldownEndTime || 0; 
+                    rouletteCooldownEndTime = data.rouletteCooldownEndTime || 0;
+
+                    if (typeof ship1.maxPower === 'undefined') ship1.maxPower = INITIAL_SHIP_MAX_POWER;
+                    if (typeof ship2.maxPower === 'undefined') ship2.maxPower = INITIAL_SHIP_MAX_POWER;
+                    if (typeof ship3.maxPower === 'undefined') ship3.maxPower = INITIAL_SHIP_MAX_POWER;
+
+                    updatePlayerStats();
+                    updateAllShipCooldowns();
+                    updateResourceCircle();
+                    updateResourceButtonState();
+                    updateRouletteCooldownUI();
+                    updateAttackCooldownUI();
+
+                    if (fleetName && fleetName !== "أسطولي العظيم") {
+                        showSection('mainMenu');
+                    }
+                    return true;
+                }
+            } catch (e) {
+                console.error("Error loading from localStorage:", e);
+                localStorage.clear();
+            }
+            return false;
+        }
+
+        function saveDataToLocalStorage() {
+            try {
+                const dataToStore = {
+                    money: playerMoney,
+                    keys: playerKeys,
+                    fleetName: fleetName,
+                    isGoldenNameActive: isGoldenNameActive,
+                    isStarIconActive: isStarIconActive,
+                    ship1: ship1,
+                    ship2: ship2,
+                    ship3: ship3,
+                    attackCooldownEndTime: attackCooldownEndTime,
+                    rouletteCooldownEndTime: rouletteCooldownEndTime
+                };
+                localStorage.setItem('playerData', JSON.stringify(dataToStore));
+            } catch (e) {
+                console.error("Error saving to localStorage:", e);
+            }
+        }
+
         async function initializeFirebase() {
             try {
                 app = initializeApp(firebaseConfig);
@@ -1436,7 +1495,6 @@
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         userId = user.uid;
-                        console.log("Firebase authenticated. User ID:", userId);
                         userDbRef = ref(db, `artifacts/${appId}/users/${userId}/playerData`);
                         
                         await fetchOrCreateUserData();
@@ -1448,12 +1506,12 @@
 
                     } else {
                         userId = null;
-                        console.log("Firebase not authenticated.");
                         clearPublicDataListeners();
                         authModal.style.display = 'flex';
                         logoutBtn.classList.add('hidden');
                         showSection('hidden');
                         resourceCollectionBtnWrapper.classList.add('hidden');
+                        localStorage.removeItem('playerData');
                     }
                 });
 
@@ -1520,7 +1578,6 @@
                     if (typeof ship2.maxPower === 'undefined') ship2.maxPower = INITIAL_SHIP_MAX_POWER;
                     if (typeof ship3.maxPower === 'undefined') ship3.maxPower = INITIAL_SHIP_MAX_POWER;
 
-                    console.log("User data loaded from Realtime DB:", data);
                 } else {
                     fleetName = "أسطولي العظيم";
                     await set(userDbRef, {
@@ -1537,7 +1594,6 @@
                     });
                     playerMoney = 100;
                     playerKeys = 1;
-                    console.log("New user data created in Realtime DB.");
                 }
 
                 updatePlayerStats();
@@ -1546,6 +1602,7 @@
                 updateResourceButtonState();
                 updateRouletteCooldownUI();
                 updateAttackCooldownUI();
+                saveDataToLocalStorage();
 
                 if (fleetName === null || fleetName === "أسطولي العظيم") {
                     initialFleetNameModal.style.display = 'flex';
@@ -1561,7 +1618,6 @@
 
         async function saveUserData() {
             if (!userDbRef || !userId) {
-                console.warn("User DB reference or User ID not set. Cannot save data.");
                 return;
             }
             try {
@@ -1577,6 +1633,7 @@
                     attackCooldownEndTime: attackCooldownEndTime,
                     rouletteCooldownEndTime: rouletteCooldownEndTime
                 });
+                saveDataToLocalStorage();
             } catch (error) {
                 console.error("Error saving user data:", error);
                 window.showMessage("حدث خطأ أثناء حفظ بياناتك. يرجى المحاولة لاحقاً.");
@@ -1592,9 +1649,11 @@
                     fleetName: fleetName,
                     power: playerPower,
                     isOnline: isOnline,
-                    lastSeen: Date.now()
+                    lastSeen: Date.now(),
+                    ship1Power: ship1.power,
+                    ship2Power: ship2.power,
+                    ship3Power: ship3.power
                 });
-                console.log(`User ${userId} status updated to ${isOnline ? 'online' : 'offline'}.`);
             } catch (error) {
                 console.error("Error updating online status:", error);
             }
@@ -1654,16 +1713,25 @@
             const online = players.filter(p => p.isOnline && p.userId !== userId);
             const offline = players.filter(p => !p.isOnline && p.userId !== userId);
 
+            const getStrongestShipPower = (playerData) => {
+                let maxPower = 0;
+                if (playerData.ship1Power) maxPower = Math.max(maxPower, playerData.ship1Power);
+                if (playerData.ship2Power) maxPower = Math.max(maxPower, playerData.ship2Power);
+                if (playerData.ship3Power) maxPower = Math.max(maxPower, playerData.ship3Power);
+                return maxPower;
+            };
+
             if (online.length === 0) {
                 onlinePlayersListEl.innerHTML = '<p class="text-center text-gray-400">لا يوجد لاعبون متصلون حالياً غيرك.</p>';
             } else {
                 online.forEach(player => {
                     const li = document.createElement('li');
                     li.className = 'bg-gray-700 p-3 rounded-md mb-2 flex justify-between items-center';
+                    const strongestPower = getStrongestShipPower(player);
                     li.innerHTML = `
                         <span class="font-bold text-green-400">${player.fleetName}</span>
-                        <span class="text-sm text-gray-300">القوة: ${formatNumber(player.power)}</span>
-                        <span class="text-xs text-gray-500">${player.userId.substring(0, 8)}...</span>
+                        <span class="text-sm text-gray-300"><i class="fas fa-fist-raised text-red-500 ml-1"></i>${formatNumber(strongestPower)}</span>
+                        <span class="text-xs text-gray-500">${player.userId}</span>
                     `;
                     onlinePlayersListEl.appendChild(li);
                 });
@@ -1675,10 +1743,11 @@
                 offline.forEach(player => {
                     const li = document.createElement('li');
                     li.className = 'bg-gray-800 p-3 rounded-md mb-2 flex justify-between items-center opacity-70';
+                    const strongestPower = getStrongestShipPower(player);
                     li.innerHTML = `
                         <span class="font-bold text-gray-400">${player.fleetName}</span>
-                        <span class="text-sm text-gray-500">القوة: ${formatNumber(player.power)}</span>
-                        <span class="text-xs text-gray-500">${player.userId.substring(0, 8)}...</span>
+                        <span class="text-sm text-gray-500"><i class="fas fa-fist-raised text-red-500 ml-1"></i>${formatNumber(strongestPower)}</span>
+                        <span class="text-xs text-gray-500">${player.userId}</span>
                     `;
                     offlinePlayersListEl.appendChild(li);
                 });
@@ -1873,7 +1942,7 @@
                 if (form.iconType === 'font-awesome') {
                     iconHtml = `<i class="${form.iconClass} text-blue-400"></i>`;
                 } else {
-                    iconHtml = `<img src="${form.imgSrc}" alt="Ship Form" onerror="this.onerror=null;this.src='https://placehold.co/50x50/21262d/e2e8f0?text=Error';" />`;
+                    iconHtml = `<img src="${form.imgSrc}" alt="Image of Ship Form" onerror="this.onerror=null;this.src='https://placehold.co/50x50/21262d/e2e8f0?text=Error';" />`;
                 }
 
                 itemDiv.innerHTML = `
@@ -2623,6 +2692,10 @@
             setInterval(updateRouletteCooldownUI, 1000); 
             setInterval(updateAttackCooldownUI, 1000); 
 
+            const loadedFromLocal = loadDataFromLocalStorage();
+            if (!loadedFromLocal) {
+                authModal.style.display = 'flex';
+            }
             await initializeFirebase();
         });
 
