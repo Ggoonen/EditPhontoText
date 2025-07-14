@@ -313,7 +313,7 @@ body {
     transition: transform 0.3s ease-out, opacity 0.3s ease-out;
 }
 
-.modal-overlay.visible .popup-content, .modal-overlay.visible .message-modal-content, .modal-overlay.visible #house-info-modal > div, .modal-overlay.visible #store-detail-modal > div, .modal-overlay.visible #inventory-modal > div, .modal-overlay.visible #auth-flow-modal > div {
+.modal-overlay.visible .popup-content, .modal-overlay.visible .message-modal-content, .modal-overlay.visible #house-info-modal > div, .modal-overlay.visible #store-detail-modal > div, .modal-overlay.visible .message-modal-content, .modal-overlay.visible #inventory-modal > div, .modal-overlay.visible #auth-flow-modal > div {
     transform: scale(1);
     opacity: 1;
 }
