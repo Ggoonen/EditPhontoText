@@ -25,36 +25,6 @@
             flex-direction: column;
         }
 
-        /* تنسيقات شاشة التحميل */
-        #loading-overlay {
-            transition: opacity 0.5s ease-in-out;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #1a202c;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-        }
-
-        .loader {
-            border: 8px solid #f3f3f3; /* Light grey */
-            border-top: 8px solid #3498db; /* Blue */
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spinner 1.5s linear infinite;
-        }
-
-        /* حركة دوران لشريط التحميل */
-        @keyframes spinner {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
         /* تنسيقات العروض (Views) */
         .view {
             width: 100%;
@@ -404,11 +374,7 @@
     </style>
 </head>
 <body oncontextmenu="return false;" ondragstart="return false;">
-    <div id="loading-overlay">
-        <div class="loader"></div>
-    </div>
-
-    <div class="w-full max-w-md mx-auto h-screen relative overflow-hidden rounded-3xl shadow-2xl bg-gray-800 hidden">
+    <div class="w-full max-w-md mx-auto h-screen relative overflow-hidden rounded-3xl shadow-2xl bg-gray-800">
         <div id="main-menu-view" class="view transform translate-x-0">
             <div id="dollar-collector" class="bg-gray-700 rounded-xl shadow-md">
                 <div id="dollar-collector-progress" class="absolute top-0 left-0 h-full bg-green-500 opacity-30 z-0"></div>
@@ -878,21 +844,20 @@
         const MAX_NAME_CHANGES = 3; // الحد الأقصى لعدد مرات تغيير الاسم
 
         let currentHouseIndex = 0; // فهرس البيت النشط حالياً
-        let houses = [ // تعريف البيوت الأربعة
+        let houses = [ // تعريف البيوت (تم تقليلها إلى بيتين)
             { id: 1, name: "البيت الأول", power: 1, unlocked: true, threshold: 25000, rewardedThresholds: [], img: "https://f.top4top.io/p_3479z75z10.png" },
-            { id: 2, name: "البيت الثاني", power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [], img: "https://i.top4top.io/p_34791336l0.png" },
-            { id: 3, name: "البيت الثالث", power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [], img: "https://k.top4top.io/p_3479f6o0n0.png" },
-            { id: 4, name: "البيت الرابع", power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [], img: "https://l.top4top.io/p_347900b1w0.png" }
+            { id: 2, name: "البيت الثاني", power: 1, unlocked: false, threshold: 50000, rewardedThresholds: [], img: "https://i.top4top.io/p_34791336l0.png" }
         ];
+        // تم تعديل جوائز ترقية البيت لتناسب نطاق القوة الجديد
         const HOUSE_UPGRADE_REWARDS = [
-            { threshold: 250, dollars: 1250, points: 500 },
-            { threshold: 500, dollars: 2500, points: 1000 },
-            { threshold: 1000, dollars: 5000, points: 2000 },
-            { threshold: 2000, dollars: 10000, points: 4000 },
-            { threshold: 4000, dollars: 20000, points: 8000 },
-            { threshold: 8000, dollars: 40000, points: 16000 },
-            { threshold: 15000, dollars: 75000, points: 30000 },
-            { threshold: 20000, dollars: 100000, points: 40000 }
+            { threshold: 1000, dollars: 500, points: 200 },
+            { threshold: 2500, dollars: 1250, points: 500 },
+            { threshold: 5000, dollars: 2500, points: 1000 },
+            { threshold: 10000, dollars: 5000, points: 2000 },
+            { threshold: 20000, dollars: 10000, points: 4000 },
+            { threshold: 30000, dollars: 15000, points: 6000 },
+            { threshold: 40000, dollars: 20000, points: 8000 },
+            { threshold: 50000, dollars: 25000, points: 10000 }
         ];
 
         let challengeState = 'ATTACK_READY'; // حالة نظام التحدي: 'ATTACK_READY' (جاهز للهجوم)، 'COOLDOWN' (في فترة تهدئة)
@@ -911,7 +876,6 @@
         };
 
         // الحصول على عناصر DOM (واجهة المستخدم)
-        const loadingOverlay = document.getElementById('loading-overlay');
         const appDiv = document.querySelector('.w-full.max-w-md.mx-auto'); // العنصر الرئيسي للتطبيق
 
         // عناصر القائمة الرئيسية
@@ -1189,66 +1153,78 @@
         // دمج وإعدادات Firebase: تتم المصادقة وتحميل البيانات الأولية هنا
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                userId = user.uid; 
+                userId = user.uid;
                 console.log("User authenticated:", userId);
-                loadPlayerData(); 
-                loadHouses(); 
-                loadGlobalAttacks(); 
-                loadInventory(); 
-                listenForPlayerUpdates(); 
-                updateOnlineStatus(true); 
-                startAccumulationLoop(); 
-                if (loadingOverlay) loadingOverlay.classList.add('hidden'); 
-                if (appDiv) appDiv.classList.remove('hidden'); 
-                showView('main-menu-view'); 
+                (async () => {
+                    try {
+                        // تحميل البيانات بترتيب تسلسلي
+                        await loadPlayerData();
+                        await loadHouses();
+                        await loadInventory();
+
+                        // هذه هي مستمعات (listeners) مستمرة، لا تحتاج إلى انتظارها في Promise.all
+                        loadGlobalAttacks(); // هذا يقوم بإعداد مستمع onValue
+                        listenForPlayerUpdates(); // هذا يقوم بإعداد مستمع onValue
+
+                        updateOnlineStatus(true);
+                        startAccumulationLoop();
+                        showView('main-menu-view'); // إظهار القائمة الرئيسية مباشرة
+                    } catch (error) {
+                        console.error("فشل تحميل البيانات الأولية بعد المصادقة:", error);
+                        showMessageModal('خطأ في التحميل', 'فشل تحميل بيانات اللعبة. يرجى التحقق من اتصالك بالإنترنت أو قواعد Firebase.', 'error');
+                    }
+                })();
             } else {
+                // إذا لم يتم تسجيل دخول أي مستخدم، حاول تسجيل الدخول بشكل مجهول
                 signInAnonymously(auth)
                     .then(() => {
-                        console.log("Signed in anonymously.");
+                        console.log("تم تسجيل الدخول كمجهول. onAuthStateChanged سيتم تشغيله مرة أخرى بكائن المستخدم.");
                     })
                     .catch((error) => {
-                        console.error("Error signing in anonymously: ", error);
-                        showMessageModal('خطأ', 'فشل تسجيل الدخول التلقائي. يرجى المحاولة مرة أخرى.', 'error');
+                        console.error("خطأ في تسجيل الدخول كمجهول: ", error);
+                        showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول التلقائي. يرجى المحاولة مرة أخرى.', 'error');
                     });
             }
         });
 
         // وظائف حفظ وتحميل البيانات من/إلى Firebase
-        function savePlayerData() {
+        async function savePlayerData() {
             if (!userId) {
                 console.warn("Cannot save player data: userId is null.");
-                return;
+                return; // لا ترفض الوعد، فقط لا تفعل شيئًا
             }
-            set(ref(database, 'users/' + userId + '/data'), {
-                playerName: playerName,
-                dollars: dollars,
-                points: points,
-                totalPower: totalPower,
-                innovationLevel: innovationLevel,
-                innovationCost: innovationCost,
-                innovationPowerIncrease: innovationPowerIncrease,
-                accumulatedDollars: accumulatedDollars,
-                accumulatedPoints: accumulatedPoints,
-                accumulatedPower: accumulatedPower,
-                lastCollectTime: lastCollectTime,
-                isNameSetPermanently: isNameSetPermanently,
-                lastPlayerNameChangeTimestamp: lastPlayerNameChangeTimestamp,
-                nameChangeCount: nameChangeCount,
-                lastOnline: Date.now() 
-            }).then(() => {
+            try {
+                await set(ref(database, 'users/' + userId + '/data'), {
+                    playerName: playerName,
+                    dollars: dollars,
+                    points: points,
+                    totalPower: totalPower,
+                    innovationLevel: innovationLevel,
+                    innovationCost: innovationCost,
+                    innovationPowerIncrease: innovationPowerIncrease,
+                    accumulatedDollars: accumulatedDollars,
+                    accumulatedPoints: accumulatedPoints,
+                    accumulatedPower: accumulatedPower,
+                    lastCollectTime: lastCollectTime,
+                    isNameSetPermanently: isNameSetPermanently,
+                    lastPlayerNameChangeTimestamp: lastPlayerNameChangeTimestamp,
+                    nameChangeCount: nameChangeCount,
+                    lastOnline: Date.now() 
+                });
                 console.log("Player data saved successfully!");
-            }).catch((error) => {
+            } catch (error) {
                 console.error("Error saving player data: ", error);
-                showToast('فشل حفظ البيانات.', 'error');
-            });
+                showToast('خطأ في حفظ بيانات اللاعب. (ربما قواعد Firebase)', 'error');
+            }
         }
 
-        function loadPlayerData() {
+        async function loadPlayerData() {
             if (!userId) {
                 console.warn("Cannot load player data: userId is null.");
                 return;
             }
-            get(ref(database, 'users/' + userId + '/data')).then((snapshot) => {
+            try {
+                const snapshot = await get(ref(database, 'users/' + userId + '/data'));
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     playerName = data.playerName || "لاعب جديد";
@@ -1271,36 +1247,46 @@
                     if (!isNameSetPermanently) {
                         showAuthFlowModal("أهلاً بك أيها المغامر الجديد!", "يرجى تعيين اسمك أو تسجيل الدخول لحفظ تقدمك.");
                     }
-                    savePlayerData(); 
+                    await savePlayerData(); // حفظ البيانات الأولية للمستخدم الجديد
                 }
                 updateUI(); 
-            }).catch((error) => {
+            } catch (error) {
                 console.error("Error loading player data: ", error);
-                showToast('فشل تحميل البيانات.', 'error');
-            });
+                showToast('خطأ في تحميل بيانات اللاعب. (ربما قواعد Firebase)', 'error');
+                throw error; // إعادة رمي الخطأ ليتم التقاطه بواسطة catch في onAuthStateChanged
+            }
         }
 
-        function saveHouses() {
+        async function saveHouses() {
             if (!userId) {
                 console.warn("Cannot save houses: userId is null.");
                 return;
             }
-            set(ref(database, 'users/' + userId + '/houses'), houses)
-                .then(() => console.log("Houses saved successfully"))
-                .catch(error => console.error("Error saving houses: ", error));
-            set(ref(database, 'users/' + userId + '/currentHouseIndex'), currentHouseIndex)
-                .then(() => console.log("Current house index saved successfully"))
-                .catch(error => console.error("Error saving current house index: ", error));
+            try {
+                await Promise.all([
+                    set(ref(database, 'users/' + userId + '/houses'), houses),
+                    set(ref(database, 'users/' + userId + '/currentHouseIndex'), currentHouseIndex)
+                ]);
+                console.log("Houses and current house index saved successfully");
+            } catch (error) {
+                console.error("Error saving houses or current house index: ", error);
+                showToast('خطأ في حفظ معلومات البيوت. (ربما قواعد Firebase)', 'error');
+            }
         }
 
-        function loadHouses() {
+        async function loadHouses() {
             if (!userId) {
                 console.warn("Cannot load houses: userId is null.");
                 return;
             }
-            get(ref(database, 'users/' + userId + '/houses')).then((snapshot) => {
-                if (snapshot.exists()) {
-                    const loadedHouses = snapshot.val();
+            try {
+                const [housesSnapshot, indexSnapshot] = await Promise.all([
+                    get(ref(database, 'users/' + userId + '/houses')),
+                    get(ref(database, 'users/' + userId + '/currentHouseIndex'))
+                ]);
+
+                if (housesSnapshot.exists()) {
+                    const loadedHouses = housesSnapshot.val();
                     console.log("Loaded houses raw:", loadedHouses);
                     if (Array.isArray(loadedHouses) && loadedHouses.length === houses.length) {
                         houses = loadedHouses.map((loadedHouse, index) => {
@@ -1312,37 +1298,36 @@
                         });
                         console.log("Houses merged:", houses);
                     } else {
-                        console.warn("Loaded houses structure is incorrect, resetting to default.");
+                        console.warn("Loaded houses structure is incorrect or length mismatch, resetting to default.");
+                        // إذا كانت البيانات المحملة غير صالحة، استخدم الإعدادات الافتراضية
                         houses = [
                             { id: 1, name: "البيت الأول", power: 1, unlocked: true, threshold: 25000, rewardedThresholds: [], img: "https://f.top4top.io/p_3479z75z10.png" },
-                            { id: 2, name: "البيت الثاني", power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [], img: "https://i.top4top.io/p_34791336l0.png" },
-                            { id: 3, name: "البيت الثالث", power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [], img: "https://k.top4top.io/p_3479f6o0n0.png" },
-                            { id: 4, name: "البيت الرابع", power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [], img: "https://l.top4top.io/p_347900b1w0.png" }
+                            { id: 2, name: "البيت الثاني", power: 1, unlocked: false, threshold: 50000, rewardedThresholds: [], img: "https://i.top4top.io/p_34791336l0.png" }
                         ];
-                        saveHouses();
+                        await saveHouses(); // حفظ البيوت الافتراضية الجديدة
                     }
                 } else {
-                    console.log("No house data found. Saving default houses.");
-                    saveHouses(); 
+                    console.log("No house data found. Default houses will be used and saved.");
+                    await saveHouses(); // حفظ البيوت الافتراضية
                 }
-            }).then(() => {
-                return get(ref(database, 'users/' + userId + '/currentHouseIndex'));
-            }).then((snapshot) => {
-                if (snapshot.exists()) {
-                    currentHouseIndex = snapshot.val();
+
+                if (indexSnapshot.exists()) {
+                    currentHouseIndex = indexSnapshot.val();
                     if (currentHouseIndex >= houses.length || currentHouseIndex < 0) {
                         currentHouseIndex = 0; 
                     }
                     console.log("Current house index loaded:", currentHouseIndex);
                 } else {
                     currentHouseIndex = 0;
-                    console.log("No current house index found. Setting to 0.");
+                    console.log("No current house index found. Setting to 0 and saving.");
+                    await saveHouses(); // حفظ الفهرس الافتراضي
                 }
                 updateUI(); 
-            }).catch((error) => {
+            } catch (error) {
                 console.error("Error loading houses or index: ", error);
-                showToast('فشل تحميل معلومات البيوت.', 'error');
-            });
+                showToast('خطأ في تحميل معلومات البيوت. (ربما قواعد Firebase)', 'error');
+                throw error;
+            }
         }
 
 
@@ -1369,27 +1354,6 @@
             });
         }
 
-        function renderGlobalAttacks() {
-            if (!globalAttacksList) {
-                console.error("renderGlobalAttacks: globalAttacksList element not found.");
-                return;
-            }
-            globalAttacksList.innerHTML = '';
-            if (globalAttacks.length === 0) {
-                globalAttacksList.innerHTML = '<p class="text-gray-400 text-center">لا توجد هجمات عالمية حالياً.</p>';
-                return;
-            }
-            globalAttacks.forEach(attack => {
-                const attackElement = document.createElement('div');
-                attackElement.className = `p-3 rounded-lg shadow-sm ${attack.result === 'win' ? 'bg-green-800' : 'bg-red-800'} text-gray-100 text-sm`;
-                attackElement.innerHTML = `
-                    <p><span class="font-semibold">${attack.attackerName}</span> (قوة: ${attack.attackerPower.toLocaleString()}) هاجم <span class="font-semibold">${attack.defenderName}</span> (قوة: ${attack.defenderPower.toLocaleString()})</p>
-                    <p class="text-xs text-gray-300 mt-1">النتيجة: <span class="font-bold">${attack.result === 'win' ? 'فوز' : 'خسارة'}</span> - في ${new Date(attack.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}</p>
-                `;
-                globalAttacksList.appendChild(attackElement);
-            });
-        }
-
         function saveInventory() {
             if (!userId) {
                 console.warn("Cannot save inventory: userId is null.");
@@ -1397,15 +1361,19 @@
             }
             set(ref(database, 'users/' + userId + '/inventory'), inventory)
                 .then(() => console.log("Inventory saved successfully"))
-                .catch(error => console.error("Error saving inventory: ", error));
+                .catch(error => {
+                    console.error("Error saving inventory: ", error);
+                    showToast('خطأ في حفظ المخزون. (ربما قواعد Firebase)', 'error');
+                });
         }
 
-        function loadInventory() {
+        async function loadInventory() {
             if (!userId) {
                 console.warn("Cannot load inventory: userId is null.");
                 return;
             }
-            get(ref(database, 'users/' + userId + '/inventory')).then((snapshot) => {
+            try {
+                const snapshot = await get(ref(database, 'users/' + userId + '/inventory'));
                 if (snapshot.exists()) {
                     inventory = snapshot.val() || [];
                     console.log("Inventory loaded:", inventory);
@@ -1414,9 +1382,11 @@
                     console.log("No inventory data found.");
                 }
                 renderInventoryCount();
-            }).catch((error) => {
+            } catch (error) {
                 console.error("Error loading inventory: ", error);
-            });
+                showToast('خطأ في تحميل المخزون. (ربما قواعد Firebase)', 'error');
+                throw error;
+            }
         }
 
         // تحديث حالة الاتصال بالإنترنت للمستخدم الحالي
@@ -2112,14 +2082,22 @@
                     nameChangeCount++; 
                     showToast('تم إنشاء الحساب وتسجيل الدخول بنجاح!', 'success');
                     hideModal(authFlowModal);
-                    loadPlayerData();
-                    loadHouses();
-                    loadGlobalAttacks();
-                    loadInventory();
-                    listenForPlayerUpdates();
-                    updateOnlineStatus(true);
-                    startAccumulationLoop();
-                    console.log("User signed up and logged in:", userId);
+                    // إعادة تحميل جميع البيانات للمستخدم المسجل حديثاً
+                    (async () => {
+                        try {
+                            await loadPlayerData();
+                            await loadHouses();
+                            await loadInventory();
+                            loadGlobalAttacks();
+                            listenForPlayerUpdates();
+                            updateOnlineStatus(true);
+                            startAccumulationLoop();
+                            console.log("User signed up and logged in:", userId);
+                        } catch (error) {
+                            console.error("فشل تحميل البيانات بعد إنشاء الحساب:", error);
+                            showMessageModal('خطأ في التحميل', 'فشل تحميل بيانات اللعبة بعد إنشاء الحساب. يرجى التحقق من اتصالك بالإنترنت أو قواعد Firebase.', 'error');
+                        }
+                    })();
                 })
                 .catch((error) => {
                     const errorCode = error.code;
@@ -2148,14 +2126,22 @@
                     isNameSetPermanently = true; 
                     showToast('تم تسجيل الدخول بنجاح!', 'success');
                     hideModal(authFlowModal);
-                    loadPlayerData();
-                    loadHouses();
-                    loadGlobalAttacks();
-                    loadInventory();
-                    listenForPlayerUpdates();
-                    updateOnlineStatus(true);
-                    startAccumulationLoop();
-                    console.log("User signed in:", userId);
+                    // إعادة تحميل جميع البيانات للمستخدم الذي سجل الدخول
+                    (async () => {
+                        try {
+                            await loadPlayerData();
+                            await loadHouses();
+                            await loadInventory();
+                            loadGlobalAttacks();
+                            listenForPlayerUpdates();
+                            updateOnlineStatus(true);
+                            startAccumulationLoop();
+                            console.log("User signed in:", userId);
+                        } catch (error) {
+                            console.error("فشل تحميل البيانات بعد تسجيل الدخول:", error);
+                            showMessageModal('خطأ في التحميل', 'فشل تحميل بيانات اللعبة بعد تسجيل الدخول. يرجى التحقق من اتصالك بالإنترنت أو قواعد Firebase.', 'error');
+                        }
+                    })();
                 })
                 .catch((error) => {
                     const errorCode = error.code;
