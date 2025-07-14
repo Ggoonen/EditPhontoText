@@ -14,7 +14,7 @@
             color: #e2e8f0;
             display: flex;
             flex-direction: column;
-            min-height: 10vh;
+            min-height: 100vh; /* Changed to 100vh for full height */
             overflow-x: hidden;
             user-select: none;
             -webkit-user-select: none;
@@ -1258,8 +1258,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        // تم تعديل هذا السطر لاستيراد serverTimestamp مباشرةً
-        import { getDatabase, ref, set, get, update, onValue, push, query, orderByChild, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref, set, get, update, onValue, push, query, orderByChild, onDisconnect, serverTimestamp, limitToLast } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -1295,6 +1294,8 @@
         const ATTACK_COOLDOWN_GLOBAL_MS = 7 * 60 * 1000; 
 
         let globalAttackCooldownEndTime = 0;
+        let lastAttackedOpponentId = null; // New: To track the last attacked player for temporary hiding
+        let lastGlobalCooldownState = false; // New: To track cooldown state change for re-rendering
 
         let ship1 = { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
         let ship2 = { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
@@ -1549,7 +1550,6 @@
                         const lastSeenRef = ref(db, `artifacts/${appId}/public/onlinePlayers/${userId}/lastSeen`);
                         
                         onDisconnect(presenceRef).set(false);
-                        // تم تعديل هذا السطر لاستخدام serverTimestamp()
                         onDisconnect(lastSeenRef).set(serverTimestamp());
 
                         await fetchOrCreateUserData();
@@ -1713,6 +1713,7 @@
                     }
                 }
                 updateOnlinePlayersUI(allPlayers);
+                // Only re-render attackable players if the section is currently visible
                 if (document.getElementById('attackSection').classList.contains('animate-fade-in-up')) {
                     renderAttackablePlayers(allPlayers);
                 }
@@ -1833,8 +1834,10 @@
                     if (attack.result === 'win') {
                         resultText = 'فزت';
                         resultColor = 'text-green-400';
-                        winningsText = ` +${formatNumber(attack.winnings.money)} <i class="fas fa-dollar-sign"></i>`;
-                        if (attack.winnings.key) {
+                        if (attack.winnings && attack.winnings.money) { // Check if winnings.money exists
+                            winningsText = ` +${formatNumber(attack.winnings.money)} <i class="fas fa-dollar-sign"></i>`;
+                        }
+                        if (attack.winnings && attack.winnings.key) { // Check if winnings.key exists
                             winningsText += ` +${attack.winnings.key} <i class="fas fa-key"></i>`;
                         }
                     } else {
@@ -1862,7 +1865,9 @@
                     li.innerHTML = `<span class="font-bold">${attack.attackerFleetName}</span> ${resultText} ضد <span class="font-bold">${attack.defenderFleetName}</span>.`;
                 }
                 
-                li.innerHTML += `<p class="text-xs text-gray-500 mt-1">${new Date(attack.timestamp).toLocaleString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>`;
+                // Ensure timestamp is a number before creating Date object
+                const timestamp = typeof attack.timestamp === 'number' ? attack.timestamp : Date.now();
+                li.innerHTML += `<p class="text-xs text-gray-500 mt-1">${new Date(timestamp).toLocaleString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>`;
                 challengeLogListEl.appendChild(li);
             });
         }
@@ -1871,7 +1876,13 @@
             if (!attackablePlayersListEl || !userId) return;
 
             attackablePlayersListEl.innerHTML = '';
-            const otherPlayers = allPlayers.filter(p => p.userId !== userId);
+            let otherPlayers = allPlayers.filter(p => p.userId !== userId);
+
+            // Filter out the last attacked opponent if the global cooldown is still active
+            const cooldownActive = globalAttackCooldownEndTime > Date.now();
+            if (cooldownActive && lastAttackedOpponentId) {
+                otherPlayers = otherPlayers.filter(p => p.userId !== lastAttackedOpponentId);
+            }
 
             if (otherPlayers.length === 0) {
                 attackablePlayersListEl.innerHTML = '<p class="text-center text-gray-400">لا يوجد لاعبون آخرون للهجوم عليهم حالياً.</p>';
@@ -1950,7 +1961,25 @@
             updatePlayerStats();
 
             globalAttackCooldownEndTime = Date.now() + ATTACK_COOLDOWN_GLOBAL_MS;
+            lastAttackedOpponentId = opponent.userId; // Store the ID of the attacked opponent
             await saveUserData();
+            
+            // Re-render attackable players immediately to hide the attacked opponent
+            if (document.getElementById('attackSection').classList.contains('animate-fade-in-up')) {
+                const playersRef = ref(db, `artifacts/${appId}/public/onlinePlayers`);
+                get(playersRef).then(snapshot => {
+                    const data = snapshot.val();
+                    const allPlayers = [];
+                    if (data) {
+                        for (const key in data) {
+                            allPlayers.push(data[key]);
+                        }
+                    }
+                    renderAttackablePlayers(allPlayers);
+                }).catch(error => {
+                    window.showMessage("حدث خطأ أثناء تحميل قائمة اللاعبين للهجوم.");
+                });
+            }
 
             try {
                 const attackLogRef = ref(db, `artifacts/${appId}/public/attackLog`);
@@ -1961,28 +1990,51 @@
                     defenderFleetName: opponent.fleetName,
                     result: win ? 'win' : 'loss',
                     winnings: winnings,
-                    timestamp: Date.now()
+                    timestamp: serverTimestamp() // Use serverTimestamp for accuracy
                 });
             } catch (error) {
             }
         }
 
         function updateAttackCooldownsUI() {
-            if (document.getElementById('attackSection').classList.contains('animate-fade-in-up')) {
-                const attackButtons = attackablePlayersListEl.querySelectorAll('.attack-player-btn');
-                attackButtons.forEach(button => {
-                    const cooldownRemaining = globalAttackCooldownEndTime - Date.now();
-                    const isOnCooldown = cooldownRemaining > 0;
+            const cooldownRemaining = globalAttackCooldownEndTime - Date.now();
+            const isOnCooldown = cooldownRemaining > 0;
 
-                    if (isOnCooldown) {
-                        button.disabled = true;
-                        button.textContent = formatTime(cooldownRemaining);
-                    } else {
-                        button.disabled = false;
-                        button.textContent = 'هجوم';
+            // Get all attack buttons to update their state
+            const attackButtons = attackablePlayersListEl.querySelectorAll('.attack-player-btn');
+            attackButtons.forEach(button => {
+                if (isOnCooldown) {
+                    button.disabled = true;
+                    button.textContent = formatTime(cooldownRemaining);
+                } else {
+                    button.disabled = false;
+                    button.textContent = 'هجوم';
+                }
+            });
+
+            // If cooldown just ended, reset lastAttackedOpponentId and re-render the list
+            if (lastGlobalCooldownState && !isOnCooldown) {
+                lastAttackedOpponentId = null; // Player reappears
+                if (document.getElementById('attackSection').classList.contains('animate-fade-in-up')) {
+                    // Re-fetch and re-render players to include the one that reappeared
+                    if (db) {
+                        const playersRef = ref(db, `artifacts/${appId}/public/onlinePlayers`);
+                        get(playersRef).then(snapshot => {
+                            const data = snapshot.val();
+                            const allPlayers = [];
+                            if (data) {
+                                for (const key in data) {
+                                    allPlayers.push(data[key]);
+                                }
+                            }
+                            renderAttackablePlayers(allPlayers);
+                        }).catch(error => {
+                            window.showMessage("حدث خطأ أثناء تحميل قائمة اللاعبين للهجوم.");
+                        });
                     }
-                });
+                }
             }
+            lastGlobalCooldownState = isOnCooldown; // Update state for next check
         }
 
         function populateShipFormsList() {
