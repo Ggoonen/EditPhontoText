@@ -4,10 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لعبة تقمص الأدوار العربية</title>
+    <!-- ربط Tailwind CSS لسهولة التنسيق -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css"> </head>
-<body class="bg-gray-900 text-white font-sans overflow-hidden">
+    <!-- ربط ملف التنسيقات الخاص بك (style.css) - سنقوم بإنشائه لاحقًا -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-900 text-white font-sans overflow-hidden" oncontextmenu="return false;" ondragstart="return false;">
 
+    <!-- شاشة التحميل الأولية -->
     <div id="loading-overlay" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
         <div class="text-center">
             <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
@@ -15,7 +19,9 @@
         </div>
     </div>
 
+    <!-- حاوية التطبيق الرئيسية (تظهر بعد التحميل) -->
     <div id="app" class="hidden">
+        <!-- قسم رأس الصفحة (الهيدر) -->
         <header class="flex justify-between items-center p-4 bg-gray-800 shadow-lg relative z-20">
             <h1 class="text-3xl font-bold text-indigo-400">لعبة الأدوار</h1>
             <div class="flex items-center space-x-4 space-x-reverse">
@@ -32,6 +38,7 @@
             </div>
         </header>
 
+        <!-- قسم جمع الموارد (يظهر في الزاوية العلوية اليسرى) -->
         <div id="dollar-collector" class="bg-gray-700 text-gray-100 p-2 rounded-lg shadow-md flex flex-col items-center justify-center">
             <h3 class="font-semibold text-gray-100 relative z-10 text-center underline text-xs">موارد متراكمة</h3>
             <div class="resource-display-row flex items-center justify-between w-full">
@@ -60,6 +67,7 @@
             <p id="collect-timer-display" class="text-xs text-gray-400 mt-1" style="display: none;">استلام بعد: <span id="collect-countdown"></span></p>
         </div>
 
+        <!-- الشريط الجانبي الأيسر -->
         <aside id="sidebar" class="fixed top-0 left-0 h-full w-64 bg-gray-800 shadow-xl transform -translate-x-full transition-transform duration-300 ease-in-out z-40 p-4">
             <button id="close-sidebar" class="absolute top-4 left-4 text-gray-400 hover:text-white">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -79,8 +87,10 @@
             </nav>
         </aside>
 
+        <!-- المحتوى الرئيسي -->
         <main class="p-4 pt-20 flex justify-center items-start min-h-screen relative">
             <div id="content" class="w-full max-w-4xl bg-gray-800 rounded-lg shadow-lg p-6 relative">
+                <!-- لوحة القيادة -->
                 <div id="dashboard-view" class="view">
                     <h2 class="text-3xl font-bold text-white mb-6 border-b-2 border-indigo-500 pb-3">لوحة القيادة</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -100,11 +110,13 @@
                     <div class="bg-gray-700 p-4 rounded-lg shadow mb-6">
                         <h3 class="text-xl font-semibold text-gray-200 mb-2">أحدث الإشعارات</h3>
                         <div id="notifications-list" class="space-y-2">
+                            <!-- الإشعارات ستظهر هنا -->
                             <p class="text-gray-400">لا توجد إشعارات حالياً.</p>
                         </div>
                     </div>
                 </div>
 
+                <!-- الابتكار -->
                 <div id="innovation-view" class="view hidden">
                     <h2 class="text-3xl font-bold text-white mb-6 border-b-2 border-indigo-500 pb-3">الابتكار</h2>
                     <div id="innovation-content">
@@ -118,6 +130,7 @@
                         <div class="bg-gray-700 p-4 rounded-lg shadow">
                             <h3 class="text-xl font-semibold text-gray-200 mb-2">تقدم البيوت</h3>
                             <div id="houses-progress" class="mb-4">
+                                <!-- سيتم ملؤها بواسطة JS -->
                                 <div class="flex items-center mb-2">
                                     <span class="text-gray-300 mr-2">البيت 1:</span>
                                     <div class="w-full bg-gray-600 rounded-full h-2">
@@ -132,11 +145,13 @@
                     </div>
                 </div>
 
+                <!-- التحدي -->
                 <div id="challenge-view" class="view hidden">
                     <h2 class="text-3xl font-bold text-white mb-6 border-b-2 border-indigo-500 pb-3">التحدي</h2>
                     <div id="challenge-area" class="bg-gray-700 p-6 rounded-lg shadow-inner text-center">
                         <h3 class="text-2xl font-bold text-white mb-4" id="challengeStatus">جاري البحث عن خصم...</h3>
                         
+                        <!-- بطاقة اللاعب المستهدف للتحدي -->
                         <div id="targetPlayerCard" class="hidden bg-gray-800 p-4 rounded-lg shadow-md max-w-xs mx-auto mb-4">
                             <h4 class="text-xl font-bold text-indigo-400 mb-2" id="targetPlayerName"></h4>
                             <p class="text-gray-300">القوة: <span id="targetPlayerPower" class="font-semibold text-red-400"></span></p>
@@ -145,25 +160,30 @@
                             </button>
                         </div>
 
+                        <!-- مؤقت التهدئة بعد الهجوم -->
                         <div id="cooldownTimer" class="hidden text-center">
                             <p class="text-xl text-gray-300 mb-2">يجب الانتظار قبل التحدي القادم:</p>
                             <p class="text-4xl font-bold text-yellow-400 mb-4"><span id="timerDisplay">02:00</span></p>
                         </div>
 
+                        <!-- رسالة الفوز/الخسارة -->
                         <div id="challengeResult" class="hidden text-center text-xl font-semibold mt-4"></div>
                     </div>
                     <div class="mt-6 bg-gray-700 p-4 rounded-lg shadow">
                         <h3 class="text-xl font-semibold text-gray-200 mb-2">سجل التحديات</h3>
                         <ul id="challenge-log" class="list-disc list-inside text-gray-300 space-y-1">
-                            </ul>
+                            <!-- سجل التحديات سيتم ملؤه هنا -->
+                        </ul>
                     </div>
                 </div>
 
+                <!-- العشيرة -->
                 <div id="clan-view" class="view hidden">
                     <h2 class="text-3xl font-bold text-white mb-6 border-b-2 border-indigo-500 pb-3">العشيرة</h2>
                     <p class="text-gray-300">هنا ستكون معلومات عشيرتك.</p>
                 </div>
 
+                <!-- الترتيب -->
                 <div id="ranking-view" class="view hidden">
                     <h2 class="text-3xl font-bold text-white mb-6 border-b-2 border-indigo-500 pb-3">الترتيب</h2>
                     <table class="min-w-full bg-gray-700 rounded-lg overflow-hidden">
@@ -175,18 +195,22 @@
                             </tr>
                         </thead>
                         <tbody id="ranking-list" class="divide-y divide-gray-600">
-                            </tbody>
+                            <!-- سيتم ملؤها بواسطة JS -->
+                        </tbody>
                     </table>
                 </div>
 
+                <!-- السوق -->
                 <div id="market-view" class="view hidden">
                     <h2 class="text-3xl font-bold text-white mb-6 border-b-2 border-indigo-500 pb-3">السوق</h2>
                     <p class="text-gray-300">هنا يمكنك شراء وبيع العناصر.</p>
                 </div>
 
+                <!-- جميع اللاعبين -->
                 <div id="all-players-view" class="view hidden">
                     <h2 class="text-3xl font-bold text-white mb-6 border-b-2 border-indigo-500 pb-3">جميع اللاعبين</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="all-players-list">
+                        <!-- قائمة اللاعبين ستظهر هنا -->
                         <p class="text-gray-400">لا يوجد لاعبون لعرضهم حالياً.</p>
                     </div>
                 </div>
@@ -194,6 +218,7 @@
         </main>
     </div>
 
+    <!-- نافذة إعدادات اللاعب (مودال) -->
     <div id="settings-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
         <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md relative">
             <button id="close-settings-modal" class="absolute top-4 left-4 text-gray-400 hover:text-white">
@@ -222,6 +247,7 @@
         </div>
     </div>
 
+    <!-- نافذة الرسائل العامة (مودال) -->
     <div id="message-modal" class="modal-overlay hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
         <div class="bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-sm relative text-center">
             <button id="close-message-modal" class="absolute top-4 left-4 text-gray-400 hover:text-white">
@@ -235,5 +261,7 @@
         </div>
     </div>
 
-    <script type="module" src="script.js"></script> </body>
+    <!-- ربط ملف JavaScript الخاص بك (script.js) - سنقوم بإنشائه لاحقًا -->
+    <script type="module" src="script.js"></script>
+</body>
 </html>
