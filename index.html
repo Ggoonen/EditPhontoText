@@ -355,6 +355,9 @@
         .main-menu-item-bg-developments {
             background: linear-gradient(to bottom, #00BFFF, #1E90FF);
         }
+        .main-menu-item-bg-roulette-log { /* New style for roulette log */
+            background: linear-gradient(to bottom, #6A5ACD, #483D8B);
+        }
 
 
         .store-item {
@@ -963,6 +966,12 @@
 
     <main class="flex-grow p-4 flex flex-col items-center justify-center relative">
         <section id="mainMenu" class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8 w-full max-w-4xl hidden">
+            <div class="pill-style-item main-menu-item-bg-roulette-log" onclick="showSection('rouletteLogSection')">
+                <div class="content">
+                    <i class="fas fa-history"></i>
+                    <span>سجل الروليت</span>
+                </div>
+            </div>
             <div class="pill-style-item main-menu-item-bg-1" onclick="showSection('myFleet')">
                 <div class="content">
                     <i class="fas fa-ship"></i>
@@ -1203,6 +1212,16 @@
                 </ul>
             </div>
         </section>
+
+        <section id="rouletteLogSection" class="hidden p-6 rounded-xl shadow-xl w-full max-w-2xl text-gray-100 section-container">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200" onclick="showSection('mainMenu')">
+                <i class="fas fa-arrow-right text-3xl"></i>
+            </button>
+            <h2 class="text-3xl font-bold text-center mb-6 text-gray-100">سجل الروليت</h2>
+            <ul id="rouletteLogList" class="space-y-3">
+                <!-- Roulette log entries will be inserted here -->
+            </ul>
+        </section>
     </main>
 
     <div id="resourceCollectionBtnWrapper" class="resource-btn-wrapper hidden">
@@ -1261,7 +1280,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getDatabase, ref, set, get, update, onValue, push, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        // Import the entire database module as 'database' to access ServerValue
+        import * as database from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref, set, get, update, onValue, push, query, orderByChild, limitToLast, onDisconnect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -1284,6 +1305,7 @@
         let userDbRef = null; 
         let onlinePlayersListener = null; 
         let attackLogListener = null; 
+        let rouletteLogListener = null; // New listener for roulette log
 
         let playerPower = 0;
         let playerMoney = 0;
@@ -1403,6 +1425,7 @@
         let challengeLogSection;
         let attackSection;
         let onlinePlayersSection;
+        let rouletteLogSection; // New section element
 
         let messageModal;
         let modalMessage;
@@ -1451,6 +1474,7 @@
         let offlinePlayersListEl;
         let challengeLogListEl;
         let attackablePlayersListEl;
+        let rouletteLogListEl; // New list element for roulette log
 
         const shipFormsData = [
             { levelRange: '1 - 1000', iconType: 'font-awesome', iconClass: 'fas fa-ship', imgSrc: '' },
@@ -1547,12 +1571,25 @@
                         userId = user.uid;
                         userDbRef = ref(db, `artifacts/${appId}/users/${userId}/playerData`);
                         
+                        // Set up onDisconnect for presence
+                        const presenceRef = ref(db, `artifacts/${appId}/public/onlinePlayers/${userId}/isOnline`);
+                        const lastSeenRef = ref(db, `artifacts/${appId}/public/onlinePlayers/${userId}/lastSeen`);
+                        
+                        onDisconnect(presenceRef).set(false);
+                        onDisconnect(lastSeenRef).set(database.ServerValue.TIMESTAMP); // Fixed: Use database.ServerValue.TIMESTAMP
+
                         await fetchOrCreateUserData();
-                        await updateOnlineStatus(true);
+                        await updateOnlineStatus(true); // Set online status when user logs in
                         setupPublicDataListeners();
 
                         authModal.style.display = 'none';
 
+                        // Periodically update lastSeen to keep user marked as online
+                        setInterval(() => {
+                            if (userId) {
+                                updateOnlineStatus(true);
+                            }
+                        }, 30 * 1000); // Every 30 seconds
                     } else {
                         userId = null;
                         clearPublicDataListeners();
@@ -1723,6 +1760,22 @@
                 updateChallengeLogUI(attacks);
             }, (error) => {
             });
+
+            // New: Listener for user's private roulette log
+            const userRouletteLogRef = ref(db, `artifacts/${appId}/users/${userId}/rouletteLog`);
+            const rouletteLogQuery = query(userRouletteLogRef, orderByChild('timestamp'), limitToLast(20)); // Limit to last 20 entries
+            rouletteLogListener = onValue(rouletteLogQuery, (snapshot) => {
+                const data = snapshot.val();
+                const entries = [];
+                if (data) {
+                    for (const key in data) {
+                        entries.push(data[key]);
+                    }
+                }
+                entries.sort((a, b) => b.timestamp - a.timestamp); // Sort by most recent first
+                updateRouletteLogUI(entries);
+            }, (error) => {
+            });
         }
 
         function clearPublicDataListeners() {
@@ -1733,6 +1786,10 @@
             if (attackLogListener) {
                 attackLogListener();
                 attackLogListener = null;
+            }
+            if (rouletteLogListener) { // Clear roulette log listener
+                rouletteLogListener();
+                rouletteLogListener = null;
             }
         }
 
@@ -1912,10 +1969,11 @@
             }
 
             let win = false;
+            // Updated win probability
             if (playerPower > opponent.power) {
-                win = Math.random() < 0.6; 
+                win = Math.random() < 0.9; // 90% win chance if player power is higher
             } else {
-                win = Math.random() < 0.4; 
+                win = Math.random() < 0.4; // 40% win chance if player power is lower or equal
             }
 
             let winnings = { money: 0, key: 0 };
@@ -2415,7 +2473,7 @@
         }
 
         window.showSection = function(sectionId) {
-            const sections = [mainMenuSection, myFleetSection, storeSection, onlineSection, rouletteSection, developmentsSection, challengeLogSection, attackSection, onlinePlayersSection];
+            const sections = [mainMenuSection, myFleetSection, storeSection, onlineSection, rouletteSection, developmentsSection, challengeLogSection, attackSection, onlinePlayersSection, rouletteLogSection];
             sections.forEach(section => {
                 section.classList.remove('animate-fade-in-up');
                 section.classList.add('hidden');
@@ -2612,14 +2670,61 @@
             endRound();
         }
 
-        function endRound() {
+        async function endRound() {
             gameActive = false;
             cashOutBtn.classList.add('hidden');
             cashOutBtn.disabled = true;
             
             rouletteCooldownEndTime = Date.now() + ROULETTE_COOLDOWN_MS;
             updateRouletteCooldownUI(); 
-            saveUserData();
+            saveUserData(); // This will save the cooldown
+
+            // Save roulette log entry
+            if (userId) {
+                const logRef = ref(db, `artifacts/${appId}/users/${userId}/rouletteLog`);
+                await push(logRef, {
+                    betAmount: betAmount,
+                    finalMultiplier: currentMultiplier,
+                    winnings: hasCashedOut ? Math.round(betAmount * currentMultiplier) : 0,
+                    loss: hasCashedOut ? 0 : betAmount,
+                    result: hasCashedOut ? 'win' : 'loss',
+                    timestamp: Date.now()
+                });
+            }
+        }
+
+        // New: Function to update roulette log UI
+        function updateRouletteLogUI(entries) {
+            if (!rouletteLogListEl) return;
+            rouletteLogListEl.innerHTML = '';
+            if (entries.length === 0) {
+                rouletteLogListEl.innerHTML = '<p class="text-center text-gray-400">لا يوجد سجل للروليت حالياً.</p>';
+                return;
+            }
+
+            entries.forEach(entry => {
+                const li = document.createElement('li');
+                li.className = 'bg-gray-700 p-3 rounded-md mb-2';
+                let resultText = '';
+                let resultColor = '';
+                let details = '';
+
+                if (entry.result === 'win') {
+                    resultText = 'فوز';
+                    resultColor = 'text-green-400';
+                    details = `ربحت ${formatNumber(entry.winnings)} <i class="fas fa-dollar-sign"></i> عند ${entry.finalMultiplier.toFixed(2)}x`;
+                } else {
+                    resultText = 'خسارة';
+                    resultColor = 'text-red-400';
+                    details = `خسرت ${formatNumber(entry.loss)} <i class="fas fa-dollar-sign"></i> عند ${entry.finalMultiplier.toFixed(2)}x`;
+                }
+                
+                li.innerHTML = `
+                    <span class="font-bold ${resultColor}">${resultText}</span>: رهان ${formatNumber(entry.betAmount)} <i class="fas fa-dollar-sign"></i> - ${details}
+                    <p class="text-xs text-gray-500 mt-1">${new Date(entry.timestamp).toLocaleString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                `;
+                rouletteLogListEl.appendChild(li);
+            });
         }
 
         function handleUpgradeShip1Click() { upgradeShip(ship1); }
@@ -2665,7 +2770,7 @@
             ship3LevelEl = document.getElementById('ship3Level');
             ship3ProgressEl = document.getElementById('ship3Progress');
             ship3MaxPowerEl = document.getElementById('ship3MaxPower');
-            upgradeShip3Btn = document.getElementById('upgradeShip3'); /* Fixed: Changed from 'upgrade3Btn' to 'upgradeShip3' */
+            upgradeShip3Btn = document.getElementById('upgradeShip3'); 
             ship3CooldownDisplay = document.getElementById('ship3CooldownDisplay');
             ship3IconContainerEl = document.querySelector('#ship3Container > .icon-container');
             ship3IconIEl = ship3IconContainerEl.querySelector('i');
@@ -2680,6 +2785,7 @@
             challengeLogSection = document.getElementById('challengeLog');
             attackSection = document.getElementById('attackSection');
             onlinePlayersSection = document.getElementById('onlinePlayersSection');
+            rouletteLogSection = document.getElementById('rouletteLogSection'); // Get new section element
 
             messageModal = document.getElementById('messageModal');
             modalMessage = document.getElementById('modalMessage');
@@ -2725,6 +2831,7 @@
             offlinePlayersListEl = document.getElementById('offlinePlayersList');
             challengeLogListEl = document.getElementById('challengeLogList');
             attackablePlayersListEl = document.getElementById('attackablePlayersList');
+            rouletteLogListEl = document.getElementById('rouletteLogList'); // Get new list element
 
 
             upgradeShip1Btn.addEventListener('click', handleUpgradeShip1Click);
@@ -2757,9 +2864,13 @@
             document.addEventListener('selectstart', event => event.preventDefault());
         });
 
+        // The beforeunload event is still useful for immediate status updates,
+        // but onDisconnect in Firebase provides a more robust solution for unexpected closures.
         window.addEventListener('beforeunload', async () => {
             if (userId) {
-                await updateOnlineStatus(false);
+                // No need to explicitly set offline here, onDisconnect handles it.
+                // But we can ensure data is saved one last time.
+                await saveUserData(); 
             }
         });
     </script>
