@@ -1284,6 +1284,7 @@
         let userDbRef = null; 
         let onlinePlayersListener = null; 
         let attackLogListener = null; 
+        let currentActiveSectionId = null; // New: To track the currently active section
 
         let playerPower = 0;
         let playerMoney = 0;
@@ -1494,30 +1495,25 @@
                         userDbRef = ref(db, `artifacts/${appId}/users/${userId}/playerData`);
                         console.log("Firebase Auth State Changed: User logged in. userId:", userId);
                         
+                        // Set up onDisconnect only once per user session
                         const presenceRef = ref(db, `artifacts/${appId}/public/onlinePlayers/${userId}/isOnline`);
                         const lastSeenRef = ref(db, `artifacts/${appId}/public/onlinePlayers/${userId}/lastSeen`);
-                        
                         onDisconnect(presenceRef).set(false);
                         onDisconnect(lastSeenRef).set(serverTimestamp());
 
                         await fetchOrCreateUserData();
-                        await updateOnlineStatus(true); 
-                        setupPublicDataListeners();
+                        setupPublicDataListeners(); // Start listening to public data
 
                         authModal.style.display = 'none';
 
-                        setInterval(() => {
-                            if (userId) {
-                                updateOnlineStatus(true);
-                            }
-                        }, 30 * 1000); 
                     } else {
                         console.log("Firebase Auth State Changed: User logged out or no user.");
                         userId = null;
-                        clearPublicDataListeners();
+                        clearPublicDataListeners(); // Stop listening to public data
                         authModal.style.display = 'flex';
                         showSection('hidden'); // Hide all game sections
                         resourceCollectionBtnWrapper.classList.add('hidden');
+                        // No need to reset data here, logoutUser handles it explicitly
                     }
                 });
 
@@ -1555,9 +1551,39 @@
 
         async function logoutUser() {
             try {
+                // Before signing out, explicitly set online status to false if user was online
+                if (userId && currentActiveSectionId === 'onlineSection') {
+                    await updateOnlineStatus(false);
+                }
+
                 await signOut(auth);
                 window.showMessage('تم تسجيل الخروج بنجاح!');
                 console.log("User logged out.");
+
+                // Reset all local player data to default values
+                playerMoney = 0;
+                playerKeys = 0;
+                playerPower = 0; 
+                fleetName = null; 
+                isGoldenNameActive = false;
+                isStarIconActive = false;
+                ship1 = { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+                ship2 = { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+                ship3 = { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+                globalAttackCooldownEndTime = 0;
+                rouletteCooldownEndTime = 0;
+                accumulatedResources = 0;
+                lastAttackedOpponentId = null;
+                currentActiveSectionId = null; // Reset active section on logout
+
+                // Update UI to reflect reset data
+                updatePlayerStats();
+                updateAllShipCooldowns();
+                updateResourceCircle();
+                updateResourceButtonState();
+                updateRouletteCooldownUI();
+                updateAttackCooldownsUI(); 
+
             } catch (error) {
                 console.error("Error during logout:", error);
                 window.showMessage(`خطأ في تسجيل الخروج: ${error.message}`);
@@ -1582,7 +1608,6 @@
                     isGoldenNameActive = data.isGoldenNameActive !== undefined ? data.isGoldenNameActive : false;
                     isStarIconActive = data.isStarIconActive !== undefined ? data.isStarIconActive : false;
 
-                    // Initialize ship objects with defaults if missing or incomplete
                     ship1 = { 
                         power: (data.ship1 && data.ship1.power !== undefined) ? data.ship1.power : 0,
                         level: (data.ship1 && data.ship1.level !== undefined) ? data.ship1.level : 0,
@@ -1606,12 +1631,13 @@
 
                     globalAttackCooldownEndTime = data.globalAttackCooldownEndTime !== undefined ? data.globalAttackCooldownEndTime : 0;
                     rouletteCooldownEndTime = data.rouletteCooldownEndTime !== undefined ? data.rouletteCooldownEndTime : 0;
+                    accumulatedResources = data.accumulatedResources !== undefined ? data.accumulatedResources : 0; // Load accumulated resources
 
-                    console.log("Data loaded successfully:", { playerMoney, playerKeys, fleetName, isGoldenNameActive, isStarIconActive, ship1, ship2, ship3, globalAttackCooldownEndTime, rouletteCooldownEndTime });
+                    console.log("Data loaded successfully:", { playerMoney, playerKeys, fleetName, isGoldenNameActive, isStarIconActive, ship1, ship2, ship3, globalAttackCooldownEndTime, rouletteCooldownEndTime, accumulatedResources });
 
                 } else {
                     console.log("User data does NOT exist. Initializing new data.");
-                    fleetName = "أسطولي العظيم"; // Default name for new users
+                    fleetName = "أسطولي العظيم"; 
                     playerMoney = 100;
                     playerKeys = 1;
                     isGoldenNameActive = false;
@@ -1621,6 +1647,7 @@
                     ship3 = { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
                     globalAttackCooldownEndTime = 0;
                     rouletteCooldownEndTime = 0;
+                    accumulatedResources = 0; // Initialize for new users
 
                     await set(userDbRef, {
                         money: playerMoney,
@@ -1632,7 +1659,8 @@
                         ship2: ship2,
                         ship3: ship3,
                         globalAttackCooldownEndTime: globalAttackCooldownEndTime,
-                        rouletteCooldownEndTime: rouletteCooldownEndTime
+                        rouletteCooldownEndTime: rouletteCooldownEndTime,
+                        accumulatedResources: accumulatedResources // Save for new users
                     });
                     console.log("New data initialized and saved to Firebase.");
                 }
@@ -1647,7 +1675,7 @@
                 if (fleetName === null || fleetName === "أسطولي العظيم") {
                     initialFleetNameModal.style.display = 'flex';
                 } else {
-                    window.showSection('mainMenu');
+                    window.showSection('mainMenu'); // Show main menu after data is loaded
                 }
 
             } catch (error) {
@@ -1673,7 +1701,8 @@
                     ship2: ship2,
                     ship3: ship3,
                     globalAttackCooldownEndTime: globalAttackCooldownEndTime, 
-                    rouletteCooldownEndTime: rouletteCooldownEndTime
+                    rouletteCooldownEndTime: rouletteCooldownEndTime,
+                    accumulatedResources: accumulatedResources // Save accumulated resources
                 });
                 console.log("User data saved successfully.");
             } catch (error) {
@@ -1686,18 +1715,35 @@
             if (!userId || !fleetName) return;
             try {
                 const playerStatusRef = ref(db, `artifacts/${appId}/public/onlinePlayers/${userId}`);
-                await set(playerStatusRef, {
-                    userId: userId,
-                    fleetName: fleetName,
-                    power: playerPower,
-                    isOnline: isOnline,
-                    lastSeen: Date.now(),
-                    ship1Power: ship1.power,
-                    ship2Power: ship2.power,
-                    ship3Power: ship3.power,
-                    ship2Unlocked: ship2.unlocked,
-                    ship3Unlocked: ship3.unlocked
-                });
+                if (isOnline) {
+                    await set(playerStatusRef, {
+                        userId: userId,
+                        fleetName: fleetName,
+                        power: playerPower,
+                        isOnline: true,
+                        lastSeen: Date.now(),
+                        ship1Power: ship1.power,
+                        ship2Power: ship2.power,
+                        ship3Power: ship3.power,
+                        ship2Unlocked: ship2.unlocked,
+                        ship3Unlocked: ship3.unlocked
+                    });
+                    console.log(`User ${userId} set to online.`);
+                } else {
+                    await set(playerStatusRef, {
+                        userId: userId,
+                        fleetName: fleetName,
+                        power: playerPower,
+                        isOnline: false,
+                        lastSeen: Date.now(),
+                        ship1Power: ship1.power,
+                        ship2Power: ship2.power,
+                        ship3Power: ship3.power,
+                        ship2Unlocked: ship2.unlocked,
+                        ship3Unlocked: ship3.unlocked
+                    });
+                    console.log(`User ${userId} set to offline.`);
+                }
             } catch (error) {
                 console.error("Error updating online status:", error);
             }
@@ -2086,9 +2132,7 @@
                 fleetStarIconEl.classList.add('hidden');
             }
             saveUserData(); 
-            if (userId) {
-                updateOnlineStatus(true); 
-            }
+            // Removed updateOnlineStatus(true) from here, now handled by showSection
         }
 
         function formatTime(ms) {
@@ -2270,6 +2314,7 @@
                 const collectedAmount = Math.floor(Math.random() * 6) + 1;
                 accumulatedResources = Math.min(MAX_ACCUMULATED_RESOURCES, accumulatedResources + collectedAmount);
                 updateResourceCircle();
+                // No need to saveUserData here, it's called by collectAccumulatedResources when collected
             }
             updateResourceButtonState(); 
         }
@@ -2471,7 +2516,7 @@
                 fleetName = name;
                 initialFleetNameModal.style.display = 'none';
                 updatePlayerStats(); 
-                await updateOnlineStatus(true);
+                // No need to update online status here, it's handled by showSection('mainMenu')
                 window.showSection('mainMenu');
             } else {
                 window.showMessage('الرجاء إدخال اسم صالح لأسطولك!');
@@ -2480,6 +2525,13 @@
 
         window.showSection = function(sectionId) {
             const sections = [mainMenuSection, myFleetSection, storeSection, onlineSection, rouletteSection, developmentsSection, challengeLogSection, attackSection, onlinePlayersSection];
+
+            // Logic to handle online status when changing sections
+            if (currentActiveSectionId === 'onlineSection' && sectionId !== 'onlineSection' && userId) {
+                // User is leaving the online section
+                updateOnlineStatus(false);
+            }
+
             sections.forEach(section => {
                 section.classList.remove('animate-fade-in-up');
                 section.classList.add('hidden');
@@ -2490,6 +2542,14 @@
                 targetSection.classList.remove('hidden');
                 targetSection.classList.add('animate-fade-in-up');
             }
+
+            // Logic to handle online status when entering the online section
+            if (sectionId === 'onlineSection' && userId) {
+                updateOnlineStatus(true);
+            }
+
+            // Update the current active section ID
+            currentActiveSectionId = sectionId;
 
             if (sectionId === 'mainMenu') {
                 resourceCollectionBtnWrapper.classList.remove('hidden');
@@ -2804,7 +2864,7 @@
             document.getElementById('confirmShipExpansionBtn').addEventListener('click', handleConfirmShipExpansionClick); 
             startGameBtn.addEventListener('click', handleStartGameClick);
             cashOutBtn.addEventListener('click', handleCashOutClick);
-            logoutBtn.addEventListener('click', handleLogoutClick); // Add event listener for logout button
+            logoutBtn.addEventListener('click', handleLogoutClick); 
 
             loginBtn.addEventListener('click', loginUser);
             registerBtn.addEventListener('click', registerUser);
@@ -2823,6 +2883,9 @@
         });
 
         window.addEventListener('beforeunload', async () => {
+            if (userId && currentActiveSectionId === 'onlineSection') {
+                await updateOnlineStatus(false); // Set offline when closing tab if in online section
+            }
             if (userId) {
                 await saveUserData(); 
             }
