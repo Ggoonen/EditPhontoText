@@ -1602,6 +1602,7 @@
 
             } catch (error) {
                 window.showMessage("حدث خطأ في الاتصال بالخادم. يرجى المحاولة لاحقاً.");
+                console.error("Firebase initialization error:", error);
             }
         }
 
@@ -1613,6 +1614,7 @@
                 window.showMessage('تم التسجيل بنجاح! يمكنك الآن تسجيل الدخول.');
             } catch (error) {
                 window.showMessage(`خطأ في التسجيل: ${error.message}`);
+                console.error("Registration error:", error);
             }
         }
 
@@ -1624,6 +1626,7 @@
                 window.showMessage('تم تسجيل الدخول بنجاح!');
             } catch (error) {
                 window.showMessage(`خطأ في تسجيل الدخول: ${error.message}`);
+                console.error("Login error:", error);
             }
         }
 
@@ -1681,11 +1684,13 @@
 
             } catch (error) {
                 window.showMessage("حدث خطأ أثناء تحميل بياناتك. يرجى المحاولة لاحقاً.");
+                console.error("Error fetching or creating user data:", error);
             }
         }
 
         async function saveUserData() {
             if (!userDbRef || !userId) {
+                console.warn("User data not saved: userDbRef or userId is null.");
                 return;
             }
             try {
@@ -1704,11 +1709,15 @@
                 saveDataToLocalStorage();
             } catch (error) {
                 window.showMessage("حدث خطأ أثناء حفظ بياناتك. يرجى المحاولة لاحقاً.");
+                console.error("Error saving user data:", error);
             }
         }
 
         async function updateOnlineStatus(isOnline) {
-            if (!userId || !fleetName) return;
+            if (!userId || !fleetName) {
+                console.warn("Cannot update online status: userId or fleetName is null.");
+                return;
+            }
             try {
                 const playerStatusRef = ref(db, `artifacts/${appId}/public/onlinePlayers/${userId}`);
                 await set(playerStatusRef, {
@@ -1723,16 +1732,22 @@
                     ship2Unlocked: ship2.unlocked,
                     ship3Unlocked: ship3.unlocked
                 });
+                console.log(`User ${userId} online status set to ${isOnline}`);
             } catch (error) {
+                console.error("Error updating online status:", error);
             }
         }
 
         function setupPublicDataListeners() {
-            if (!db) return;
+            if (!db) {
+                console.warn("Firebase DB not initialized, cannot set up public data listeners.");
+                return;
+            }
 
             const playersRef = ref(db, `artifacts/${appId}/public/onlinePlayers`);
             onlinePlayersListener = onValue(playersRef, (snapshot) => {
                 const data = snapshot.val();
+                console.log("Online Players Data Received:", data); // Log received data
                 const allPlayers = [];
                 if (data) {
                     for (const key in data) {
@@ -1744,12 +1759,14 @@
                     renderAttackablePlayers(allPlayers);
                 }
             }, (error) => {
+                console.error("Error fetching online players:", error); // Log errors
             });
 
             const attackLogRef = ref(db, `artifacts/${appId}/public/attackLog`);
             const attackLogQuery = query(attackLogRef, orderByChild('timestamp'), limitToLast(5));
             attackLogListener = onValue(attackLogQuery, (snapshot) => {
                 const data = snapshot.val();
+                console.log("Attack Log Data Received:", data); // Log received data
                 const attacks = [];
                 if (data) {
                     for (const key in data) {
@@ -1759,6 +1776,7 @@
                 attacks.reverse(); 
                 updateChallengeLogUI(attacks);
             }, (error) => {
+                console.error("Error fetching attack log:", error); // Log errors
             });
 
             // New: Listener for user's private roulette log
@@ -1766,6 +1784,7 @@
             const rouletteLogQuery = query(userRouletteLogRef, orderByChild('timestamp'), limitToLast(20)); // Limit to last 20 entries
             rouletteLogListener = onValue(rouletteLogQuery, (snapshot) => {
                 const data = snapshot.val();
+                console.log("Roulette Log Data Received:", data); // Log received data
                 const entries = [];
                 if (data) {
                     for (const key in data) {
@@ -1775,6 +1794,7 @@
                 entries.sort((a, b) => b.timestamp - a.timestamp); // Sort by most recent first
                 updateRouletteLogUI(entries);
             }, (error) => {
+                console.error("Error fetching roulette log:", error); // Log errors
             });
         }
 
@@ -1782,14 +1802,17 @@
             if (onlinePlayersListener) {
                 onlinePlayersListener(); 
                 onlinePlayersListener = null;
+                console.log("Online players listener detached.");
             }
             if (attackLogListener) {
                 attackLogListener();
                 attackLogListener = null;
+                console.log("Attack log listener detached.");
             }
             if (rouletteLogListener) { // Clear roulette log listener
                 rouletteLogListener();
                 rouletteLogListener = null;
+                console.log("Roulette log listener detached.");
             }
         }
 
@@ -2012,6 +2035,7 @@
                     timestamp: Date.now()
                 });
             } catch (error) {
+                console.error("Error logging attack:", error);
             }
         }
 
@@ -2508,6 +2532,7 @@
                         renderAttackablePlayers(allPlayers);
                     }).catch(error => {
                         window.showMessage("حدث خطأ أثناء تحميل قائمة اللاعبين للهجوم.");
+                        console.error("Error fetching players for attack section:", error);
                     });
                 }
             }
