@@ -3,29 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق جوال</title>
+    <title>تطبيق إدارة الموارد</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* تنسيقات عامة للجسم */
+        /* General body styles */
         body {
             font-family: 'Outfit', sans-serif;
-            background-color: #1a202c; /* bg-gray-900 */
-            color: #edf2f7; /* text-white */
-            direction: rtl; /* لضمان الاتجاه من اليمين لليسار */
-            text-align: right; /* لمحاذاة النص لليمين افتراضياً */
-            -webkit-user-select: none; /* منع تحديد النص في Safari */
-            -ms-user-select: none; /* منع تحديد النص في IE/Edge */
-            user-select: none; /* منع تحديد النص في المتصفحات الحديثة */
+            background-color: #0a0a0a; /* Darker background */
+            color: #e4e4e7; /* Lighter text for contrast */
+            direction: rtl; /* Ensure right-to-left direction */
+            text-align: right; /* Default text alignment to right */
+            -webkit-user-select: none; /* Prevent text selection in Safari */
+            -ms-user-select: none; /* Prevent text selection in IE/Edge */
+            user-select: none; /* Prevent text selection in modern browsers */
         }
 
-        /* حاوية التطبيق الرئيسية */
-        .w-full.max-w-md.mx-auto.h-screen.relative.overflow-hidden.rounded-3xl.shadow-2xl.bg-gray-800 {
+        /* Main application container - wider, more immersive */
+        .app-container {
+            width: 100%;
+            max-width: 480px; /* Slightly wider for better mobile feel */
+            margin: 0 auto;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            border-radius: 2rem; /* More rounded */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5); /* Deeper shadow */
+            background-color: #18181b; /* Dark zinc */
             display: flex;
             flex-direction: column;
         }
 
-        /* تنسيقات العروض (Views) */
+        /* View styles */
         .view {
             width: 100%;
             height: 100%;
@@ -35,188 +44,236 @@
             padding: 1.5rem; /* p-6 */
             display: flex;
             flex-direction: column;
-            justify-content: flex-start; /* محاذاة المحتوى للأعلى */
+            justify-content: flex-start; /* Align content to top */
             align-items: center;
-            transition: transform 0.3s ease-out; /* حركة الانتقال بين العروض */
-            background-color: #2d3748; /* bg-gray-800 */
-            overflow-y: auto; /* للسماح بالتمرير إذا كان المحتوى كبيراً */
-            padding-top: 5rem; /* مسافة من الأعلى لعدم تداخل المحتوى مع الهيدر */
+            transition: transform 0.4s ease-in-out; /* Smoother transition */
+            background-color: #18181b; /* Dark zinc */
+            overflow-y: auto; /* Allow scrolling if content is large */
+            padding-top: 6rem; /* More top padding for header */
         }
 
-        /* إخفاء العروض غير النشطة */
+        /* Hide inactive views */
         .view.hidden {
             display: none;
         }
 
-        /* تنسيقات زر العودة */
-        .absolute.top-4.left-4 {
-            z-index: 20; /* لضمان ظهوره فوق المحتوى */
+        /* Back button styles */
+        .back-button {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            color: #a1a1aa; /* Zinc 400 */
+            transition: color 0.2s ease-in-out;
+            z-index: 20;
+        }
+        .back-button:hover {
+            color: #e4e4e7; /* Lighter on hover */
         }
 
-        /* تنسيقات قائمة الموارد المتراكمة (Dollar Collector) */
+        /* Header bar for resources and player name */
+        .header-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #27272a; /* Zinc 800 */
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 10;
+            border-bottom-left-radius: 1rem;
+            border-bottom-right-radius: 1rem;
+        }
+
+        .resource-display-header {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #e4e4e7;
+            gap: 0.5rem;
+        }
+        .resource-display-header svg {
+            width: 1.1rem;
+            height: 1.1rem;
+        }
+
+        /* Accumulated Resources (Dollar Collector) styles */
         #dollar-collector {
             position: absolute;
             top: 1rem;
-            right: 1rem; /* تم تغيير left إلى right لوضعه في الزاوية العلوية اليمنى */
-            width: 120px; /* عرض ثابت */
-            padding: 0.2rem;
-            border-radius: 0.5rem;
+            right: 1.5rem; /* Placed at top-right corner */
+            width: 130px; /* Slightly wider */
+            padding: 0.4rem;
+            border-radius: 0.75rem; /* More rounded */
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            background: #2d3748; /* bg-gray-700 */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* ظل خفيف */
-            z-index: 10; /* لضمان ظهوره فوق العناصر الأخرى */
+            background: #27272a; /* Zinc 800 */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4); /* Deeper shadow */
+            z-index: 11; /* Above header bar */
+            border: 1px solid #3f3f46; /* Zinc 700 border */
+            text-align: center;
         }
 
         #dollar-collector .resource-display-row {
             display: flex;
-            justify-content: space-between; /* توزيع العناصر بالتساوي مع دفع الزر لليمين */
+            justify-content: space-around; /* Distribute items more evenly */
             align-items: center;
-            flex-wrap: wrap; /* السماح بتجاوز السطر إذا لزم الأمر */
-            margin-bottom: 0.1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.4rem;
             position: relative;
             z-index: 1;
-            width: 100%; /* ضمان أن يأخذ العرض الكامل للعنصر الأب */
+            width: 100%;
         }
 
         #dollar-collector .resource-display-row > div {
             display: flex;
             align-items: center;
-            white-space: nowrap; /* منع التفاف النص لعدم كسر عرض الموارد */
-            margin-right: 0.2rem; /* مسافة بين عرض الموارد */
+            white-space: nowrap;
+            font-size: 0.75rem;
         }
-
-        #dollar-collector .resource-display-row > div:last-of-type {
-            margin-right: 0; /* إزالة المسافة من آخر عنصر عرض موارد */
+        #dollar-collector .resource-display-row > div svg {
+            width: 0.8rem;
+            height: 0.8rem;
+            margin-left: 0.1rem;
         }
 
         #collect-dollars-button {
-            padding: 0.2rem 0.5rem;
-            font-size: 0.7rem;
+            padding: 0.3rem 0.8rem;
+            font-size: 0.75rem;
             position: relative;
             z-index: 1;
-            width: auto; /* السماح للزر بتحديد عرضه بناءً على المحتوى */
-            margin-left: 0.2rem; /* مسافة صغيرة من اليسار */
-            margin-right: auto; /* دفع الزر إلى أقصى اليمين */
-            margin-bottom: 0.2rem;
+            width: 90%; /* Take more width */
+            margin: 0.2rem auto; /* Center button */
+            background: linear-gradient(to right, #22c55e, #16a34a); /* Green gradient */
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        #collect-dollars-button:disabled {
+            background: #4b5563; /* Gray for disabled */
+            cursor: not-allowed;
         }
 
-        /* تنسيقات عناصر القائمة الرئيسية */
+        /* Main menu item styles */
         .menu-item {
-            min-height: 120px; /* ارتفاع أدنى لبطاقات القائمة */
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            min-height: 140px; /* Taller cards */
+            border-radius: 1.5rem; /* More rounded */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4); /* Deeper shadow */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border 0.2s ease-in-out;
+            border: 2px solid transparent; /* Default transparent border */
+            background-color: #27272a; /* Zinc 800 as base */
         }
 
         .menu-item:hover {
-            transform: translateY(-5px); /* تأثير رفع عند التحويم */
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4); /* ظل أكبر عند التحويم */
+            transform: translateY(-8px); /* More pronounced lift */
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6); /* Even deeper shadow */
+            border-color: #6366f1; /* Indigo border on hover */
+        }
+        .menu-item svg {
+            width: 3.5rem; /* Larger icons */
+            height: 3.5rem;
+            margin-bottom: 0.75rem;
+            color: #a78bfa; /* Purple-ish tint for icons */
+        }
+        .menu-item span {
+            font-size: 1.25rem; /* Larger text */
+            font-weight: 700;
         }
 
-        /* تنسيقات زر الابتكار في Game View */
+        /* Innovation button in Game View styles */
         #innovation-button {
-            background: linear-gradient(to right, #4c51bf, #6b46c1); /* لون متدرج */
-            padding: 0.75rem 1.5rem; /* py-3 px-6 */
-            border-radius: 0.75rem; /* rounded-xl */
-            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            background: linear-gradient(to right, #6366f1, #8b5cf6); /* Indigo to violet gradient */
+            padding: 0.8rem 1.8rem;
+            border-radius: 1rem;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+            font-size: 1.1rem;
             transition: all 0.2s ease-in-out;
         }
 
         #innovation-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
-            filter: brightness(1.1); /* زيادة الإضاءة عند التحويم */
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            filter: brightness(1.15);
         }
-
         #innovation-button:active {
             transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        #innovation-button-text {
-            display: flex;
-            align-items: center;
-        }
-
-        .price-display {
-            display: flex;
-            align-items: center;
-            margin-right: 0.5rem; /* مسافة بين النص والسعر */
-        }
-
-        .price-display svg {
-            margin-left: 0.25rem; /* مسافة صغيرة بين الأيقونة والرقم */
-        }
-
-        /* تنسيقات بطاقات البيوت في Game View */
+        /* House card styles in Game View */
         .house-card {
-            background-color: #2d3748; /* bg-gray-700 */
-            padding: 1rem;
-            border-radius: 0.75rem; /* rounded-xl */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            background-color: #27272a; /* Zinc 800 */
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
             text-align: center;
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border 0.2s ease-in-out;
+            border: 2px solid transparent;
         }
 
         .house-card.active-house {
-            border: 3px solid #6366f1; /* لون حدود مميز للبيت النشط */
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.6); /* ظل متوهج */
+            border: 3px solid #3b82f6; /* Blue border for active house */
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.7); /* Glowing blue shadow */
         }
 
         .house-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
         .house-card img {
-            max-width: 80px;
+            max-width: 100px; /* Larger house images */
             height: auto;
-            margin: 0 auto 0.5rem;
+            margin: 0 auto 1rem;
         }
 
-        /* تنسيقات عناصر المتجر */
+        /* Store item styles */
         .store-item {
-            background-color: #2d3748; /* bg-gray-700 */
-            padding: 1rem;
-            border-radius: 0.75rem; /* rounded-xl */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            text-align: center;
+            background-color: #27272a; /* Zinc 800 */
+            padding: 1.25rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            min-height: 180px; /* ارتفاع أدنى لعناصر المتجر */
+            min-height: 200px; /* Taller store items */
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
 
         .store-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
 
         .store-item img {
-            max-width: 100px;
+            max-width: 120px; /* Larger item images */
             height: auto;
-            margin-bottom: 0.5rem;
-        }
-
-        .store-item .item-title {
-            font-weight: 600;
-            color: #e2e8f0; /* text-gray-200 */
             margin-bottom: 0.75rem;
         }
 
+        .store-item .item-title {
+            font-weight: 700;
+            color: #e4e4e7;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
         .store-item .buy-button {
-            background: linear-gradient(to right, #48bb78, #38a169); /* bg-green-500 to green-600 */
+            background: linear-gradient(to right, #22c55e, #16a34a); /* Green gradient */
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.75rem;
             font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.25rem;
+            gap: 0.4rem;
             transition: all 0.2s ease-in-out;
+            font-size: 0.95rem;
         }
 
         .store-item .buy-button:hover {
@@ -224,15 +281,15 @@
             transform: scale(1.05);
         }
 
-        /* تنسيقات اللاعبين في قائمة اونلاين */
+        /* Player list styles in Online view */
         .player-card {
-            background-color: #2d3748; /* bg-gray-700 */
-            padding: 1rem;
-            border-radius: 0.75rem; /* rounded-xl */
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            background-color: #27272a; /* Zinc 800 */
+            padding: 1.25rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.25rem;
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
 
@@ -242,51 +299,51 @@
         }
 
         .player-card .status-indicator {
-            width: 10px;
-            height: 10px;
+            width: 12px; /* Larger indicator */
+            height: 12px;
             border-radius: 50%;
         }
 
-        /* تنسيقات نافذة الـ Toast (الإشعارات الصغيرة) */
+        /* Toast Notification styles */
         #toast-notification {
-            background-color: #333;
+            background-color: #3f3f46; /* Zinc 700 */
             color: white;
-            padding: 0.75rem 1.25rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-            min-width: 200px;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            min-width: 250px;
             text-align: center;
-            z-index: 1000; /* لضمان ظهوره فوق كل شيء */
+            z-index: 1000;
         }
 
         #toast-notification.success {
-            background-color: #48bb78; /* أخضر للنجاح */
+            background-color: #22c55e; /* Green */
         }
 
         #toast-notification.error {
-            background-color: #ef4444; /* أحمر للخطأ */
+            background-color: #ef4444; /* Red */
         }
 
         #toast-notification.info {
-            background-color: #3b82f6; /* أزرق للمعلومات */
+            background-color: #3b82f6; /* Blue */
         }
 
-        /* تنسيقات المودال العام */
+        /* General Modal styles */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(5px);
+            background-color: rgba(0, 0, 0, 0.85); /* Darker overlay */
+            backdrop-filter: blur(8px); /* More blur */
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 100;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
         }
 
         .modal-overlay.visible {
@@ -295,15 +352,16 @@
         }
 
         .popup-content, .message-modal-content, #house-info-modal > div, #store-detail-modal > div, #inventory-modal > div, #auth-flow-modal > div {
-            background-color: #2d3748; /* bg-gray-700 */
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            max-width: 400px;
+            background-color: #27272a; /* Zinc 800 */
+            padding: 2.5rem; /* More padding */
+            border-radius: 1.5rem; /* More rounded */
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6); /* Deeper shadow */
+            max-width: 450px; /* Slightly wider */
             width: 90%;
-            transform: scale(0.95);
+            transform: scale(0.9); /* Start smaller */
             opacity: 0;
-            transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+            transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+            border: 1px solid #3f3f46; /* Zinc 700 border */
         }
 
         .modal-overlay.visible .popup-content, .modal-overlay.visible .message-modal-content, .modal-overlay.visible #house-info-modal > div, .modal-overlay.visible #store-detail-modal > div, .modal-overlay.visible .message-modal-content, .modal-overlay.visible #inventory-modal > div, .modal-overlay.visible #auth-flow-modal > div {
@@ -311,299 +369,281 @@
             opacity: 1;
         }
 
-        /* تنسيقات أزرار الكمية في المتجر */
+        /* Quantity buttons in store styles */
         .quantity-button {
-            background-color: #4a5568; /* bg-gray-600 */
+            background-color: #3f3f46; /* Zinc 700 */
             color: white;
-            width: 36px;
-            height: 36px;
+            width: 40px; /* Larger buttons */
+            height: 40px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
+            font-size: 1.5rem; /* Larger font */
             font-weight: bold;
             transition: background-color 0.2s ease-in-out;
         }
 
         .quantity-button:hover {
-            background-color: #6366f1; /* bg-indigo-500 */
+            background-color: #6366f1; /* Indigo 500 */
         }
 
-        /* تنسيقات رسائل تفعيل الرمز التعويضي */
+        /* Redeem code status message styles */
         .redeem-status {
-            margin-top: 1rem;
-            font-size: 0.9rem;
+            margin-top: 1.25rem;
+            font-size: 1rem;
             font-weight: 600;
         }
 
         .redeem-status.success {
-            color: #48bb78; /* أخضر */
+            color: #22c55e; /* Green */
         }
 
         .redeem-status.error {
-            color: #ef4444; /* أحمر */
+            color: #ef4444; /* Red */
         }
 
-        /* تنسيقات عناصر المخزون */
+        /* Inventory item styles */
         .inventory-item {
-            background-color: #374151; /* bg-gray-700 */
-            padding: 0.75rem;
-            border-radius: 0.5rem;
+            background-color: #3f3f46; /* Zinc 700 */
+            padding: 1rem;
+            border-radius: 0.75rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 1rem;
-            color: #e2e8f0; /* text-gray-200 */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            font-size: 1.05rem;
+            color: #e4e4e7;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         .inventory-item .use-button {
-            background-color: #6366f1; /* bg-indigo-500 */
+            background-color: #6366f1; /* Indigo 500 */
             color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 0.375rem;
-            font-size: 0.875rem;
+            padding: 0.4rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
             font-weight: bold;
             transition: background-color 0.2s ease-in-out;
         }
 
         .inventory-item .use-button:hover {
-            background-color: #4f46e5; /* bg-indigo-600 */
+            background-color: #4f46e5; /* Indigo 600 */
         }
     </style>
 </head>
 <body oncontextmenu="return false;" ondragstart="return false;">
-    <div class="w-full max-w-md mx-auto h-screen relative overflow-hidden rounded-3xl shadow-2xl bg-gray-800">
-        <div id="main-menu-view" class="view transform translate-x-0">
-            <div id="dollar-collector" class="bg-gray-700 rounded-xl shadow-md">
-                <div id="dollar-collector-progress" class="absolute top-0 left-0 h-full bg-green-500 opacity-30 z-0"></div>
-                <h3 class="font-semibold text-gray-100 relative z-10 text-center underline text-xs">موارد متراكمة</h3>
-                <div class="resource-display-row">
-                    <div class="flex items-center text-gray-200 text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
-                        </svg>
-                        <span class="font-bold text-green-300" id="accumulated-dollars-display">$0</span>
-                    </div>
-                    <div class="flex items-center text-gray-200 text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
-                            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
-                        </svg>
-                        <span class="font-bold text-yellow-300" id="accumulated-points-display">0</span>
-                    </div>
-                    <div class="flex items-center text-gray-200 text-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 ml-1 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        <span class="font-bold text-red-300" id="accumulated-power-display">0</span>
-                    </div>
-                    <button id="collect-dollars-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-1 px-3 rounded-lg shadow-md transition duration-200 ease-in-out text-xs">
-                        استلام
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-gray-700 p-4 rounded-xl mb-6 shadow-md text-center mt-24"> <!-- Adjusted margin-top for dollar collector -->
-                <h2 class="text-xl font-bold text-gray-100 mb-3" id="player-name-display">تعيين اسم</h2>
-                <div class="flex items-center justify-center gap-x-4 mb-3">
-                    <div class="flex items-center text-gray-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
-                            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
-                        </svg>
-                        <span class="text-base" id="player-points-display">0</span>
-                    </div>
-                    <div class="flex items-center text-gray-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
-                        </svg>
-                        <span class="text-base" id="player-dollars-display">$0</span>
-                    </div>
-                    <div class="flex items-center text-gray-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        <span class="text-base" id="player-total-power-display-main">0</span>
-                    </div>
-                </div>
-            </div>
-
-            <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">القائمة الرئيسية</h1>
-            <div class="grid grid-cols-2 gap-6 view-content">
-                <div id="play-menu-item" class="menu-item bg-gradient-to-br from-green-600 to-teal-700 text-white p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17.25L15 12l-5.25-5.25M12 21a9 9 0 110-18 9 9 0 010 18z" />
+    <div class="app-container">
+        <!-- Header Bar for Player Info -->
+        <div class="header-bar">
+            <div class="flex items-center gap-x-3">
+                <h2 class="text-xl font-bold text-zinc-100" id="player-name-display-header">اللاعب</h2>
+                <div class="flex items-center text-zinc-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
                     </svg>
-                    <span class="text-lg font-semibold">العب</span>
+                    <span class="text-base" id="player-points-display-header">0</span>
                 </div>
-                <div id="attack-log-menu-item" class="menu-item bg-gradient-to-br from-orange-600 to-red-700 text-white p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                <div class="flex items-center text-zinc-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
                     </svg>
-                    <span class="text-lg font-semibold">سجل التحدي</span>
+                    <span class="text-base" id="player-dollars-display-header">$0</span>
                 </div>
-                <div id="store-menu-item" class="menu-item bg-gradient-to-br from-blue-600 to-cyan-700 text-white p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
-                    <span class="text-lg font-semibold">متجر</span>
-                </div>
-                <div id="online-menu-item" class="menu-item bg-gradient-to-br from-yellow-600 to-amber-700 text-white p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <div class="flex items-center text-zinc-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    <span class="text-lg font-semibold">اونلاين</span>
+                    <span class="text-base" id="player-total-power-display-header">0</span>
                 </div>
-                <div id="challenge-menu-item" class="menu-item bg-gradient-to-br from-gray-600 to-gray-700 text-white p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            </div>
+        </div>
+
+        <!-- Dollar Collector -->
+        <div id="dollar-collector">
+            <div id="dollar-collector-progress" class="absolute top-0 left-0 h-full bg-emerald-500 opacity-30 z-0"></div>
+            <h3 class="font-semibold text-zinc-100 relative z-10 text-center text-xs mb-1">موارد متراكمة</h3>
+            <div class="resource-display-row">
+                <div class="flex items-center text-zinc-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
+                    </svg>
+                    <span class="font-bold text-green-300" id="accumulated-dollars-display">$0</span>
+                </div>
+                <div class="flex items-center text-zinc-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="font-bold text-yellow-300" id="accumulated-points-display">0</span>
+                </div>
+                <div class="flex items-center text-zinc-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span class="font-bold text-red-300" id="accumulated-power-display">0</span>
+                </div>
+            </div>
+            <button id="collect-dollars-button" class="text-white font-bold transition duration-200 ease-in-out">
+                استلام
+            </button>
+        </div>
+
+        <!-- Main Menu View -->
+        <div id="main-menu-view" class="view transform translate-x-0">
+            <h1 class="text-4xl font-extrabold text-zinc-100 mb-10 mt-6">القائمة الرئيسية</h1>
+            <div class="grid grid-cols-2 gap-6 w-full max-w-sm">
+                <div id="play-menu-item" class="menu-item flex flex-col items-center justify-center text-center cursor-pointer text-emerald-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17.25L15 12l-5.25-5.25M12 21a9 9 0 110-18 9 9 0 010 18z" />
+                    </svg>
+                    <span class="text-zinc-100">العب</span>
+                </div>
+                <div id="attack-log-menu-item" class="menu-item flex flex-col items-center justify-center text-center cursor-pointer text-rose-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
+                    <span class="text-zinc-100">سجل التحدي</span>
+                </div>
+                <div id="store-menu-item" class="menu-item flex flex-col items-center justify-center text-center cursor-pointer text-sky-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    <span class="text-zinc-100">المتجر</span>
+                </div>
+                <div id="online-menu-item" class="menu-item flex flex-col items-center justify-center text-center cursor-pointer text-amber-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span class="text-zinc-100">اونلاين</span>
+                </div>
+                <div id="challenge-menu-item" class="menu-item flex flex-col items-center justify-center text-center cursor-pointer text-purple-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h2v-2a3 3 0 00-3-3H8a3 3 0 00-3 3v2H3m10-9a4 4 0 11-8 0 4 4 0 018 0zM7 10h.01M12 12h.01M17 12h.01M12 15h.01M12 18h.01M12 21h.01" />
                     </svg>
-                    <span class="text-lg font-semibold">تحدي اللاعبون</span>
+                    <span class="text-zinc-100">تحدي اللاعبون</span>
                 </div>
-                <div id="redeem-code-menu-item" class="menu-item bg-gradient-to-br from-pink-600 to-red-600 text-white p-6 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg cursor-pointer">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <div id="redeem-code-menu-item" class="menu-item flex flex-col items-center justify-center text-center cursor-pointer text-pink-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.707-8.707z" />
                     </svg>
-                    <span class="text-lg font-semibold">رمز تعويضي</span>
+                    <span class="text-zinc-100">رمز تعويضي</span>
                 </div>
             </div>
         </div>
 
+        <!-- Attack Log View -->
         <div id="attack-log-view" class="view transform translate-x-full">
-            <div id="back-to-main-from-attack-log" class="absolute top-4 left-4 text-gray-400 hover:text-gray-200 cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <button id="back-to-main-from-attack-log" class="back-button">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
-            </div>
-            <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">سجل التحدي</h1>
-
-            <div class="view-content">
-                <div class="bg-gray-700 p-6 rounded-xl mb-6 shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-100 mb-4">سجل الهجمات العالمية (آخر 5)</h2>
-                    <div id="global-attacks-list" class="flex flex-col gap-2">
-                        <p class="text-gray-400 text-center">لا توجد هجمات عالمية حالياً.</p>
-                    </div>
+            </button>
+            <h1 class="text-3xl font-bold text-zinc-100 mb-8">سجل التحدي</h1>
+            <div class="w-full max-w-md bg-zinc-800 p-6 rounded-xl shadow-lg border border-zinc-700">
+                <h2 class="text-xl font-semibold text-zinc-100 mb-4">سجل الهجمات العالمية (آخر 5)</h2>
+                <div id="global-attacks-list" class="flex flex-col gap-3">
+                    <p class="text-zinc-400 text-center">لا توجد هجمات عالمية حالياً.</p>
                 </div>
             </div>
         </div>
 
+        <!-- Game View -->
         <div id="game-view" class="view transform translate-x-full">
-            <div id="back-to-main-from-game" class="absolute top-4 left-4 text-gray-400 hover:text-gray-200 cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <button id="back-to-main-from-game" class="back-button">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
-            </div>
-            <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">العب</h1>
+            </button>
+            <h1 class="text-3xl font-bold text-zinc-100 mb-8">العب</h1>
 
-            <div id="game-info-icon" class="absolute top-4 right-4 text-gray-400 hover:text-gray-200 cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div id="game-info-icon" class="absolute top-6 right-6 text-zinc-400 hover:text-zinc-200 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
             </div>
 
-            <div id="inventory-icon" class="absolute top-4 left-12 text-gray-400 hover:text-gray-200 cursor-pointer flex items-center p-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div id="inventory-icon" class="absolute top-6 left-16 text-zinc-400 hover:text-zinc-200 cursor-pointer flex items-center p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4m0-10h.01" />
                 </svg>
                 <span id="inventory-count" class="bg-red-500 text-white text-xs font-bold rounded-full px-2 py-0.5 -mt-2 -mr-2">0</span>
             </div>
 
-            <div class="flex items-center justify-center mb-6">
-                <button id="innovation-prev-button" class="text-gray-400 hover:text-gray-200 p-2 rounded-full transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <div class="flex items-center justify-center mb-8">
+                <button id="innovation-prev-button" class="text-zinc-400 hover:text-zinc-200 p-3 rounded-full transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
-                <button id="innovation-button" class="text-white font-bold flex items-center mx-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <button id="innovation-button" class="text-white font-bold flex items-center mx-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 ml-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17H21l-9-15-9 15h11.337z" />
                     </svg>
                     <span id="innovation-button-text">
                         <span>تفعيل الابتكار</span>
                         <span class="price-display">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
                         </svg>
                             <span>مجاني</span>
                         </span>
                     </span>
                 </button>
-                <button id="innovation-next-button" class="text-gray-400 hover:text-gray-200 p-2 rounded-full transition-colors duration-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <button id="innovation-next-button" class="text-zinc-400 hover:text-zinc-200 p-3 rounded-full transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                 </button>
             </div>
-            <div id="innovation-timer" class="text-gray-300 text-lg text-center mb-6 hidden">
+            <div id="innovation-timer" class="text-zinc-300 text-lg text-center mb-6 hidden">
                 الوقت المتبقي: <span id="timer-display-value">5:00</span>
             </div>
 
-            <div id="game-total-power-display" class="text-gray-200 text-lg text-center mb-4">
-                القوة الإجمالية: <span id="player-total-power-display-game" class="font-bold text-red-400">0</span>
+            <div id="game-total-power-display" class="text-zinc-200 text-xl text-center mb-6 font-semibold">
+                القوة الإجمالية: <span id="player-total-power-display-game" class="font-bold text-rose-400">0</span>
             </div>
 
-            <div id="next-house-info" class="text-gray-300 text-center text-base mb-6 hidden">
+            <div id="next-house-info" class="text-zinc-300 text-center text-base mb-6 hidden">
             </div>
 
-            <div id="houses-container" class="grid grid-cols-2 gap-4 justify-items-center view-content">
+            <div id="houses-container" class="grid grid-cols-1 gap-6 w-full max-w-sm">
             </div>
         </div>
 
+        <!-- Store View -->
         <div id="store-view" class="view transform translate-x-full">
-            <div id="back-to-main-from-store" class="absolute top-4 left-4 text-gray-400 hover:text-gray-200 cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <button id="back-to-main-from-store" class="back-button">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
-            </div>
-            <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">المتجر</h1>
+            </button>
+            <h1 class="text-3xl font-bold text-zinc-100 mb-8">المتجر</h1>
 
-            <div class="flex items-center justify-center gap-x-4 mb-6 bg-gray-700 p-3 rounded-xl shadow-md">
-                <div class="flex items-center text-gray-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
-                            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
-                        </svg>
-                    <span class="text-base" id="store-player-points-display">0</span>
-                </div>
-                <div class="flex items-center text-gray-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
-                        </svg>
-                    <span class="text-base" id="store-player-dollars-display">$0</span>
-                </div>
-                <div class="flex items-center text-gray-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    <span class="text-base" id="store-player-total-power-display">0</span>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 view-content">
-                <div id="store-item-reduce-time" class="store-item">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-lg">
+                <div id="store-item-reduce-time" class="store-item cursor-pointer">
                     <img src="https://f.top4top.io/p_3479ijdcl0.png" alt="Reduce Time">
                     <span class="item-title">تقليل وقت الابتكار</span>
                     <button class="buy-button">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-1 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V3m0 9v3m0 3.545c-1.472 0-2.688-.475-3.463-1.249A3.987 3.987 0 018 18a4 4 0 00-4 4h16c0-2.209-1.791-4-4-4a4 4 0 01-3.463-1.249C14.688 17.07 13.472 16.545 12 16.545z" />
                         </svg>
                         <span>200</span>
                     </button>
                 </div>
-                <div id="store-item-convert-points" class="store-item">
+                <div id="store-item-convert-points" class="store-item cursor-pointer">
                     <img src="https://i.top4top.io/s_34795cyi20.png" alt="Convert Points">
                     <span class="item-title">تحويل النقاط</span>
                     <button class="buy-button">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
                         </svg>
                         <span>500</span>
                     </button>
                 </div>
-                <div id="store-item-buy-innovation3" class="store-item">
+                <div id="store-item-buy-innovation3" class="store-item cursor-pointer">
                     <img src="https://f.top4top.io/s_34796x9520.png" alt="Buy Innovation 3">
                     <span class="item-title">شراء ابتكار ثالث</span>
                     <button class="buy-button">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 ml-1 text-yellow-400" viewBox="0 0 24 24" fill="currentColor">
                             <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm.5 4.75a.75.75 0 00-1.5 0v.625H9.75a.75.75 0 000 1.5h1.25v.625a.75.75 0 001.5 0v-.625h1.25a.75.75 0 000-1.5h-1.25V7a.75.75 0 00-.75-.75zM12 18a.75.75 0 00.75-.75v-1.5a.75.75 0 00-1.5 0v1.5c0 .414.336.75.75.75zM12 13.5a.75.75 0 00.75-.75V9.75a.75.75 0 00-1.5 0v3c0 .414.336.75.75.75z" clip-rule="evenodd" />
                         </svg>
                         <span>3000</span>
@@ -612,57 +652,58 @@
             </div>
         </div>
 
+        <!-- Challenge View -->
         <div id="challenge-view" class="view transform translate-x-full">
-            <div id="back-to-main-from-challenge" class="absolute top-4 left-4 text-gray-400 hover:text-gray-200 cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <button id="back-to-main-from-challenge" class="back-button">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
-            </div>
-            <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">تحدي اللاعبون</h1>
-            <div id="challenge-players-list" class="view-content flex flex-col gap-4">
-                <p class="text-gray-300 text-center">جاري تحميل لاعب...</p>
+            </button>
+            <h1 class="text-3xl font-bold text-zinc-100 mb-8">تحدي اللاعبون</h1>
+            <div id="challenge-players-list" class="w-full max-w-md flex flex-col gap-4">
+                <p class="text-zinc-400 text-center">جاري تحميل لاعب...</p>
             </div>
         </div>
 
+        <!-- Online View -->
         <div id="online-view" class="view transform translate-x-full">
-            <div id="back-to-main-from-online" class="absolute top-4 left-4 text-gray-400 hover:text-gray-200 cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <button id="back-to-main-from-online" class="back-button">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
-            </div>
-            <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">اونلاين</h1>
+            </button>
+            <h1 class="text-3xl font-bold text-zinc-100 mb-8">اونلاين</h1>
             
-            <div class="view-content">
-                <div class="bg-gray-700 p-4 rounded-xl mb-6 shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-100 mb-4">اللاعبون المتصلون</h2>
-                    <div id="online-players-list" class="flex flex-col gap-3">
-                        <p class="text-gray-400 text-center">لا يوجد لاعبون متصلون حالياً.</p>
-                    </div>
-                </div>
-
-                <div class="bg-gray-700 p-4 rounded-xl shadow-md">
-                    <h2 class="text-xl font-semibold text-gray-100 mb-4">جميع اللاعبين</h2>
-                    <div id="all-players-list" class="flex flex-col gap-3">
-                        <p class="text-gray-400 text-center">لا يوجد لاعبون مسجلون.</p>
-                    </div>
+            <div class="w-full max-w-md bg-zinc-800 p-6 rounded-xl shadow-lg border border-zinc-700 mb-6">
+                <h2 class="text-xl font-semibold text-zinc-100 mb-4">اللاعبون المتصلون</h2>
+                <div id="online-players-list" class="flex flex-col gap-3">
+                    <p class="text-zinc-400 text-center">لا يوجد لاعبون متصلون حالياً.</p>
                 </div>
             </div>
 
-            <div id="online-player-total-power-display" class="text-gray-200 text-lg text-center mt-4">
-                قوتك الإجمالية: <span class="font-bold text-red-400" id="player-total-power-display-online">0</span>
+            <div class="w-full max-w-md bg-zinc-800 p-6 rounded-xl shadow-lg border border-zinc-700">
+                <h2 class="text-xl font-semibold text-zinc-100 mb-4">جميع اللاعبين</h2>
+                <div id="all-players-list" class="flex flex-col gap-3">
+                    <p class="text-zinc-400 text-center">لا يوجد لاعبون مسجلون.</p>
+                </div>
+            </div>
+
+            <div id="online-player-total-power-display" class="text-zinc-200 text-lg text-center mt-6">
+                قوتك الإجمالية: <span class="font-bold text-rose-400" id="player-total-power-display-online">0</span>
             </div>
         </div>
 
+        <!-- Redeem Code View -->
         <div id="redeem-code-view" class="view transform translate-x-full">
-            <div id="back-to-main-from-redeem-code" class="absolute top-4 left-4 text-gray-400 hover:text-gray-200 cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <button id="back-to-main-from-redeem-code" class="back-button">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
-            </div>
-            <h1 class="text-3xl font-bold text-center text-gray-100 mb-8">رمز تعويضي</h1>
-            <div class="bg-gray-700 p-6 rounded-xl shadow-md text-center">
-                <input type="text" id="redeem-code-input" class="w-full p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="أدخل الرمز التعويضي هنا...">
-                <button id="redeem-code-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+            </button>
+            <h1 class="text-3xl font-bold text-zinc-100 mb-8">رمز تعويضي</h1>
+            <div class="w-full max-w-md bg-zinc-800 p-8 rounded-xl shadow-lg border border-zinc-700 text-center">
+                <input type="text" id="redeem-code-input" class="w-full p-3 rounded-lg bg-zinc-900 text-white placeholder-zinc-500 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="أدخل الرمز التعويضي هنا...">
+                <button id="redeem-code-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-200 ease-in-out">
                     تفعيل الرمز
                 </button>
                 <p id="redeem-status-message" class="redeem-status"></p>
@@ -670,50 +711,51 @@
         </div>
     </div>
 
+    <!-- Modals (Popups) -->
     <div id="popup-modal" class="modal-overlay hidden">
-        <div class="popup-content text-center max-w-sm w-full transform scale-95 opacity-0">
-            <h3 class="text-2xl font-bold text-gray-100 mb-4">تم الترقية!</h3>
-            <p class="text-gray-200 text-lg mb-2">القوة المرتفعة: <span id="power-increase-display" class="popup-number text-yellow-300"></span></p>
-            <p class="text-gray-200 text-lg mb-6">القوة الإجمالية: <span id="total-power-display" class="popup-number text-green-300"></span></p>
-            <button id="popup-close-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+        <div class="popup-content text-center">
+            <h3 class="text-2xl font-bold text-zinc-100 mb-4">تم الترقية!</h3>
+            <p class="text-zinc-200 text-lg mb-2">القوة المرتفعة: <span id="power-increase-display" class="popup-number text-yellow-300 font-bold"></span></p>
+            <p class="text-zinc-200 text-lg mb-6">القوة الإجمالية: <span id="total-power-display" class="popup-number text-emerald-300 font-bold"></span></p>
+            <button id="popup-close-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                 حسناً
             </button>
         </div>
     </div>
 
     <div id="house-info-modal" class="modal-overlay hidden">
-        <div class="bg-gray-700 p-8 rounded-xl shadow-2xl text-center max-w-sm w-full transform scale-95 opacity-0 transition-all duration-300 ease-out">
-            <h3 class="text-2xl font-bold text-gray-100 mb-4">معلومات البيت والترقيات</h3>
-            <div class="text-gray-200 text-lg mb-6 text-right">
+        <div class="text-center">
+            <h3 class="text-2xl font-bold text-zinc-100 mb-4">معلومات البيت والترقيات</h3>
+            <div class="text-zinc-200 text-lg mb-6 text-right">
                 <p class="font-bold mb-2">جوائز ترقية البيت:</p>
                 <ul id="house-upgrade-rewards-list" class="list-none p-0 m-0">
                 </ul>
             </div>
-            <button id="house-info-close-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+            <button id="house-info-close-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                 حسناً
             </button>
         </div>
     </div>
 
     <div id="message-modal" class="modal-overlay hidden">
-        <div class="message-modal-content text-center max-w-sm w-full transform scale-95 opacity-0">
-            <h3 class="text-2xl font-bold text-gray-100 mb-4" id="message-modal-title"></h3>
-            <p class="text-gray-200 text-lg mb-6" id="message-modal-text"></p>
-            <button id="message-modal-close-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+        <div class="message-modal-content text-center">
+            <h3 class="text-2xl font-bold text-zinc-100 mb-4" id="message-modal-title"></h3>
+            <p class="text-zinc-200 text-lg mb-6" id="message-modal-text"></p>
+            <button id="message-modal-close-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                 حسناً
             </button>
         </div>
     </div>
 
     <div id="password-input-modal" class="modal-overlay hidden">
-        <div class="message-modal-content text-center max-w-sm w-full transform scale-95 opacity-0">
-            <h3 class="text-2xl font-bold text-gray-100 mb-4">أدخل كلمة المرور</h3>
-            <input type="password" id="password-input" class="w-full p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="كلمة المرور..." maxlength="20">
+        <div class="message-modal-content text-center">
+            <h3 class="text-2xl font-bold text-zinc-100 mb-4">أدخل كلمة المرور</h3>
+            <input type="password" id="password-input" class="w-full p-3 rounded-lg bg-zinc-900 text-white placeholder-zinc-500 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="كلمة المرور..." maxlength="20">
             <div class="flex justify-center gap-4">
-                <button id="password-confirm-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                <button id="password-confirm-button" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                     تأكيد
                 </button>
-                <button id="password-cancel-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                <button id="password-cancel-button" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                     إلغاء
                 </button>
             </div>
@@ -721,23 +763,23 @@
     </div>
 
     <div id="store-detail-modal" class="modal-overlay hidden">
-        <div class="bg-gray-700 p-8 rounded-xl shadow-2xl text-center max-w-sm w-full transform scale-95 opacity-0 transition-all duration-300 ease-out">
-            <img id="store-detail-image" src="" alt="Item Image" class="h-24 w-24 object-contain mx-auto mb-4">
-            <h3 id="store-detail-title" class="text-2xl font-bold text-gray-100 mb-2"></h3>
-            <p id="store-detail-description" class="text-gray-300 text-base mb-4"></p>
+        <div class="text-center">
+            <img id="store-detail-image" src="" alt="Item Image" class="h-28 w-28 object-contain mx-auto mb-4">
+            <h3 id="store-detail-title" class="text-2xl font-bold text-zinc-100 mb-2"></h3>
+            <p id="store-detail-description" class="text-zinc-300 text-base mb-4"></p>
             
             <div id="quantity-selection" class="flex items-center justify-center gap-4 mb-6">
                 <button id="store-detail-quantity-minus" class="quantity-button">-</button>
-                <span id="store-detail-quantity-display" class="text-white text-lg font-bold">1</span>
+                <span id="store-detail-quantity-display" class="text-white text-xl font-bold">1</span>
                 <button id="store-detail-quantity-plus" class="quantity-button">+</button>
             </div>
-            <p class="text-gray-200 text-lg mb-6">التكلفة الإجمالية: <span class="text-green-400 font-bold" id="store-detail-total-cost"></span></p>
+            <p class="text-zinc-200 text-lg mb-6">التكلفة الإجمالية: <span class="text-emerald-400 font-bold" id="store-detail-total-cost"></span></p>
 
             <div class="flex justify-center gap-4">
-                <button id="store-detail-confirm-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                <button id="store-detail-confirm-button" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                     تأكيد الشراء
                 </button>
-                <button id="store-detail-cancel-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                <button id="store-detail-cancel-button" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                     إلغاء
                 </button>
             </div>
@@ -745,51 +787,51 @@
     </div>
 
     <div id="inventory-modal" class="modal-overlay hidden">
-        <div class="bg-gray-700 p-8 rounded-xl shadow-2xl text-center max-w-sm w-full transform scale-95 opacity-0 transition-all duration-300 ease-out">
-            <h3 class="text-2xl font-bold text-gray-100 mb-6">حقيبتي</h3>
+        <div class="text-center">
+            <h3 class="text-2xl font-bold text-zinc-100 mb-6">حقيبتي</h3>
             <div id="inventory-items-list" class="flex flex-col gap-4">
             </div>
-            <button id="inventory-close-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-6">
+            <button id="inventory-close-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-6">
                 إغلاق
             </button>
         </div>
     </div>
 
     <div id="auth-flow-modal" class="modal-overlay hidden">
-        <div class="bg-gray-700 p-8 rounded-xl shadow-2xl text-center max-w-sm w-full transform scale-95 opacity-0">
-            <h3 class="text-2xl font-bold text-gray-100 mb-4" id="auth-modal-title"></h3>
+        <div class="text-center">
+            <h3 class="text-2xl font-bold text-zinc-100 mb-4" id="auth-modal-title"></h3>
             
             <div id="set-name-section">
-                <input type="text" id="player-name-input" class="w-full p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="أدخل اسمك هنا..." maxlength="15">
+                <input type="text" id="player-name-input" class="w-full p-3 rounded-lg bg-zinc-900 text-white placeholder-zinc-500 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="أدخل اسمك هنا..." maxlength="15">
                 <div class="flex justify-center gap-4">
-                    <button id="set-name-confirm-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                    <button id="set-name-confirm-button" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                         تأكيد الاسم
                     </button>
-                    <button id="set-name-continue-guest-button" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                    <button id="set-name-continue-guest-button" class="bg-zinc-600 hover:bg-zinc-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                         المتابعة كضيف
                     </button>
                 </div>
-                <p class="text-gray-400 mt-4">أو سجل دخول/أنشئ حساب لحفظ تقدمك:</p>
+                <p class="text-zinc-400 mt-4">أو سجل دخول/أنشئ حساب لحفظ تقدمك:</p>
                 <button id="show-email-auth-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-2 w-full">
                     تسجيل دخول / إنشاء حساب
                 </button>
-                <button id="auth-flow-cancel-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-2 w-full hidden">
+                <button id="auth-flow-cancel-button" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-2 w-full hidden">
                     إلغاء
                 </button>
             </div>
 
             <div id="email-auth-section" class="hidden">
-                <input type="email" id="auth-email-input" class="w-full p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="البريد الإلكتروني">
-                <input type="password" id="auth-password-input" class="w-full p-3 rounded-lg bg-gray-800 text-white placeholder-gray-400 mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="كلمة المرور" maxlength="20">
+                <input type="email" id="auth-email-input" class="w-full p-3 rounded-lg bg-zinc-900 text-white placeholder-zinc-500 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="البريد الإلكتروني">
+                <input type="password" id="auth-password-input" class="w-full p-3 rounded-lg bg-zinc-900 text-white placeholder-zinc-500 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="كلمة المرور" maxlength="20">
                 <div class="flex justify-center gap-4">
-                    <button id="auth-signup-button" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                    <button id="auth-signup-button" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                         إنشاء حساب
                     </button>
-                    <button id="auth-signin-button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
+                    <button id="auth-signin-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out">
                         تسجيل دخول
                     </button>
                 </div>
-                <button id="back-to-name-section-button" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-4 w-full">
+                <button id="back-to-name-section-button" class="bg-zinc-600 hover:bg-zinc-700 text-white font-bold py-2 px-5 rounded-lg shadow-md transition duration-200 ease-in-out mt-4 w-full">
                     العودة
                 </button>
             </div>
@@ -800,28 +842,29 @@
     </div>
 
     <script type="module">
-        // استيراد وحدات Firebase الضرورية
+        // Import necessary Firebase modules
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js';
         import { getDatabase, ref, set, get, onValue, update } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js';
         import { getAuth, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js';
 
-        // تهيئة Firebase - تم استبدال القيم بقيم مشروعك السابقة
+        // Initialize Firebase - YOUR PROJECT'S CONFIGURATION
         const firebaseConfig = {
-            apiKey: "AIzaSyAgmDkMKcfMG3r_16t_6rcjZQJOUFVpVOo",
-            authDomain: "kingb7ar-935b8.firebaseapp.com",
-            databaseURL: "https://kingb7ar-935b8-default-rtdb.firebaseio.com",
-            projectId: "kingb7ar-935b8",
-            storageBucket: "kingb7ar-935b8.firebaseapp.com",
-            messagingSenderId: "157617641483",
-            appId: "1:157617641483:web:f8a0e51c1cd1bc4199cf0e"
+            apiKey: "AIzaSyBAepZChU6qfWGTQDrzEpJm_TRIrr6vhq8",
+            authDomain: "mygame-7c747.firebaseapp.com",
+            databaseURL: "https://mygame-7c747-default-rtdb.firebaseio.com",
+            projectId: "mygame-7c747",
+            storageBucket: "mygame-7c747.firebasestorage.app",
+            messagingSenderId: "191691681571",
+            appId: "1:191691681571:web:b72500edfeb669a9026696",
+            measurementId: "G-T20P9CWB1L"
         };
 
-        // تهيئة تطبيق Firebase وقاعدة البيانات والمصادقة
+        // Initialize Firebase app, database, and authentication
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
         const auth = getAuth(app);
 
-        // المتغيرات العامة للعبة
+        // Global game variables
         let userId = null;
         let playerName = "لاعب جديد";
         let dollars = 0;
@@ -833,22 +876,23 @@
         let accumulatedDollars = 0;
         let accumulatedPoints = 0;
         let accumulatedPower = 0;
-        let lastCollectTime = 0; // وقت آخر عملية جمع للموارد
-        const COLLECT_COOLDOWN_DURATION = 1 * 60 * 1000; // مدة تهدئة جمع الموارد: دقيقة واحدة (بالمللي ثانية)
-        let collectCountdownInterval = null; // معرف مؤقت العد التنازلي لجمع الموارد
+        let lastCollectTime = 0; // Time of last resource collection
+        const COLLECT_COOLDOWN_DURATION = 1 * 60 * 1000; // Resource collection cooldown: 1 minute (in milliseconds)
+        let collectCountdownInterval = null; // Countdown timer ID for resource collection
 
-        let isNameSetPermanently = false; // هل تم تعيين الاسم بشكل دائم (عبر تسجيل الدخول مثلاً)
-        let lastPlayerNameChangeTimestamp = 0; // وقت آخر تغيير للاسم
-        const NAME_CHANGE_COOLDOWN_DURATION = 30 * 24 * 60 * 60 * 1000; // مدة تهدئة تغيير الاسم: 30 يوماً (بالمللي ثانية)
-        let nameChangeCount = 0; // عدد مرات تغيير الاسم
-        const MAX_NAME_CHANGES = 3; // الحد الأقصى لعدد مرات تغيير الاسم
+        let isNameSetPermanently = false; // Is the name permanently set (e.g., via login)
+        let lastPlayerNameChangeTimestamp = 0; // Time of last name change
+        const NAME_CHANGE_COOLDOWN_DURATION = 30 * 24 * 60 * 60 * 1000; // Name change cooldown: 30 days (in milliseconds)
+        let nameChangeCount = 0; // Number of name changes
+        const MAX_NAME_CHANGES = 3; // Maximum number of name changes
 
-        let currentHouseIndex = 0; // فهرس البيت النشط حالياً
-        let houses = [ // تعريف البيوت (تم تقليلها إلى بيتين)
+        let currentHouseIndex = 0; // Current active house index
+        // Define only two houses with adjusted thresholds for 50,000 max power
+        let houses = [
             { id: 1, name: "البيت الأول", power: 1, unlocked: true, threshold: 25000, rewardedThresholds: [], img: "https://f.top4top.io/p_3479z75z10.png" },
             { id: 2, name: "البيت الثاني", power: 1, unlocked: false, threshold: 50000, rewardedThresholds: [], img: "https://i.top4top.io/p_34791336l0.png" }
         ];
-        // تم تعديل جوائز ترقية البيت لتناسب نطاق القوة الجديد
+        // Adjusted house upgrade rewards for the new power range
         const HOUSE_UPGRADE_REWARDS = [
             { threshold: 1000, dollars: 500, points: 200 },
             { threshold: 2500, dollars: 1250, points: 500 },
@@ -860,14 +904,14 @@
             { threshold: 50000, dollars: 25000, points: 10000 }
         ];
 
-        let challengeState = 'ATTACK_READY'; // حالة نظام التحدي: 'ATTACK_READY' (جاهز للهجوم)، 'COOLDOWN' (في فترة تهدئة)
-        let currentChallengePlayer = null; // اللاعب المستهدف في التحدي الحالي
-        let challengeTimerRemaining = 0; // الوقت المتبقي في مؤقت التحدي (بالثواني)
-        let challengeTimerInterval = null; // معرف مؤقت التحدي
-        let globalAttacks = []; // سجل الهجمات العالمية (للعرض في سجل التحدي)
+        let challengeState = 'ATTACK_READY'; // Challenge system state: 'ATTACK_READY' (ready to attack), 'COOLDOWN' (in cooldown period)
+        let currentChallengePlayer = null; // Target player in current challenge
+        let challengeTimerRemaining = 0; // Time remaining in challenge timer (in seconds)
+        let challengeTimerInterval = null; // Challenge timer ID
+        let globalAttacks = []; // Global attack log (for display in Attack Log)
         const MAX_GLOBAL_ATTACKS = 5;
 
-        let inventory = []; // { id: 'item-id', name: 'اسم العنصر', type: 'نوع العنصر', quantity: 1 }
+        let inventory = []; // { id: 'item-id', name: 'Item Name', type: 'Item Type', quantity: 1 }
 
         const REDEEM_CODES = {
             "FREE2000": { dollars: 2000, points: 1000, power: 500, usedBy: [] },
@@ -875,15 +919,16 @@
             "POINTS500": { dollars: 0, points: 500, power: 0, usedBy: [] }
         };
 
-        // الحصول على عناصر DOM (واجهة المستخدم)
-        const appDiv = document.querySelector('.w-full.max-w-md.mx-auto'); // العنصر الرئيسي للتطبيق
+        // Get DOM elements
+        const appContainer = document.querySelector('.app-container'); // Main app container
 
-        // عناصر القائمة الرئيسية
-        const playerNameDisplayMain = document.getElementById('player-name-display');
-        const playerPointsDisplayMain = document.getElementById('player-points-display');
-        const playerDollarsDisplayMain = document.getElementById('player-dollars-display');
-        const playerTotalPowerDisplayMain = document.getElementById('player-total-power-display-main');
+        // Header Bar elements
+        const playerNameDisplayHeader = document.getElementById('player-name-display-header');
+        const playerPointsDisplayHeader = document.getElementById('player-points-display-header');
+        const playerDollarsDisplayHeader = document.getElementById('player-dollars-display-header');
+        const playerTotalPowerDisplayHeader = document.getElementById('player-total-power-display-header');
 
+        // Main Menu elements
         const playMenuItem = document.getElementById('play-menu-item');
         const attackLogMenuItem = document.getElementById('attack-log-menu-item');
         const storeMenuItem = document.getElementById('store-menu-item');
@@ -891,7 +936,7 @@
         const challengeMenuItem = document.getElementById('challenge-menu-item');
         const redeemCodeMenuItem = document.getElementById('redeem-code-menu-item');
 
-        // عناصر Game View
+        // Game View elements
         const gameView = document.getElementById('game-view');
         const backToMainFromGame = document.getElementById('back-to-main-from-game');
         const innovationPrevButton = document.getElementById('innovation-prev-button');
@@ -908,41 +953,38 @@
         const inventoryIcon = document.getElementById('inventory-icon');
         const inventoryCountDisplay = document.getElementById('inventory-count');
 
-        // عناصر Attack Log View
+        // Attack Log View elements
         const attackLogView = document.getElementById('attack-log-view');
         const backToMainFromAttackLog = document.getElementById('back-to-main-from-attack-log');
         const globalAttacksList = document.getElementById('global-attacks-list');
 
-        // عناصر Store View
+        // Store View elements
         const storeView = document.getElementById('store-view');
         const backToMainFromStore = document.getElementById('back-to-main-from-store');
-        const storePlayerPointsDisplay = document.getElementById('store-player-points-display');
-        const storePlayerDollarsDisplay = document.getElementById('store-player-dollars-display');
-        const storePlayerTotalPowerDisplay = document.getElementById('store-player-total-power-display');
         const storeItemReduceTime = document.getElementById('store-item-reduce-time');
         const storeItemConvertPoints = document.getElementById('store-item-convert-points');
         const storeItemBuyInnovation3 = document.getElementById('store-item-buy-innovation3');
 
-        // عناصر Challenge View
+        // Challenge View elements
         const challengeView = document.getElementById('challenge-view');
         const backToMainFromChallenge = document.getElementById('back-to-main-from-challenge');
         const challengePlayersList = document.getElementById('challenge-players-list');
 
-        // عناصر Online View
+        // Online View elements
         const onlineView = document.getElementById('online-view');
         const backToMainFromOnline = document.getElementById('back-to-main-from-online');
         const onlinePlayersList = document.getElementById('online-players-list');
         const allPlayersList = document.getElementById('all-players-list');
         const playerTotalPowerDisplayOnline = document.getElementById('player-total-power-display-online');
 
-        // عناصر Redeem Code View
+        // Redeem Code View elements
         const redeemCodeView = document.getElementById('redeem-code-view');
         const backToMainFromRedeemCode = document.getElementById('back-to-main-from-redeem-code');
         const redeemCodeInput = document.getElementById('redeem-code-input');
         const redeemCodeButton = document.getElementById('redeem-code-button');
         const redeemStatusMessage = document.getElementById('redeem-status-message');
 
-        // عناصر Dollar Collector
+        // Dollar Collector elements
         const dollarCollector = document.getElementById('dollar-collector');
         const dollarCollectorProgress = document.getElementById('dollar-collector-progress');
         const accumulatedDollarsDisplay = document.getElementById('accumulated-dollars-display');
@@ -950,30 +992,30 @@
         const accumulatedPowerDisplay = document.getElementById('accumulated-power-display');
         const collectDollarsButton = document.getElementById('collect-dollars-button');
 
-        // عناصر Popup Modal (للترقيات)
+        // Popup Modal (for upgrades) elements
         const popupModal = document.getElementById('popup-modal');
         const powerIncreaseDisplay = document.getElementById('power-increase-display');
         const totalPowerDisplayPopup = document.getElementById('total-power-display');
         const popupCloseButton = document.getElementById('popup-close-button');
 
-        // عناصر House Info Modal
+        // House Info Modal elements
         const houseInfoModal = document.getElementById('house-info-modal');
         const houseUpgradeRewardsList = document.getElementById('house-upgrade-rewards-list');
         const houseInfoCloseButton = document.getElementById('house-info-close-button');
 
-        // عناصر Message Modal
+        // Message Modal elements
         const messageModal = document.getElementById('message-modal');
         const messageModalTitle = document.getElementById('message-modal-title');
         const messageModalText = document.getElementById('message-modal-text');
         const messageModalCloseButton = document.getElementById('message-modal-close-button');
 
-        // عناصر Password Input Modal
+        // Password Input Modal elements
         const passwordInputModal = document.getElementById('password-input-modal');
         const passwordInput = document.getElementById('password-input');
         const passwordConfirmButton = document.getElementById('password-confirm-button');
         const passwordCancelButton = document.getElementById('password-cancel-button');
 
-        // عناصر Store Detail Modal
+        // Store Detail Modal elements
         const storeDetailModal = document.getElementById('store-detail-modal');
         const storeDetailImage = document.getElementById('store-detail-image');
         const storeDetailTitle = document.getElementById('store-detail-title');
@@ -985,12 +1027,12 @@
         const storeDetailCancelButton = document.getElementById('store-detail-cancel-button');
         const storeDetailQuantityPlus = document.getElementById('store-detail-quantity-plus'); 
 
-        // عناصر Inventory Modal
+        // Inventory Modal elements
         const inventoryModal = document.getElementById('inventory-modal');
         const inventoryItemsList = document.getElementById('inventory-items-list');
         const inventoryCloseButton = document.getElementById('inventory-close-button');
 
-        // عناصر Auth Flow Modal
+        // Auth Flow Modal elements
         const authFlowModal = document.getElementById('auth-flow-modal');
         const authModalTitle = document.getElementById('auth-modal-title');
         const setNameSection = document.getElementById('set-name-section');
@@ -1004,14 +1046,14 @@
         const setNameContinueGuestButton = document.getElementById('set-name-continue-guest-button');
         const authFlowCancelButton = document.getElementById('auth-flow-cancel-button'); 
 
-        // عناصر Toast Notification
+        // Toast Notification elements
         const toastNotification = document.getElementById('toast-notification');
 
-        // حالة المتجر الحالية
+        // Current store state
         let currentStoreItem = null;
         let currentStoreQuantity = 1;
 
-        // وظائف عامة للتحكم في واجهة المستخدم
+        // General UI control functions
         function showView(viewId) {
             console.log(`Attempting to show view: ${viewId}`);
             document.querySelectorAll('.view').forEach(view => {
@@ -1029,7 +1071,7 @@
             updateUI(); 
         }
 
-        // إظهار نافذة منبثقة (مودال)
+        // Show a modal
         function showModal(modalElement) {
             if (!modalElement) {
                 console.error("showModal: modalElement is null or undefined.");
@@ -1045,7 +1087,7 @@
             }
         }
 
-        // إخفاء نافذة منبثقة (مودال)
+        // Hide a modal
         function hideModal(modalElement) {
             if (!modalElement) {
                 console.error("hideModal: modalElement is null or undefined.");
@@ -1061,7 +1103,7 @@
             modalElement.classList.remove('visible');
         }
 
-        // عرض رسالة في نافذة منبثقة (مودال)
+        // Display a message in a modal
         function showMessageModal(title, message) {
             if (!messageModalTitle || !messageModalText) {
                 console.error("showMessageModal: Modal elements not found.");
@@ -1072,7 +1114,7 @@
             showModal(messageModal);
         }
 
-        // إظهار إشعار Toast
+        // Show a Toast notification
         function showToast(message, type = 'info') {
             if (!toastNotification) {
                 console.error("showToast: toastNotification element not found.");
@@ -1087,20 +1129,16 @@
             }, 3000); 
         }
 
-        // تحديث جميع عناصر واجهة المستخدم بالقيم الحالية للمتغيرات
+        // Update all UI elements with current variable values
         function updateUI() {
             console.log("Updating UI...");
-            playerNameDisplayMain.textContent = playerName;
-            playerPointsDisplayMain.textContent = points.toLocaleString();
-            playerDollarsDisplayMain.textContent = dollars.toLocaleString();
-            playerTotalPowerDisplayMain.textContent = totalPower.toLocaleString();
+            playerNameDisplayHeader.textContent = playerName;
+            playerPointsDisplayHeader.textContent = points.toLocaleString();
+            playerDollarsDisplayHeader.textContent = dollars.toLocaleString();
+            playerTotalPowerDisplayHeader.textContent = totalPower.toLocaleString();
 
             playerTotalPowerDisplayGame.textContent = totalPower.toLocaleString();
             playerTotalPowerDisplayOnline.textContent = totalPower.toLocaleString();
-
-            storePlayerPointsDisplay.textContent = points.toLocaleString();
-            storePlayerDollarsDisplay.textContent = dollars.toLocaleString();
-            storePlayerTotalPowerDisplay.textContent = totalPower.toLocaleString();
 
             accumulatedDollarsDisplay.textContent = `$${Math.floor(accumulatedDollars).toLocaleString()}`;
             accumulatedPointsDisplay.textContent = Math.floor(accumulatedPoints).toLocaleString();
@@ -1112,7 +1150,7 @@
             console.log("UI updated.");
         }
 
-        // تحديث حالة زر جمع الموارد (نشط/معطل بناءً على المؤقت)
+        // Update collect button state (enabled/disabled based on timer)
         function updateCollectButtonState() {
             const now = Date.now();
             const timeLeftMs = COLLECT_COOLDOWN_DURATION - (now - lastCollectTime);
@@ -1141,7 +1179,7 @@
             }
         }
 
-        // تحديث عرض عدد العناصر في المخزون
+        // Update inventory count display
         function renderInventoryCount() {
             const totalItems = inventory.reduce((sum, item) => sum + item.quantity, 0);
             if (inventoryCountDisplay) {
@@ -1150,48 +1188,48 @@
             }
         }
 
-        // دمج وإعدادات Firebase: تتم المصادقة وتحميل البيانات الأولية هنا
+        // Firebase integration and setup: Authentication and initial data loading
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 userId = user.uid;
                 console.log("User authenticated:", userId);
                 (async () => {
                     try {
-                        // تحميل البيانات بترتيب تسلسلي
+                        // Load data sequentially
                         await loadPlayerData();
                         await loadHouses();
                         await loadInventory();
 
-                        // هذه هي مستمعات (listeners) مستمرة، لا تحتاج إلى انتظارها في Promise.all
-                        loadGlobalAttacks(); // هذا يقوم بإعداد مستمع onValue
-                        listenForPlayerUpdates(); // هذا يقوم بإعداد مستمع onValue
+                        // These are continuous listeners, no need to await them in Promise.all
+                        loadGlobalAttacks(); // This sets up a continuous onValue listener
+                        listenForPlayerUpdates(); // This sets up a continuous onValue listener
 
                         updateOnlineStatus(true);
                         startAccumulationLoop();
-                        showView('main-menu-view'); // إظهار القائمة الرئيسية مباشرة
+                        showView('main-menu-view'); // Show main menu directly
                     } catch (error) {
-                        console.error("فشل تحميل البيانات الأولية بعد المصادقة:", error);
+                        console.error("Failed to load initial data after authentication:", error);
                         showMessageModal('خطأ في التحميل', 'فشل تحميل بيانات اللعبة. يرجى التحقق من اتصالك بالإنترنت أو قواعد Firebase.', 'error');
                     }
                 })();
             } else {
-                // إذا لم يتم تسجيل دخول أي مستخدم، حاول تسجيل الدخول بشكل مجهول
+                // If no user is logged in, try anonymous sign-in
                 signInAnonymously(auth)
                     .then(() => {
-                        console.log("تم تسجيل الدخول كمجهول. onAuthStateChanged سيتم تشغيله مرة أخرى بكائن المستخدم.");
+                        console.log("Signed in anonymously. onAuthStateChanged will re-trigger with user object.");
                     })
                     .catch((error) => {
-                        console.error("خطأ في تسجيل الدخول كمجهول: ", error);
+                        console.error("Error signing in anonymously: ", error);
                         showMessageModal('خطأ في المصادقة', 'فشل تسجيل الدخول التلقائي. يرجى المحاولة مرة أخرى.', 'error');
                     });
             }
         });
 
-        // وظائف حفظ وتحميل البيانات من/إلى Firebase
+        // Functions to save and load data from/to Firebase
         async function savePlayerData() {
             if (!userId) {
                 console.warn("Cannot save player data: userId is null.");
-                return; // لا ترفض الوعد، فقط لا تفعل شيئًا
+                return;
             }
             try {
                 await set(ref(database, 'users/' + userId + '/data'), {
@@ -1247,13 +1285,13 @@
                     if (!isNameSetPermanently) {
                         showAuthFlowModal("أهلاً بك أيها المغامر الجديد!", "يرجى تعيين اسمك أو تسجيل الدخول لحفظ تقدمك.");
                     }
-                    await savePlayerData(); // حفظ البيانات الأولية للمستخدم الجديد
+                    await savePlayerData(); // Save initial data for new user
                 }
                 updateUI(); 
             } catch (error) {
                 console.error("Error loading player data: ", error);
                 showToast('خطأ في تحميل بيانات اللاعب. (ربما قواعد Firebase)', 'error');
-                throw error; // إعادة رمي الخطأ ليتم التقاطه بواسطة catch في onAuthStateChanged
+                throw error; // Re-throw error to be caught by catch in onAuthStateChanged
             }
         }
 
@@ -1288,10 +1326,11 @@
                 if (housesSnapshot.exists()) {
                     const loadedHouses = housesSnapshot.val();
                     console.log("Loaded houses raw:", loadedHouses);
+                    // Check if loaded houses array matches the expected structure/length
                     if (Array.isArray(loadedHouses) && loadedHouses.length === houses.length) {
                         houses = loadedHouses.map((loadedHouse, index) => {
                             return {
-                                ...houses[index], 
+                                ...houses[index], // Preserve default properties like img if not in loaded data
                                 ...loadedHouse, 
                                 rewardedThresholds: loadedHouse.rewardedThresholds || [] 
                             };
@@ -1299,16 +1338,16 @@
                         console.log("Houses merged:", houses);
                     } else {
                         console.warn("Loaded houses structure is incorrect or length mismatch, resetting to default.");
-                        // إذا كانت البيانات المحملة غير صالحة، استخدم الإعدادات الافتراضية
+                        // If loaded data is invalid, use default settings
                         houses = [
                             { id: 1, name: "البيت الأول", power: 1, unlocked: true, threshold: 25000, rewardedThresholds: [], img: "https://f.top4top.io/p_3479z75z10.png" },
                             { id: 2, name: "البيت الثاني", power: 1, unlocked: false, threshold: 50000, rewardedThresholds: [], img: "https://i.top4top.io/p_34791336l0.png" }
                         ];
-                        await saveHouses(); // حفظ البيوت الافتراضية الجديدة
+                        await saveHouses(); // Save new default houses
                     }
                 } else {
                     console.log("No house data found. Default houses will be used and saved.");
-                    await saveHouses(); // حفظ البيوت الافتراضية
+                    await saveHouses(); // Save default houses
                 }
 
                 if (indexSnapshot.exists()) {
@@ -1320,7 +1359,7 @@
                 } else {
                     currentHouseIndex = 0;
                     console.log("No current house index found. Setting to 0 and saving.");
-                    await saveHouses(); // حفظ الفهرس الافتراضي
+                    await saveHouses(); // Save default index
                 }
                 updateUI(); 
             } catch (error) {
@@ -1389,7 +1428,7 @@
             }
         }
 
-        // تحديث حالة الاتصال بالإنترنت للمستخدم الحالي
+        // Update current user's online status
         function updateOnlineStatus(isOnline) {
             if (!userId) {
                 console.warn("Cannot update online status: userId is null.");
@@ -1401,12 +1440,12 @@
             }).catch(error => console.error("Error updating online status: ", error));
         }
 
-        // حدث عند إغلاق أو تحديث الصفحة: تحديث حالة الاتصال إلى "غير متصل"
+        // Event on page close or refresh: set online status to "offline"
         window.addEventListener('beforeunload', () => {
             updateOnlineStatus(false);
         });
 
-        // الاستماع لتحديثات بيانات اللاعبين الآخرين (للتصنيفات وقوائم اللاعبين)
+        // Listen for updates on other players' data (for leaderboards and player lists)
         function listenForPlayerUpdates() {
             onValue(ref(database, 'users'), (snapshot) => {
                 console.log("Firebase users data updated. Refreshing players lists.");
@@ -1416,7 +1455,7 @@
             });
         }
 
-        // وظائف اللعبة الرئيسية: جمع الموارد
+        // Main game functions: Resource collection
         function collectDollars() {
             const now = Date.now();
             if (now - lastCollectTime < COLLECT_COOLDOWN_DURATION) {
@@ -1438,7 +1477,7 @@
             savePlayerData(); 
         }
 
-        // بدء حلقة تراكم الموارد (تزيد الموارد تلقائياً بمرور الوقت)
+        // Start resource accumulation loop (resources increase automatically over time)
         function startAccumulationLoop() {
             setInterval(() => {
                 const incomeRate = 1 + (innovationLevel * 0.1); 
@@ -1454,7 +1493,7 @@
             }, 1000); 
         }
 
-        // وظائف الابتكار (Play View)
+        // Innovation functions (Play View)
         function renderHouses() {
             if (!housesContainer) {
                 console.error("renderHouses: housesContainer element not found.");
@@ -1463,12 +1502,12 @@
             housesContainer.innerHTML = '';
             houses.forEach((house, index) => {
                 const houseCard = document.createElement('div');
-                houseCard.className = `house-card ${index === currentHouseIndex ? 'active-house' : ''}`;
+                houseCard.className = `house-card ${index === currentHouseIndex ? 'active-house' : ''} w-full`;
                 houseCard.innerHTML = `
                     <img src="${house.img}" alt="${house.name}" class="house-image">
-                    <h4 class="text-xl font-semibold text-gray-100 mb-1">${house.name}</h4>
-                    <p class="text-gray-300 text-sm">القوة: <span class="font-bold text-red-400">${house.power.toLocaleString()}</span></p>
-                    <p class="text-gray-400 text-xs mt-1">المطلوب للبيت التالي: ${house.threshold.toLocaleString()}</p>
+                    <h4 class="text-xl font-semibold text-zinc-100 mb-2">${house.name}</h4>
+                    <p class="text-zinc-300 text-base">القوة: <span class="font-bold text-rose-400">${house.power.toLocaleString()}</span></p>
+                    <p class="text-zinc-400 text-sm mt-1">المطلوب للبيت التالي: ${house.threshold.toLocaleString()}</p>
                 `;
                 housesContainer.appendChild(houseCard);
             });
@@ -1478,8 +1517,8 @@
                 if (nextHouseInfo) {
                     nextHouseInfo.classList.remove('hidden');
                     nextHouseInfo.innerHTML = `
-                        <p class="text-lg">البيت التالي: <span class="font-bold text-indigo-400">${nextHouse.name}</span></p>
-                        <p class="text-sm text-gray-400">يتطلب قوة ${nextHouse.threshold.toLocaleString()} لفتح.</p>
+                        <p class="text-lg">البيت التالي: <span class="font-bold text-blue-400">${nextHouse.name}</span></p>
+                        <p class="text-sm text-zinc-400">يتطلب قوة ${nextHouse.threshold.toLocaleString()} لفتح.</p>
                     `;
                 }
             } else {
@@ -1541,7 +1580,7 @@
             saveHouses();
         }
 
-        // وظائف Store View
+        // Store View functions
         const storeItems = {
             'reduce-time': {
                 id: 'reduce-time',
@@ -1661,7 +1700,7 @@
             }
         }
 
-        // وظائف Challenge View
+        // Challenge View functions
         function selectRandomChallengePlayer() {
             if (!challengePlayersList) {
                 console.error("selectRandomChallengePlayer: challengePlayersList element not found.");
@@ -1694,13 +1733,13 @@
                 if (eligiblePlayers.length > 0) {
                     eligiblePlayers.forEach(player => {
                         const playerCard = document.createElement('div');
-                        playerCard.className = `player-card bg-gray-700 p-4 rounded-xl shadow-md flex items-center justify-between transition duration-200 ease-in-out hover:bg-gray-600 cursor-pointer`;
+                        playerCard.className = `player-card bg-zinc-800 p-4 rounded-xl shadow-md flex items-center justify-between transition duration-200 ease-in-out hover:bg-zinc-700 cursor-pointer`;
                         playerCard.innerHTML = `
                             <div>
                                 <h4 class="text-lg font-semibold text-white">${player.name}</h4>
-                                <p class="text-sm text-gray-300">القوة: <span class="font-bold text-red-400">${player.totalPower.toLocaleString()}</span></p>
+                                <p class="text-sm text-zinc-300">القوة: <span class="font-bold text-rose-400">${player.totalPower.toLocaleString()}</span></p>
                             </div>
-                            <button data-player-uid="${player.uid}" data-player-name="${player.name}" data-player-power="${player.totalPower}" class="attack-button bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200 ease-in-out">
+                            <button data-player-uid="${player.uid}" data-player-name="${player.name}" data-player-power="${player.totalPower}" class="attack-button bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200 ease-in-out">
                                 هجوم
                             </button>
                         `;
@@ -1708,12 +1747,12 @@
                     });
                     console.log("Eligible players rendered for challenge.");
                 } else {
-                    challengePlayersList.innerHTML = '<p class="text-gray-400 text-center">لا يوجد خصوم متاحون حاليًا.</p>';
+                    challengePlayersList.innerHTML = '<p class="text-zinc-400 text-center">لا يوجد خصوم متاحون حاليًا.</p>';
                     console.log("No eligible players for challenge.");
                 }
             }).catch(error => {
                 console.error("Error fetching players for challenge: ", error);
-                challengePlayersList.innerHTML = '<p class="text-red-400 text-center">حدث خطأ في تحميل الخصوم.</p>';
+                challengePlayersList.innerHTML = '<p class="text-rose-400 text-center">حدث خطأ في تحميل الخصوم.</p>';
             });
         }
 
@@ -1786,7 +1825,7 @@
                 const minutes = Math.floor(challengeTimerRemaining / 60);
                 const seconds = challengeTimerRemaining % 60;
                 if (challengePlayersList) {
-                    challengePlayersList.innerHTML = `<p class="text-gray-300 text-center text-xl">الوقت المتبقي للتحدي التالي: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</p>`;
+                    challengePlayersList.innerHTML = `<p class="text-zinc-300 text-center text-xl">الوقت المتبقي للتحدي التالي: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</p>`;
                 }
 
                 if (challengeTimerRemaining <= 0) {
@@ -1806,7 +1845,7 @@
             }
         }
 
-        // وظائف Online View
+        // Online View functions
         function fetchAllPlayers() {
             if (!onlinePlayersList || !allPlayersList) {
                 console.error("fetchAllPlayers: Player list elements not found.");
@@ -1827,6 +1866,7 @@
                             isOnline: player.isOnline,
                             lastOnline: player.lastOnline || 0
                         };
+                        // Only show offline players if their power is >= 3000
                         if (!player.isOnline && player.totalPower < 3000) {
                             continue; 
                         }
@@ -1847,8 +1887,8 @@
                 console.log("All players fetched and rendered.");
             }).catch(error => {
                 console.error("Error fetching all players: ", error);
-                onlinePlayersList.innerHTML = '<p class="text-red-400 text-center">فشل تحميل قائمة اللاعبين المتصلين.</p>';
-                allPlayersList.innerHTML = '<p class="text-red-400 text-center">فشل تحميل قائمة جميع اللاعبين.</p>';
+                onlinePlayersList.innerHTML = '<p class="text-rose-400 text-center">فشل تحميل قائمة اللاعبين المتصلين.</p>';
+                allPlayersList.innerHTML = '<p class="text-rose-400 text-center">فشل تحميل قائمة جميع اللاعبين.</p>';
             });
         }
 
@@ -1859,30 +1899,30 @@
             }
             container.innerHTML = '';
             if (players.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-center">لا يوجد لاعبون ${isOnlineList ? 'متصلون' : 'غير متصلين'} حالياً.</p>`;
+                container.innerHTML = `<p class="text-zinc-400 text-center">لا يوجد لاعبون ${isOnlineList ? 'متصلون' : 'غير متصلين'} حالياً.</p>`;
                 return;
             }
 
             players.forEach(player => {
                 const playerCard = document.createElement('div');
-                const onlineStatusClass = player.isOnline ? 'bg-green-500' : 'bg-red-500';
+                const onlineStatusClass = player.isOnline ? 'bg-emerald-500' : 'bg-rose-500';
                 const onlineStatusText = player.isOnline ? 'متصل' : 'غير متصل';
-                const bgColor = player.isOnline ? 'bg-gray-700' : 'bg-gray-800'; 
+                const bgColor = player.isOnline ? 'bg-zinc-700' : 'bg-zinc-800'; 
 
                 playerCard.className = `${bgColor} p-4 rounded-xl shadow-md flex items-center gap-4`;
                 playerCard.innerHTML = `
                     <div class="w-3 h-3 rounded-full ${onlineStatusClass} flex-shrink-0"></div>
                     <div>
-                        <h4 class="text-lg font-semibold text-white">${player.name} ${player.uid === userId ? '<span class="text-indigo-400 text-xs">(أنت)</span>' : ''}</h4>
-                        <p class="text-sm text-gray-300">القوة: <span class="font-bold text-red-400">${player.totalPower.toLocaleString()}</span></p>
-                        <p class="text-xs text-gray-400">${onlineStatusText}</p>
+                        <h4 class="text-lg font-semibold text-white">${player.name} ${player.uid === userId ? '<span class="text-blue-400 text-xs">(أنت)</span>' : ''}</h4>
+                        <p class="text-sm text-zinc-300">القوة: <span class="font-bold text-rose-400">${player.totalPower.toLocaleString()}</span></p>
+                        <p class="text-xs text-zinc-400">${onlineStatusText}</p>
                     </div>
                 `;
                 container.appendChild(playerCard);
             });
         }
 
-        // وظائف Redeem Code View
+        // Redeem Code View functions
         function redeemCode() {
             if (!redeemCodeInput || !redeemStatusMessage) {
                 console.error("redeemCode: Redeem code elements not found.");
@@ -1943,7 +1983,7 @@
         }
 
 
-        // وظائف Inventory Modal
+        // Inventory Modal functions
         function renderInventoryItems() {
             if (!inventoryItemsList) {
                 console.error("renderInventoryItems: inventoryItemsList element not found.");
@@ -1951,7 +1991,7 @@
             }
             inventoryItemsList.innerHTML = '';
             if (inventory.length === 0) {
-                inventoryItemsList.innerHTML = '<p class="text-gray-400 text-center">حقيبتك فارغة.</p>';
+                inventoryItemsList.innerHTML = '<p class="text-zinc-400 text-center">حقيبتك فارغة.</p>';
                 return;
             }
 
@@ -1992,7 +2032,7 @@
             console.log(`Item ${itemId} used. Remaining quantity: ${item.quantity}`);
         }
 
-        // وظائف Authentication Flow Modal
+        // Authentication Flow Modal functions
         function showAuthFlowModal(title, message) {
             if (!authModalTitle || !setNameSection || !document.getElementById('email-auth-section') || !authFlowModal) {
                 console.error("showAuthFlowModal: Auth modal elements not found.");
@@ -2082,7 +2122,7 @@
                     nameChangeCount++; 
                     showToast('تم إنشاء الحساب وتسجيل الدخول بنجاح!', 'success');
                     hideModal(authFlowModal);
-                    // إعادة تحميل جميع البيانات للمستخدم المسجل حديثاً
+                    // Reload all data for newly registered user
                     (async () => {
                         try {
                             await loadPlayerData();
@@ -2094,7 +2134,7 @@
                             startAccumulationLoop();
                             console.log("User signed up and logged in:", userId);
                         } catch (error) {
-                            console.error("فشل تحميل البيانات بعد إنشاء الحساب:", error);
+                            console.error("Failed to load data after account creation:", error);
                             showMessageModal('خطأ في التحميل', 'فشل تحميل بيانات اللعبة بعد إنشاء الحساب. يرجى التحقق من اتصالك بالإنترنت أو قواعد Firebase.', 'error');
                         }
                     })();
@@ -2126,7 +2166,7 @@
                     isNameSetPermanently = true; 
                     showToast('تم تسجيل الدخول بنجاح!', 'success');
                     hideModal(authFlowModal);
-                    // إعادة تحميل جميع البيانات للمستخدم الذي سجل الدخول
+                    // Reload all data for the signed-in user
                     (async () => {
                         try {
                             await loadPlayerData();
@@ -2138,7 +2178,7 @@
                             startAccumulationLoop();
                             console.log("User signed in:", userId);
                         } catch (error) {
-                            console.error("فشل تحميل البيانات بعد تسجيل الدخول:", error);
+                            console.error("Failed to load data after sign-in:", error);
                             showMessageModal('خطأ في التحميل', 'فشل تحميل بيانات اللعبة بعد تسجيل الدخول. يرجى التحقق من اتصالك بالإنترنت أو قواعد Firebase.', 'error');
                         }
                     })();
@@ -2151,7 +2191,7 @@
                 });
         }
 
-        // معالجات الأحداث (Event Listeners)
+        // Event Listeners
         if (collectDollarsButton) collectDollarsButton.addEventListener('click', collectDollars);
 
         if (playMenuItem) playMenuItem.addEventListener('click', () => showView('game-view')); 
@@ -2211,7 +2251,7 @@
                 HOUSE_UPGRADE_REWARDS.forEach(reward => {
                     const li = document.createElement('li');
                     const isRewarded = currentHouse.rewardedThresholds.includes(reward.threshold);
-                    li.className = `mb-1 ${isRewarded ? 'text-green-400 line-through' : 'text-gray-200'}`;
+                    li.className = `mb-1 ${isRewarded ? 'text-emerald-400 line-through' : 'text-zinc-200'}`;
                     li.innerHTML = `وصول قوة البيت إلى ${reward.threshold.toLocaleString()}: +$${reward.dollars.toLocaleString()}، +${reward.points.toLocaleString()} نقطة`;
                     houseUpgradeRewardsList.appendChild(li);
                 });
@@ -2294,7 +2334,7 @@
         if (authFlowCancelButton) authFlowCancelButton.addEventListener('click', () => hideModal(authFlowModal));
 
 
-        // تحديث حالة اتصال المستخدم بالإنترنت بشكل دوري (كل دقيقة)
+        // Periodically update user's online status (every minute)
         setInterval(() => {
             updateOnlineStatus(true);
         }, 60 * 1000); 
