@@ -1,80 +1,83 @@
+/* تنسيقات عامة للجسم */
 body {
     direction: rtl; /* لجعل اتجاه النص من اليمين لليسار */
     text-align: right; /* لمحاذاة النص لليمين افتراضياً */
 }
 
-/* تنسيقات التحميل */
+/* تنسيقات شاشة التحميل */
 #loading-overlay {
     transition: opacity 0.5s ease-in-out;
 }
 
 .loader {
-    border-top-color: #3498db;
-    animation: spinner 1.5s linear infinite;
+    border-top-color: #3498db; /* لون شريط التحميل */
+    animation: spinner 1.5s linear infinite; /* حركة دوران */
 }
 
+/* حركة دوران لشريط التحميل */
 @keyframes spinner {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 
-/* الشريط الجانبي */
+/* تنسيقات الشريط الجانبي */
 #sidebar.open {
-    transform: translateX(0);
+    transform: translateX(0); /* إظهار الشريط الجانبي عند إضافة كلاس 'open' */
 }
 
-/* تنسيقات المودال */
+/* تنسيقات النوافذ المنبثقة (المودال) */
 .modal-overlay {
-    background-color: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(5px);
-    transition: opacity 0.3s ease-in-out;
+    background-color: rgba(0, 0, 0, 0.75); /* خلفية شبه شفافة */
+    backdrop-filter: blur(5px); /* تأثير ضبابي للخلفية */
+    transition: opacity 0.3s ease-in-out; /* انتقال سلس للشفافية */
 }
 
-/* إخفاء طريقة العرض الافتراضية */
+/* إخفاء طريقة العرض الافتراضية للعروض المختلفة */
 .view {
     display: none;
 }
 
+/* إظهار طريقة العرض النشطة */
 .view.active {
     display: block;
 }
 
-/* Dollar Collector */
+/* تنسيقات قسم جمع الموارد (Dollar Collector) */
 #dollar-collector {
     position: absolute;
     top: 1rem;
-    right: 1rem; /* تم تغيير left إلى right لوضعه في اليمين */
-    width: 120px;
+    right: 1rem; /* تم تغيير left إلى right لوضعه في الزاوية العلوية اليمنى */
+    width: 120px; /* عرض ثابت */
     padding: 0.2rem;
     border-radius: 0.5rem;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    background: #2d3748;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    z-index: 10;
+    background: #2d3748; /* خلفية داكنة */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* ظل خفيف */
+    z-index: 10; /* لضمان ظهوره فوق العناصر الأخرى */
 }
 
 #dollar-collector .resource-display-row {
     display: flex;
-    justify-content: space-between; /* Changed to space-between to push button right */
+    justify-content: space-between; /* توزيع العناصر بالتساوي مع دفع الزر لليمين */
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* السماح بتجاوز السطر إذا لزم الأمر */
     margin-bottom: 0.1rem;
     position: relative;
     z-index: 1;
-    width: 100%; /* Ensure it takes full width of parent */
+    width: 100%; /* ضمان أن يأخذ العرض الكامل للعنصر الأب */
 }
 
 #dollar-collector .resource-display-row > div {
     display: flex;
     align-items: center;
-    white-space: nowrap; /* Prevent wrapping for resource display */
-    margin-right: 0.2rem; /* Spacing between resource displays */
+    white-space: nowrap; /* منع التفاف النص لعدم كسر عرض الموارد */
+    margin-right: 0.2rem; /* مسافة بين عرض الموارد */
 }
 
 #dollar-collector .resource-display-row > div:last-of-type {
-    margin-right: 0;
+    margin-right: 0; /* إزالة المسافة من آخر عنصر عرض موارد */
 }
 
 #collect-dollars-button {
@@ -82,12 +85,12 @@ body {
     font-size: 0.7rem;
     position: relative;
     z-index: 1;
-    width: auto; /* Let it size based on content */
-    margin-left: 0.2rem; /* Small margin from left edge */
-    margin-right: auto; /* Push to the right */
+    width: auto; /* السماح للزر بتحديد عرضه بناءً على المحتوى */
+    margin-left: 0.2rem; /* مسافة صغيرة من اليسار */
+    margin-right: auto; /* دفع الزر إلى أقصى اليمين */
     margin-bottom: 0.2rem;
 }
 
 #collect-timer-display {
-    text-align: center;
+    text-align: center; /* محاذاة نص المؤقت في المنتصف */
 }
