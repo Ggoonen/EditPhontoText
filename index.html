@@ -891,14 +891,23 @@
             flex-shrink: 0;
         }
         .attack-player-btn {
-            @apply px-4 py-2 rounded-full font-bold text-sm transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg;
-            background: linear-gradient(to bottom, #3b82f6, #2563eb);
-            color: white;
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.1);
             border: 2px solid rgba(255, 255, 255, 0.15);
             position: relative;
             overflow: hidden;
+            color: white;
+            background: linear-gradient(to bottom, #3b82f6, #2563eb);
             min-width: 80px;
             text-align: center;
+        }
+        .attack-player-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.25);
         }
         .attack-player-btn:disabled {
             background: linear-gradient(to bottom, #6b7280, #4b5563);
@@ -908,7 +917,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-900 min-h-screen flex flex-col">
+<body class="bg-gray-900 min-h-screen flex flex-col" oncontextmenu="return false;">
 
     <div id="authModal" class="modal">
         <div class="modal-content">
@@ -949,7 +958,6 @@
         <div class="header-fleet-name flex justify-between items-center px-4">
             <span id="fleetName">أسطولي العظيم</span>
             <i id="fleetStarIcon" class="fas fa-star text-yellow-300 hidden"></i>
-            <button id="logoutBtn" class="header-logout-btn hidden">تسجيل الخروج</button>
         </div>
     </header>
 
@@ -996,7 +1004,7 @@
                 <div class="ship-item-card">
                     <div class="icon-container">
                         <i class="fas fa-ship"></i>
-                        <img id="ship1IconImg" src="" alt="Image of Ship Icon" class="w-full h-full object-contain" style="display: none;" draggable="false">
+                        <img id="ship1IconImg" src="" alt="Ship Icon" class="w-full h-full object-contain" style="display: none;" draggable="false">
                     </div>
                     <div class="info-container">
                         <h3>السفينة الأساسية</h3>
@@ -1254,7 +1262,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getDatabase, ref, set, get, update, onValue, push, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBAepZChU6qfWGTQDrzEpJm_TRIrr6vhq8",
@@ -1286,7 +1294,9 @@
 
         const INITIAL_SHIP_MAX_POWER = 10000;
         const UPGRADE_COOLDOWN_MS = 3 * 60 * 1000;
-        const ATTACK_COOLDOWN_PER_OPPONENT_MS = 7 * 60 * 1000;
+        const ATTACK_COOLDOWN_GLOBAL_MS = 7 * 60 * 1000; 
+
+        let globalAttackCooldownEndTime = 0;
 
         let ship1 = { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
         let ship2 = { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
@@ -1346,14 +1356,11 @@
         let animationFrameId;
         let lastFrameTime = 0;
 
-        let attackCooldowns = {}; 
-
         let playerPowerEl;
         let playerMoneyEl;
         let playerKeysEl;
         let fleetNameEl;
         let fleetStarIconEl;
-        let logoutBtn;
 
         let ship1PowerEl;
         let ship1LevelEl;
@@ -1485,7 +1492,7 @@
                     ship1 = data.ship1 || { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
                     ship2 = data.ship2 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
                     ship3 = data.ship3 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
-                    attackCooldowns = data.attackCooldowns || {}; 
+                    globalAttackCooldownEndTime = data.globalAttackCooldownEndTime || 0; 
                     rouletteCooldownEndTime = data.rouletteCooldownEndTime || 0;
 
                     if (typeof ship1.maxPower === 'undefined') ship1.maxPower = INITIAL_SHIP_MAX_POWER;
@@ -1497,6 +1504,7 @@
                     updateResourceCircle();
                     updateResourceButtonState();
                     updateRouletteCooldownUI();
+                    updateAttackCooldownsUI(); 
                     
                     if (fleetName && fleetName !== "أسطولي العظيم") {
                         showSection('mainMenu');
@@ -1520,7 +1528,7 @@
                     ship1: ship1,
                     ship2: ship2,
                     ship3: ship3,
-                    attackCooldowns: attackCooldowns, 
+                    globalAttackCooldownEndTime: globalAttackCooldownEndTime, 
                     rouletteCooldownEndTime: rouletteCooldownEndTime
                 };
                 localStorage.setItem('playerData', JSON.stringify(dataToStore));
@@ -1544,13 +1552,11 @@
                         setupPublicDataListeners();
 
                         authModal.style.display = 'none';
-                        logoutBtn.classList.remove('hidden');
 
                     } else {
                         userId = null;
                         clearPublicDataListeners();
                         authModal.style.display = 'flex';
-                        logoutBtn.classList.add('hidden');
                         showSection('hidden');
                         resourceCollectionBtnWrapper.classList.add('hidden');
                         localStorage.removeItem('playerData');
@@ -1584,18 +1590,6 @@
             }
         }
 
-        async function logoutUser() {
-            try {
-                if (userId) {
-                    await updateOnlineStatus(false);
-                }
-                await signOut(auth);
-                window.showMessage('تم تسجيل الخروج بنجاح.');
-            } catch (error) {
-                window.showMessage(`خطأ في تسجيل الخروج: ${error.message}`);
-            }
-        }
-
         async function fetchOrCreateUserData() {
             try {
                 const snapshot = await get(userDbRef);
@@ -1609,7 +1603,7 @@
                     ship1 = data.ship1 || { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
                     ship2 = data.ship2 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
                     ship3 = data.ship3 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
-                    attackCooldowns = data.attackCooldowns || {}; 
+                    globalAttackCooldownEndTime = data.globalAttackCooldownEndTime || 0; 
                     rouletteCooldownEndTime = data.rouletteCooldownEndTime || 0;
 
                     if (typeof ship1.maxPower === 'undefined') ship1.maxPower = INITIAL_SHIP_MAX_POWER;
@@ -1627,7 +1621,7 @@
                         ship1: ship1,
                         ship2: ship2,
                         ship3: ship3,
-                        attackCooldowns: {},
+                        globalAttackCooldownEndTime: 0,
                         rouletteCooldownEndTime: 0
                     });
                     playerMoney = 100;
@@ -1639,6 +1633,7 @@
                 updateResourceCircle();
                 updateResourceButtonState();
                 updateRouletteCooldownUI();
+                updateAttackCooldownsUI(); 
                 saveDataToLocalStorage();
 
                 if (fleetName === null || fleetName === "أسطولي العظيم") {
@@ -1666,7 +1661,7 @@
                     ship1: ship1,
                     ship2: ship2,
                     ship3: ship3,
-                    attackCooldowns: attackCooldowns, 
+                    globalAttackCooldownEndTime: globalAttackCooldownEndTime, 
                     rouletteCooldownEndTime: rouletteCooldownEndTime
                 });
                 saveDataToLocalStorage();
@@ -1880,7 +1875,7 @@
                 const strongestPower = Math.max(opponent.ship1Power || 0, opponent.ship2Power || 0, opponent.ship3Power || 0);
                 const unlockedShipsCount = (opponent.ship2Unlocked ? 1 : 0) + (opponent.ship3Unlocked ? 1 : 0) + 1;
 
-                const cooldownRemaining = (attackCooldowns[opponent.userId] || 0) - Date.now();
+                const cooldownRemaining = globalAttackCooldownEndTime - Date.now();
                 const isOnCooldown = cooldownRemaining > 0;
                 const buttonText = isOnCooldown ? formatTime(cooldownRemaining) : 'هجوم';
                 const buttonDisabled = isOnCooldown ? 'disabled' : '';
@@ -1911,8 +1906,8 @@
                 window.showMessage("الرجاء اختيار خصم أولاً.");
                 return;
             }
-            if ((attackCooldowns[opponent.userId] || 0) > Date.now()) {
-                window.showMessage(`لا يمكنك مهاجمة ${opponent.fleetName} الآن. يرجى الانتظار ${formatTime(attackCooldowns[opponent.userId] - Date.now())}.`);
+            if (globalAttackCooldownEndTime > Date.now()) {
+                window.showMessage(`لا يمكنك الهجوم الآن. يرجى الانتظار ${formatTime(globalAttackCooldownEndTime - Date.now())}.`);
                 return;
             }
 
@@ -1944,7 +1939,7 @@
             window.showMessage(resultText);
             updatePlayerStats();
 
-            attackCooldowns[opponent.userId] = Date.now() + ATTACK_COOLDOWN_PER_OPPONENT_MS;
+            globalAttackCooldownEndTime = Date.now() + ATTACK_COOLDOWN_GLOBAL_MS;
             await saveUserData();
 
             try {
@@ -1966,8 +1961,7 @@
             if (document.getElementById('attackSection').classList.contains('animate-fade-in-up')) {
                 const attackButtons = attackablePlayersListEl.querySelectorAll('.attack-player-btn');
                 attackButtons.forEach(button => {
-                    const opponentId = button.dataset.opponentId;
-                    const cooldownRemaining = (attackCooldowns[opponentId] || 0) - Date.now();
+                    const cooldownRemaining = globalAttackCooldownEndTime - Date.now();
                     const isOnCooldown = cooldownRemaining > 0;
 
                     if (isOnCooldown) {
@@ -2150,7 +2144,7 @@
                 ship === ship1 ? ship1PowerEl : (ship === ship2 ? ship2PowerEl : ship3PowerEl),
                 ship === ship1 ? ship1LevelEl : (ship === ship2 ? ship2LevelEl : ship3LevelEl),
                 ship === ship1 ? ship1ProgressEl : (ship === ship2 ? ship2ProgressEl : ship3ProgressEl),
-                ship === ship1 ? upgradeShip1Btn : (ship === ship2 ? upgradeShip2Btn : upgrade3Btn),
+                ship === ship1 ? upgradeShip1Btn : (ship === ship2 ? upgradeShip2Btn : upgradeShip3Btn),
                 ship === ship1 ? null : (ship === ship2 ? ship2Container : ship3Container),
                 ship === ship1 ? ship1CooldownDisplay : (ship === ship2 ? ship2CooldownDisplay : ship3CooldownDisplay),
                 ship === ship1 ? ship1MaxPowerEl : (ship === ship2 ? ship2MaxPowerEl : ship3MaxPowerEl),
@@ -2644,7 +2638,6 @@
             playerKeysEl = document.getElementById('playerKeys');
             fleetNameEl = document.getElementById('fleetName');
             fleetStarIconEl = document.getElementById('fleetStarIcon');
-            logoutBtn = document.getElementById('logoutBtn');
 
             ship1PowerEl = document.getElementById('ship1Power'); 
             ship1LevelEl = document.getElementById('ship1Level');
@@ -2672,7 +2665,7 @@
             ship3LevelEl = document.getElementById('ship3Level');
             ship3ProgressEl = document.getElementById('ship3Progress');
             ship3MaxPowerEl = document.getElementById('ship3MaxPower');
-            upgradeShip3Btn = document.getElementById('upgradeShip3'); 
+            upgradeShip3Btn = document.getElementById('upgrade3Btn'); 
             ship3CooldownDisplay = document.getElementById('ship3CooldownDisplay');
             ship3IconContainerEl = document.querySelector('#ship3Container > .icon-container');
             ship3IconIEl = ship3IconContainerEl.querySelector('i');
@@ -2746,7 +2739,6 @@
 
             loginBtn.addEventListener('click', loginUser);
             registerBtn.addEventListener('click', registerUser);
-            logoutBtn.addEventListener('click', logoutUser);
 
             setInterval(updateAllShipCooldowns, 1000);
             setInterval(autoAccumulateResources, RESOURCE_ACCUMULATION_INTERVAL_MS);
