@@ -1,7 +1,7 @@
 // استيراد وحدات Firebase الضرورية
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js';
 import { getDatabase, ref, set, get, onValue, update } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js';
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js';
+import { getAuth, signInAnonymously, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js';
 
 // تهيئة Firebase - تم استبدال القيم بقيم مشروعك السابقة
 const firebaseConfig = {
@@ -9,7 +9,7 @@ const firebaseConfig = {
     authDomain: "kingb7ar-935b8.firebaseapp.com",
     databaseURL: "https://kingb7ar-935b8-default-rtdb.firebaseio.com",
     projectId: "kingb7ar-935b8",
-    storageBucket: "kingb7ar-935b8.firebaseapp.com", // تم تصحيح هذا المسار
+    storageBucket: "kingb7ar-935b8.firebaseapp.com",
     messagingSenderId: "157617641483",
     appId: "1:157617641483:web:f8a0e51c1cd1bc4199cf0e"
 };
@@ -41,280 +41,268 @@ const NAME_CHANGE_COOLDOWN_DURATION = 30 * 24 * 60 * 60 * 1000; // مدة تهد
 let nameChangeCount = 0; // عدد مرات تغيير الاسم
 const MAX_NAME_CHANGES = 3; // الحد الأقصى لعدد مرات تغيير الاسم
 
-let activeHouseIndex = 0; // فهرس البيت النشط حالياً
+let currentHouseIndex = 0; // فهرس البيت النشط حالياً
 let houses = [ // تعريف البيوت الأربعة
-    { id: 1, power: 1, unlocked: true, threshold: 25000, rewardedThresholds: [] }, // البيت الأول مفتوح دائماً، يتطلب 25000 لفتح التالي
-    { id: 2, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] },
-    { id: 3, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] },
-    { id: 4, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] }
+    { id: 1, name: "البيت الأول", power: 1, unlocked: true, threshold: 25000, rewardedThresholds: [], img: "https://f.top4top.io/p_3479z75z10.png" },
+    { id: 2, name: "البيت الثاني", power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [], img: "https://i.top4top.io/p_34791336l0.png" },
+    { id: 3, name: "البيت الثالث", power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [], img: "https://k.top4top.io/p_3479f6o0n0.png" },
+    { id: 4, name: "البيت الرابع", power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [], img: "https://l.top4top.io/p_347900b1w0.png" }
+];
+const HOUSE_UPGRADE_REWARDS = [
+    { threshold: 250, dollars: 1250, points: 500 },
+    { threshold: 500, dollars: 2500, points: 1000 },
+    { threshold: 1000, dollars: 5000, points: 2000 },
+    { threshold: 2000, dollars: 10000, points: 4000 },
+    { threshold: 4000, dollars: 20000, points: 8000 },
+    { threshold: 8000, dollars: 40000, points: 16000 },
+    { threshold: 15000, dollars: 75000, points: 30000 },
+    { threshold: 20000, dollars: 100000, points: 40000 }
 ];
 
 let challengeState = 'ATTACK_READY'; // حالة نظام التحدي: 'ATTACK_READY' (جاهز للهجوم)، 'COOLDOWN' (في فترة تهدئة)
 let currentChallengePlayer = null; // اللاعب المستهدف في التحدي الحالي
 let challengeTimerRemaining = 0; // الوقت المتبقي في مؤقت التحدي (بالثواني)
 let challengeTimerInterval = null; // معرف مؤقت التحدي
-let challengeLog = []; // سجل التحديات: { opponentName, result (win/lose), playerPower, opponentPower }
+let globalAttacks = []; // سجل الهجمات العالمية (للعرض في سجل التحدي)
+const MAX_GLOBAL_ATTACKS = 5;
 
-let notifications = []; // قائمة الإشعارات: { message, type (success, error, info), timestamp }
-const MAX_NOTIFICATIONS = 5; // الحد الأقصى لعدد الإشعارات المعروضة
+let inventory = []; // { id: 'item-id', name: 'اسم العنصر', type: 'نوع العنصر', quantity: 1 }
 
-// الحصول على عناصر DOM (واجهة المستخدم)
+const REDEEM_CODES = {
+    "FREE2000": { dollars: 2000, points: 1000, power: 500, usedBy: [] },
+    "POWERUP100": { dollars: 0, points: 0, power: 100, usedBy: [] },
+    "POINTS500": { dollars: 0, points: 500, power: 0, usedBy: [] }
+};
+
+// عناصر DOM
 const loadingOverlay = document.getElementById('loading-overlay');
-const appDiv = document.getElementById('app');
+const appDiv = document.querySelector('.w-full.max-w-md.mx-auto'); // العنصر الرئيسي للتطبيق
 
-const playerNameDisplay = document.getElementById('player-name');
-const totalPowerDisplay = document.getElementById('total-power');
-const playerDollarsDisplay = document.getElementById('player-dollars');
-const playerPointsDisplay = document.getElementById('player-points');
-const playerPowerDisplay = document.getElementById('player-power');
+// عناصر القائمة الرئيسية
+const playerNameDisplayMain = document.getElementById('player-name-display');
+const playerPointsDisplayMain = document.getElementById('player-points-display');
+const playerDollarsDisplayMain = document.getElementById('player-dollars-display');
+const playerTotalPowerDisplayMain = document.getElementById('player-total-power-display-main');
 
+const playMenuItem = document.getElementById('play-menu-item');
+const attackLogMenuItem = document.getElementById('attack-log-menu-item');
+const storeMenuItem = document.getElementById('store-menu-item');
+const onlineMenuItem = document.getElementById('online-menu-item');
+const challengeMenuItem = document.getElementById('challenge-menu-item');
+const redeemCodeMenuItem = document.getElementById('redeem-code-menu-item');
+
+// عناصر Game View
+const gameView = document.getElementById('game-view');
+const backToMainFromGame = document.getElementById('back-to-main-from-game');
+const innovationPrevButton = document.getElementById('innovation-prev-button');
+const innovationNextButton = document.getElementById('innovation-next-button');
 const innovationButton = document.getElementById('innovation-button');
-const innovationCostDisplay = document.getElementById('innovation-cost');
-const currentInnovationPowerDisplay = document.getElementById('current-innovation-power');
-const housesProgressContainer = document.getElementById('houses-progress');
-const currentHousePowerDisplay = document.getElementById('current-house-power-display');
-const nextHouseThresholdDisplay = document.getElementById('next-house-threshold');
+const innovationButtonText = document.getElementById('innovation-button-text');
+const innovationTimerDisplay = document.getElementById('innovation-timer');
+const timerDisplayValue = document.getElementById('timer-display-value');
+const gameTotalPowerDisplay = document.getElementById('game-total-power-display');
+const playerTotalPowerDisplayGame = document.getElementById('player-total-power-display-game');
+const housesContainer = document.getElementById('houses-container');
+const nextHouseInfo = document.getElementById('next-house-info');
+const gameInfoIcon = document.getElementById('game-info-icon');
+const inventoryIcon = document.getElementById('inventory-icon');
+const inventoryCountDisplay = document.getElementById('inventory-count');
 
-const challengeStatusDisplay = document.getElementById('challengeStatus');
-const targetPlayerCard = document.getElementById('targetPlayerCard');
-const targetPlayerNameDisplay = document.getElementById('targetPlayerName');
-const targetPlayerPowerDisplay = document.getElementById('targetPlayerPower');
-const attackButton = document.getElementById('attackButton');
-const cooldownTimerDisplay = document.getElementById('cooldownTimer');
-const timerDisplay = document.getElementById('timerDisplay');
-const challengeResultDisplay = document.getElementById('challengeResult');
-const challengeLogList = document.getElementById('challenge-log');
+// عناصر Attack Log View
+const attackLogView = document.getElementById('attack-log-view');
+const backToMainFromAttackLog = document.getElementById('back-to-main-from-attack-log');
+const globalAttacksList = document.getElementById('global-attacks-list');
 
+// عناصر Store View
+const storeView = document.getElementById('store-view');
+const backToMainFromStore = document.getElementById('back-to-main-from-store');
+const storePlayerPointsDisplay = document.getElementById('store-player-points-display');
+const storePlayerDollarsDisplay = document.getElementById('store-player-dollars-display');
+const storePlayerTotalPowerDisplay = document.getElementById('store-player-total-power-display');
+const storeItemReduceTime = document.getElementById('store-item-reduce-time');
+const storeItemConvertPoints = document.getElementById('store-item-convert-points');
+const storeItemBuyInnovation3 = document.getElementById('store-item-buy-innovation3');
+
+// عناصر Challenge View
+const challengeView = document.getElementById('challenge-view');
+const backToMainFromChallenge = document.getElementById('back-to-main-from-challenge');
+const challengePlayersList = document.getElementById('challenge-players-list');
+
+// عناصر Online View
+const onlineView = document.getElementById('online-view');
+const backToMainFromOnline = document.getElementById('back-to-main-from-online');
+const onlinePlayersList = document.getElementById('online-players-list');
+const allPlayersList = document.getElementById('all-players-list');
+const playerTotalPowerDisplayOnline = document.getElementById('player-total-power-display-online');
+
+// عناصر Redeem Code View
+const redeemCodeView = document.getElementById('redeem-code-view');
+const backToMainFromRedeemCode = document.getElementById('back-to-main-from-redeem-code');
+const redeemCodeInput = document.getElementById('redeem-code-input');
+const redeemCodeButton = document.getElementById('redeem-code-button');
+const redeemStatusMessage = document.getElementById('redeem-status-message');
+
+// عناصر Dollar Collector
+const dollarCollector = document.getElementById('dollar-collector');
+const dollarCollectorProgress = document.getElementById('dollar-collector-progress');
 const accumulatedDollarsDisplay = document.getElementById('accumulated-dollars-display');
 const accumulatedPointsDisplay = document.getElementById('accumulated-points-display');
 const accumulatedPowerDisplay = document.getElementById('accumulated-power-display');
 const collectDollarsButton = document.getElementById('collect-dollars-button');
-const collectTimerDisplay = document.getElementById('collect-timer-display');
-const collectCountdownDisplay = document.getElementById('collect-countdown');
 
-const sidebar = document.getElementById('sidebar');
-const settingsButton = document.getElementById('settings-button');
-const closeSidebarButton = document.getElementById('close-sidebar');
+// عناصر Popup Modal (للترقيات)
+const popupModal = document.getElementById('popup-modal');
+const powerIncreaseDisplay = document.getElementById('power-increase-display');
+const totalPowerDisplayPopup = document.getElementById('total-power-display');
+const popupCloseButton = document.getElementById('popup-close-button');
 
-const settingsModal = document.getElementById('settings-modal');
-const closeSettingsModalButton = document.getElementById('close-settings-modal');
-const playerNameInput = document.getElementById('player-name-input');
-const setNameConfirmButton = document.getElementById('set-name-confirm-button');
-const nameChangeCooldownMessage = document.getElementById('name-change-cooldown-message');
-const nameChangeCooldownDisplay = document.getElementById('name-change-cooldown-display');
-const saveGameButton = document.getElementById('save-game-button');
-const loadGameButton = document.getElementById('load-game-button');
-const resetGameButton = document.getElementById('reset-game-button');
+// عناصر House Info Modal
+const houseInfoModal = document.getElementById('house-info-modal');
+const houseUpgradeRewardsList = document.getElementById('house-upgrade-rewards-list');
+const houseInfoCloseButton = document.getElementById('house-info-close-button');
 
+// عناصر Message Modal
 const messageModal = document.getElementById('message-modal');
 const messageModalTitle = document.getElementById('message-modal-title');
-const messageModalBody = document.getElementById('message-modal-body');
-const messageModalOkButton = document.getElementById('message-modal-ok');
+const messageModalText = document.getElementById('message-modal-text');
+const messageModalCloseButton = document.getElementById('message-modal-close-button');
 
-const notificationsList = document.getElementById('notifications-list');
+// عناصر Password Input Modal
+const passwordInputModal = document.getElementById('password-input-modal');
+const passwordInput = document.getElementById('password-input');
+const passwordConfirmButton = document.getElementById('password-confirm-button');
+const passwordCancelButton = document.getElementById('password-cancel-button');
 
-// عناصر التنقل (Views)
-const navDashboard = document.getElementById('nav-dashboard');
-const navInnovation = document.getElementById('nav-innovation');
-const navChallenge = document.getElementById('nav-challenge');
-const navClan = document.getElementById('nav-clan');
-const navRanking = document.getElementById('nav-ranking');
-const navMarket = document.getElementById('nav-market');
-const navAllPlayers = document.getElementById('nav-all-players');
+// عناصر Store Detail Modal
+const storeDetailModal = document.getElementById('store-detail-modal');
+const storeDetailImage = document.getElementById('store-detail-image');
+const storeDetailTitle = document.getElementById('store-detail-title');
+const storeDetailDescription = document.getElementById('store-detail-description');
+const storeDetailQuantityMinus = document.getElementById('store-detail-quantity-minus');
+const storeDetailQuantityDisplay = document.getElementById('store-detail-quantity-display');
+const storeDetailQuantityPlus = document.getElementById('store-detail-quantity-plus');
+const storeDetailTotalCost = document.getElementById('store-detail-total-cost');
+const storeDetailConfirmButton = document.getElementById('store-detail-confirm-button');
+const storeDetailCancelButton = document.getElementById('store-detail-cancel-button');
 
-const dashboardView = document.getElementById('dashboard-view');
-const innovationView = document.getElementById('innovation-view');
-const challengeView = document.getElementById('challenge-view');
-const clanView = document.getElementById('clan-view');
-const rankingView = document.getElementById('ranking-view');
-const marketView = document.getElementById('market-view');
-const allPlayersView = document.getElementById('all-players-view');
-const rankingList = document.getElementById('ranking-list');
-const allPlayersList = document.getElementById('all-players-list');
+// عناصر Inventory Modal
+const inventoryModal = document.getElementById('inventory-modal');
+const inventoryItemsList = document.getElementById('inventory-items-list');
+const inventoryCloseButton = document.getElementById('inventory-close-button');
+
+// عناصر Auth Flow Modal
+const authFlowModal = document.getElementById('auth-flow-modal');
+const authModalTitle = document.getElementById('auth-modal-title');
+const setNameSection = document.getElementById('set-name-section');
+const authEmailInput = document.getElementById('auth-email-input');
+const authPasswordInput = document.getElementById('auth-password-input');
+const authSignupButton = document.getElementById('auth-signup-button');
+const authSigninButton = document.getElementById('auth-signin-button');
+const showEmailAuthButton = document.getElementById('show-email-auth-button');
+const backToNameSectionButton = document.getElementById('back-to-name-section-button');
+const setNameConfirmButton = document.getElementById('set-name-confirm-button');
+const setNameContinueGuestButton = document.getElementById('set-name-continue-guest-button');
+const authFlowCancelButton = document.getElementById('auth-flow-cancel-button'); // زر الإلغاء في مودال المصادقة
+
+// عناصر Toast Notification
+const toastNotification = document.getElementById('toast-notification');
+
+// حالة المتجر الحالية
+let currentStoreItem = null;
+let currentStoreQuantity = 1;
 
 // وظائف عامة للتحكم في واجهة المستخدم
 function showView(viewId) {
-    // إخفاء جميع العروض
     document.querySelectorAll('.view').forEach(view => {
-        view.classList.add('hidden');
-        view.classList.remove('active');
+        view.style.transform = 'translateX(100%)'; // تحريك جميع العروض إلى اليمين
+        view.classList.remove('active'); // إزالة كلاس active
     });
-    // إظهار العرض المطلوب
     const activeView = document.getElementById(viewId);
     if (activeView) {
-        activeView.classList.remove('hidden');
-        activeView.classList.add('active');
-        // تحديثات خاصة لكل عرض عند إظهاره
-        if (viewId === 'ranking-view') {
-            fetchRanking();
-        } else if (viewId === 'all-players-view') {
-            fetchAllPlayers();
-        } else if (viewId === 'challenge-view') {
-            startChallengeFlow(); // بدء أو استئناف تدفق التحدي عند الدخول للعرض
-        }
+        activeView.style.transform = 'translateX(0)'; // تحريك العرض النشط إلى المنتصف
+        activeView.classList.add('active'); // إضافة كلاس active
     }
-    sidebar.classList.remove('open'); // إغلاق الشريط الجانبي بعد اختيار العرض
+    updateUI(); // تحديث الواجهة بعد تغيير العرض
+}
+
+// إظهار نافذة منبثقة (مودال)
+function showModal(modalElement) {
+    modalElement.classList.add('visible');
+    modalElement.querySelector('.popup-content, .message-modal-content, div:first-of-type').classList.add('scale-100', 'opacity-100');
+}
+
+// إخفاء نافذة منبثقة (مودال)
+function hideModal(modalElement) {
+    modalElement.querySelector('.popup-content, .message-modal-content, div:first-of-type').classList.remove('scale-100', 'opacity-100');
+    modalElement.classList.remove('visible');
 }
 
 // عرض رسالة في نافذة منبثقة (مودال)
-function showMessageModal(title, message, type = 'info') {
+function showMessageModal(title, message) {
     messageModalTitle.textContent = title;
-    messageModalBody.textContent = message;
-    // يمكنك إضافة تنسيقات بناءً على النوع (type) هنا (مثلاً، تغيير لون الحدود)
-    messageModal.classList.remove('hidden');
+    messageModalText.textContent = message;
+    showModal(messageModal);
 }
 
-// إضافة إشعار جديد
-function addNotification(message, type = 'info') {
-    const timestamp = new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-    notifications.unshift({ message, type, timestamp }); // إضافة الإشعار في بداية القائمة (الأحدث أولاً)
-
-    // الاحتفاظ بآخر عدد محدد من الإشعارات فقط
-    if (notifications.length > MAX_NOTIFICATIONS) {
-        notifications = notifications.slice(0, MAX_NOTIFICATIONS);
-    }
-    renderNotifications(); // إعادة رسم الإشعارات
-    saveNotifications(); // حفظ الإشعارات في Firebase
-}
-
-// عرض الإشعارات في واجهة المستخدم
-function renderNotifications() {
-    notificationsList.innerHTML = ''; // مسح القائمة الحالية
-    if (notifications.length === 0) {
-        notificationsList.innerHTML = '<p class="text-gray-400">لا توجد إشعارات حالياً.</p>';
-        return;
-    }
-    notifications.forEach(notif => {
-        const p = document.createElement('p');
-        let textColorClass = 'text-gray-300';
-        if (notif.type === 'success') {
-            textColorClass = 'text-green-400';
-        } else if (notif.type === 'error') {
-            textColorClass = 'text-red-400';
-        } else if (notif.type === 'info') {
-            textColorClass = 'text-blue-400';
-        }
-        p.className = `text-sm ${textColorClass}`;
-        p.innerHTML = `<span class="text-gray-500 text-xs ml-2">[${notif.timestamp}]</span> ${notif.message}`;
-        notificationsList.appendChild(p);
-    });
+// إظهار إشعار Toast
+function showToast(message, type = 'info') {
+    toastNotification.textContent = message;
+    toastNotification.className = `fixed top-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-50 ${type}`;
+    toastNotification.classList.add('opacity-100');
+    setTimeout(() => {
+        toastNotification.classList.remove('opacity-100');
+    }, 3000); // يختفي بعد 3 ثوانٍ
 }
 
 // تحديث جميع عناصر واجهة المستخدم بالقيم الحالية للمتغيرات
 function updateUI() {
-    playerNameDisplay.textContent = playerName;
-    playerDollarsDisplay.textContent = dollars.toLocaleString();
-    playerPointsDisplay.textContent = points.toLocaleString();
-    playerPowerDisplay.textContent = totalPower.toLocaleString();
-    totalPowerDisplay.textContent = totalPower.toLocaleString();
-    dashboardPlayerName.textContent = playerName;
-    dashboardActiveHouse.textContent = `البيت ${houses[activeHouseIndex].id}`;
-    dashboardHousePower.textContent = houses[activeHouseIndex].power.toLocaleString();
+    playerNameDisplayMain.textContent = playerName;
+    playerPointsDisplayMain.textContent = points.toLocaleString();
+    playerDollarsDisplayMain.textContent = dollars.toLocaleString();
+    playerTotalPowerDisplayMain.textContent = totalPower.toLocaleString();
 
-    currentInnovationPowerDisplay.textContent = innovationLevel.toLocaleString();
-    innovationCostDisplay.textContent = innovationCost.toLocaleString();
-    currentHousePowerDisplay.textContent = houses[activeHouseIndex].power.toLocaleString();
-    updateNextHouseInfo(); // تحديث معلومات البيت التالي
+    playerTotalPowerDisplayGame.textContent = totalPower.toLocaleString();
+    playerTotalPowerDisplayOnline.textContent = totalPower.toLocaleString();
+
+    storePlayerPointsDisplay.textContent = points.toLocaleString();
+    storePlayerDollarsDisplay.textContent = dollars.toLocaleString();
+    storePlayerTotalPowerDisplay.textContent = totalPower.toLocaleString();
 
     accumulatedDollarsDisplay.textContent = `$${Math.floor(accumulatedDollars).toLocaleString()}`;
     accumulatedPointsDisplay.textContent = Math.floor(accumulatedPoints).toLocaleString();
     accumulatedPowerDisplay.textContent = Math.floor(accumulatedPower).toLocaleString();
 
     updateCollectButtonState(); // تحديث حالة زر جمع الموارد
-    renderHousesProgress(); // إعادة رسم تقدم البيوت
-    renderNotifications(); // إعادة رسم الإشعارات
+    renderHouses(); // إعادة رسم البيوت
+    renderInventoryCount(); // تحديث عدد العناصر في المخزون
 }
 
 // تحديث حالة زر جمع الموارد (نشط/معطل بناءً على المؤقت)
 function updateCollectButtonState() {
     const now = Date.now();
-    if (now - lastCollectTime < COLLECT_COOLDOWN_DURATION) {
-        collectDollarsButton.disabled = true;
-        collectDollarsButton.classList.add('opacity-50', 'cursor-not-allowed');
-        collectTimerDisplay.style.display = 'block';
-        startCollectCountdown(); // بدء العد التنازلي إذا كان الزر معطلاً
-    } else {
+    const timeLeftMs = COLLECT_COOLDOWN_DURATION - (now - lastCollectTime);
+    const progress = Math.min(100, ((COLLECT_COOLDOWN_DURATION - timeLeftMs) / COLLECT_COOLDOWN_DURATION) * 100);
+    dollarCollectorProgress.style.width = `${progress}%`;
+
+    if (timeLeftMs <= 0) {
         collectDollarsButton.disabled = false;
         collectDollarsButton.classList.remove('opacity-50', 'cursor-not-allowed');
-        collectTimerDisplay.style.display = 'none';
-        stopCollectCountdown(); // إيقاف العد التنازلي إذا كان الزر نشطاً
-    }
-}
-
-// بدء العد التنازلي لزر جمع الموارد
-function startCollectCountdown() {
-    if (collectCountdownInterval) clearInterval(collectCountdownInterval); // مسح أي مؤقت سابق
-    collectCountdownInterval = setInterval(() => {
-        const now = Date.now();
-        const timeLeftMs = COLLECT_COOLDOWN_DURATION - (now - lastCollectTime);
-        if (timeLeftMs <= 0) {
-            clearInterval(collectCountdownInterval); // إيقاف المؤقت عند الانتهاء
-            updateCollectButtonState(); // تحديث حالة الزر
-            return;
-        }
+        dollarCollectorProgress.style.width = '100%';
+        collectDollarsButton.textContent = 'استلام';
+    } else {
+        collectDollarsButton.disabled = true;
+        collectDollarsButton.classList.add('opacity-50', 'cursor-not-allowed');
         const minutes = Math.floor(timeLeftMs / (1000 * 60));
         const seconds = Math.floor((timeLeftMs % (1000 * 60)) / 1000);
-        collectCountdownDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    }, 1000); // تحديث كل ثانية
-}
-
-// إيقاف العد التنازلي لزر جمع الموارد
-function stopCollectCountdown() {
-    if (collectCountdownInterval) {
-        clearInterval(collectCountdownInterval);
-        collectCountdownInterval = null;
+        collectDollarsButton.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
 }
 
-// تحديث معلومات البيت التالي المطلوب فتحه
-function updateNextHouseInfo() {
-    const currentHouse = houses[activeHouseIndex];
-    const nextHouseIndex = activeHouseIndex + 1;
-
-    if (nextHouseIndex < houses.length) {
-        const nextHouse = houses[nextHouseIndex];
-        nextHouseThresholdDisplay.textContent = nextHouse.threshold.toLocaleString();
-    } else {
-        nextHouseThresholdDisplay.textContent = 'لا يوجد بيت قادم'; // إذا كانت جميع البيوت مفتوحة
-    }
-}
-
-// رسم تقدم البيوت في واجهة المستخدم
-function renderHousesProgress() {
-    housesProgressContainer.innerHTML = ''; // مسح المحتوى الحالي
-    houses.forEach((house, index) => {
-        const isCurrent = (index === activeHouseIndex); // هل هذا هو البيت النشط؟
-        const isUnlocked = house.unlocked; // هل البيت مفتوح؟
-        const progress = Math.min(100, (house.power / house.threshold) * 100); // حساب نسبة التقدم
-        const barColor = isUnlocked ? 'bg-green-500' : 'bg-gray-500'; // لون شريط التقدم
-        const textColor = isUnlocked ? 'text-green-300' : 'text-gray-300'; // لون النص
-        const borderColor = isCurrent ? 'border-2 border-indigo-400' : 'border border-gray-600'; // لون الحدود
-
-        const houseDiv = document.createElement('div');
-        houseDiv.className = `flex flex-col p-2 rounded-lg ${borderColor} mb-3 transition duration-300 ease-in-out`;
-        if (isCurrent) {
-            houseDiv.classList.add('bg-gray-600'); // خلفية مختلفة للبيت النشط
-        } else if (isUnlocked) {
-            houseDiv.classList.add('bg-gray-700');
-        } else {
-            houseDiv.classList.add('bg-gray-800', 'opacity-75'); // خلفية معتمة للبيوت المغلقة
-        }
-
-        houseDiv.innerHTML = `
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-lg font-semibold ${textColor}">البيت ${house.id} ${isCurrent ? '(الحالي)' : ''}</span>
-                <span class="text-sm ${textColor}">${isUnlocked ? 'مفتوح' : 'مغلق'}</span>
-            </div>
-            <div class="flex items-center">
-                <div class="w-full bg-gray-600 rounded-full h-2">
-                    <div class="${barColor} h-2 rounded-full" style="width: ${progress}%;"></div>
-                </div>
-                <span class="text-xs ${textColor} ml-2">${Math.round(progress)}%</span>
-            </div>
-            <p class="text-xs text-gray-400 mt-1">القوة: ${house.power.toLocaleString()}/${house.threshold.toLocaleString()}</p>
-        `;
-        housesProgressContainer.appendChild(houseDiv);
-    });
+// تحديث عرض عدد العناصر في المخزون
+function renderInventoryCount() {
+    const totalItems = inventory.reduce((sum, item) => sum + item.quantity, 0);
+    inventoryCountDisplay.textContent = totalItems.toLocaleString();
+    inventoryCountDisplay.classList.toggle('hidden', totalItems === 0);
 }
 
 // دمج وإعدادات Firebase: تتم المصادقة وتحميل البيانات الأولية هنا
@@ -323,17 +311,20 @@ onAuthStateChanged(auth, (user) => {
         userId = user.uid; // تعيين معرف المستخدم
         loadPlayerData(); // تحميل بيانات اللاعب
         loadHouses(); // تحميل بيانات البيوت
-        loadChallengeLog(); // تحميل سجل التحديات
-        loadNotifications(); // تحميل الإشعارات
+        loadGlobalAttacks(); // تحميل سجل الهجمات العالمية
+        loadInventory(); // تحميل المخزون
         listenForPlayerUpdates(); // بدء الاستماع لتحديثات اللاعبين الآخرين (للترتيب وقائمة اللاعبين)
         updateOnlineStatus(true); // تعيين حالة المستخدم كـ "متصل"
         startAccumulationLoop(); // بدء حلقة تراكم الموارد
-        appDiv.classList.remove('hidden'); // إظهار واجهة التطبيق
         loadingOverlay.classList.add('hidden'); // إخفاء شاشة التحميل
-        showView('dashboard-view'); // عرض لوحة القيادة كأول شاشة
+        showView('main-menu-view'); // عرض القائمة الرئيسية
     } else {
         // إذا لم يكن هناك مستخدم مسجل الدخول، حاول تسجيل الدخول كمستخدم مجهول
         signInAnonymously(auth)
+            .then(() => {
+                // إذا كان تسجيل الدخول المجهول ناجحاً، سيتم تشغيل onAuthStateChanged مرة أخرى
+                // وإذا لم يكن المستخدم جديداً، سيتم تحميل بياناته
+            })
             .catch((error) => {
                 console.error("Error signing in anonymously: ", error);
                 showMessageModal('خطأ', 'فشل تسجيل الدخول التلقائي. يرجى المحاولة مرة أخرى.', 'error');
@@ -351,20 +342,20 @@ function savePlayerData() {
             totalPower: totalPower,
             innovationLevel: innovationLevel,
             innovationCost: innovationCost,
+            innovationPowerIncrease: innovationPowerIncrease,
             accumulatedDollars: accumulatedDollars,
             accumulatedPoints: accumulatedPoints,
             accumulatedPower: accumulatedPower,
             lastCollectTime: lastCollectTime,
             isNameSetPermanently: isNameSetPermanently,
             lastPlayerNameChangeTimestamp: lastPlayerNameChangeTimestamp,
-            nameChangeCount: nameChangeCount, // حفظ عدد مرات تغيير الاسم
+            nameChangeCount: nameChangeCount,
             lastOnline: Date.now() // تحديث وقت آخر اتصال
         }).then(() => {
             console.log("Player data saved successfully!");
-            // addNotification('تم حفظ بياناتك بنجاح.', 'success'); // اختياري: إظهار إشعار عند الحفظ
         }).catch((error) => {
             console.error("Error saving player data: ", error);
-            showMessageModal('خطأ', 'فشل حفظ البيانات. يرجى التحقق من اتصالك.', 'error');
+            showToast('فشل حفظ البيانات.', 'error');
         });
     }
 }
@@ -380,20 +371,23 @@ function loadPlayerData() {
                 totalPower = data.totalPower || 0;
                 innovationLevel = data.innovationLevel || 1;
                 innovationCost = data.innovationCost || 100;
+                innovationPowerIncrease = data.innovationPowerIncrease || 10;
                 accumulatedDollars = data.accumulatedDollars || 0;
                 accumulatedPoints = data.accumulatedPoints || 0;
                 accumulatedPower = data.accumulatedPower || 0;
                 lastCollectTime = data.lastCollectTime || 0;
                 isNameSetPermanently = data.isNameSetPermanently || false;
                 lastPlayerNameChangeTimestamp = data.lastPlayerNameChangeTimestamp || 0;
-                nameChangeCount = data.nameChangeCount || 0; // تحميل عدد مرات تغيير الاسم
+                nameChangeCount = data.nameChangeCount || 0;
             } else {
-                savePlayerData(); // حفظ البيانات الافتراضية إذا لم يتم العثور على بيانات
+                // إذا لم يتم العثور على بيانات، هذا يعني مستخدم جديد
+                showAuthFlowModal("أهلاً بك أيها المغامر الجديد!", "يرجى تعيين اسمك أو تسجيل الدخول لحفظ تقدمك.");
+                savePlayerData(); // حفظ البيانات الافتراضية للمستخدم الجديد
             }
             updateUI(); // تحديث واجهة المستخدم بعد التحميل
         }).catch((error) => {
             console.error("Error loading player data: ", error);
-            showMessageModal('خطأ', 'فشل تحميل البيانات. يرجى التحقق من اتصالك.', 'error');
+            showToast('فشل تحميل البيانات.', 'error');
         });
     }
 }
@@ -403,9 +397,9 @@ function saveHouses() {
         set(ref(database, 'users/' + userId + '/houses'), houses)
             .then(() => console.log("Houses saved successfully"))
             .catch(error => console.error("Error saving houses: ", error));
-        set(ref(database, 'users/' + userId + '/activeHouseIndex'), activeHouseIndex)
-            .then(() => console.log("Active house index saved successfully"))
-            .catch(error => console.error("Error saving active house index: ", error));
+        set(ref(database, 'users/' + userId + '/currentHouseIndex'), currentHouseIndex)
+            .then(() => console.log("Current house index saved successfully"))
+            .catch(error => console.error("Error saving current house index: ", error));
     }
 }
 
@@ -413,107 +407,98 @@ function loadHouses() {
     if (userId) {
         get(ref(database, 'users/' + userId + '/houses')).then((snapshot) => {
             if (snapshot.exists()) {
-                houses = snapshot.val();
-                // التأكد من أن مصفوفة البيوت تحتوي على 4 عناصر بالضبط. إذا لم يكن كذلك، قم بإعادة تعيينها أو تعديلها.
-                if (!Array.isArray(houses) || houses.length !== 4) {
-                    houses = [
-                        { id: 1, power: 1, unlocked: true, threshold: 25000, rewardedThresholds: [] },
-                        { id: 2, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] },
-                        { id: 3, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] },
-                        { id: 4, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] }
-                    ];
-                    saveHouses(); // حفظ الهيكل الصحيح
+                const loadedHouses = snapshot.val();
+                // التأكد من أن جميع البيوت المحملة تحتوي على الخصائص المطلوبة
+                if (Array.isArray(loadedHouses) && loadedHouses.length === houses.length) {
+                    houses = loadedHouses.map((loadedHouse, index) => ({
+                        ...houses[index], // الاحتفاظ بالخصائص الافتراضية مثل الاسم والصورة
+                        ...loadedHouse, // دمج البيانات المحملة
+                        rewardedThresholds: loadedHouse.rewardedThresholds || [] // التأكد من وجود rewardedThresholds
+                    }));
                 } else {
-                    // التأكد من أن جميع البيوت تحتوي على الخصائص المطلوبة (مثل rewardedThresholds)
-                    houses.forEach(house => {
-                        if (!house.rewardedThresholds) {
-                            house.rewardedThresholds = [];
-                        }
-                        if (typeof house.threshold === 'undefined') {
-                            house.threshold = 25000; // عتبة افتراضية إذا كانت مفقودة
-                        }
-                    });
+                    saveHouses(); // حفظ البيوت الافتراضية إذا كانت البيانات غير متطابقة
                 }
             } else {
                 saveHouses(); // حفظ البيوت الافتراضية إذا لم يتم العثور عليها
             }
         }).then(() => {
-            return get(ref(database, 'users/' + userId + '/activeHouseIndex'));
+            return get(ref(database, 'users/' + userId + '/currentHouseIndex'));
         }).then((snapshot) => {
             if (snapshot.exists()) {
-                activeHouseIndex = snapshot.val();
-                if (activeHouseIndex >= houses.length || activeHouseIndex < 0) {
-                    activeHouseIndex = 0; // إعادة تعيين إذا كان الفهرس غير صالح
+                currentHouseIndex = snapshot.val();
+                if (currentHouseIndex >= houses.length || currentHouseIndex < 0) {
+                    currentHouseIndex = 0; // إعادة تعيين إذا كان الفهرس غير صالح
                 }
             } else {
-                activeHouseIndex = 0;
+                currentHouseIndex = 0;
             }
             updateUI(); // تحديث واجهة المستخدم بعد تحميل البيوت والفهرس النشط
         }).catch((error) => {
             console.error("Error loading houses: ", error);
-            showMessageModal('خطأ', 'فشل تحميل معلومات البيوت. يرجى التحقق من اتصالك.', 'error');
+            showToast('فشل تحميل معلومات البيوت.', 'error');
         });
     }
 }
 
-function saveChallengeLog() {
-    if (userId) {
-        set(ref(database, 'users/' + userId + '/challengeLog'), challengeLog)
-            .then(() => console.log("Challenge log saved successfully"))
-            .catch(error => console.error("Error saving challenge log: ", error));
+function saveGlobalAttacks() {
+    if (globalAttacks.length > MAX_GLOBAL_ATTACKS) {
+        globalAttacks = globalAttacks.slice(0, MAX_GLOBAL_ATTACKS);
     }
+    set(ref(database, 'global/attacks'), globalAttacks)
+        .then(() => console.log("Global attacks saved successfully"))
+        .catch(error => console.error("Error saving global attacks: ", error));
 }
 
-function loadChallengeLog() {
-    if (userId) {
-        get(ref(database, 'users/' + userId + '/challengeLog')).then((snapshot) => {
-            if (snapshot.exists()) {
-                challengeLog = snapshot.val() || [];
-            } else {
-                challengeLog = [];
-            }
-            renderChallengeLog();
-        }).catch((error) => {
-            console.error("Error loading challenge log: ", error);
-        });
-    }
-}
-
-function renderChallengeLog() {
-    challengeLogList.innerHTML = '';
-    if (challengeLog.length === 0) {
-        challengeLogList.innerHTML = '<li class="text-gray-400">لا يوجد سجل تحديات حالياً.</li>';
-        return;
-    }
-    challengeLog.forEach(entry => {
-        const li = document.createElement('li');
-        const resultText = entry.result === 'win' ? 'فوز' : 'خسارة';
-        const resultColor = entry.result === 'win' ? 'text-green-400' : 'text-red-400';
-        li.className = `${resultColor}`;
-        li.innerHTML = `تحديت <span class="font-semibold">${entry.opponentName}</span> (قوته: ${entry.opponentPower.toLocaleString()}) و كانت النتيجة: <span class="font-bold">${resultText}</span> (قوتك: ${entry.playerPower.toLocaleString()})`;
-        challengeLogList.appendChild(li);
+function loadGlobalAttacks() {
+    onValue(ref(database, 'global/attacks'), (snapshot) => {
+        if (snapshot.exists()) {
+            globalAttacks = snapshot.val() || [];
+            renderGlobalAttacks();
+        } else {
+            globalAttacks = [];
+            renderGlobalAttacks();
+        }
+    }, (error) => {
+        console.error("Error loading global attacks: ", error);
     });
 }
 
-function saveNotifications() {
+function renderGlobalAttacks() {
+    globalAttacksList.innerHTML = '';
+    if (globalAttacks.length === 0) {
+        globalAttacksList.innerHTML = '<p class="text-gray-400 text-center">لا توجد هجمات عالمية حالياً.</p>';
+        return;
+    }
+    globalAttacks.forEach(attack => {
+        const attackElement = document.createElement('div');
+        attackElement.className = `p-3 rounded-lg shadow-sm ${attack.result === 'win' ? 'bg-green-800' : 'bg-red-800'} text-gray-100 text-sm`;
+        attackElement.innerHTML = `
+            <p><span class="font-semibold">${attack.attackerName}</span> (قوة: ${attack.attackerPower.toLocaleString()}) هاجم <span class="font-semibold">${attack.defenderName}</span> (قوة: ${attack.defenderPower.toLocaleString()})</p>
+            <p class="text-xs text-gray-300 mt-1">النتيجة: <span class="font-bold">${attack.result === 'win' ? 'فوز' : 'خسارة'}</span> - في ${new Date(attack.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}</p>
+        `;
+        globalAttacksList.appendChild(attackElement);
+    });
+}
+
+function saveInventory() {
     if (userId) {
-        set(ref(database, 'users/' + userId + '/notifications'), notifications)
-            .then(() => console.log("Notifications saved successfully"))
-            .catch(error => console.error("Error saving notifications: ", error));
+        set(ref(database, 'users/' + userId + '/inventory'), inventory)
+            .then(() => console.log("Inventory saved successfully"))
+            .catch(error => console.error("Error saving inventory: ", error));
     }
 }
 
-function loadNotifications() {
+function loadInventory() {
     if (userId) {
-        get(ref(database, 'users/' + userId + '/notifications')).then((snapshot) => {
+        get(ref(database, 'users/' + userId + '/inventory')).then((snapshot) => {
             if (snapshot.exists()) {
-                notifications = snapshot.val() || [];
+                inventory = snapshot.val() || [];
             } else {
-                notifications = [];
+                inventory = [];
             }
-            renderNotifications();
+            renderInventoryCount();
         }).catch((error) => {
-            console.error("Error loading notifications: ", error);
+            console.error("Error loading inventory: ", error);
         });
     }
 }
@@ -538,8 +523,7 @@ function listenForPlayerUpdates() {
     onValue(ref(database, 'users'), (snapshot) => {
         // هذا المستمع سيتم تشغيله كلما تغيرت بيانات أي مستخدم
         // يستخدم لتحديث قوائم الترتيب وجميع اللاعبين
-        console.log("Firebase users data updated. Refreshing rankings/players.");
-        fetchRanking(); // تحديث الترتيب
+        console.log("Firebase users data updated. Refreshing players lists.");
         fetchAllPlayers(); // تحديث قائمة جميع اللاعبين
     }, (error) => {
         console.error("Error listening for user updates: ", error);
@@ -551,10 +535,7 @@ function collectDollars() {
     const now = Date.now();
     // التحقق من مؤقت التهدئة
     if (now - lastCollectTime < COLLECT_COOLDOWN_DURATION) {
-        const timeLeftMs = COLLECT_COOLDOWN_DURATION - (now - lastCollectTime);
-        const minutes = Math.floor(timeLeftMs / (1000 * 60));
-        const seconds = Math.floor((timeLeftMs % (1000 * 60)) / 1000);
-        showMessageModal('انتظر قليلاً', `لا يزال المؤقت نشطًا. يمكنك الاستلام بعد ${minutes} دقيقة و ${seconds} ثانية.`, 'info');
+        showToast('انتظر قليلاً، المؤقت لا يزال نشطًا.', 'info');
         return;
     }
 
@@ -562,7 +543,7 @@ function collectDollars() {
     dollars += Math.floor(accumulatedDollars);
     points += Math.floor(accumulatedPoints);
     totalPower += Math.floor(accumulatedPower);
-    addNotification(`تم استلام $${Math.floor(accumulatedDollars).toLocaleString()} و ${Math.floor(accumulatedPoints).toLocaleString()} نقطة و ${Math.floor(accumulatedPower).toLocaleString()} قوة!`, 'success');
+    showToast(`تم استلام $${Math.floor(accumulatedDollars).toLocaleString()} و ${Math.floor(accumulatedPoints).toLocaleString()} نقطة و ${Math.floor(accumulatedPower).toLocaleString()} قوة!`, 'success');
 
     // إعادة تعيين الموارد المتراكمة
     accumulatedDollars = 0;
@@ -579,7 +560,7 @@ function startAccumulationLoop() {
     setInterval(() => {
         const incomeRate = 1 + (innovationLevel * 0.1); // معدل الدخل الأساسي + مكافأة من مستوى الابتكار
         const powerIncomeRate = 0.1 + (innovationLevel * 0.01); // معدل اكتساب القوة (أقل)
-        const currentHouse = houses[activeHouseIndex];
+        const currentHouse = houses[currentHouseIndex];
         const houseBonus = currentHouse.power * 0.01; // مكافأة من قوة البيت الحالي (1%)
 
         accumulatedDollars += (incomeRate + houseBonus) / 60; // تتراكم كل ثانية (مقسمة على 60 لتكون معدل دقيقة)
@@ -590,63 +571,182 @@ function startAccumulationLoop() {
     }, 1000); // كل ثانية
 }
 
-// معالج حدث زر الابتكار
-innovationButton.addEventListener('click', () => {
+// وظائف الابتكار (Play View)
+function renderHouses() {
+    housesContainer.innerHTML = '';
+    houses.forEach((house, index) => {
+        const houseCard = document.createElement('div');
+        houseCard.className = `house-card ${index === currentHouseIndex ? 'active-house' : ''}`;
+        houseCard.innerHTML = `
+            <img src="${house.img}" alt="${house.name}" class="house-image">
+            <h4 class="text-xl font-semibold text-gray-100 mb-1">${house.name}</h4>
+            <p class="text-gray-300 text-sm">القوة: <span class="font-bold text-red-400">${house.power.toLocaleString()}</span></p>
+            <p class="text-gray-400 text-xs mt-1">المطلوب للبيت التالي: ${house.threshold.toLocaleString()}</p>
+        `;
+        housesContainer.appendChild(houseCard);
+    });
+
+    // تحديث معلومات البيت التالي
+    const nextHouse = houses[currentHouseIndex + 1];
+    if (nextHouse && !nextHouse.unlocked) {
+        nextHouseInfo.classList.remove('hidden');
+        nextHouseInfo.innerHTML = `
+            <p class="text-lg">البيت التالي: <span class="font-bold text-indigo-400">${nextHouse.name}</span></p>
+            <p class="text-sm text-gray-400">يتطلب قوة ${nextHouse.threshold.toLocaleString()} لفتح.</p>
+        `;
+    } else {
+        nextHouseInfo.classList.add('hidden');
+    }
+}
+
+function activateInnovation() {
     if (dollars >= innovationCost) {
-        dollars -= innovationCost; // خصم التكلفة
-        innovationLevel++; // زيادة مستوى الابتكار
-        totalPower += innovationPowerIncrease; // زيادة القوة الإجمالية للاعب
-        innovationCost = Math.floor(innovationCost * 1.5); // زيادة تكلفة الابتكار التالي
-        innovationPowerIncrease = Math.floor(innovationPowerIncrease * 1.1); // زيادة مكافأة القوة من الابتكار
+        dollars -= innovationCost;
+        innovationLevel++;
+        totalPower += innovationPowerIncrease;
+        innovationCost = Math.floor(innovationCost * 1.5);
+        innovationPowerIncrease = Math.floor(innovationPowerIncrease * 1.1);
 
         // زيادة قوة البيت الحالي
-        houses[activeHouseIndex].power += 100; // كل ابتكار يضيف 100 قوة للبيت الحالي
+        houses[currentHouseIndex].power += 100;
 
-        addNotification(`تم تطوير القوة الرئيسية. أصبحت قوتك ${totalPower.toLocaleString()}!`, 'success');
+        showToast(`تم تطوير القوة الرئيسية. أصبحت قوتك ${totalPower.toLocaleString()}!`, 'success');
 
-        // منطق فتح البيت الجديد: يجب أن يصل البيت الحالي إلى عتبة 25000 قوة
-        const currentHouse = houses[activeHouseIndex];
-        const nextHouseIndex = activeHouseIndex + 1;
+        // عرض البوب أب
+        powerIncreaseDisplay.textContent = innovationPowerIncrease.toLocaleString();
+        totalPowerDisplayPopup.textContent = totalPower.toLocaleString();
+        showModal(popupModal);
+
+        // التحقق من فتح البيت التالي
+        const currentHouse = houses[currentHouseIndex];
+        const nextHouseIndex = currentHouseIndex + 1;
         if (nextHouseIndex < houses.length && !houses[nextHouseIndex].unlocked) {
             if (currentHouse.power >= currentHouse.threshold) {
-                houses[nextHouseIndex].unlocked = true; // فتح البيت التالي
-                showMessageModal('بيت جديد مفتوح!', `تهانينا! لقد فتحت البيت رقم ${houses[nextHouseIndex].id}!`, 'success');
-                // حالياً، لا يتم التبديل التلقائي للبيت الجديد، يتركه للاعب ليقوم بذلك يدوياً.
+                houses[nextHouseIndex].unlocked = true;
+                showMessageModal('بيت جديد مفتوح!', `تهانينا! لقد فتحت البيت رقم ${houses[nextHouseIndex].id}: ${houses[nextHouseIndex].name}!`, 'success');
             }
         }
 
         // التحقق من مكافآت قوة البيت
-        const rewardedThresholdsForHouse = [250, 500, 1000, 2000, 4000, 8000, 15000, 20000]; // عتبات أمثلة للمكافآت
-        rewardedThresholdsForHouse.forEach(threshold => {
-            if (currentHouse.power >= threshold && !currentHouse.rewardedThresholds.includes(threshold)) {
-                // إعطاء مكافأة للوصول إلى هذه العتبة
-                const rewardDollars = threshold * 5;
-                const rewardPoints = threshold * 2;
-                dollars += rewardDollars;
-                points += rewardPoints;
-                addNotification(`لقد وصلت قوة البيت ${currentHouse.id} إلى ${threshold.toLocaleString()}! حصلت على $${rewardDollars.toLocaleString()} و ${rewardPoints.toLocaleString()} نقطة مكافأة!`, 'success');
-                currentHouse.rewardedThresholds.push(threshold); // وضع علامة على أنها مكافأة تم منحها
+        HOUSE_UPGRADE_REWARDS.forEach(reward => {
+            if (currentHouse.power >= reward.threshold && !currentHouse.rewardedThresholds.includes(reward.threshold)) {
+                dollars += reward.dollars;
+                points += reward.points;
+                showToast(`لقد وصلت قوة البيت ${currentHouse.id} إلى ${reward.threshold.toLocaleString()}! حصلت على $${reward.dollars.toLocaleString()} و ${reward.points.toLocaleString()} نقطة مكافأة!`, 'success');
+                currentHouse.rewardedThresholds.push(reward.threshold);
             }
         });
 
     } else {
-        showMessageModal('مال غير كافٍ', 'ليس لديك مال كافٍ للابتكار!', 'error');
+        showToast('مال غير كافٍ للابتكار!', 'error');
     }
-    updateUI(); // تحديث واجهة المستخدم
-    savePlayerData(); // حفظ بيانات اللاعب
-    saveHouses(); // حفظ بيانات البيوت
-});
-
-// وظائف نظام التحدي
-function startChallengeFlow() {
-    stopChallengeTimer(); // إيقاف أي مؤقت تحدي سابق
-    challengeState = 'ATTACK_READY'; // تعيين الحالة إلى "جاهز للهجوم" مباشرة
-    challengePlayersList.innerHTML = '<p class="text-gray-300 text-center">جاري تحميل لاعب...</p>'; // رسالة تحميل
-    selectRandomChallengePlayer(); // اختيار لاعب عشوائي جديد
+    updateUI();
+    savePlayerData();
+    saveHouses();
 }
 
+// وظائف Store View
+const storeItems = {
+    'reduce-time': {
+        title: 'تقليل وقت الابتكار',
+        description: 'يقلل من وقت انتظار الابتكار التالي بنسبة 10%.',
+        cost: 200,
+        currency: 'dollars',
+        img: 'https://f.top4top.io/p_3479ijdcl0.png',
+        action: () => {
+            // هذا العنصر سيتم استخدامه كعنصر مخزون
+            const existingItem = inventory.find(item => item.id === 'reduce-time');
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                inventory.push({ id: 'reduce-time', name: 'تقليل وقت الابتكار', type: 'consumable', quantity: 1 });
+            }
+            showToast('تمت إضافة عنصر "تقليل وقت الابتكار" إلى حقيبتك!', 'success');
+        }
+    },
+    'convert-points': {
+        title: 'تحويل النقاط',
+        description: 'يحول 500 نقطة إلى 250 دولار.',
+        cost: 500,
+        currency: 'points',
+        img: 'https://i.top4top.io/s_34795cyi20.png',
+        action: () => {
+            if (points >= 500) {
+                points -= 500;
+                dollars += 250;
+                showToast('تم تحويل 500 نقطة إلى 250 دولار!', 'success');
+            } else {
+                showToast('نقاط غير كافية للتحويل.', 'error');
+            }
+        }
+    },
+    'buy-innovation3': {
+        title: 'شراء ابتكار ثالث',
+        description: 'يزيد مستوى الابتكار لديك بشكل كبير.',
+        cost: 3000,
+        currency: 'points',
+        img: 'https://f.top4top.io/s_34796x9520.png',
+        action: () => {
+            innovationLevel += 3; // مثال: زيادة 3 مستويات ابتكار
+            totalPower += innovationPowerIncrease * 3; // زيادة القوة بناءً على ذلك
+            showToast('تم شراء ابتكار ثالث بنجاح!', 'success');
+        }
+    }
+};
+
+function openStoreDetailModal(itemId) {
+    currentStoreItem = storeItems[itemId];
+    if (!currentStoreItem) return;
+
+    storeDetailImage.src = currentStoreItem.img;
+    storeDetailTitle.textContent = currentStoreItem.title;
+    storeDetailDescription.textContent = currentStoreItem.description;
+    currentStoreQuantity = 1;
+    updateStoreDetailCost();
+    showModal(storeDetailModal);
+}
+
+function updateStoreDetailCost() {
+    const cost = currentStoreItem.cost * currentStoreQuantity;
+    const currencySymbol = currentStoreItem.currency === 'dollars' ? '$' : '';
+    storeDetailTotalCost.textContent = `${currencySymbol}${cost.toLocaleString()}`;
+    storeDetailQuantityDisplay.textContent = currentStoreQuantity;
+}
+
+function confirmPurchase() {
+    if (!currentStoreItem) return;
+
+    const totalCost = currentStoreItem.cost * currentStoreQuantity;
+    let canAfford = false;
+
+    if (currentStoreItem.currency === 'dollars') {
+        if (dollars >= totalCost) {
+            dollars -= totalCost;
+            canAfford = true;
+        }
+    } else if (currentStoreItem.currency === 'points') {
+        if (points >= totalCost) {
+            points -= totalCost;
+            canAfford = true;
+        }
+    }
+
+    if (canAfford) {
+        for (let i = 0; i < currentStoreQuantity; i++) {
+            currentStoreItem.action(); // تنفيذ الإجراء لكل كمية
+        }
+        showToast(`تم شراء ${currentStoreQuantity} من ${currentStoreItem.title} بنجاح!`, 'success');
+        hideModal(storeDetailModal);
+        updateUI();
+        savePlayerData();
+        saveInventory();
+    } else {
+        showToast('موارد غير كافية للشراء.', 'error');
+    }
+}
+
+// وظائف Challenge View
 function selectRandomChallengePlayer() {
-    // جلب قائمة اللاعبين من Firebase، باستثناء اللاعب الحالي
     get(ref(database, 'users')).then((snapshot) => {
         const allPlayersData = snapshot.val();
         const eligiblePlayers = [];
@@ -670,67 +770,108 @@ function selectRandomChallengePlayer() {
             }
         }
 
-        if (eligiblePlayers.length > 0) {
-            const randomIndex = Math.floor(Math.random() * eligiblePlayers.length);
-            currentChallengePlayer = eligiblePlayers[randomIndex]; // تعيين اللاعب المستهدف
+        challengePlayersList.innerHTML = ''; // مسح القائمة الحالية
 
-            challengeState = 'ATTACK_READY'; // جاهز للهجوم فوراً
-            challengeTimerRemaining = 0; // لا يوجد وقت استعداد
-            renderCurrentChallengePlayer(); // رسم اللاعب المستهدف
+        if (eligiblePlayers.length > 0) {
+            // عرض اللاعبين المؤهلين للتحدي
+            eligiblePlayers.forEach(player => {
+                const playerCard = document.createElement('div');
+                playerCard.className = `player-card bg-gray-700 p-4 rounded-xl shadow-md flex items-center justify-between transition duration-200 ease-in-out hover:bg-gray-600 cursor-pointer`;
+                playerCard.innerHTML = `
+                    <div>
+                        <h4 class="text-lg font-semibold text-white">${player.name}</h4>
+                        <p class="text-sm text-gray-300">القوة: <span class="font-bold text-red-400">${player.totalPower.toLocaleString()}</span></p>
+                    </div>
+                    <button data-player-uid="${player.uid}" class="attack-button bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-200 ease-in-out">
+                        هجوم
+                    </button>
+                `;
+                challengePlayersList.appendChild(playerCard);
+            });
         } else {
-            challengeStatusDisplay.textContent = 'لا يوجد خصوم متاحون حاليًا.';
-            targetPlayerCard.classList.add('hidden');
-            cooldownTimerDisplay.classList.add('hidden');
-            challengeResultDisplay.classList.add('hidden');
-            currentChallengePlayer = null;
+            challengePlayersList.innerHTML = '<p class="text-gray-400 text-center">لا يوجد خصوم متاحون حاليًا.</p>';
         }
     }).catch(error => {
         console.error("Error fetching players for challenge: ", error);
-        challengeStatusDisplay.textContent = 'حدث خطأ في تحميل الخصوم.';
-        targetPlayerCard.classList.add('hidden');
-        cooldownTimerDisplay.classList.add('hidden');
+        challengePlayersList.innerHTML = '<p class="text-red-400 text-center">حدث خطأ في تحميل الخصوم.</p>';
     });
 }
 
-function renderCurrentChallengePlayer() {
-    if (challengeState === 'ATTACK_READY' && currentChallengePlayer) {
-        challengeStatusDisplay.textContent = 'خصم جاهز للتحدي!';
-        targetPlayerNameDisplay.textContent = currentChallengePlayer.name;
-        targetPlayerPowerDisplay.textContent = currentChallengePlayer.totalPower.toLocaleString();
-        targetPlayerCard.classList.remove('hidden');
-        attackButton.classList.remove('hidden');
-        cooldownTimerDisplay.classList.add('hidden');
-        challengeResultDisplay.classList.add('hidden');
-    } else if (challengeState === 'COOLDOWN') {
-        challengeStatusDisplay.textContent = 'انتظر اللاعب القادم...';
-        targetPlayerCard.classList.add('hidden');
-        attackButton.classList.add('hidden');
-        cooldownTimerDisplay.classList.remove('hidden');
-        challengeResultDisplay.classList.remove('hidden'); // إبقاء نتيجة التحدي مرئية أثناء فترة التهدئة
-        // تحديث المؤقت يتم بواسطة startChallengeTimer
-    } else {
-        challengeStatusDisplay.textContent = 'جاري البحث عن خصم...';
-        targetPlayerCard.classList.add('hidden');
-        cooldownTimerDisplay.classList.add('hidden');
-        challengeResultDisplay.classList.add('hidden');
+function handleAttack(opponentUid, opponentName, opponentPower) {
+    if (challengeState === 'COOLDOWN') {
+        showToast('يجب الانتظار حتى انتهاء مؤقت التهدئة قبل الهجوم مرة أخرى.', 'info');
+        return;
     }
+
+    const playerStrength = totalPower;
+    const opponentStrength = opponentPower;
+
+    let result = '';
+    let message = '';
+    let playerDollarsGained = 0;
+    let playerPointsGained = 0;
+    let playerPowerGained = 0;
+
+    const winChance = playerStrength / (playerStrength + opponentStrength);
+    const isWin = Math.random() < winChance;
+
+    if (isWin) {
+        result = 'win';
+        playerDollarsGained = Math.floor(opponentStrength * 0.1);
+        playerPointsGained = Math.floor(opponentStrength * 0.05);
+        playerPowerGained = Math.floor(opponentStrength * 0.01);
+        dollars += playerDollarsGained;
+        points += playerPointsGained;
+        totalPower += playerPowerGained;
+        message = `لقد فزت في التحدي ضد ${opponentName}! حصلت على $${playerDollarsGained.toLocaleString()}، ${playerPointsGained.toLocaleString()} نقطة، و ${playerPowerGained.toLocaleString()} قوة.`;
+    } else {
+        result = 'lose';
+        const penaltyDollars = Math.floor(dollars * 0.05);
+        const penaltyPoints = Math.floor(points * 0.02);
+        dollars = Math.max(0, dollars - penaltyDollars);
+        points = Math.max(0, points - penaltyPoints);
+        message = `لقد خسرت في التحدي ضد ${opponentName}. خسرت $${penaltyDollars.toLocaleString()} و ${penaltyPoints.toLocaleString()} نقطة.`;
+    }
+
+    showToast(message, isWin ? 'success' : 'error');
+
+    // إضافة الهجوم إلى السجل العالمي
+    const attackEntry = {
+        attackerUid: userId,
+        attackerName: playerName,
+        attackerPower: playerStrength,
+        defenderUid: opponentUid,
+        defenderName: opponentName,
+        defenderPower: opponentPower,
+        result: result,
+        timestamp: Date.now()
+    };
+    globalAttacks.unshift(attackEntry); // إضافة في البداية (الأحدث أولاً)
+    saveGlobalAttacks(); // حفظ السجل العالمي
+
+    // بدء مؤقت التهدئة
+    challengeState = 'COOLDOWN';
+    challengeTimerRemaining = 2 * 60; // 2 دقائق تهدئة
+    startChallengeTimer();
+
+    updateUI();
+    savePlayerData();
 }
 
 function startChallengeTimer() {
-    if (challengeTimerInterval) clearInterval(challengeTimerInterval); // مسح أي مؤقت سابق
+    if (challengeTimerInterval) clearInterval(challengeTimerInterval);
     challengeTimerInterval = setInterval(() => {
-        challengeTimerRemaining--; // تقليل الوقت المتبقي
+        challengeTimerRemaining--;
         const minutes = Math.floor(challengeTimerRemaining / 60);
         const seconds = challengeTimerRemaining % 60;
-        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        challengePlayersList.innerHTML = `<p class="text-gray-300 text-center text-xl">الوقت المتبقي للتحدي التالي: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}</p>`;
 
         if (challengeTimerRemaining <= 0) {
-            clearInterval(challengeTimerInterval); // إيقاف المؤقت عند الانتهاء
-            if (challengeState === 'COOLDOWN') {
-                startChallengeFlow(); // جلب لاعب جديد بعد انتهاء التهدئة
-            }
+            clearInterval(challengeTimerInterval);
+            challengeState = 'ATTACK_READY';
+            selectRandomChallengePlayer(); // جلب لاعبين جدد بعد انتهاء التهدئة
         }
-    }, 1000); // تحديث كل ثانية
+    }, 1000);
 }
 
 function stopChallengeTimer() {
@@ -740,337 +881,397 @@ function stopChallengeTimer() {
     }
 }
 
-// معالج حدث زر الهجوم
-function handleAttackClick() {
-    if (challengeState === 'ATTACK_READY' && currentChallengePlayer) {
-        const playerStrength = totalPower;
-        const opponentStrength = currentChallengePlayer.totalPower;
-
-        let result = '';
-        let message = '';
-        let playerDollarsGained = 0;
-        let playerPointsGained = 0;
-        let playerPowerGained = 0;
-
-        // منطق بسيط للفوز/الخسارة: القوة الأعلى تفوز غالباً
-        const winChance = playerStrength / (playerStrength + opponentStrength);
-        const isWin = Math.random() < winChance;
-
-        if (isWin) {
-            result = 'win';
-            playerDollarsGained = Math.floor(opponentStrength * 0.1); // كسب 10% من قوة الخصم كدولارات
-            playerPointsGained = Math.floor(opponentStrength * 0.05); // كسب 5% كنقاط
-            playerPowerGained = Math.floor(opponentStrength * 0.01); // كسب 1% كقوة
-            dollars += playerDollarsGained;
-            points += playerPointsGained;
-            totalPower += playerPowerGained;
-            message = `لقد فزت في التحدي ضد ${currentChallengePlayer.name}! حصلت على $${playerDollarsGained.toLocaleString()}، ${playerPointsGained.toLocaleString()} نقطة، و ${playerPowerGained.toLocaleString()} قوة.`;
-            challengeResultDisplay.className = 'text-center text-xl font-semibold mt-4 text-green-500';
-            challengeResultDisplay.textContent = 'فوز!';
-        } else {
-            result = 'lose';
-            // عقوبات بسيطة للخسارة، أو عدم كسب أي شيء
-            const penaltyDollars = Math.floor(dollars * 0.05); // خسارة 5% من الدولارات
-            const penaltyPoints = Math.floor(points * 0.02); // خسارة 2% من النقاط
-            dollars = Math.max(0, dollars - penaltyDollars);
-            points = Math.max(0, points - penaltyPoints);
-            message = `لقد خسرت في التحدي ضد ${currentChallengePlayer.name}. خسرت $${penaltyDollars.toLocaleString()} و ${penaltyPoints.toLocaleString()} نقطة.`;
-            challengeResultDisplay.className = 'text-center text-xl font-semibold mt-4 text-red-500';
-            challengeResultDisplay.textContent = 'خسارة!';
-        }
-
-        addNotification(message, isWin ? 'success' : 'error');
-        // إضافة نتيجة التحدي إلى السجل
-        challengeLog.unshift({
-            opponentName: currentChallengePlayer.name,
-            result: result,
-            playerPower: playerStrength,
-            opponentPower: opponentStrength
-        });
-        if (challengeLog.length > 10) challengeLog.pop(); // الاحتفاظ بآخر 10 إدخالات فقط في السجل
-
-        savePlayerData(); // حفظ بيانات اللاعب المحدثة
-        saveChallengeLog(); // حفظ سجل التحديات
-        updateUI(); // تحديث واجهة المستخدم
-        renderChallengeLog(); // إعادة رسم سجل التحديات
-
-        // بدء فترة التهدئة بعد الهجوم (سواء فوز أو خسارة)
-        challengeState = 'COOLDOWN';
-        challengeTimerRemaining = 2 * 60; // مؤقت تهدئة لمدة دقيقتين بعد الهجوم
-        renderCurrentChallengePlayer(); // تحديث عرض اللاعب المستهدف (ليظهر المؤقت)
-        startChallengeTimer(); // بدء مؤقت التهدئة
-    }
-}
-
-// وظائف الترتيب (Ranking)
-function fetchRanking() {
+// وظائف Online View
+function fetchAllPlayers() {
     get(ref(database, 'users')).then((snapshot) => {
         const allPlayersData = snapshot.val();
-        const players = [];
+        const onlinePlayers = [];
+        const offlinePlayers = [];
 
         for (const uid in allPlayersData) {
             const player = allPlayersData[uid].data;
             if (player && player.playerName && player.totalPower) {
-                players.push({
+                const playerInfo = {
                     uid: uid,
                     name: player.playerName,
                     totalPower: player.totalPower,
-                    isOnline: player.isOnline // تضمين حالة الاتصال
-                });
+                    isOnline: player.isOnline,
+                    lastOnline: player.lastOnline || 0
+                };
+                if (player.isOnline) {
+                    onlinePlayers.push(playerInfo);
+                } else {
+                    offlinePlayers.push(playerInfo);
+                }
             }
         }
 
-        players.sort((a, b) => b.totalPower - a.totalPower); // ترتيب اللاعبين حسب القوة الإجمالية تنازلياً
+        // ترتيب اللاعبين المتصلين حسب القوة
+        onlinePlayers.sort((a, b) => b.totalPower - a.totalPower);
+        // ترتيب اللاعبين غير المتصلين حسب القوة
+        offlinePlayers.sort((a, b) => b.totalPower - a.totalPower);
 
-        rankingList.innerHTML = ''; // مسح القائمة الحالية
-
-        if (players.length === 0) {
-            rankingList.innerHTML = '<tr><td colspan="3" class="py-2 px-4 text-center text-gray-400">لا يوجد لاعبون في الترتيب حالياً.</td></tr>';
-            return;
-        }
-
-        players.forEach((player, index) => {
-            const row = document.createElement('tr');
-            const rankClass = (index === 0) ? 'text-yellow-400 font-bold' : // المركز الأول
-                             (index === 1) ? 'text-gray-300 font-semibold' : // المركز الثاني
-                             (index === 2) ? 'text-amber-500 font-semibold' : // المركز الثالث
-                             'text-gray-300'; // باقي المراكز
-            const highlightClass = (player.uid === userId) ? 'bg-indigo-700' : (index % 2 === 0 ? 'bg-gray-700' : 'bg-gray-600'); // تمييز اللاعب الحالي
-
-            row.className = `${highlightClass} hover:bg-gray-500 transition duration-150 ease-in-out`;
-            row.innerHTML = `
-                <td class="py-2 px-4 ${rankClass}">${index + 1}</td>
-                <td class="py-2 px-4 text-gray-200">${player.name} ${player.isOnline ? '<span class="text-green-400 text-xs ml-1">(متصل)</span>' : ''}</td>
-                <td class="py-2 px-4 text-red-300">${player.totalPower.toLocaleString()}</td>
-            `;
-            rankingList.appendChild(row);
-        });
+        renderPlayerList(onlinePlayersList, onlinePlayers, true);
+        renderPlayerList(allPlayersList, offlinePlayers, false); // عرض اللاعبين غير المتصلين هنا
     }).catch(error => {
-        console.error("Error fetching ranking: ", error);
-        rankingList.innerHTML = '<tr><td colspan="3" class="py-2 px-4 text-center text-red-400">فشل تحميل الترتيب.</td></tr>';
+        console.error("Error fetching all players: ", error);
+        onlinePlayersList.innerHTML = '<p class="text-red-400 text-center">فشل تحميل قائمة اللاعبين المتصلين.</p>';
+        allPlayersList.innerHTML = '<p class="text-red-400 text-center">فشل تحميل قائمة جميع اللاعبين.</p>';
     });
 }
 
-// وظائف جميع اللاعبين (All Players)
-function fetchAllPlayers() {
-    get(ref(database, 'users')).then((snapshot) => {
-        const allPlayersData = snapshot.val();
-        const allPlayersSorted = [];
+function renderPlayerList(container, players, isOnlineList) {
+    container.innerHTML = '';
+    if (players.length === 0) {
+        container.innerHTML = `<p class="text-gray-400 text-center">لا يوجد لاعبون ${isOnlineList ? 'متصلون' : 'غير متصلين'} حالياً.</p>`;
+        return;
+    }
 
-        for (const uid in allPlayersData) {
-            if (uid === userId) continue; // تخطي اللاعب الحالي
+    players.forEach(player => {
+        const playerCard = document.createElement('div');
+        const onlineStatusClass = player.isOnline ? 'bg-green-500' : 'bg-red-500';
+        const onlineStatusText = player.isOnline ? 'متصل' : 'غير متصل';
+        const bgColor = player.isOnline ? 'bg-gray-700' : 'bg-gray-800'; // خلفية مختلفة للمتصلين وغير المتصلين
 
-            const player = allPlayersData[uid].data;
-            // لا توجد فلترة هنا، يتم عرض جميع اللاعبين بغض النظر عن حالة الاتصال أو القوة
-            allPlayersSorted.push(player);
-        }
-
-        allPlayersSorted.sort((a, b) => b.totalPower - a.totalPower); // ترتيب اللاعبين حسب القوة الإجمالية تنازلياً
-
-        allPlayersList.innerHTML = ''; // مسح القائمة الحالية
-
-        if (allPlayersSorted.length === 0) {
-            allPlayersList.innerHTML = '<p class="text-gray-400 col-span-full text-center">لا يوجد لاعبون لعرضهم حالياً.</p>';
-            return;
-        }
-
-        allPlayersSorted.forEach(player => {
-            const playerCard = document.createElement('div');
-            const onlineStatusClass = player.isOnline ? 'bg-green-500' : 'bg-red-500';
-            const onlineStatusText = player.isOnline ? 'متصل' : 'غير متصل';
-            const bgColor = player.isOnline ? 'bg-gray-700' : 'bg-gray-800'; // خلفية مختلفة للمتصلين وغير المتصلين
-
-            playerCard.className = `${bgColor} p-4 rounded-lg shadow-md flex items-center space-x-4 space-x-reverse`;
-            playerCard.innerHTML = `
-                <div class="w-2 h-2 rounded-full ${onlineStatusClass}"></div>
-                <div>
-                    <h4 class="text-lg font-semibold text-white">${player.playerName}</h4>
-                    <p class="text-sm text-gray-300">القوة: <span class="font-bold text-red-400">${player.totalPower.toLocaleString()}</span></p>
-                    <p class="text-xs text-gray-400">${onlineStatusText}</p>
-                </div>
-            `;
-            allPlayersList.appendChild(playerCard);
-        });
-    }).catch(error => {
-        console.error("Error fetching all players: ", error);
-        allPlayersList.innerHTML = '<p class="text-red-400 col-span-full text-center">فشل تحميل قائمة اللاعبين.</p>';
+        playerCard.className = `${bgColor} p-4 rounded-xl shadow-md flex items-center gap-4`;
+        playerCard.innerHTML = `
+            <div class="w-3 h-3 rounded-full ${onlineStatusClass} flex-shrink-0"></div>
+            <div>
+                <h4 class="text-lg font-semibold text-white">${player.name} ${player.uid === userId ? '<span class="text-indigo-400 text-xs">(أنت)</span>' : ''}</h4>
+                <p class="text-sm text-gray-300">القوة: <span class="font-bold text-red-400">${player.totalPower.toLocaleString()}</span></p>
+                <p class="text-xs text-gray-400">${onlineStatusText}</p>
+            </div>
+        `;
+        container.appendChild(playerCard);
     });
+}
+
+// وظائف Redeem Code View
+function redeemCode() {
+    const code = redeemCodeInput.value.trim().toUpperCase();
+    if (!code) {
+        redeemStatusMessage.textContent = 'الرجاء إدخال رمز.';
+        redeemStatusMessage.className = 'redeem-status error';
+        return;
+    }
+
+    const codeData = REDEEM_CODES[code];
+    if (!codeData) {
+        redeemStatusMessage.textContent = 'رمز غير صالح.';
+        redeemStatusMessage.className = 'redeem-status error';
+        return;
+    }
+
+    if (codeData.usedBy.includes(userId)) {
+        redeemStatusMessage.textContent = 'لقد استخدمت هذا الرمز بالفعل.';
+        redeemStatusMessage.className = 'redeem-status error';
+        return;
+    }
+
+    dollars += codeData.dollars || 0;
+    points += codeData.points || 0;
+    totalPower += codeData.power || 0;
+
+    codeData.usedBy.push(userId); // تسجيل المستخدم الذي استخدم الرمز
+    update(ref(database, 'redeemCodes/' + code), codeData) // تحديث الرمز في Firebase
+        .then(() => {
+            redeemStatusMessage.textContent = 'تم تفعيل الرمز بنجاح!';
+            redeemStatusMessage.className = 'redeem-status success';
+            showToast('تم تفعيل الرمز بنجاح!', 'success');
+            updateUI();
+            savePlayerData();
+        })
+        .catch(error => {
+            console.error("Error updating redeem code usage: ", error);
+            redeemStatusMessage.textContent = 'حدث خطأ أثناء تفعيل الرمز.';
+            redeemStatusMessage.className = 'redeem-status error';
+            showToast('حدث خطأ أثناء تفعيل الرمز.', 'error');
+        });
+}
+
+// وظائف Inventory Modal
+function renderInventoryItems() {
+    inventoryItemsList.innerHTML = '';
+    if (inventory.length === 0) {
+        inventoryItemsList.innerHTML = '<p class="text-gray-400 text-center">حقيبتك فارغة.</p>';
+        return;
+    }
+
+    inventory.forEach(item => {
+        const itemElement = document.createElement('div');
+        itemElement.className = 'inventory-item';
+        itemElement.innerHTML = `
+            <span>${item.name} (x${item.quantity})</span>
+            <button class="use-button" data-item-id="${item.id}">استخدام</button>
+        `;
+        inventoryItemsList.appendChild(itemElement);
+    });
+}
+
+function useInventoryItem(itemId) {
+    const itemIndex = inventory.findIndex(item => item.id === itemId);
+    if (itemIndex === -1) return;
+
+    const item = inventory[itemIndex];
+
+    if (itemId === 'reduce-time') {
+        // تقليل وقت الابتكار
+        innovationTimerRemaining = Math.max(0, innovationTimerRemaining - 60); // مثال: تقليل دقيقة
+        showToast('تم تقليل وقت الابتكار!', 'info');
+    }
+    // أضف المزيد من منطق استخدام العناصر هنا
+
+    item.quantity--;
+    if (item.quantity <= 0) {
+        inventory.splice(itemIndex, 1); // إزالة العنصر إذا نفدت الكمية
+    }
+    renderInventoryItems();
+    renderInventoryCount();
+    saveInventory();
+    updateUI();
+}
+
+// وظائف Authentication Flow Modal
+function showAuthFlowModal(title, message) {
+    authModalTitle.textContent = title;
+    // يمكنك عرض الرسالة في مكان ما داخل المودال إذا أردت
+    showModal(authFlowModal);
+    setNameSection.classList.remove('hidden');
+    document.getElementById('email-auth-section').classList.add('hidden');
+    authFlowCancelButton.classList.add('hidden');
+}
+
+function handleSetNameConfirm() {
+    const newName = playerNameInput.value.trim();
+    if (newName && newName.length >= 3 && newName.length <= 15) {
+        playerName = newName;
+        isNameSetPermanently = true; // يعتبر الاسم مؤكداً إذا تم تعيينه هنا
+        lastPlayerNameChangeTimestamp = Date.now();
+        nameChangeCount++; // زيادة عدد مرات تغيير الاسم
+        showToast(`تم تعيين اسمك إلى ${playerName}.`, 'success');
+        hideModal(authFlowModal);
+        updateUI();
+        savePlayerData();
+    } else {
+        showToast('اسم غير صالح. يجب أن يكون بين 3 و 15 حرفاً.', 'error');
+    }
+}
+
+function handleContinueGuest() {
+    isNameSetPermanently = false; // التأكد من أنه ضيف
+    showToast('تمت المتابعة كضيف. لن يتم حفظ تقدمك بشكل دائم.', 'info');
+    hideModal(authFlowModal);
+    updateUI();
+    // لا حاجة لحفظ البيانات هنا، لأنها لن تكون دائمة
+}
+
+function handleEmailSignup() {
+    const email = authEmailInput.value;
+    const password = authPasswordInput.value;
+    if (!email || !password) {
+        showToast('الرجاء إدخال البريد الإلكتروني وكلمة المرور.', 'error');
+        return;
+    }
+    createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            // Signed in
+            const user = userCredential.user;
+            userId = user.uid; // تحديث userId
+            isNameSetPermanently = true; // الاسم يعتبر دائم الآن
+            lastPlayerNameChangeTimestamp = Date.now(); // تحديث وقت تغيير الاسم
+            nameChangeCount++; // زيادة عدد مرات تغيير الاسم
+            showToast('تم إنشاء الحساب وتسجيل الدخول بنجاح!', 'success');
+            hideModal(authFlowModal);
+            updateUI();
+            savePlayerData(); // حفظ البيانات الآن تحت المستخدم الجديد
+            loadHouses(); // تحميل البيوت للمستخدم الجديد
+            loadGlobalAttacks();
+            loadInventory();
+            listenForPlayerUpdates();
+            updateOnlineStatus(true);
+            startAccumulationLoop();
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            showToast(`خطأ في إنشاء الحساب: ${errorMessage}`, 'error');
+            console.error("Signup error:", errorCode, errorMessage);
+        });
+}
+
+function handleEmailSignin() {
+    const email = authEmailInput.value;
+    const password = authPasswordInput.value;
+    if (!email || !password) {
+        showToast('الرجاء إدخال البريد الإلكتروني وكلمة المرور.', 'error');
+        return;
+    }
+    signInWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+            // Signed in
+            const user = userCredential.user;
+            userId = user.uid; // تحديث userId
+            isNameSetPermanently = true; // الاسم يعتبر دائم الآن
+            showToast('تم تسجيل الدخول بنجاح!', 'success');
+            hideModal(authFlowModal);
+            updateUI();
+            savePlayerData(); // حفظ البيانات الآن تحت المستخدم الجديد
+            loadHouses(); // تحميل البيوت للمستخدم الجديد
+            loadGlobalAttacks();
+            loadInventory();
+            listenForPlayerUpdates();
+            updateOnlineStatus(true);
+            startAccumulationLoop();
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            showToast(`خطأ في تسجيل الدخول: ${errorMessage}`, 'error');
+            console.error("Signin error:", errorCode, errorMessage);
+        });
 }
 
 // معالجات الأحداث (Event Listeners)
 collectDollarsButton.addEventListener('click', collectDollars);
 
-// معالج حدث زر الإعدادات لفتح المودال
-settingsButton.addEventListener('click', () => {
-    settingsModal.classList.remove('hidden');
-    playerNameInput.value = playerName; // وضع الاسم الحالي في حقل الإدخال
-    const now = Date.now();
-    const timeSinceLastChange = now - lastPlayerNameChangeTimestamp;
+// أحداث التنقل في القائمة الرئيسية
+playMenuItem.addEventListener('click', () => showView('game-view'));
+attackLogMenuItem.addEventListener('click', () => showView('attack-log-view'));
+storeMenuItem.addEventListener('click', () => showView('store-view'));
+onlineMenuItem.addEventListener('click', () => showView('online-view'));
+challengeMenuItem.addEventListener('click', () => showView('challenge-view'));
+redeemCodeMenuItem.addEventListener('click', () => showView('redeem-code-view'));
 
-    // منطق التحكم في تغيير الاسم
-    if (isNameSetPermanently && nameChangeCount >= MAX_NAME_CHANGES) {
-        nameChangeCooldownMessage.textContent = `لقد وصلت إلى الحد الأقصى لتغيير الاسم (${MAX_NAME_CHANGES} مرات).`;
-        nameChangeCooldownMessage.classList.remove('hidden');
-        setNameConfirmButton.disabled = true;
-        setNameConfirmButton.classList.add('opacity-50', 'cursor-not-allowed');
-    } else if (isNameSetPermanently && timeSinceLastChange < NAME_CHANGE_COOLDOWN_DURATION) {
-        const remainingTimeMs = NAME_CHANGE_COOLDOWN_DURATION - timeSinceLastChange;
-        const remainingDays = Math.ceil(remainingTimeMs / (1000 * 60 * 60 * 24));
-        nameChangeCooldownDisplay.textContent = `${remainingDays} يوم(أيام)`;
-        nameChangeCooldownMessage.classList.remove('hidden');
-        setNameConfirmButton.disabled = true;
-        setNameConfirmButton.classList.add('opacity-50', 'cursor-not-allowed');
+// أحداث أزرار العودة
+backToMainFromGame.addEventListener('click', () => showView('main-menu-view'));
+backToMainFromAttackLog.addEventListener('click', () => showView('main-menu-view'));
+backToMainFromStore.addEventListener('click', () => showView('main-menu-view'));
+backToMainFromChallenge.addEventListener('click', () => {
+    stopChallengeTimer(); // إيقاف المؤقت عند العودة
+    showView('main-menu-view');
+});
+backToMainFromOnline.addEventListener('click', () => showView('main-menu-view'));
+backToMainFromRedeemCode.addEventListener('click', () => showView('main-menu-view'));
+
+// أحداث Game View (الابتكار)
+innovationPrevButton.addEventListener('click', () => {
+    if (currentHouseIndex > 0) {
+        currentHouseIndex--;
+        updateUI();
+        saveHouses();
     } else {
-        nameChangeCooldownMessage.classList.add('hidden');
-        setNameConfirmButton.disabled = false;
-        setNameConfirmButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        showToast('أنت في البيت الأول بالفعل.', 'info');
     }
 });
 
-// معالج حدث زر إغلاق مودال الإعدادات
-closeSettingsModalButton.addEventListener('click', () => {
-    settingsModal.classList.add('hidden');
-});
-
-// معالج حدث زر "موافق" في مودال الرسائل
-messageModalOkButton.addEventListener('click', () => {
-    messageModal.classList.add('hidden');
-});
-
-// معالج حدث زر إغلاق مودال الرسائل
-closeMessageModalButton.addEventListener('click', () => {
-    messageModal.classList.add('hidden');
-});
-
-// معالج حدث زر تأكيد تغيير الاسم
-setNameConfirmButton.addEventListener('click', () => {
-    const newName = playerNameInput.value.trim();
-    if (newName && newName.length >= 3 && newName.length <= 20) { // التحقق من طول الاسم
-        const oldPlayerName = playerName;
-        playerName = newName;
-
-        const now = Date.now();
-        const timeSinceLastChange = now - lastPlayerNameChangeTimestamp;
-
-        // إعادة فحص شروط تغيير الاسم (للتأكد مرة أخرى)
-        if (isNameSetPermanently && nameChangeCount >= MAX_NAME_CHANGES) {
-            showMessageModal('لا يمكن تغيير الاسم', `لقد وصلت إلى الحد الأقصى لتغيير الاسم (${MAX_NAME_CHANGES} مرات).`, 'info');
-            return;
-        }
-
-        if (isNameSetPermanently && (Date.now() - lastPlayerNameChangeTimestamp < NAME_CHANGE_COOLDOWN_DURATION)) {
-            const remainingTimeMs = NAME_CHANGE_COOLDOWN_DURATION - (now - lastPlayerNameChangeTimestamp);
-            const remainingDays = Math.ceil(remainingTimeMs / (1000 * 60 * 60 * 24));
-            showMessageModal('لا يمكن تغيير الاسم', `لا يمكنك تغيير اسمك إلا بعد مرور ${remainingDays} يوم(أيام) أخرى.`, 'info');
-            return;
-        }
-
-        // زيادة عدد مرات تغيير الاسم فقط إذا تغير الاسم بالفعل وكان قد تم تعيينه بشكل دائم من قبل
-        if (playerName !== oldPlayerName) {
-            if (isNameSetPermanently) {
-                nameChangeCount++;
-            }
-            isNameSetPermanently = true; // وضع علامة على أن الاسم تم تعيينه بشكل دائم
-            lastPlayerNameChangeTimestamp = Date.now(); // تحديث وقت آخر تغيير للاسم
-            addNotification(`تم تغيير اسمك إلى ${playerName}.`, 'success');
+innovationNextButton.addEventListener('click', () => {
+    if (currentHouseIndex < houses.length - 1) {
+        if (houses[currentHouseIndex + 1].unlocked) {
+            currentHouseIndex++;
+            updateUI();
+            saveHouses();
         } else {
-            addNotification('لم يتغير الاسم.', 'info');
+            showToast('البيت التالي غير مفتوح بعد!', 'error');
         }
-
-        updateUI(); // تحديث واجهة المستخدم
-        savePlayerData(); // حفظ بيانات اللاعب
-        settingsModal.classList.add('hidden'); // إغلاق مودال الإعدادات
     } else {
-        showMessageModal('اسم غير صالح', 'يجب أن يكون الاسم بين 3 و 20 حرفاً.', 'error');
+        showToast('لا يوجد بيوت أخرى لفتحها.', 'info');
     }
 });
 
-// معالج حدث زر حفظ اللعبة
-saveGameButton.addEventListener('click', () => {
-    savePlayerData();
-    saveHouses();
-    saveChallengeLog();
-    saveNotifications();
-    showMessageModal('حفظ اللعبة', 'تم حفظ بياناتك بنجاح!', 'success');
+innovationButton.addEventListener('click', activateInnovation);
+gameInfoIcon.addEventListener('click', () => {
+    houseInfoModal.querySelector('div:first-of-type').classList.remove('scale-100', 'opacity-100'); // Reset animation
+    houseInfoModal.classList.remove('visible'); // Hide first to reset
+    
+    houseUpgradeRewardsList.innerHTML = '';
+    HOUSE_UPGRADE_REWARDS.forEach(reward => {
+        const li = document.createElement('li');
+        const currentHouse = houses[currentHouseIndex];
+        const isRewarded = currentHouse.rewardedThresholds.includes(reward.threshold);
+        li.className = `mb-1 ${isRewarded ? 'text-green-400 line-through' : 'text-gray-200'}`;
+        li.innerHTML = `وصول قوة البيت إلى ${reward.threshold.toLocaleString()}: +$${reward.dollars.toLocaleString()}، +${reward.points.toLocaleString()} نقطة`;
+        houseUpgradeRewardsList.appendChild(li);
+    });
+    showModal(houseInfoModal);
 });
+houseInfoCloseButton.addEventListener('click', () => hideModal(houseInfoModal));
 
-// معالج حدث زر تحميل اللعبة
-loadGameButton.addEventListener('click', () => {
-    loadPlayerData();
-    loadHouses();
-    loadChallengeLog();
-    loadNotifications();
-    showMessageModal('تحميل اللعبة', 'تم تحميل بياناتك بنجاح!', 'success');
+// أحداث Store View
+storeItemReduceTime.addEventListener('click', () => openStoreDetailModal('reduce-time'));
+storeItemConvertPoints.addEventListener('click', () => openStoreDetailModal('convert-points'));
+storeItemBuyInnovation3.addEventListener('click', () => openStoreDetailModal('buy-innovation3'));
+
+// أحداث Store Detail Modal
+storeDetailQuantityMinus.addEventListener('click', () => {
+    if (currentStoreQuantity > 1) {
+        currentStoreQuantity--;
+        updateStoreDetailCost();
+    }
 });
+storeDetailQuantityPlus.addEventListener('click', () => {
+    currentStoreQuantity++;
+    updateStoreDetailCost();
+});
+storeDetailConfirmButton.addEventListener('click', confirmPurchase);
+storeDetailCancelButton.addEventListener('click', () => hideModal(storeDetailModal));
 
-// معالج حدث زر إعادة تعيين اللعبة
-resetGameButton.addEventListener('click', () => {
-    // تأكيد من المستخدم قبل إعادة التعيين
-    if (confirm('هل أنت متأكد أنك تريد إعادة تعيين اللعبة؟ ستفقد كل تقدمك!')) {
-        // إعادة تعيين جميع المتغيرات إلى قيمها الافتراضية
-        dollars = 0;
-        points = 0;
-        totalPower = 0;
-        innovationLevel = 1;
-        innovationCost = 100;
-        innovationPowerIncrease = 10;
-        accumulatedDollars = 0;
-        accumulatedPoints = 0;
-        accumulatedPower = 0;
-        lastCollectTime = 0;
-        playerName = "لاعب جديد";
-        isNameSetPermanently = false;
-        lastPlayerNameChangeTimestamp = 0;
-        nameChangeCount = 0; // إعادة تعيين عدد مرات تغيير الاسم
-        activeHouseIndex = 0;
-        houses = [ // إعادة تعيين البيوت إلى حالتها الافتراضية
-            { id: 1, power: 1, unlocked: true, threshold: 25000, rewardedThresholds: [] },
-            { id: 2, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] },
-            { id: 3, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] },
-            { id: 4, power: 1, unlocked: false, threshold: 25000, rewardedThresholds: [] }
-        ];
-        challengeLog = []; // مسح سجل التحديات
-        notifications = []; // مسح الإشعارات
-
-        // مسح البيانات من Firebase أيضاً
-        if (userId) {
-            set(ref(database, 'users/' + userId + '/data'), null);
-            set(ref(database, 'users/' + userId + '/houses'), null);
-            set(ref(database, 'users/' + userId + '/challengeLog'), null);
-            set(ref(database, 'users/' + userId + '/notifications'), null);
-        }
-
-        updateUI(); // تحديث واجهة المستخدم
-        renderChallengeLog(); // إعادة رسم سجل التحديات
-        renderNotifications(); // إعادة رسم الإشعارات
-        showMessageModal('إعادة تعيين', 'تمت إعادة تعيين اللعبة بنجاح!', 'info');
-        settingsModal.classList.add('hidden'); // إغلاق مودال الإعدادات
+// أحداث Challenge View (أزرار الهجوم)
+challengePlayersList.addEventListener('click', (event) => {
+    const attackBtn = event.target.closest('.attack-button');
+    if (attackBtn) {
+        const opponentUid = attackBtn.dataset.playerUid;
+        const opponentCard = attackBtn.closest('.player-card');
+        const opponentName = opponentCard.querySelector('h4').textContent.split('(')[0].trim(); // استخراج الاسم فقط
+        const opponentPower = parseInt(opponentCard.querySelector('.font-bold.text-red-400').textContent.replace(/,/g, ''));
+        
+        handleAttack(opponentUid, opponentName, opponentPower);
     }
 });
 
-// تبديل الشريط الجانبي (Sidebar)
-sidebar.classList.remove('-translate-x-full'); // التأكد من إخفائه مبدئياً بواسطة CSS
-settingsButton.addEventListener('click', () => {
-    sidebar.classList.toggle('open'); // تبديل كلاس 'open' لإظهار/إخفاء الشريط
+// أحداث Redeem Code View
+redeemCodeButton.addEventListener('click', redeemCode);
+
+// أحداث Popup Modal
+popupCloseButton.addEventListener('click', () => hideModal(popupModal));
+
+// أحداث Message Modal
+messageModalCloseButton.addEventListener('click', () => hideModal(messageModal));
+
+// أحداث Inventory
+inventoryIcon.addEventListener('click', () => {
+    renderInventoryItems();
+    showModal(inventoryModal);
+});
+inventoryCloseButton.addEventListener('click', () => hideModal(inventoryModal));
+inventoryItemsList.addEventListener('click', (event) => {
+    const useButton = event.target.closest('.use-button');
+    if (useButton) {
+        const itemId = useButton.dataset.itemId;
+        useInventoryItem(itemId);
+    }
 });
 
-closeSidebarButton.addEventListener('click', () => {
-    sidebar.classList.remove('open'); // إغلاق الشريط الجانبي
+// أحداث Auth Flow Modal
+setNameConfirmButton.addEventListener('click', handleSetNameConfirm);
+setNameContinueGuestButton.addEventListener('click', handleContinueGuest);
+showEmailAuthButton.addEventListener('click', () => {
+    setNameSection.classList.add('hidden');
+    document.getElementById('email-auth-section').classList.remove('hidden');
+    authModalTitle.textContent = "تسجيل دخول / إنشاء حساب";
+    authFlowCancelButton.classList.remove('hidden'); // إظهار زر الإلغاء
 });
-
-// روابط التنقل بين العروض المختلفة
-navDashboard.addEventListener('click', () => showView('dashboard-view'));
-navInnovation.addEventListener('click', () => showView('innovation-view'));
-navChallenge.addEventListener('click', () => showView('challenge-view'));
-navClan.addEventListener('click', () => showView('clan-view'));
-navRanking.addEventListener('click', () => showView('ranking-view'));
-navMarket.addEventListener('click', () => showView('market-view'));
-navAllPlayers.addEventListener('click', () => showView('all-players-view'));
-
-// معالج حدث زر الهجوم في نظام التحدي
-attackButton.addEventListener('click', handleAttackClick);
+backToNameSectionButton.addEventListener('click', () => {
+    setNameSection.classList.remove('hidden');
+    document.getElementById('email-auth-section').classList.add('hidden');
+    authModalTitle.textContent = "أهلاً بك أيها المغامر الجديد!";
+    authFlowCancelButton.classList.add('hidden'); // إخفاء زر الإلغاء
+});
+authSignupButton.addEventListener('click', handleEmailSignup);
+authSigninButton.addEventListener('click', handleEmailSignin);
+authFlowCancelButton.addEventListener('click', () => hideModal(authFlowModal));
 
 // تحديث حالة اتصال المستخدم بالإنترنت بشكل دوري (كل دقيقة)
 setInterval(() => {
     updateOnlineStatus(true);
 }, 60 * 1000); // كل دقيقة
+
