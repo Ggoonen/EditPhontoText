@@ -1258,8 +1258,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        // تم تعديل هذا السطر لاستيراد ServerValue بشكل صحيح
         import * as database from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-        import { getDatabase, ref, set, get, update, onValue, push, query, orderByChild, limitToLast, onDisconnect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getDatabase, ref, set, get, update, onValue, push, query, orderByChild, onDisconnect } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -1549,6 +1550,7 @@
                         const lastSeenRef = ref(db, `artifacts/${appId}/public/onlinePlayers/${userId}/lastSeen`);
                         
                         onDisconnect(presenceRef).set(false);
+                        // تم تعديل هذا السطر لاستخدام ServerValue مباشرةً
                         onDisconnect(lastSeenRef).set(database.ServerValue.TIMESTAMP);
 
                         await fetchOrCreateUserData();
