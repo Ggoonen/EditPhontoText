@@ -14,12 +14,8 @@
             color: #e2e8f0;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
+            min-height: 10vh;
             overflow-x: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
         }
         body::-webkit-scrollbar {
             display: none;
@@ -255,19 +251,6 @@
         .header-logout-btn:hover {
             background-color: #ef4444;
         }
-        .change-name-btn {
-            background-color: #4a5568;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            margin-right: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        .change-name-btn:hover {
-            background-color: #6b7280;
-        }
 
         .pill-style-item {
             border-radius: 50px;
@@ -409,13 +392,6 @@
             position: relative;
             z-index: 2;
         }
-        .store-item img { /* For image icons in store */
-            width: 2.5rem;
-            height: 2.5rem;
-            margin-bottom: 0.2rem;
-            position: relative;
-            z-index: 2;
-        }
 
         .store-item h3 {
             font-size: 0.9rem;
@@ -425,7 +401,7 @@
             z-index: 2;
         }
         .store-item .price-display {
-            font-size: 0.7rem; /* Smaller font size */
+            font-size: 0.8rem;
             font-weight: bold;
             color: #cbd5e0;
             margin-top: 0.2rem;
@@ -434,9 +410,6 @@
             gap: 2px;
             position: relative;
             z-index: 2;
-        }
-        .store-item .price-display i {
-            font-size: 0.8rem; /* Smaller icon size */
         }
         .store-item .price-display i.fa-dollar-sign {
             color: #4CAF50;
@@ -450,53 +423,6 @@
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        @keyframes pink-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        @keyframes fiery-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background: position: 0% 50%; }
-        }
-        @keyframes silver-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        @keyframes blue-glow-animation {
-            0% { text-shadow: 0 0 5px #3b82f6, 0 0 10px #3b82f6, 0 0 15px #3b82f6; }
-            50% { text-shadow: 0 0 10px #2563eb, 0 0 20px #2563eb, 0 0 30px #2563eb; }
-            100% { text-shadow: 0 0 5px #3b82f6, 0 0 10px #3b82f6, 0 0 15px #3b82f6; }
-        }
-        @keyframes emerald-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        @keyframes royal-crimson-animation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        @keyframes crown-animation {
-            0% { transform: scale(1) rotate(0deg); opacity: 1; }
-            25% { transform: scale(1.1) rotate(5deg); opacity: 0.9; }
-            50% { transform: scale(1) rotate(0deg); opacity: 1; }
-            75% { transform: scale(1.1) rotate(-5deg); opacity: 0.9; }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-        @keyframes lion-animation { 
-            0% { transform: scale(1) rotate(0deg); opacity: 1; }
-            50% { transform: scale(1.05) rotate(3deg); opacity: 0.95; }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
-        @keyframes glowing-icon {
-            0% { filter: drop-shadow(0 0 5px rgba(255,255,255,0.7)); }
-            50% { filter: drop-shadow(0 0 15px rgba(255,255,255,1)); }
-            100% { filter: drop-shadow(0 0 5px rgba(255,255,255,0.7)); }
-        }
 
         .golden-text {
             background: linear-gradient(90deg, #ffd700, #ffec8b, #ffd700, #ffec8b);
@@ -505,59 +431,6 @@
             background-clip: text;
             color: transparent;
             animation: gold-animation 3s linear infinite;
-        }
-        .pink-text {
-            background: linear-gradient(90deg, #ff69b4, #ffb6c1, #ff69b4, #ffb6c1);
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: pink-animation 3s linear infinite;
-        }
-        .fiery-text {
-            background: linear-gradient(90deg, #ff4500, #ffa500, #ff4500, #ffa500);
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: fiery-animation 3s linear infinite;
-        }
-        .silver-text {
-            background: linear-gradient(90deg, #c0c0c0, #e0e0e0, #c0c0c0, #e0e0e0);
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: silver-animation 3s linear infinite;
-        }
-        .blue-glow-text {
-            color: #3b82f6;
-            animation: blue-glow-animation 2s ease-in-out infinite;
-        }
-        .emerald-text {
-            background: linear-gradient(90deg, #00c9a7, #00e0b7, #00c9a7, #00e0b7);
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: emerald-animation 3s linear infinite;
-        }
-        .royal-crimson-text {
-            background: linear-gradient(90deg, #8b0000, #dc143c, #8b0000, #dc143c);
-            background-size: 200% 100%;
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: royal-crimson-animation 3s linear infinite;
-        }
-        .animated-crown-icon {
-            animation: crown-animation 2s ease-in-out infinite;
-        }
-        .animated-lion-icon { 
-            animation: lion-animation 1.5s ease-in-out infinite;
-        }
-        .glowing-icon {
-            animation: glowing-icon 2s ease-in-out infinite;
         }
 
         @keyframes fade-in-up {
@@ -587,11 +460,6 @@
             font-size: 5rem;
             margin-bottom: 20px;
         }
-        #storeItemDetailModal .item-icon-img { 
-            width: 5rem;
-            height: 5rem;
-            margin: 0 auto 20px auto; 
-        }
         #storeItemDetailModal .item-description {
             font-size: 1.1rem;
             color: #a0aec0;
@@ -619,9 +487,6 @@
             display: flex;
             gap: 15px;
             justify-content: center;
-        }
-        .modal-actions .pill-modal-btn {
-            min-width: 120px; 
         }
 
         .pill-modal-btn {
@@ -984,239 +849,28 @@
             font-size: 0.9rem;
             color: #a0aec0;
         }
-        .attack-player-item {
-            background-color: #21262d;
-            border-radius: 15px;
-            padding: 1rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            border: 1px solid #30363d;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .attack-player-item .player-info {
-            display: flex;
-            flex-direction: column;
-            text-align: right;
-            flex-grow: 1;
-        }
-        .attack-player-item .player-info h3 {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #e2e8f0;
-        }
-        .attack-player-item .player-info p {
-            font-size: 0.9rem;
-            color: #a0aec0;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-        .attack-player-item .attack-btn-wrapper {
-            margin-left: 15px;
-            flex-shrink: 0;
-        }
-        .attack-player-btn {
-            border-radius: 50px;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            position: relative;
-            overflow: hidden;
-            color: white;
-            background: linear-gradient(to bottom, #3b82f6, #2563eb);
-            min-width: 80px;
-            text-align: center;
-        }
-        .attack-player-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.25);
-        }
-        .attack-player-btn:disabled {
-            background: linear-gradient(to bottom, #6b7280, #4b5563);
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        .online-player-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-            cursor: pointer; 
-        }
-        .online-player-list-item.online {
-            background-color: #21262d;
-        }
-        .online-player-list-item.offline {
-            background-color: #1a202c;
-            opacity: 0.7;
-        }
-        .online-player-info {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .online-player-ships {
-            display: flex;
-            gap: 0.25rem;
-            align-items: center;
-        }
-        .online-player-ship-icon {
-            width: 25px;
-            height: 25px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        .online-player-ship-icon i {
-            font-size: 1.2rem;
-            position: absolute;
-        }
-        .online-player-ship-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            position: absolute;
-        }
-        .online-player-ship-icon.unlocked i, .online-player-ship-icon.unlocked img {
-            filter: none; 
-        }
-        .online-player-ship-icon.locked i, .online-player-ship-icon.locked img {
-            filter: grayscale(100%); 
-            opacity: 0.6;
-        }
-        .player-profile-modal-content {
-            max-width: 600px;
-            text-align: right;
-        }
-        .player-profile-modal-content .profile-header {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            margin-bottom: 1.5rem;
-        }
-        .player-profile-modal-content .profile-header h2 {
-            margin-left: 10px;
-            font-size: 2.5rem;
-        }
-        .player-profile-modal-content .profile-header .status-dot {
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-        .player-profile-modal-content .profile-header .status-dot.online {
-            background-color: #22c55e;
-        }
-        .player-profile-modal-content .profile-header .status-dot.offline {
-            background-color: #ef4444;
-        }
-        .player-profile-modal-content .profile-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .player-profile-modal-content .profile-stat-item {
-            background-color: #21262d;
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-        }
-        .player-profile-modal-content .profile-stat-item i {
-            font-size: 2rem;
-            margin-bottom: 5px;
-        }
-        .player-profile-modal-content .profile-stat-item span {
-            font-size: 1rem;
-            font-weight: bold;
-        }
-        .player-profile-modal-content .profile-ships-section {
-            margin-top: 1.5rem;
-        }
-        .player-profile-modal-content .profile-ship-card {
-            background-color: #21262d;
-            border-radius: 15px;
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .player-profile-modal-content .profile-ship-card .icon-container {
-            width: 50px;
-            height: 50px;
-            margin-left: 1rem;
-            position: relative;
-        }
-        .player-profile-modal-content .profile-ship-card .icon-container i {
-            font-size: 2.5rem;
-            position: absolute;
-        }
-        .player-profile-modal-content .profile-ship-card .icon-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            position: absolute;
-        }
-        .player-profile-modal-content .profile-ship-card .info {
-            flex-grow: 1;
-            text-align: right;
-        }
-        .player-profile-modal-content .profile-ship-card .info h4 {
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-        .player-profile-modal-content .profile-ship-card .info p {
-            font-size: 0.9rem;
-            color: #a0aec0;
-        }
-        .player-profile-modal-content .profile-footer {
-            margin-top: 1.5rem;
-            font-size: 0.9rem;
-            color: #a0aec0;
-        }
-        #authModal .modal-content {
-            background-color: #161b22; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4); 
-            border: 1px solid #30363d; 
-            width: 90%;
-            max-width: 400px; 
-            padding: 24px;
-            text-align: center;
-        }
-        #changeFleetNameModal .modal-content {
-            max-width: 400px;
-        }
     </style>
 </head>
-<body class="bg-gray-900 min-h-screen flex flex-col" oncontextmenu="return false;">
+<body class="bg-gray-900 min-h-screen flex flex-col">
 
     <div id="authModal" class="modal">
         <div class="modal-content">
             <h2 class="text-2xl font-bold mb-4">تسجيل الدخول / التسجيل</h2>
             <input type="email" id="authEmailInput" placeholder="البريد الإلكتروني" class="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
             <input type="password" id="authPasswordInput" placeholder="كلمة المرور" class="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button id="loginBtn" class="btn btn-primary w-full mb-3">تسجيل الدخول</button>
-            <button id="registerBtn" class="btn btn-secondary w-full">تسجيل جديد</button>
+            <div class="flex flex-col gap-3">
+                <button id="loginBtn" class="btn btn-primary w-full">تسجيل الدخول</button>
+                <button id="registerBtn" class="btn btn-secondary w-full">تسجيل جديد</button>
+            </div>
         </div>
     </div>
 
-    <div id="changeFleetNameModal" class="modal">
+    <div id="initialFleetNameModal" class="modal">
         <div class="modal-content">
-            <span class="close-button" onclick="closeChangeFleetNameModal()">&times;</span>
-            <h2 class="text-2xl font-bold mb-4">تغيير اسم الأسطول</h2>
-            <input type="text" id="changeFleetNameInput" placeholder="اسم الأسطول الجديد" class="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <button id="confirmChangeFleetNameBtn" class="btn btn-primary w-full">تأكيد التغيير</button>
+            <h2 class="text-2xl font-bold mb-4">أهلاً بك أيها القائد!</h2>
+            <p class="mb-6">الرجاء تعيين اسم لأسطولك:</p>
+            <input type="text" id="initialFleetNameInput" placeholder="اسم الأسطول" class="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="confirmInitialFleetNameBtn" class="btn btn-primary w-full">تأكيد</button>
         </div>
     </div>
 
@@ -1238,13 +892,7 @@
         <div class="header-fleet-name flex justify-between items-center px-4">
             <span id="fleetName">أسطولي العظيم</span>
             <i id="fleetStarIcon" class="fas fa-star text-yellow-300 hidden"></i>
-            <i id="fleetCrownIcon" class="fas fa-chess-king text-yellow-400 hidden"></i>
-            <img id="fleetLionIcon" src="https://d.top4top.io/p_3482hpjya1.png" alt="Lion Icon" class="w-6 h-6 ml-1 hidden animated-lion-icon" draggable="false">
-            <span id="lionCountDisplay" class="text-xs text-gray-400 ml-1 hidden">x0</span>
-            <button id="changeNameBtn" class="change-name-btn">تغيير الاسم</button>
-        </div>
-        <div class="text-center mt-2">
-            <button id="logoutBtn" class="header-logout-btn">تسجيل الخروج</button>
+            <button id="logoutBtn" class="header-logout-btn hidden">تسجيل الخروج</button>
         </div>
     </header>
 
@@ -1290,8 +938,8 @@
             <div class="space-y-6">
                 <div class="ship-item-card">
                     <div class="icon-container">
-                        <i id="ship1IconI" class="fas fa-ship"></i>
-                        <img id="ship1IconImg" src="" alt="Ship Icon" class="w-full h-full object-contain" style="display: none;" draggable="false">
+                        <i class="fas fa-ship"></i>
+                        <img id="ship1IconImg" src="" alt="Image of Ship Icon" class="w-full h-full object-contain" style="display: none;">
                     </div>
                     <div class="info-container">
                         <h3>السفينة الأساسية</h3>
@@ -1309,8 +957,8 @@
 
                 <div id="ship2Container" class="ship-item-card opacity-50 pointer-events-none">
                     <div class="icon-container">
-                        <i id="ship2IconI" class="fas fa-ship text-gray-500"></i>
-                        <img id="ship2IconImg" src="" alt="Image of Ship Icon" style="display: none;" draggable="false">
+                        <i class="fas fa-ship text-gray-500"></i>
+                        <img id="ship2IconImg" src="" alt="Image of Ship Icon" style="display: none;">
                     </div>
                     <div class="info-container">
                         <h3 class="text-gray-400">السفينة الثانية</h3>
@@ -1328,8 +976,8 @@
 
                 <div id="ship3Container" class="ship-item-card opacity-50 pointer-events-none">
                     <div class="icon-container">
-                        <i id="ship3IconI" class="fas fa-ship text-gray-500"></i>
-                        <img id="ship3IconImg" src="" alt="Image of Ship Icon" style="display: none;" draggable="false">
+                        <i class="fas fa-ship text-gray-500"></i>
+                        <img id="ship3IconImg" src="" alt="Image of Ship Icon" style="display: none;">
                     </div>
                     <div class="info-container">
                         <h3 class="text-gray-400">السفينة الثالثة</h3>
@@ -1353,12 +1001,25 @@
             </button>
             <h2 class="text-3xl font-bold text-center mb-6 text-gray-100">المتجر</h2>
             <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
-                <!-- Essential Items -->
                 <div class="store-item bg-gray-700" onclick="showStoreItemDetail('completeUpgrade')">
-                    <img src="https://c.top4top.io/p_3482irls40.png" alt="Image of Complete Upgrade Icon" draggable="false">
+                    <i class="fas fa-hourglass-end text-yellow-500"></i>
                     <h3>إكمال التطوير</h3>
                     <div class="price-display">
-                        <span>2</span> <i class="fas fa-key"></i>
+                        <span>3</span> <i class="fas fa-key"></i>
+                    </div>
+                </div>
+                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('goldenName')">
+                    <i class="fas fa-crown text-yellow-400"></i>
+                    <h3>اسم ذهبي متحرك</h3>
+                    <div class="price-display">
+                        <span>1500</span> <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('starIcon')">
+                    <i class="fas fa-star text-yellow-300"></i>
+                    <h3>أيقونة النجمة</h3>
+                    <div class="price-display">
+                        <span>3000</span> <i class="fas fa-dollar-sign"></i>
                     </div>
                 </div>
                 <div class="store-item bg-gray-700" onclick="showStoreItemDetail('shipExpansion')">
@@ -1373,96 +1034,6 @@
                     <h3>شراء مفاتيح</h3>
                     <div class="price-display">
                         <span>150</span> <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-                <!-- Lucky Box -->
-                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('luckyBox')">
-                    <img src="https://e.top4top.io/p_348281x7t0.png" alt="Image of Lucky Box" draggable="false">
-                    <h3>صندوق الحظ</h3>
-                    <div class="price-display">
-                        <span>3500</span> <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-                <!-- Free Box -->
-                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('freeBox')">
-                    <img src="https://a.top4top.io/p_3483uplj00.png" alt="Image of Free Box" draggable="false">
-                    <h3>صندوق مجاني</h3>
-                    <div class="price-display">
-                        <span>مجاني</span>
-                    </div>
-                </div>
-                <!-- Cosmetic Items -->
-                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('goldenName')">
-                    <i class="fas fa-crown text-yellow-400"></i>
-                    <h3>اسم ذهبي متحرك</h3>
-                    <div class="price-display">
-                        <span>3000</span> <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('pinkName')">
-                    <i class="fas fa-heart text-pink-500"></i>
-                    <h3>اسم وردي متحرك</h3>
-                    <div class="price-display">
-                        <span>1500</span> <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('fieryName')">
-                    <i class="fas fa-fire text-orange-500"></i>
-                    <h3>اسم ناري ملتهب</h3>
-                    <div class="price-display">
-                        <span>2000</span> <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-                <!-- New Name Cosmetics -->
-                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('silverName')">
-                    <i class="fas fa-gem text-gray-300"></i>
-                    <h3>اسم فضي لامع</h3>
-                    <div class="price-display">
-                        <span>2500</span> <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('blueGlowName')">
-                    <i class="fas fa-lightbulb text-blue-400"></i>
-                    <h3>اسم أزرق متوهج</h3>
-                    <div class="price-display">
-                        <span>4000</span> <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('emeraldName')">
-                    <i class="fas fa-leaf text-green-500"></i>
-                    <h3>اسم أخضر زمردي</h3>
-                    <div class="price-display">
-                        <span>6000</span> <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('royalCrimsonName')">
-                    <i class="fas fa-shield-alt text-red-600"></i>
-                    <h3>اسم قرمزي ملكي</h3>
-                    <div class="price-display">
-                        <span>9000</span> <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-
-                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('starIcon')">
-                    <i class="fas fa-star text-yellow-300"></i>
-                    <h3>أيقونة النجمة</h3>
-                    <div class="price-display">
-                        <span>3000</span> <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('crownIcon')">
-                    <i class="fas fa-chess-king text-yellow-400"></i>
-                    <h3>أيقونة تاج ذهبي</h3>
-                    <div class="price-display">
-                        <span>5000</span> <i class="fas fa-dollar-sign"></i>
-                    </div>
-                </div>
-                <!-- Lion Icon -->
-                <div class="store-item bg-gray-700" onclick="showStoreItemDetail('lionIcon')">
-                    <img src="https://d.top4top.io/p_3482hpjya1.png" alt="Image of Lion Icon" draggable="false">
-                    <h3>أيقونة الأسد المتوهج</h3>
-                    <div class="price-display">
-                        <span>-</span> <i class="fas fa-dollar-sign"></i> 
                     </div>
                 </div>
             </div>
@@ -1490,7 +1061,8 @@
                 <div class="pill-style-item main-menu-item-bg-6" onclick="showSection('onlinePlayersSection')">
                     <div class="content">
                         <i class="fas fa-users"></i>
-                    <span>المتصلون حاليا</span>
+                        <span>المتصلون حاليا</span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1545,9 +1117,17 @@
                 <i class="fas fa-arrow-right text-3xl"></i>
             </button>
             <h2 class="text-3xl font-bold text-center mb-6 text-gray-100">الهجوم</h2>
-            <div id="attackablePlayersList" class="space-y-3">
+            <div class="flex flex-col items-center justify-center space-y-4">
+                <div class="bg-gray-800 p-4 rounded-xl w-full text-center">
+                    <h3 class="text-xl font-bold mb-2">خصمك الحالي:</h3>
+                    <p id="attackOpponentName" class="text-yellow-300 text-2xl font-semibold">جارٍ البحث عن خصم...</p>
+                    <p id="attackOpponentPower" class="text-gray-400 text-lg"></p>
+                </div>
+                <button id="attackBtn" class="btn btn-primary w-full max-w-xs" disabled>هجوم</button>
+                <button id="nextOpponentBtn" class="btn btn-secondary w-full max-w-xs">خصم عشوائي آخر</button>
+                <p id="attackCooldownDisplay" class="text-sm text-gray-400 mt-2">جاهز للهجوم!</p>
+                <p class="text-center text-sm text-gray-500 mt-4">الفوز يمنحك 200-800 دولار وفرصة 15% للحصول على مفتاح. الخسارة لا تكلفك شيئاً.</p>
             </div>
-            <p class="text-center text-sm text-gray-500 mt-4">الفوز يمنحك 200-800 دولار وفرصة 15% للحصول على مفتاح. الخسارة لا تكلفك شيئاً.</p>
         </section>
 
         <section id="onlinePlayersSection" class="hidden p-6 rounded-xl shadow-xl w-full max-w-2xl text-gray-100 section-container">
@@ -1594,8 +1174,7 @@
         <div class="modal-content">
             <span class="close-button" onclick="closeStoreItemDetailModal(true)">&times;</span>
             <h2 id="storeItemTitle"></h2>
-            <i id="storeItemIcon" class="item-icon hidden"></i>
-            <img id="storeItemIconImg" src="" alt="Item Icon" class="item-icon-img hidden" draggable="false">
+            <i id="storeItemIcon" class="item-icon"></i>
             <p id="storeItemDescription" class="item-description"></p>
             <p id="storeItemPrice" class="item-price"></p>
             <div class="modal-actions">
@@ -1623,63 +1202,23 @@
         </div>
     </div>
 
-    <!-- Player Profile Modal -->
-    <div id="playerProfileModal" class="modal">
-        <div class="modal-content player-profile-modal-content">
-            <span class="close-button" onclick="closePlayerProfileModal()">&times;</span>
-            <div class="profile-header">
-                <h2 id="profileFleetName"></h2>
-                <i id="profileStarIcon" class="fas fa-star text-yellow-300 hidden"></i>
-                <i id="profileCrownIcon" class="fas fa-chess-king text-yellow-400 hidden"></i>
-                <img id="profileLionIcon" src="https://d.top4top.io/p_3482hpjya1.png" alt="Lion Icon" class="w-6 h-6 ml-1 hidden animated-lion-icon" draggable="false">
-                <span id="profileLionCountDisplay" class="text-xs text-gray-400 ml-1 hidden">x0</span>
-                <div id="profileStatusDot" class="status-dot"></div>
-            </div>
-            <div class="profile-stats-grid">
-                <div class="profile-stat-item">
-                    <i class="fas fa-fist-raised text-red-500"></i>
-                    <span id="profileTotalPower">0</span>
-                    <p class="text-xs text-gray-400">القوة الكلية</p>
-                </div>
-            </div>
-            <div class="profile-ships-section">
-                <h3 class="text-xl font-bold mb-3 text-right">السفن:</h3>
-                <div id="profileShipsList" class="space-y-3">
-                    <!-- Ship cards will be inserted here -->
-                </div>
-            </div>
-            <div class="profile-footer">
-                <p>معرف المستخدم: <span id="profileUserId"></span></p>
-            </div>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getDatabase, ref, set, get, update, onValue, push, query, orderByChild, onDisconnect, serverTimestamp, limitToLast } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
-        import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getDatabase, ref, set, get, update, onValue, push, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBAepZChU6qfWGTQDrzEpJm_TRIrr6vhq8",
             authDomain: "mygame-7c747.firebaseapp.com",
             databaseURL: "https://mygame-7c747-default-rtdb.firebaseio.com",
             projectId: "mygame-7c747",
+            appId: "1:191691681571:web:8dbc3991cb550b5e026696",
             storageBucket: "mygame-7c747.firebasestorage.app",
             messagingSenderId: "191691681571",
-            appId: "1:191691681571:web:8dbc3991cb550b5e026696",
             measurementId: "G-XDP3YKZGH3"
         };
-        
-        const appId = firebaseConfig.projectId; 
 
-        // Constants for game mechanics
-        const INITIAL_SHIP_MAX_POWER = 10000;
-        const UPGRADE_COOLDOWN_MS = 3 * 60 * 1000; // 3 minutes
-        const ATTACK_COOLDOWN_GLOBAL_MS = 5 * 60 * 1000; // 5 minutes
-        const FREE_BOX_COOLDOWN_MS = 1 * 60 * 60 * 1000; // 1 hour
-        const ROULETTE_COOLDOWN_MS = 1 * 60 * 1000; // 1 minute
-        const MAX_ACCUMULATED_RESOURCES = 200; // Max resources for the collection button
-        const RESOURCE_ACCUMULATION_INTERVAL_MS = 10 * 1000; // Accumulate resources every 10 seconds
+        const appId = firebaseConfig.projectId; 
 
         let app;
         let db;
@@ -1688,43 +1227,66 @@
         let userDbRef = null; 
         let onlinePlayersListener = null; 
         let attackLogListener = null; 
-        let currentActiveSectionId = null; 
 
-        let playerData = {
-            power: 0,
-            money: 0,
-            keys: 0,
-            fleetName: null, 
-            isGoldenNameOwned: false,
-            isGoldenNameActive: false,
-            isPinkNameOwned: false, 
-            isPinkNameActive: false,
-            isFieryNameOwned: false, 
-            isFieryNameActive: false,
-            isSilverNameOwned: false, 
-            isSilverNameActive: false, 
-            isBlueGlowNameOwned: false, 
-            isBlueGlowNameActive: false, 
-            isEmeraldNameOwned: false, 
-            isEmeraldNameActive: false, 
-            isRoyalCrimsonNameOwned: false, 
-            isRoyalCrimsonNameActive: false, 
-            isStarIconOwned: false,
-            isStarIconActive: false,
-            isCrownIconOwned: false, 
-            isCrownIconActive: false,
-            lionCount: 0, 
-            isLionActive: false, 
-            freeBoxCooldownEndTime: 0,
-            ship1: { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
-            ship2: { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
-            ship3: { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
-            globalAttackCooldownEndTime: 0,
-            rouletteCooldownEndTime: 0,
-            accumulatedResources: 0,
-            lastAttackedOpponentId: null,
-            lastUpdated: 0 
+        let playerPower = 0;
+        let playerMoney = 0;
+        let playerKeys = 0;
+        let fleetName = null; 
+        let isGoldenNameActive = false;
+        let isStarIconActive = false;
+
+        const INITIAL_SHIP_MAX_POWER = 10000;
+        const UPGRADE_COOLDOWN_MS = 3 * 60 * 1000;
+
+        let ship1 = { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+        let ship2 = { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+        let ship3 = { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+
+        let accumulatedResources = 0;
+        const MAX_ACCUMULATED_RESOURCES = 200;
+        const RESOURCE_ACCUMULATION_INTERVAL_MS = 3000;
+
+        const storeItems = {
+            completeUpgrade: {
+                title: 'إكمال التطوير',
+                icon: 'fas fa-hourglass-end text-yellow-500',
+                description: 'ينهي وقت انتظار تطوير السفن.',
+                price: 3, 
+                currency: 'key' 
+            },
+            goldenName: {
+                title: 'اسم ذهبي متحرك',
+                icon: 'fas fa-crown text-yellow-400',
+                description: 'اجعل اسم أسطولك يتوهج بالذهب.',
+                price: 1500,
+                currency: 'money'
+            },
+            starIcon: {
+                title: 'أيقونة النجمة',
+                icon: 'fas fa-star text-yellow-300',
+                description: 'أضف نجمة لامعة بجانب اسمك.',
+                price: 3000,
+                currency: 'money'
+            },
+            shipExpansion: {
+                title: 'توسيع السفينة',
+                icon: 'fas fa-expand-arrows-alt text-blue-400',
+                description: 'يزيد الحد الأقصى لقوة السفينة المختارة بمقدار 5000 نقطة قوة إضافية. يمكن شراء هذا التوسيع عدة مرات لأي سفينة.',
+                price: 50, 
+                currency: 'key' 
+            },
+            buyKeys: { 
+                title: 'شراء مفاتيح',
+                icon: 'fas fa-key text-yellow-400',
+                description: 'احصل على المزيد من المفاتيح لفتح الميزات أو إكمال التطوير.',
+                price: 150, 
+                currency: 'money',
+                amount: 1 
+            }
         };
+
+        const ROULETTE_COOLDOWN_MS = 1 * 60 * 1000;
+        let rouletteCooldownEndTime = 0;
 
         let gameActive = false;
         let currentMultiplier = 1.00;
@@ -1734,16 +1296,15 @@
         let animationFrameId;
         let lastFrameTime = 0;
 
+        let currentOpponent = null;
+        let attackCooldownEndTime = 0;
+
         let playerPowerEl;
         let playerMoneyEl;
         let playerKeysEl;
         let fleetNameEl;
         let fleetStarIconEl;
-        let fleetCrownIconEl; 
-        let fleetLionIconEl;
-        let lionCountDisplayEl; 
         let logoutBtn;
-        let changeNameBtn; 
 
         let ship1PowerEl;
         let ship1LevelEl;
@@ -1752,8 +1313,8 @@
         let upgradeShip1Btn;
         let ship1CooldownDisplay;
         let ship1IconContainerEl; 
-        let ship1IconIEl;
         let ship1IconImgEl;
+        let ship1IconIEl;
 
         let ship2Container;
         let ship2PowerEl;
@@ -1796,9 +1357,9 @@
         let loginBtn;
         let registerBtn;
 
-        let changeFleetNameModal; 
-        let changeFleetNameInput;
-        let confirmChangeFleetNameBtn;
+        let initialFleetNameModal;
+        let initialFleetNameInput;
+        let confirmInitialFleetNameBtn;
 
         let resourceCollectionBtnWrapper;
         let resourceCollectionBtn;
@@ -1812,7 +1373,6 @@
         let storeItemDetailModal;
         let storeItemTitle;
         let storeItemIcon;
-        let storeItemIconImg; 
         let storeItemDescription;
         let storeItemPrice;
         let buyStoreItemBtn;
@@ -1834,18 +1394,11 @@
         let onlinePlayersListEl;
         let offlinePlayersListEl;
         let challengeLogListEl;
-        let attackablePlayersListEl;
-
-        let playerProfileModal; 
-        let profileFleetNameEl; 
-        let profileStarIconEl; 
-        let profileCrownIconEl; 
-        let profileLionIconEl;
-        let profileLionCountDisplayEl; 
-        let profileStatusDotEl; 
-        let profileTotalPowerEl; 
-        let profileShipsListEl; 
-        let profileUserIdEl; 
+        let attackCooldownDisplayEl;
+        let attackOpponentNameEl;
+        let attackOpponentPowerEl;
+        let attackBtnEl;
+        let nextOpponentBtnEl;
 
         const shipFormsData = [
             { levelRange: '1 - 1000', iconType: 'font-awesome', iconClass: 'fas fa-ship', imgSrc: '' },
@@ -1853,172 +1406,6 @@
             { levelRange: '4001 - 9999', iconType: 'image', iconClass: '', imgSrc: 'https://b.top4top.io/p_3482vv1ax2.png' },
             { levelRange: '10000+', iconType: 'image', iconClass: '', imgSrc: 'https://c.top4top.io/p_3482878s83.png' }
         ];
-
-        const storeItems = {
-            completeUpgrade: {
-                title: 'إكمال التطوير',
-                iconType: 'image', 
-                icon: 'https://c.top4top.io/p_3482irls40.png',
-                description: 'ينهي وقت انتظار تطوير السفن.',
-                price: 2,
-                currency: 'key',
-                type: 'utility'
-            },
-            shipExpansion: {
-                title: 'توسيع السفينة',
-                iconType: 'font-awesome', 
-                icon: 'fas fa-expand-arrows-alt text-blue-400',
-                description: 'يزيد الحد الأقصى لقوة السفينة المختارة بمقدار 5000 نقطة قوة إضافية. يمكن شراء هذا التوسيع عدة مرات لأي سفينة.',
-                price: 50, 
-                currency: 'key',
-                type: 'utility'
-            },
-            buyKeys: { 
-                title: 'شراء مفاتيح',
-                iconType: 'font-awesome', 
-                icon: 'fas fa-key text-yellow-400',
-                description: 'احصل على المزيد من المفاتيح لفتح الميزات أو إكمال التطوير.',
-                price: 150, 
-                currency: 'money',
-                amount: 1,
-                type: 'utility'
-            },
-            luckyBox: { 
-                title: 'صندوق الحظ',
-                iconType: 'image',
-                icon: 'https://e.top4top.io/p_348281x7t0.png',
-                description: 'جرب حظك واحصل على جوائز قيمة!',
-                price: 3500,
-                currency: 'money',
-                type: 'lucky_box'
-            },
-            freeBox: { 
-                title: 'صندوق مجاني',
-                iconType: 'image',
-                icon: 'https://a.top4top.io/p_3483uplj00.png',
-                description: 'احصل على مكافآت مجانية كل ساعة!',
-                price: 0,
-                currency: 'none',
-                type: 'free_box'
-            },
-            goldenName: {
-                title: 'اسم ذهبي متحرك',
-                iconType: 'font-awesome', 
-                icon: 'fas fa-crown text-yellow-400',
-                description: 'اجعل اسم أسطولك يتوهج بالذهب.',
-                price: 3000,
-                currency: 'money',
-                type: 'name_cosmetic',
-                ownedKey: 'isGoldenNameOwned',
-                activeKey: 'isGoldenNameActive',
-                cssClass: 'golden-text'
-            },
-            pinkName: { 
-                title: 'اسم وردي متحرك',
-                iconType: 'font-awesome', 
-                icon: 'fas fa-heart text-pink-500',
-                description: 'اجعل اسم أسطولك يتوهج باللون الوردي.',
-                price: 1500,
-                currency: 'money',
-                type: 'name_cosmetic',
-                ownedKey: 'isPinkNameOwned',
-                activeKey: 'isPinkNameActive',
-                cssClass: 'pink-text'
-            },
-            fieryName: { 
-                title: 'اسم ناري ملتهب',
-                iconType: 'font-awesome', 
-                icon: 'fas fa-fire text-orange-500',
-                description: 'اجعل اسم أسطولك يتوهج بالنار.',
-                price: 2000,
-                currency: 'money',
-                type: 'name_cosmetic',
-                ownedKey: 'isFieryNameOwned',
-                activeKey: 'isFieryNameActive',
-                cssClass: 'fiery-text'
-            },
-            silverName: { 
-                title: 'اسم فضي لامع',
-                iconType: 'font-awesome',
-                icon: 'fas fa-gem text-gray-300',
-                description: 'اجعل اسم أسطولك يتوهج بالفضة.',
-                price: 2500,
-                currency: 'money',
-                type: 'name_cosmetic',
-                ownedKey: 'isSilverNameOwned',
-                activeKey: 'isSilverNameActive',
-                cssClass: 'silver-text'
-            },
-            blueGlowName: { 
-                title: 'اسم أزرق متوهج',
-                iconType: 'font-awesome',
-                icon: 'fas fa-lightbulb text-blue-400',
-                description: 'اجعل اسم أسطولك يتوهج باللون الأزرق.',
-                price: 4000,
-                currency: 'money',
-                type: 'name_cosmetic',
-                ownedKey: 'isBlueGlowNameOwned',
-                activeKey: 'isBlueGlowNameActive',
-                cssClass: 'blue-glow-text'
-            },
-            emeraldName: { 
-                title: 'اسم أخضر زمردي',
-                iconType: 'font-awesome',
-                icon: 'fas fa-leaf text-green-500',
-                description: 'اجعل اسم أسطولك يتوهج باللون الأخضر الزمردي.',
-                price: 6000,
-                currency: 'money',
-                type: 'name_cosmetic',
-                ownedKey: 'isEmeraldNameOwned',
-                activeKey: 'isEmeraldNameActive',
-                cssClass: 'emerald-text'
-            },
-            royalCrimsonName: { 
-                title: 'اسم قرمزي ملكي',
-                iconType: 'font-awesome',
-                icon: 'fas fa-shield-alt text-red-600',
-                description: 'اجعل اسم أسطولك يتوهج باللون القرمزي الملكي.',
-                price: 9000,
-                currency: 'money',
-                type: 'name_cosmetic',
-                ownedKey: 'isRoyalCrimsonNameOwned',
-                activeKey: 'isRoyalCrimsonNameActive',
-                cssClass: 'royal-crimson-text'
-            },
-            starIcon: {
-                title: 'أيقونة النجمة',
-                iconType: 'font-awesome', 
-                icon: 'fas fa-star text-yellow-300',
-                description: 'أضف نجمة لامعة بجانب اسمك.',
-                price: 3000,
-                currency: 'money',
-                type: 'icon_cosmetic',
-                ownedKey: 'isStarIconOwned',
-                activeKey: 'isStarIconActive'
-            },
-            crownIcon: { 
-                title: 'أيقونة تاج ذهبي',
-                iconType: 'font-awesome', 
-                icon: 'fas fa-chess-king text-yellow-400',
-                description: 'أضف تاجاً ذهبياً متحركاً بجانب اسمك.',
-                price: 5000,
-                currency: 'money',
-                type: 'icon_cosmetic',
-                ownedKey: 'isCrownIconOwned',
-                activeKey: 'isCrownIconActive'
-            },
-            lionIcon: { 
-                title: 'أيقونة الأسد المتوهج',
-                iconType: 'image',
-                icon: 'https://d.top4top.io/p_3482hpjya1.png',
-                description: 'أيقونة أسد متوهجة تمنح 7000 قوة إضافية لأسطولك. يمكن الحصول عليها من صندوق الحظ.',
-                price: '-', 
-                currency: 'none',
-                type: 'icon_cosmetic',
-                ownedKey: 'lionCount', 
-                activeKey: 'isLionActive'
-            }
-        };
 
         function formatNumber(num) {
             if (num >= 1000000) {
@@ -2040,24 +1427,61 @@
             messageModal.style.display = 'none';
         }
 
-        function saveToLocalStorage() {
+        function loadDataFromLocalStorage() {
             try {
-                localStorage.setItem(`playerData_${userId}`, JSON.stringify(playerData));
-            } catch (e) {
-                console.error("Error saving to local storage:", e);
-            }
-        }
-
-        function loadFromLocalStorage() {
-            try {
-                const storedData = localStorage.getItem(`playerData_${userId}`);
+                const storedData = localStorage.getItem('playerData');
                 if (storedData) {
-                    return JSON.parse(storedData);
+                    const data = JSON.parse(storedData);
+                    playerMoney = data.money || 0;
+                    playerKeys = data.keys || 0;
+                    fleetName = data.fleetName || null;
+                    isGoldenNameActive = data.isGoldenNameActive || false;
+                    isStarIconActive = data.isStarIconActive || false;
+                    ship1 = data.ship1 || { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+                    ship2 = data.ship2 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+                    ship3 = data.ship3 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+                    attackCooldownEndTime = data.attackCooldownEndTime || 0; 
+                    rouletteCooldownEndTime = data.rouletteCooldownEndTime || 0;
+
+                    if (typeof ship1.maxPower === 'undefined') ship1.maxPower = INITIAL_SHIP_MAX_POWER;
+                    if (typeof ship2.maxPower === 'undefined') ship2.maxPower = INITIAL_SHIP_MAX_POWER;
+                    if (typeof ship3.maxPower === 'undefined') ship3.maxPower = INITIAL_SHIP_MAX_POWER;
+
+                    updatePlayerStats();
+                    updateAllShipCooldowns();
+                    updateResourceCircle();
+                    updateResourceButtonState();
+                    updateRouletteCooldownUI();
+                    updateAttackCooldownUI();
+
+                    if (fleetName && fleetName !== "أسطولي العظيم") {
+                        showSection('mainMenu');
+                    }
+                    return true;
                 }
             } catch (e) {
-                console.error("Error loading from local storage:", e);
+                localStorage.clear();
             }
-            return null;
+            return false;
+        }
+
+        function saveDataToLocalStorage() {
+            try {
+                const dataToStore = {
+                    money: playerMoney,
+                    keys: playerKeys,
+                    fleetName: fleetName,
+                    isGoldenNameActive: isGoldenNameActive,
+                    isStarIconActive: isStarIconActive,
+                    ship1: ship1,
+                    ship2: ship2,
+                    ship3: ship3,
+                    attackCooldownEndTime: attackCooldownEndTime,
+                    rouletteCooldownEndTime: rouletteCooldownEndTime
+                };
+                localStorage.setItem('playerData', JSON.stringify(dataToStore));
+            } catch (e) {
+            }
         }
 
         async function initializeFirebase() {
@@ -2066,66 +1490,35 @@
                 db = getDatabase(app);
                 auth = getAuth(app);
 
-                setPersistence(auth, browserLocalPersistence)
-                    .catch((error) => {
-                        console.error("Error setting persistence:", error);
-                        window.showMessage(`خطأ في إعدادات الحفظ: ${error.message}`);
-                    });
-
-                authModal.style.display = 'flex';
-
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         userId = user.uid;
                         userDbRef = ref(db, `artifacts/${appId}/users/${userId}/playerData`);
                         
-                        const presenceRef = ref(db, `artifacts/${appId}/public/onlinePlayers/${userId}/isOnline`);
-                        const lastSeenRef = ref(db, `artifacts/${appId}/public/onlinePlayers/${userId}/lastSeen`);
-                        await set(ref(db, `artifacts/${appId}/public/onlinePlayers/${userId}/userId`), userId); 
-                        onDisconnect(presenceRef).set(false);
-                        onDisconnect(lastSeenRef).set(serverTimestamp());
+                        await fetchOrCreateUserData();
+                        await updateOnlineStatus(true);
+                        setupPublicDataListeners();
 
-                        await fetchAndSyncUserData(); 
-
-                        await updateOnlineStatus(true); 
-                        setupPublicDataListeners(); 
-
-                        authModal.style.display = 'none'; 
-                        window.showSection('mainMenu'); 
-
-                        setInterval(() => {
-                            if (userId) {
-                                updateOnlineStatus(true);
-                            }
-                        }, 10 * 1000); 
+                        authModal.style.display = 'none';
+                        logoutBtn.classList.remove('hidden');
 
                     } else {
                         userId = null;
-                        userDbRef = null; 
-                        clearPublicDataListeners(); 
+                        clearPublicDataListeners();
                         authModal.style.display = 'flex';
-                        showSection('hidden'); 
+                        logoutBtn.classList.add('hidden');
+                        showSection('hidden');
                         resourceCollectionBtnWrapper.classList.add('hidden');
+                        localStorage.removeItem('playerData');
                     }
                 });
 
-            } catch (initializationError) {
-                window.showMessage(`حدث خطأ حرج في تهيئة Firebase: ${initializationError.message}. يرجى التحقق من إعدادات مشروع Firebase الخاص بك.`);
-            }
-        }
-
-        async function handleLogin() {
-            const email = authEmailInput.value;
-            const password = authPasswordInput.value;
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                window.showMessage('تم تسجيل الدخول بنجاح!');
             } catch (error) {
-                window.showMessage(`خطأ في تسجيل الدخول: ${error.message}`);
+                window.showMessage("حدث خطأ في الاتصال بالخادم. يرجى المحاولة لاحقاً.");
             }
         }
 
-        async function handleRegister() {
+        async function registerUser() {
             const email = authEmailInput.value;
             const password = authPasswordInput.value;
             try {
@@ -2136,207 +1529,131 @@
             }
         }
 
+        async function loginUser() {
+            const email = authEmailInput.value;
+            const password = authPasswordInput.value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                window.showMessage('تم تسجيل الدخول بنجاح!');
+            } catch (error) {
+                window.showMessage(`خطأ في تسجيل الدخول: ${error.message}`);
+            }
+        }
+
         async function logoutUser() {
             try {
                 if (userId) {
                     await updateOnlineStatus(false);
                 }
-
                 await signOut(auth);
-                window.showMessage('تم تسجيل الخروج بنجاح!');
-
-                playerData = { 
-                    power: 0, money: 0, keys: 0, fleetName: null, 
-                    isGoldenNameOwned: false, isGoldenNameActive: false,
-                    isPinkNameOwned: false, isPinkNameActive: false,
-                    isFieryNameOwned: false, isFieryNameActive: false,
-                    isSilverNameOwned: false, isSilverNameActive: false,
-                    isBlueGlowNameOwned: false, isBlueGlowNameActive: false,
-                    isEmeraldNameOwned: false, isEmeraldNameActive: false,
-                    isRoyalCrimsonNameOwned: false, isRoyalCrimsonNameActive: false,
-                    isStarIconOwned: false, isStarIconActive: false,
-                    isCrownIconOwned: false, isCrownIconActive: false,
-                    lionCount: 0, isLionActive: false, 
-                    freeBoxCooldownEndTime: 0,
-                    ship1: { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
-                    ship2: { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
-                    ship3: { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
-                    globalAttackCooldownEndTime: 0,
-                    rouletteCooldownEndTime: 0,
-                    accumulatedResources: 0,
-                    lastAttackedOpponentId: null,
-                    lastUpdated: 0
-                };
-                saveToLocalStorage(); 
-                updateUIFromPlayerData();
-
+                window.showMessage('تم تسجيل الخروج بنجاح.');
             } catch (error) {
                 window.showMessage(`خطأ في تسجيل الخروج: ${error.message}`);
             }
         }
 
-        async function fetchAndSyncUserData() {
-            if (!userId) {
-                return;
-            }
-            let localData = loadFromLocalStorage();
-            let firebaseData = null;
-
+        async function fetchOrCreateUserData() {
             try {
                 const snapshot = await get(userDbRef);
                 if (snapshot.exists()) {
-                    firebaseData = snapshot.val();
-                }
-            } catch (error) {
-                console.error("Error fetching Firebase data:", error);
-                window.showMessage("حدث خطأ أثناء تحميل بياناتك من السحابة. قد تكون البيانات قديمة.");
-            }
+                    const data = snapshot.val();
+                    playerMoney = data.money || 0;
+                    playerKeys = data.keys || 0;
+                    fleetName = data.fleetName || null;
+                    isGoldenNameActive = data.isGoldenNameActive || false;
+                    isStarIconActive = data.isStarIconActive || false;
+                    ship1 = data.ship1 || { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+                    ship2 = data.ship2 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+                    ship3 = data.ship3 || { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
+                    attackCooldownEndTime = data.attackCooldownEndTime || 0; 
+                    rouletteCooldownEndTime = data.rouletteCooldownEndTime || 0;
 
-            if (localData && firebaseData) {
-                if (localData.lastUpdated > firebaseData.lastUpdated) {
-                    playerData = localData;
-                    await saveUserDataToFirebase(); 
+                    if (typeof ship1.maxPower === 'undefined') ship1.maxPower = INITIAL_SHIP_MAX_POWER;
+                    if (typeof ship2.maxPower === 'undefined') ship2.maxPower = INITIAL_SHIP_MAX_POWER;
+                    if (typeof ship3.maxPower === 'undefined') ship3.maxPower = INITIAL_SHIP_MAX_POWER;
+
                 } else {
-                    playerData = firebaseData;
-                    saveToLocalStorage(); 
+                    fleetName = "أسطولي العظيم";
+                    await set(userDbRef, {
+                        money: 100,
+                        keys: 1,
+                        fleetName: fleetName,
+                        isGoldenNameActive: false,
+                        isStarIconActive: false,
+                        ship1: ship1,
+                        ship2: ship2,
+                        ship3: ship3,
+                        attackCooldownEndTime: 0,
+                        rouletteCooldownEndTime: 0
+                    });
+                    playerMoney = 100;
+                    playerKeys = 1;
                 }
-            } else if (localData) {
-                playerData = localData;
-                await saveUserDataToFirebase(); 
-            } else if (firebaseData) {
-                playerData = firebaseData;
-                saveToLocalStorage(); 
-            } else {
-                playerData = { 
-                    power: 0, money: 100, keys: 1, fleetName: "قائد جديد", 
-                    isGoldenNameOwned: false, isGoldenNameActive: false,
-                    isPinkNameOwned: false, isPinkNameActive: false,
-                    isFieryNameOwned: false, isFieryNameActive: false,
-                    isSilverNameOwned: false, isSilverNameActive: false,
-                    isBlueGlowNameOwned: false, isBlueGlowNameActive: false,
-                    isEmeraldNameOwned: false, isEmeraldNameActive: false,
-                    isRoyalCrimsonNameOwned: false, isRoyalCrimsonNameActive: false,
-                    isStarIconOwned: false, isStarIconActive: false,
-                    isCrownIconOwned: false, isCrownIconActive: false,
-                    lionCount: 0, isLionActive: false, 
-                    freeBoxCooldownEndTime: 0,
-                    ship1: { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
-                    ship2: { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
-                    ship3: { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
-                    globalAttackCooldownEndTime: 0,
-                    rouletteCooldownEndTime: 0,
-                    accumulatedResources: 0,
-                    lastAttackedOpponentId: null,
-                    lastUpdated: Date.now()
-                };
-                saveToLocalStorage();
-                await saveUserDataToFirebase();
+
+                updatePlayerStats();
+                updateAllShipCooldowns(); 
+                updateResourceCircle();
+                updateResourceButtonState();
+                updateRouletteCooldownUI();
+                updateAttackCooldownUI();
+                saveDataToLocalStorage();
+
+                if (fleetName === null || fleetName === "أسطولي العظيم") {
+                    initialFleetNameModal.style.display = 'flex';
+                } else {
+                    window.showSection('mainMenu');
+                }
+
+            } catch (error) {
+                window.showMessage("حدث خطأ أثناء تحميل بياناتك. يرجى المحاولة لاحقاً.");
             }
-            updateUIFromPlayerData();
         }
 
-        async function saveUserDataToFirebase() {
+        async function saveUserData() {
             if (!userDbRef || !userId) {
                 return;
             }
             try {
-                playerData.lastUpdated = Date.now(); 
-                await set(userDbRef, playerData);
+                await set(userDbRef, {
+                    money: playerMoney,
+                    keys: playerKeys,
+                    fleetName: fleetName,
+                    isGoldenNameActive: isGoldenNameActive,
+                    isStarIconActive: isStarIconActive,
+                    ship1: ship1,
+                    ship2: ship2,
+                    ship3: ship3,
+                    attackCooldownEndTime: attackCooldownEndTime,
+                    rouletteCooldownEndTime: rouletteCooldownEndTime
+                });
+                saveDataToLocalStorage();
             } catch (error) {
-                console.error("Error saving user data to Firebase:", error);
-                window.showMessage("حدث خطأ أثناء حفظ بياناتك على السحابة.");
+                window.showMessage("حدث خطأ أثناء حفظ بياناتك. يرجى المحاولة لاحقاً.");
             }
-        }
-
-        function updateUIFromPlayerData() {
-            if (!userId) return;
-
-            playerData.power = playerData.ship1.power + (playerData.ship2.unlocked ? playerData.ship2.power : 0) + (playerData.ship3.unlocked ? playerData.ship3.power : 0);
-            playerData.power += (playerData.lionCount * 7000); 
-
-            playerPowerEl.textContent = formatNumber(playerData.power);
-            playerMoneyEl.textContent = formatNumber(playerData.money);
-            playerKeysEl.textContent = formatNumber(playerData.keys);
-            fleetNameEl.textContent = playerData.fleetName;
-            
-            fleetNameEl.classList.remove('golden-text', 'pink-text', 'fiery-text', 'silver-text', 'blue-glow-text', 'emerald-text', 'royal-crimson-text');
-            
-            if (playerData.isGoldenNameActive) {
-                fleetNameEl.classList.add('golden-text');
-            } else if (playerData.isPinkNameActive) { 
-                fleetNameEl.classList.add('pink-text');
-            } else if (playerData.isFieryNameActive) { 
-                fleetNameEl.classList.add('fiery-text');
-            } else if (playerData.isSilverNameActive) { 
-                fleetNameEl.classList.add('silver-text');
-            } else if (playerData.isBlueGlowNameActive) { 
-                fleetNameEl.classList.add('blue-glow-text');
-            } else if (playerData.isEmeraldNameActive) { 
-                fleetNameEl.classList.add('emerald-text');
-            } else if (playerData.isRoyalCrimsonNameActive) { 
-                fleetNameEl.classList.add('royal-crimson-text');
-            }
-
-            fleetStarIconEl.classList.toggle('hidden', !playerData.isStarIconActive);
-            fleetCrownIconEl.classList.toggle('hidden', !playerData.isCrownIconActive);
-            fleetCrownIconEl.classList.toggle('animated-crown-icon', playerData.isCrownIconActive);
-            
-            fleetLionIconEl.classList.toggle('hidden', playerData.lionCount === 0 || !playerData.isLionActive); 
-            fleetLionIconEl.classList.toggle('animated-lion-icon', playerData.isLionActive); 
-            lionCountDisplayEl.classList.toggle('hidden', playerData.lionCount === 0 || !playerData.isLionActive); 
-            lionCountDisplayEl.textContent = `x${playerData.lionCount}`;
-
-            updateShipUI(playerData.ship1, ship1PowerEl, ship1LevelEl, ship1ProgressEl, upgradeShip1Btn, null, ship1CooldownDisplay, ship1MaxPowerEl, ship1IconContainerEl, ship1IconIEl, ship1IconImgEl);
-            updateShipUI(playerData.ship2, ship2PowerEl, ship2LevelEl, ship2ProgressEl, upgradeShip2Btn, ship2Container, ship2CooldownDisplay, ship2MaxPowerEl, ship2IconContainerEl, ship2IconIEl, ship2IconImgEl);
-            updateShipUI(playerData.ship3, ship3PowerEl, ship3LevelEl, ship3ProgressEl, upgradeShip3Btn, ship3Container, ship3CooldownDisplay, ship3MaxPowerEl, ship3IconContainerEl, ship3IconIEl, ship3IconImgEl);
-            
-            updateResourceCircle();
-            updateResourceButtonState();
-            updateRouletteCooldownUI();
-            updateAttackCooldownsUI();
-
-            saveToLocalStorage();
-            saveUserDataToFirebase(); 
-            updateOnlineStatus(true); 
         }
 
         async function updateOnlineStatus(isOnline) {
-            if (!userId || !playerData.fleetName || !db) {
-                return;
-            }
+            if (!userId || !fleetName) return;
             try {
                 const playerStatusRef = ref(db, `artifacts/${appId}/public/onlinePlayers/${userId}`);
-                const dataToSave = {
+                await set(playerStatusRef, {
                     userId: userId,
-                    fleetName: playerData.fleetName,
-                    power: playerData.power, 
+                    fleetName: fleetName,
+                    power: playerPower,
                     isOnline: isOnline,
                     lastSeen: Date.now(),
-                    ship1: { power: playerData.ship1.power, level: playerData.ship1.level, unlocked: true, maxPower: playerData.ship1.maxPower }, 
-                    ship2: { power: playerData.ship2.power, level: playerData.ship2.level, unlocked: playerData.ship2.unlocked, maxPower: playerData.ship2.maxPower },
-                    ship3: { power: playerData.ship3.power, level: playerData.ship3.level, unlocked: playerData.ship3.unlocked, maxPower: playerData.ship3.maxPower },
-                    isGoldenNameActive: playerData.isGoldenNameActive,
-                    isPinkNameActive: playerData.isPinkNameActive, 
-                    isFieryNameActive: playerData.isFieryNameActive, 
-                    isSilverNameActive: playerData.isSilverNameActive, 
-                    isBlueGlowNameActive: playerData.isBlueGlowNameActive, 
-                    isEmeraldNameActive: playerData.isEmeraldNameActive, 
-                    isRoyalCrimsonNameActive: playerData.isRoyalCrimsonNameActive, 
-                    isStarIconActive: playerData.isStarIconActive,
-                    isCrownIconActive: playerData.isCrownIconActive,
-                    isLionActive: playerData.isLionActive, 
-                    lionCount: playerData.lionCount 
-                };
-                await set(playerStatusRef, dataToSave);
+                    ship1Power: ship1.power,
+                    ship2Power: ship2.power,
+                    ship3Power: ship3.power,
+                    ship2Unlocked: ship2.unlocked,
+                    ship3Unlocked: ship3.unlocked
+                });
             } catch (error) {
-                console.error("Error updating online status:", error);
             }
         }
 
         function setupPublicDataListeners() {
-            if (!db) {
-                return;
-            }
+            if (!db) return;
 
             const playersRef = ref(db, `artifacts/${appId}/public/onlinePlayers`);
             onlinePlayersListener = onValue(playersRef, (snapshot) => {
@@ -2348,11 +1665,7 @@
                     }
                 }
                 updateOnlinePlayersUI(allPlayers);
-                if (document.getElementById('attackSection').classList.contains('animate-fade-in-up')) {
-                    renderAttackablePlayers(allPlayers);
-                }
             }, (error) => {
-                console.error("Error listening to onlinePlayers:", error);
             });
 
             const attackLogRef = ref(db, `artifacts/${appId}/public/attackLog`);
@@ -2365,10 +1678,9 @@
                         attacks.push(data[key]);
                     }
                 }
-                attacks.sort((a, b) => b.timestamp - a.timestamp); 
+                attacks.reverse(); 
                 updateChallengeLogUI(attacks);
             }, (error) => {
-                console.error("Error listening to attackLog:", error);
             });
         }
 
@@ -2385,7 +1697,6 @@
 
         function updateOnlinePlayersUI(players) {
             if (!onlinePlayersListEl || !offlinePlayersListEl) return;
-            if (!userId) return;
 
             onlinePlayersListEl.innerHTML = '';
             offlinePlayersListEl.innerHTML = '';
@@ -2393,88 +1704,39 @@
             const online = players.filter(p => p.isOnline && p.userId !== userId);
             const offline = players.filter(p => !p.isOnline && p.userId !== userId);
 
-            const getPlayerTotalPower = (playerData) => {
-                let totalPower = 0;
-                if (playerData.ship1 && playerData.ship1.power !== undefined) totalPower += playerData.ship1.power;
-                if (playerData.ship2 && playerData.ship2.unlocked && playerData.ship2.power !== undefined) totalPower += playerData.ship2.power;
-                if (playerData.ship3 && playerData.ship3.unlocked && playerData.ship3.power !== undefined) totalPower += playerData.ship3.power;
-                if (playerData.lionCount !== undefined) totalPower += (playerData.lionCount * 7000); 
-                return totalPower;
+            const getStrongestShipPower = (playerData) => {
+                let maxPower = 0;
+                if (playerData.ship1Power) maxPower = Math.max(maxPower, playerData.ship1Power);
+                if (playerData.ship2Power) maxPower = Math.max(maxPower, playerData.ship2Power);
+                if (playerData.ship3Power) maxPower = Math.max(maxPower, playerData.ship3Power);
+                return maxPower;
             };
 
-            const renderPlayerListItem = (player, isOnlineStatus) => {
-                const li = document.createElement('li');
-                li.className = `online-player-list-item ${isOnlineStatus ? 'online' : 'offline'}`;
-                li.dataset.userId = player.userId; 
-
-                let fleetNameClass = '';
-                if (player.isGoldenNameActive) fleetNameClass = 'golden-text';
-                else if (player.isPinkNameActive) fleetNameClass = 'pink-text';
-                else if (player.isFieryNameActive) fleetNameClass = 'fiery-text';
-                else if (player.isSilverNameActive) fleetNameClass = 'silver-text'; 
-                else if (player.isBlueGlowNameActive) fleetNameClass = 'blue-glow-text'; 
-                else if (player.isEmeraldNameActive) fleetNameClass = 'emerald-text'; 
-                else if (player.isRoyalCrimsonNameActive) fleetNameClass = 'royal-crimson-text'; 
-
-                const textColor = isOnlineStatus ? 'text-gray-300' : 'text-gray-500';
-
-                let fleetNameHtml = `<span class="font-bold ${fleetNameClass}">${player.fleetName}</span>`;
-                if (player.isStarIconActive) {
-                    fleetNameHtml += `<i class="fas fa-star text-yellow-300 ml-1"></i>`;
-                }
-                if (player.isCrownIconActive) { 
-                    fleetNameHtml += `<i class="fas fa-chess-king text-yellow-400 ml-1 animated-crown-icon"></i>`;
-                }
-                if (player.isLionActive && player.lionCount > 0) {
-                    fleetNameHtml += `<img src="https://d.top4top.io/p_3482hpjya1.png" alt="Lion Icon" class="w-4 h-4 ml-1 animated-lion-icon" draggable="false">`;
-                    fleetNameHtml += `<span class="text-xs text-gray-400 ml-1">x${player.lionCount}</span>`;
-                }
-
-                const totalPower = getPlayerTotalPower(player);
-
-                let shipsHtml = `<div class="online-player-ships">`;
-                const playerShips = [player.ship1, player.ship2, player.ship3];
-                playerShips.forEach((shipData, index) => {
-                    const shipLevel = shipData ? shipData.level : 0;
-                    const shipUnlocked = (index === 0) || (shipData ? shipData.unlocked : false); 
-                    const iconSrc = getShipIcon(shipLevel);
-                    const iconClass = shipUnlocked ? 'unlocked' : 'locked';
-
-                    if (iconSrc === 'font-awesome') {
-                        shipsHtml += `
-                            <div class="online-player-ship-icon ${iconClass}">
-                                <i class="fas fa-ship ${shipUnlocked ? 'text-blue-400' : 'text-gray-500'}"></i>
-                            </div>
-                        `;
-                    } else {
-                        shipsHtml += `
-                            <div class="online-player-ship-icon ${iconClass}">
-                                <img src="${iconSrc}" alt="Ship ${index + 1} Icon" onerror="this.onerror=null;this.src='https://placehold.co/25x25/21262d/e2e8f0?text=X';" draggable="false" />
-                            </div>
-                        `;
-                    }
-                });
-                shipsHtml += `</div>`;
-
-                li.innerHTML = `
-                    <div class="online-player-info">
-                        ${fleetNameHtml}
-                        <span class="text-sm ${textColor} mr-2">
-                            <i class="fas fa-fist-raised text-red-500 ml-1"></i> ${formatNumber(totalPower)}
-                        </span>
-                    </div>
-                    ${shipsHtml}
-                `;
-                li.addEventListener('click', () => showPlayerProfile(player)); 
-                return li;
+            const getUnlockedShipCount = (playerData) => {
+                let count = 1;
+                if (playerData.ship2Unlocked) count++;
+                if (playerData.ship3Unlocked) count++;
+                return count;
             };
 
             if (online.length === 0) {
                 onlinePlayersListEl.innerHTML = '<p class="text-center text-gray-400">لا يوجد لاعبون متصلون حالياً غيرك.</p>';
             } else {
                 online.forEach(player => {
-                    const listItem = renderPlayerListItem(player, true);
-                    onlinePlayersListEl.appendChild(listItem);
+                    const li = document.createElement('li');
+                    li.className = 'bg-gray-700 p-3 rounded-md mb-2 flex justify-between items-center';
+                    const strongestPower = getStrongestShipPower(player);
+                    const unlockedShipsCount = getUnlockedShipCount(player);
+                    li.innerHTML = `
+                        <span class="font-bold text-green-400">${player.fleetName}</span>
+                        <span class="text-sm text-gray-300 ml-2">
+                            <i class="fas fa-fist-raised text-red-500 ml-1"></i>${formatNumber(strongestPower)}
+                        </span>
+                        <span class="text-sm text-gray-300 ml-2">
+                            <i class="fas fa-ship text-blue-400 ml-1"></i>${unlockedShipsCount}
+                        </span>
+                    `;
+                    onlinePlayersListEl.appendChild(li);
                 });
             }
 
@@ -2482,15 +1744,26 @@
                 offlinePlayersListEl.innerHTML = '<p class="text-center text-gray-400">لا يوجد لاعبون غير متصلين حالياً.</p>';
             } else {
                 offline.forEach(player => {
-                    const listItem = renderPlayerListItem(player, false);
-                    offlinePlayersListEl.appendChild(listItem);
+                    const li = document.createElement('li');
+                    li.className = 'bg-gray-800 p-3 rounded-md mb-2 flex justify-between items-center opacity-70';
+                    const strongestPower = getStrongestShipPower(player);
+                    const unlockedShipsCount = getUnlockedShipCount(player);
+                    li.innerHTML = `
+                        <span class="font-bold text-gray-400">${player.fleetName}</span>
+                        <span class="text-sm text-gray-500 ml-2">
+                            <i class="fas fa-fist-raised text-red-500 ml-1"></i>${formatNumber(strongestPower)}
+                        </span>
+                        <span class="text-sm text-gray-500 ml-2">
+                            <i class="fas fa-ship text-blue-400 ml-1"></i>${unlockedShipsCount}
+                        </span>
+                    `;
+                    offlinePlayersListEl.appendChild(li);
                 });
             }
         }
 
         function updateChallengeLogUI(attacks) {
             if (!challengeLogListEl) return;
-            if (!userId) return;
 
             challengeLogListEl.innerHTML = '';
             if (attacks.length === 0) {
@@ -2509,10 +1782,8 @@
                     if (attack.result === 'win') {
                         resultText = 'فزت';
                         resultColor = 'text-green-400';
-                        if (attack.winnings && attack.winnings.money !== undefined) { 
-                            winningsText = ` +${formatNumber(attack.winnings.money)} <i class="fas fa-dollar-sign"></i>`;
-                        }
-                        if (attack.winnings && attack.winnings.key !== undefined) { 
+                        winningsText = ` +${formatNumber(attack.winnings.money)} <i class="fas fa-dollar-sign"></i>`;
+                        if (attack.winnings.key) {
                             winningsText += ` +${attack.winnings.key} <i class="fas fa-key"></i>`;
                         }
                     } else {
@@ -2540,135 +1811,62 @@
                     li.innerHTML = `<span class="font-bold">${attack.attackerFleetName}</span> ${resultText} ضد <span class="font-bold">${attack.defenderFleetName}</span>.`;
                 }
                 
-                const timestamp = typeof attack.timestamp === 'number' ? attack.timestamp : Date.now();
-                li.innerHTML += `<p class="text-xs text-gray-500 mt-1">${new Date(timestamp).toLocaleString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>`;
+                li.innerHTML += `<p class="text-xs text-gray-500 mt-1">${new Date(attack.timestamp).toLocaleString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>`;
                 challengeLogListEl.appendChild(li);
             });
         }
 
-        function renderAttackablePlayers(allPlayers) {
-            if (!attackablePlayersListEl || !userId) return;
-
-            attackablePlayersListEl.innerHTML = '';
-            let otherPlayers = allPlayers.filter(p => p.userId !== userId);
-
-            const cooldownActive = playerData.globalAttackCooldownEndTime > Date.now();
-            if (cooldownActive && playerData.lastAttackedOpponentId) {
-                const lastOpponent = otherPlayers.find(p => p.userId === playerData.lastAttackedOpponentId);
-                if (lastOpponent) {
-                    otherPlayers = [lastOpponent];
-                } else {
-                    otherPlayers = [];
-                }
-            }
-
-            if (otherPlayers.length === 0) {
-                attackablePlayersListEl.innerHTML = '<p class="text-center text-gray-400">لا يوجد لاعبون آخرون للهجوم عليهم حالياً.</p>';
+        async function selectRandomOpponent() {
+            if (!userId) {
+                window.showMessage("الرجاء تسجيل الدخول أو الانتظار حتى يتم تحميل بيانات المستخدم.");
                 return;
             }
 
-            otherPlayers.forEach(opponent => {
-                const li = document.createElement('div');
-                li.className = 'attack-player-item';
-
-                let opponentTotalPower = (opponent.ship1?.power || 0) + (opponent.ship2?.unlocked ? opponent.ship2.power : 0) + (opponent.ship3?.unlocked ? opponent.ship3.power : 0);
-                if (opponent.lionCount !== undefined) opponentTotalPower += (opponent.lionCount * 7000);
-                
-                const cooldownRemaining = playerData.globalAttackCooldownEndTime - Date.now();
-                const isOnCooldown = cooldownRemaining > 0;
-                const buttonText = isOnCooldown ? formatTime(cooldownRemaining) : 'هجوم';
-                const buttonDisabled = isOnCooldown ? 'disabled' : '';
-
-                let fleetNameClass = '';
-                if (opponent.isGoldenNameActive) fleetNameClass = 'golden-text';
-                else if (opponent.isPinkNameActive) fleetNameClass = 'pink-text';
-                else if (opponent.isFieryNameActive) fleetNameClass = 'fiery-text';
-                else if (opponent.isSilverNameActive) fleetNameClass = 'silver-text'; 
-                else if (opponent.isBlueGlowNameActive) fleetNameClass = 'blue-glow-text'; 
-                else if (opponent.isEmeraldNameActive) fleetNameClass = 'emerald-text'; 
-                else if (opponent.isRoyalCrimsonNameActive) fleetNameClass = 'royal-crimson-text'; 
-                
-                let fleetNameHtml = `<h3 class="${fleetNameClass}">${opponent.fleetName}</h3>`;
-                if (opponent.isStarIconActive) {
-                    fleetNameHtml += `<i class="fas fa-star text-yellow-300 ml-1"></i>`;
-                }
-                if (opponent.isCrownIconActive) { 
-                    fleetNameHtml += `<i class="fas fa-chess-king text-yellow-400 ml-1 animated-crown-icon"></i>`;
-                }
-                if (opponent.isLionActive && opponent.lionCount > 0) {
-                    fleetNameHtml += `<img src="https://d.top4top.io/p_3482hpjya1.png" alt="Lion Icon" class="w-4 h-4 ml-1 animated-lion-icon" draggable="false">`;
-                    fleetNameHtml += `<span class="text-xs text-gray-400 ml-1">x${opponent.lionCount}</span>`;
-                }
-
-                let shipsHtml = `<div class="online-player-ships">`;
-                const opponentShips = [opponent.ship1, opponent.ship2, opponent.ship3];
-                opponentShips.forEach((shipData, index) => {
-                    const shipLevel = shipData ? shipData.level : 0;
-                    const shipUnlocked = (index === 0) || (shipData ? shipData.unlocked : false); 
-                    const iconSrc = getShipIcon(shipLevel);
-                    const iconClass = shipUnlocked ? 'unlocked' : 'locked';
-
-                    if (iconSrc === 'font-awesome') {
-                        shipsHtml += `
-                            <div class="online-player-ship-icon ${iconClass}">
-                                <i class="fas fa-ship ${shipUnlocked ? 'text-blue-400' : 'text-gray-500'}"></i>
-                            </div>
-                        `;
-                    } else {
-                        shipsHtml += `
-                            <div class="online-player-ship-icon ${iconClass}">
-                                <img src="${iconSrc}" alt="Ship ${index + 1} Icon" onerror="this.onerror=null;this.src='https://placehold.co/25x25/21262d/e2e8f0?text=X';" draggable="false" />
-                            </div>
-                        `;
+            try {
+                const playersRef = ref(db, `artifacts/${appId}/public/onlinePlayers`);
+                const snapshot = await get(playersRef);
+                const data = snapshot.val();
+                const allPlayers = [];
+                if (data) {
+                    for (const key in data) {
+                        const playerData = data[key];
+                        if (playerData.userId !== userId) {
+                            allPlayers.push(playerData);
+                        }
                     }
-                });
-                shipsHtml += `</div>`;
+                }
 
-                li.innerHTML = `
-                    <div class="player-info">
-                        ${fleetNameHtml}
-                        <p>
-                            <i class="fas fa-fist-raised text-red-500"></i> ${formatNumber(opponentTotalPower)}
-                        </p>
-                    </div>
-                    <div class="attack-btn-wrapper">
-                        <button class="attack-player-btn" data-opponent-id="${opponent.userId}" ${buttonDisabled}>
-                            ${buttonText}
-                        </button>
-                    </div>
-                `;
-                attackablePlayersListEl.appendChild(li);
+                if (allPlayers.length === 0) {
+                    window.showMessage("لا يوجد لاعبون آخرون للهجوم عليهم حالياً.");
+                    attackOpponentNameEl.textContent = 'لا يوجد خصم';
+                    attackOpponentPowerEl.textContent = '';
+                    attackBtnEl.disabled = true;
+                    return;
+                }
 
-                const attackButton = li.querySelector('.attack-player-btn');
-                attackButton.addEventListener('click', () => performAttack(opponent));
-
-                li.querySelector('.player-info').addEventListener('click', (event) => {
-                    event.stopPropagation();
-                    showPlayerProfile(opponent);
-                });
-            });
+                const randomIndex = Math.floor(Math.random() * allPlayers.length);
+                currentOpponent = allPlayers[randomIndex];
+                attackOpponentNameEl.textContent = currentOpponent.fleetName;
+                attackOpponentPowerEl.textContent = `القوة: ${formatNumber(currentOpponent.power)}`;
+                attackBtnEl.disabled = false;
+            } catch (error) {
+                window.showMessage("حدث خطأ أثناء اختيار خصم. يرجى المحاولة لاحقاً.");
+            }
         }
 
-        async function performAttack(opponent) {
-            if (!opponent) {
+        async function performAttack() {
+            if (!currentOpponent) {
                 window.showMessage("الرجاء اختيار خصم أولاً.");
                 return;
             }
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
-            if (playerData.globalAttackCooldownEndTime > Date.now()) {
-                window.showMessage(`لا يمكنك الهجوم الآن. يرجى الانتظار ${formatTime(playerData.globalAttackCooldownEndTime - Date.now())}.`);
+            if (Date.now() < attackCooldownEndTime) {
+                window.showMessage(`لا يمكنك الهجوم الآن. يرجى الانتظار ${formatTime(attackCooldownEndTime - Date.now())}.`);
                 return;
             }
 
             let win = false;
-            let opponentTotalPower = (opponent.ship1?.power || 0) + (opponent.ship2?.unlocked ? opponent.ship2.power : 0) + (opponent.ship3?.unlocked ? opponent.ship3.power : 0);
-            if (opponent.lionCount !== undefined) opponentTotalPower += (opponent.lionCount * 7000);
-
-            if (playerData.power > opponentTotalPower) {
-                win = Math.random() < 0.9; 
+            if (playerPower > currentOpponent.power) {
+                win = Math.random() < 0.6; 
             } else {
                 win = Math.random() < 0.4; 
             }
@@ -2678,12 +1876,12 @@
 
             if (win) {
                 const moneyGain = Math.floor(Math.random() * (800 - 200 + 1)) + 200;
-                playerData.money += moneyGain;
+                playerMoney += moneyGain;
                 winnings.money = moneyGain;
                 resultText = `لقد فزت! حصلت على ${formatNumber(moneyGain)} أموال.`;
 
                 if (Math.random() < 0.15) {
-                    playerData.keys += 1;
+                    playerKeys += 1;
                     winnings.key = 1;
                     resultText += " وحصلت على مفتاح!";
                 }
@@ -2692,84 +1890,49 @@
             }
 
             window.showMessage(resultText);
-            updateUIFromPlayerData();
-
-            playerData.globalAttackCooldownEndTime = Date.now() + ATTACK_COOLDOWN_GLOBAL_MS;
-            playerData.lastAttackedOpponentId = opponent.userId; 
-            saveToLocalStorage();
-            saveUserDataToFirebase();
-            
-            if (document.getElementById('attackSection').classList.contains('animate-fade-in-up')) {
-                const playersRef = ref(db, `artifacts/${appId}/public/onlinePlayers`);
-                get(playersRef).then(snapshot => {
-                    const data = snapshot.val();
-                    const allPlayers = [];
-                    if (data) {
-                        for (const key in data) {
-                            allPlayers.push(data[key]);
-                        }
-                    }
-                    renderAttackablePlayers(allPlayers);
-                }).catch(error => {
-                    console.error("Error loading attackable players after attack:", error);
-                    window.showMessage("حدث خطأ أثناء تحميل قائمة اللاعبين للهجوم.");
-                });
-            }
+            updatePlayerStats();
+            await saveUserData();
 
             try {
                 const attackLogRef = ref(db, `artifacts/${appId}/public/attackLog`);
                 await push(attackLogRef, {
                     attackerId: userId,
-                    attackerFleetName: playerData.fleetName,
-                    defenderId: opponent.userId,
-                    defenderFleetName: opponent.fleetName,
+                    attackerFleetName: fleetName,
+                    defenderId: currentOpponent.userId,
+                    defenderFleetName: currentOpponent.fleetName,
                     result: win ? 'win' : 'loss',
                     winnings: winnings,
-                    timestamp: serverTimestamp() 
+                    timestamp: Date.now()
                 });
             } catch (error) {
-                console.error("Error adding attack log entry:", error);
             }
+
+            attackCooldownEndTime = Date.now() + (5 * 60 * 1000);
+            updateAttackCooldownUI();
+            attackBtnEl.disabled = true;
+            await saveUserData();
+            selectRandomOpponent();
         }
 
-        function updateAttackCooldownsUI() {
-            if (!userId) return;
-            const cooldownRemaining = playerData.globalAttackCooldownEndTime - Date.now();
-            const isOnCooldown = cooldownRemaining > 0;
+        function updateAttackCooldownUI() {
+            if (!attackCooldownDisplayEl || !attackBtnEl) return;
 
-            const attackButtons = attackablePlayersListEl.querySelectorAll('.attack-player-btn');
-            attackButtons.forEach(button => {
-                if (isOnCooldown) {
-                    button.disabled = true;
-                    button.textContent = formatTime(cooldownRemaining);
-                } else {
-                    button.disabled = false;
-                    button.textContent = 'هجوم';
-                }
-            });
+            const currentTime = Date.now();
+            const remainingTime = attackCooldownEndTime - currentTime;
 
-            if (playerData.lastGlobalCooldownState && !isOnCooldown) {
-                playerData.lastAttackedOpponentId = null; 
-                if (document.getElementById('attackSection').classList.contains('animate-fade-in-up')) {
-                    if (db) {
-                        const playersRef = ref(db, `artifacts/${appId}/public/onlinePlayers`);
-                        get(playersRef).then(snapshot => {
-                            const data = snapshot.val();
-                            const allPlayers = [];
-                            if (data) {
-                                for (const key in data) {
-                                    allPlayers.push(data[key]);
-                                }
-                            }
-                            renderAttackablePlayers(allPlayers);
-                        }).catch(error => {
-                            console.error("Error refreshing attackable players after cooldown:", error);
-                            window.showMessage("حدث خطأ أثناء تحميل قائمة اللاعبين للهجوم.");
-                        });
-                    }
-                }
+            if (remainingTime > 0) {
+                attackCooldownDisplayEl.textContent = `الهجوم متاح بعد: ${formatTime(remainingTime)}`;
+                attackBtnEl.disabled = true;
+                attackBtnEl.textContent = 'في انتظار';
+                attackBtnEl.classList.remove('btn-primary');
+                attackBtnEl.classList.add('btn-secondary');
+            } else {
+                attackCooldownDisplayEl.textContent = 'جاهز للهجوم!';
+                attackBtnEl.disabled = false;
+                attackBtnEl.textContent = 'هجوم';
+                attackBtnEl.classList.remove('btn-secondary');
+                attackBtnEl.classList.add('btn-primary');
             }
-            playerData.lastGlobalCooldownState = isOnCooldown; 
         }
 
         function populateShipFormsList() {
@@ -2781,9 +1944,9 @@
 
                 let iconHtml = '';
                 if (form.iconType === 'font-awesome') {
-                    iconHtml = `<i class="${form.iconClass} text-blue-400 glowing-icon"></i>`;
+                    iconHtml = `<i class="${form.iconClass} text-blue-400"></i>`;
                 } else {
-                    iconHtml = `<img src="${form.imgSrc}" alt="Image of Ship Form" class="glowing-icon" onerror="this.onerror=null;this.src='https://placehold.co/50x50/21262d/e2e8f0?text=X';" draggable="false" />`;
+                    iconHtml = `<img src="${form.imgSrc}" alt="Image of Ship Form" onerror="this.onerror=null;this.src='https://placehold.co/50x50/21262d/e2e8f0?text=Error';" />`;
                 }
 
                 itemDiv.innerHTML = `
@@ -2799,6 +1962,27 @@
             });
         }
 
+        function updatePlayerStats() {
+            playerPower = ship1.power + (ship2.unlocked ? ship2.power : 0) + (ship3.unlocked ? ship3.power : 0);
+            playerPowerEl.textContent = formatNumber(playerPower);
+            playerMoneyEl.textContent = formatNumber(playerMoney);
+            playerKeysEl.textContent = formatNumber(playerKeys);
+            fleetNameEl.textContent = fleetName;
+            
+            if (isGoldenNameActive) {
+                fleetNameEl.classList.add('golden-text');
+            } else {
+                fleetNameEl.classList.remove('golden-text');
+            }
+
+            if (isStarIconActive) {
+                fleetStarIconEl.classList.remove('hidden');
+            } else {
+                fleetStarIconEl.classList.add('hidden');
+            }
+            saveUserData();
+        }
+
         function formatTime(ms) {
             if (ms <= 0) return 'جاهز';
             const totalSeconds = Math.floor(ms / 1000);
@@ -2809,18 +1993,17 @@
 
         function getShipIcon(level) {
             if (level >= 10000) {
-                return 'https://c.top4top.io/p_3482878s83.png'; 
+                return 'https://c.top4top.io/p_3482878s83.png';
             } else if (level >= 4001) {
-                return 'https://b.top4top.io/p_3482vv1ax2.png'; 
+                return 'https://b.top4top.io/p_3482vv1ax2.png';
             } else if (level >= 1001) {
-                return 'https://l.top4top.io/p_3482en0id0.png'; 
+                return 'https://l.top4top.io/p_3482en0id0.png';
             } else {
                 return 'font-awesome'; 
             }
         }
 
         function updateShipUI(ship, powerEl, levelEl, progressEl, upgradeBtn, containerEl, cooldownDisplayEl, maxPowerEl, iconContainerEl, iconIEl, iconImgEl) {
-            if (!userId) return;
             powerEl.textContent = formatNumber(ship.power);
             levelEl.textContent = formatNumber(ship.level);
             maxPowerEl.textContent = formatNumber(ship.maxPower);
@@ -2870,14 +2053,12 @@
                 if (iconIEl) {
                     iconIEl.style.display = '';
                     iconIEl.className = 'fas fa-ship';
-                    if (ship.unlocked || ship === playerData.ship1) {
+                    if (ship.unlocked || ship === ship1) {
                         iconIEl.classList.remove('text-gray-500');
                         iconIEl.classList.add('text-blue-400');
-                        iconIEl.classList.add('glowing-icon'); 
                     } else {
                         iconIEl.classList.remove('text-blue-400');
                         iconIEl.classList.add('text-gray-500');
-                        iconIEl.classList.remove('glowing-icon'); 
                     }
                 }
                 if (iconImgEl) {
@@ -2890,20 +2071,11 @@
                 if (iconImgEl) {
                     iconImgEl.style.display = '';
                     iconImgEl.src = iconSrc;
-                    if (ship.unlocked || ship === playerData.ship1) {
-                        iconImgEl.classList.add('glowing-icon'); 
-                    } else {
-                        iconImgEl.classList.remove('glowing-icon'); 
-                    }
                 }
             }
         }
 
         function upgradeShip(ship) {
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
             const currentTime = Date.now();
             if (ship.power >= ship.maxPower) {
                 window.showMessage('هذه السفينة مطورة بالكامل بالفعل!');
@@ -2924,77 +2096,91 @@
 
             ship.cooldownEndTime = currentTime + UPGRADE_COOLDOWN_MS;
 
-            updateUIFromPlayerData();
+            updatePlayerStats();
+            updateShipUI(ship,
+                ship === ship1 ? ship1PowerEl : (ship === ship2 ? ship2PowerEl : ship3PowerEl),
+                ship === ship1 ? ship1LevelEl : (ship === ship2 ? ship2LevelEl : ship3LevelEl),
+                ship === ship1 ? ship1ProgressEl : (ship === ship2 ? ship2ProgressEl : ship3ProgressEl),
+                ship === ship1 ? upgradeShip1Btn : (ship === ship2 ? upgradeShip2Btn : upgradeShip3Btn),
+                ship === ship1 ? null : (ship === ship2 ? ship2Container : ship3Container),
+                ship === ship1 ? ship1CooldownDisplay : (ship === ship2 ? ship2CooldownDisplay : ship3CooldownDisplay),
+                ship === ship1 ? ship1MaxPowerEl : (ship === ship2 ? ship2MaxPowerEl : ship3MaxPowerEl),
+                ship === ship1 ? ship1IconContainerEl : (ship === ship2 ? ship2IconContainerEl : ship3IconContainerEl),
+                ship === ship1 ? ship1IconIEl : (ship === ship2 ? ship2IconIEl : ship3IconIEl),
+                ship === ship1 ? ship1IconImgEl : (ship === ship2 ? ship2IconImgEl : ship3IconImgEl)
+            );
             
-            if (ship === playerData.ship1 && playerData.ship1.power >= playerData.ship1.maxPower && !playerData.ship2.unlocked) {
-                playerData.ship2.unlocked = true;
-                updateUIFromPlayerData();
+            if (ship === ship1 && ship1.power >= ship1.maxPower && !ship2.unlocked) {
+                ship2.unlocked = true;
+                updateShipUI(ship2, ship2PowerEl, ship2LevelEl, ship2ProgressEl, upgradeShip2Btn, ship2Container, ship2CooldownDisplay, ship2MaxPowerEl, ship2IconContainerEl, ship2IconIEl, ship2IconImgEl);
                 window.showMessage('تم فتح السفينة الثانية!');
-            } else if (ship === playerData.ship2 && playerData.ship2.power >= playerData.ship2.maxPower && !playerData.ship3.unlocked) {
-                playerData.ship3.unlocked = true;
-                updateUIFromPlayerData();
+            } else if (ship === ship2 && ship2.power >= ship2.maxPower && !ship3.unlocked) {
+                ship3.unlocked = true;
+                updateShipUI(ship3, ship3PowerEl, ship3LevelEl, ship3ProgressEl, upgradeShip3Btn, ship3Container, ship3CooldownDisplay, ship3MaxPowerEl, ship3IconContainerEl, ship3IconIEl, ship3IconImgEl);
                 window.showMessage('تم فتح السفينة الثالثة!');
             }
+            saveUserData();
+        }
+
+        function updateAllShipCooldowns() {
+            updateShipUI(ship1, ship1PowerEl, ship1LevelEl, ship1ProgressEl, upgradeShip1Btn, null, ship1CooldownDisplay, ship1MaxPowerEl, ship1IconContainerEl, ship1IconIEl, ship1IconImgEl);
+            if (ship2.unlocked) {
+                updateShipUI(ship2, ship2PowerEl, ship2LevelEl, ship2ProgressEl, upgradeShip2Btn, ship2Container, ship2CooldownDisplay, ship2MaxPowerEl, ship2IconContainerEl, ship2IconIEl, ship2IconImgEl);
+            }
+            if (ship3.unlocked) {
+                updateShipUI(ship3, ship3PowerEl, ship3LevelEl, ship3ProgressEl, upgradeShip3Btn, ship3Container, ship3CooldownDisplay, ship3MaxPowerEl, ship3IconContainerEl, ship3IconIEl, ship3IconImgEl);
+            }
+            saveUserData();
         }
 
         function updateResourceCircle() {
-            if (!userId) return;
-            const percentage = (playerData.accumulatedResources / MAX_ACCUMULATED_RESOURCES) * 100;
+            const percentage = (accumulatedResources / MAX_ACCUMULATED_RESOURCES) * 100;
             const offset = circumference - (percentage / 100) * circumference;
             circleProgress.style.strokeDashoffset = offset;
-            accumulatedResourcesDisplay.textContent = `${playerData.accumulatedResources}/${MAX_ACCUMULATED_RESOURCES}`;
+            accumulatedResourcesDisplay.textContent = `${accumulatedResources}/${MAX_ACCUMULATED_RESOURCES}`;
         }
 
         function updateResourceButtonState() {
-            if (!userId) return;
             if (resourceBtnTextEl && resourceBtnIconEl && circleProgress) { 
-                if (playerData.accumulatedResources > 0) {
+                if (accumulatedResources > 0) {
                     resourceCollectionBtnWrapper.classList.remove('opacity-50', 'pointer-events-none');
                     resourceBtnTextEl.textContent = 'استلام';
                     resourceBtnIconEl.classList.remove('text-gray-400');
                     resourceBtnIconEl.classList.add('text-white');
-                    resourceBtnIconEl.classList.add('glowing-icon'); 
                     circleProgress.style.stroke = '#f39c12'; 
                 } else {
                     resourceCollectionBtnWrapper.classList.add('opacity-50', 'pointer-events-none');
                     resourceBtnTextEl.textContent = 'لا توجد موارد';
                     resourceBtnIconEl.classList.add('text-gray-400');
                     resourceBtnIconEl.classList.remove('text-white');
-                    resourceBtnIconEl.classList.remove('glowing-icon'); 
                     circleProgress.style.stroke = '#3b4554'; 
                 }
             }
         }
 
         function autoAccumulateResources() {
-            if (!userId) return;
-            if (playerData.accumulatedResources < MAX_ACCUMULATED_RESOURCES) {
+            if (accumulatedResources < MAX_ACCUMULATED_RESOURCES) {
                 const collectedAmount = Math.floor(Math.random() * 6) + 1;
-                playerData.accumulatedResources = Math.min(MAX_ACCUMULATED_RESOURCES, playerData.accumulatedResources + collectedAmount);
-                updateUIFromPlayerData();
+                accumulatedResources = Math.min(MAX_ACCUMULATED_RESOURCES, accumulatedResources + collectedAmount);
+                updateResourceCircle();
             }
+            updateResourceButtonState(); 
         }
 
         function collectAccumulatedResources() {
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
-            if (playerData.accumulatedResources > 0) {
-                playerData.money += playerData.accumulatedResources;
-                window.showMessage(`لقد استلمت ${playerData.accumulatedResources} من الموارد!`);
-                playerData.accumulatedResources = 0;
-                updateUIFromPlayerData();
+            if (accumulatedResources > 0) {
+                playerMoney += accumulatedResources;
+                window.showMessage(`لقد استلمت ${accumulatedResources} من الموارد!`);
+                accumulatedResources = 0;
+                updatePlayerStats();
+                updateResourceCircle();
+                updateResourceButtonState(); 
             } else {
                 window.showMessage('لا توجد موارد لتجميعها حالياً!');
             }
         }
 
         window.showStoreItemDetail = function(itemKey) {
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
             currentStoreItemKey = itemKey;
             const item = storeItems[itemKey];
 
@@ -3004,79 +2190,21 @@
             }
 
             storeItemTitle.textContent = item.title;
-            
-            if (item.iconType === 'font-awesome') {
-                storeItemIcon.className = `item-icon ${item.icon}`;
-                storeItemIcon.classList.remove('hidden');
-                storeItemIconImg.classList.add('hidden');
-            } else {
-                storeItemIconImg.src = item.icon;
-                storeItemIconImg.classList.remove('hidden');
-                storeItemIcon.classList.add('hidden');
-            }
-
+            storeItemIcon.className = `item-icon ${item.icon}`;
             storeItemDescription.textContent = item.description;
             
-            let priceHtml = '';
-            if (item.currency === 'none') {
-                priceHtml = item.price;
-            } else {
-                priceHtml = `${item.price} `;
-                if (item.currency === 'key') {
-                    priceHtml += `<i class="fas fa-key text-yellow-400"></i>`;
-                } else if (item.currency === 'money') {
-                    priceHtml += `<i class="fas fa-dollar-sign text-green-400"></i>`;
-                }
+            let priceHtml = `${formatNumber(item.price)} `;
+            if (item.currency === 'key') {
+                priceHtml += `<i class="fas fa-key text-yellow-400"></i>`;
+            } else if (item.currency === 'money') {
+                priceHtml += `<i class="fas fa-dollar-sign text-green-400"></i>`;
             }
             storeItemPrice.innerHTML = priceHtml;
 
-            storeItemTitle.classList.remove('golden-text', 'pink-text', 'fiery-text', 'silver-text', 'blue-glow-text', 'emerald-text', 'royal-crimson-text');
-            if (item.cssClass) {
-                storeItemTitle.classList.add(item.cssClass);
-            }
-
-            const buyBtn = document.getElementById('buyStoreItemBtn');
-            const currentTime = Date.now();
-
-            if (item.type === 'name_cosmetic' || item.type === 'icon_cosmetic') {
-                const isOwned = (item.ownedKey === 'lionCount') ? (playerData.lionCount > 0) : playerData[item.ownedKey];
-                const isActive = playerData[item.activeKey];
-
-                if (isOwned) {
-                    if (!isActive) { 
-                        buyBtn.textContent = 'تفعيل';
-                        buyBtn.classList.remove('bg-gray-600');
-                        buyBtn.classList.add('bg-blue-600');
-                    } else { 
-                        buyBtn.textContent = 'إلغاء تفعيل';
-                        buyBtn.classList.remove('bg-blue-600');
-                        buyBtn.classList.add('bg-gray-600');
-                    }
-                    buyBtn.disabled = false; 
-                } else {
-                    buyBtn.textContent = 'شراء';
-                    buyBtn.classList.remove('bg-gray-600');
-                    buyBtn.classList.add('bg-blue-600');
-                    if (itemKey === 'lionIcon') {
-                        buyBtn.disabled = true;
-                        buyBtn.textContent = 'يمكن الحصول عليه من صندوق الحظ';
-                    } else {
-                        buyBtn.disabled = false;
-                    }
-                }
-            } else if (item.type === 'free_box') {
-                if (playerData.freeBoxCooldownEndTime > currentTime) {
-                    buyBtn.disabled = true;
-                    buyBtn.textContent = `متاح بعد: ${formatTime(playerData.freeBoxCooldownEndTime - currentTime)}`;
-                } else {
-                    buyBtn.disabled = false;
-                    buyBtn.textContent = 'افتح الصندوق';
-                }
-            } else { 
-                buyBtn.textContent = 'شراء';
-                buyBtn.classList.remove('bg-gray-600');
-                buyBtn.classList.add('bg-blue-600');
-                buyBtn.disabled = false;
+            if (itemKey === 'goldenName') {
+                storeItemTitle.classList.add('golden-text');
+            } else {
+                storeItemTitle.classList.remove('golden-text');
             }
 
             storeItemDetailModal.style.display = 'flex';
@@ -3084,9 +2212,7 @@
 
         window.closeStoreItemDetailModal = function(returnToStore = false) {
             storeItemDetailModal.style.display = 'none';
-            storeItemTitle.classList.remove('golden-text', 'pink-text', 'fiery-text', 'silver-text', 'blue-glow-text', 'emerald-text', 'royal-crimson-text'); 
-            storeItemIcon.classList.add('hidden'); 
-            storeItemIconImg.classList.add('hidden'); 
+            storeItemTitle.classList.remove('golden-text');
             currentStoreItemKey = null;
             if (returnToStore) {
                 window.showSection('store');
@@ -3095,185 +2221,84 @@
 
         async function buyStoreItem() {
             if (!currentStoreItemKey) return;
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
 
             const item = storeItems[currentStoreItemKey];
             let canAfford = false;
             let message = '';
-            const currentTime = Date.now();
 
-            if (item.type === 'utility') {
-                if (item.currency === 'key') {
-                    if (playerData.keys >= item.price) {
-                        playerData.keys -= item.price;
-                        canAfford = true;
-                    } else {
-                        message = `ليس لديك ما يكفي من المفاتيح لشراء هذا العنصر (${formatNumber(item.price)} مفتاح).`;
-                    }
-                } else if (item.currency === 'money') {
-                    if (playerData.money >= item.price) {
-                        playerData.money -= item.price;
-                        canAfford = true;
-                    } else {
-                        message = `ليس لديك ما يكفي من الأموال لشراء هذا العنصر (${formatNumber(item.price)} أموال).`;
-                    }
-                }
-            } else if (item.type === 'lucky_box') { 
-                if (playerData.money >= item.price) {
-                    playerData.money -= item.price;
+            if (item.currency === 'key') {
+                if (playerKeys >= item.price) {
+                    playerKeys -= item.price;
                     canAfford = true;
-                    let prizeMessage = "لقد فتحت صندوق الحظ وحصلت على: ";
-                    const rand = Math.random() * 100;
-
-                    if (rand < 9) { 
-                        playerData.lionCount++; 
-                        playerData.isLionActive = true; 
-                        message = prizeMessage + `الأسد المتوهج! (7000 قوة إضافية). لديك الآن ${playerData.lionCount} أسد متوهج.`;
-                    } else if (rand < (9 + 15)) { 
-                        const moneyGain = Math.floor(Math.random() * (1900 - 500 + 1)) + 500;
-                        playerData.money += moneyGain;
-                        message = prizeMessage + `${formatNumber(moneyGain)} أموال!`;
-                    } else if (rand < (9 + 15 + 30)) { 
-                        const powerGain = Math.floor(Math.random() * (2500 - 500 + 1)) + 500;
-                        playerData.ship1.power += powerGain; 
-                        playerData.ship1.level = Math.min(playerData.ship1.maxPower, playerData.ship1.power);
-                        message = prizeMessage + `${formatNumber(powerGain)} قوة لسفينتك الأساسية!`;
-                    } else { 
-                        const keysGain = Math.floor(Math.random() * (25 - 14 + 1)) + 14;
-                        playerData.keys += keysGain;
-                        message = prizeMessage + `${keysGain} مفتاح!`;
-                    }
                 } else {
-                    message = `ليس لديك ما يكفي من الأموال لشراء صندوق الحظ (${formatNumber(item.price)} أموال).`;
+                    message = `ليس لديك ما يكفي من المفاتيح لشراء هذا العنصر (${formatNumber(item.price)} مفتاح).`;
                 }
-            } else if (item.type === 'free_box') { 
-                if (playerData.freeBoxCooldownEndTime > currentTime) {
-                    message = `الصندوق المجاني متاح بعد: ${formatTime(playerData.freeBoxCooldownEndTime - currentTime)}.`;
+            } else if (item.currency === 'money') {
+                if (playerMoney >= item.price) {
+                    playerMoney -= item.price;
+                    canAfford = true;
                 } else {
-                    canAfford = true; 
-                    let prizeMessage = "لقد فتحت الصندوق المجاني وحصلت على: ";
-                    const rand = Math.random() * 100;
-
-                    if (rand < 90) { 
-                        const moneyGain = Math.floor(Math.random() * (200 - 40 + 1)) + 40;
-                        playerData.money += moneyGain;
-                        message = prizeMessage + `${formatNumber(moneyGain)} أموال!`;
-                    } else { 
-                        const keysGain = Math.floor(Math.random() * (8 - 2 + 1)) + 2;
-                        playerData.keys += keysGain;
-                        message = prizeMessage + `${keysGain} مفتاح!`;
-                    }
-                    playerData.freeBoxCooldownEndTime = currentTime + FREE_BOX_COOLDOWN_MS;
-                }
-            } else if (item.type === 'name_cosmetic' || item.type === 'icon_cosmetic') {
-                const isOwned = (item.ownedKey === 'lionCount') ? (playerData.lionCount > 0) : playerData[item.ownedKey];
-                const isActive = playerData[item.activeKey];
-
-                if (isOwned) {
-                    if (item.type === 'name_cosmetic') {
-                        playerData.isGoldenNameActive = false;
-                        playerData.isPinkNameActive = false;
-                        playerData.isFieryNameActive = false;
-                        playerData.isSilverNameActive = false; 
-                        playerData.isBlueGlowNameActive = false; 
-                        playerData.isEmeraldNameActive = false; 
-                        playerData.isRoyalCrimsonNameActive = false; 
-                        if (!isActive) { 
-                            playerData[item.activeKey] = true;
-                            message = `تم تفعيل "${item.title}" بنجاح!`;
-                        } else { 
-                            message = `تم إلغاء تفعيل "${item.title}".`;
-                        }
-                    } else if (item.type === 'icon_cosmetic') {
-                        playerData.isStarIconActive = false;
-                        playerData.isCrownIconActive = false;
-                        playerData.isLionActive = false; 
-                        if (!isActive) { 
-                            playerData[item.activeKey] = true;
-                            message = `تم تفعيل "${item.title}" بنجاح!`;
-                        } else { 
-                            message = `تم إلغاء تفعيل "${item.title}".`;
-                        }
-                    }
-                    canAfford = true; 
-                } else { 
-                    if (item.currency === 'key') {
-                        if (playerData.keys >= item.price) {
-                            playerData.keys -= item.price;
-                            canAfford = true;
-                        } else {
-                            message = `ليس لديك ما يكفي من المفاتيح لشراء هذا العنصر (${formatNumber(item.price)} مفتاح).`;
-                        }
-                    } else if (item.currency === 'money') {
-                        if (playerData.money >= item.price) {
-                            playerData.money -= item.price;
-                            canAfford = true;
-                        } else {
-                            message = `ليس لديك ما يكفي من الأموال لشراء هذا العنصر (${formatNumber(item.price)} أموال).`;
-                        }
-                    }
-
-                    if (canAfford) {
-                        playerData[item.ownedKey] = true;
-                        if (item.type === 'name_cosmetic') {
-                            playerData.isGoldenNameActive = false;
-                            playerData.isPinkNameActive = false;
-                            playerData.isFieryNameActive = false;
-                            playerData.isSilverNameActive = false; 
-                            playerData.isBlueGlowNameActive = false; 
-                            playerData.isEmeraldNameActive = false; 
-                            playerData.isRoyalCrimsonNameActive = false; 
-                            playerData[item.activeKey] = true;
-                        } else if (item.type === 'icon_cosmetic') {
-                            playerData.isStarIconActive = false;
-                            playerData.isCrownIconActive = false;
-                            playerData.isLionActive = false; 
-                            playerData[item.activeKey] = true;
-                        }
-                        message = `تهانينا! لقد اشتريت "${item.title}" وتم تفعيله!`;
-                    }
+                    message = `ليس لديك ما يكفي من الأموال لشراء هذا العنصر (${formatNumber(item.price)} أموال).`;
                 }
             }
 
             if (canAfford) {
                 if (currentStoreItemKey === 'completeUpgrade') {
+                    const currentTime = Date.now();
                     let shipsOnCooldown = 0;
-                    if (playerData.ship1.cooldownEndTime > currentTime) { playerData.ship1.cooldownEndTime = 0; shipsOnCooldown++; }
-                    if (playerData.ship2.unlocked && playerData.ship2.cooldownEndTime > currentTime) { playerData.ship2.cooldownEndTime = 0; shipsOnCooldown++; }
-                    if (playerData.ship3.unlocked && playerData.ship3.cooldownEndTime > currentTime) { playerData.ship3.cooldownEndTime = 0; shipsOnCooldown++; }
+                    if (ship1.cooldownEndTime > currentTime) { ship1.cooldownEndTime = 0; shipsOnCooldown++; }
+                    if (ship2.unlocked && ship2.cooldownEndTime > currentTime) { ship2.cooldownEndTime = 0; shipsOnCooldown++; }
+                    if (ship3.unlocked && ship3.cooldownEndTime > currentTime) { ship3.cooldownEndTime = 0; shipsOnCooldown++; }
 
                     if (shipsOnCooldown > 0) {
+                        updateAllShipCooldowns();
                         message = 'تم إكمال تطوير السفن بنجاح!';
                     } else {
-                        if (item.currency === 'key') playerData.keys += item.price; 
-                        else playerData.money += item.price; 
+                        if (item.currency === 'key') playerKeys += item.price; 
+                        else playerMoney += item.price; 
                         message = 'لا توجد سفن في فترة انتظار حالياً لإكمال تطويرها.';
-                        canAfford = false;
+                        canAfford = false; 
                     }
-                } 
+                } else if (currentStoreItemKey === 'goldenName') {
+                    if (isGoldenNameActive) {
+                        if (item.currency === 'key') playerKeys += item.price; 
+                        else playerMoney += item.price; 
+                        message = 'اسمك الذهبي المتحرك مفعل بالفعل!';
+                        canAfford = false;
+                    } else {
+                        isGoldenNameActive = true;
+                        message = 'تهانينا! اسم أسطولك أصبح ذهبياً ومتحركاً!';
+                    }
+                } else if (currentStoreItemKey === 'starIcon') {
+                    if (isStarIconActive) {
+                        if (item.currency === 'key') playerKeys += item.price; 
+                        else playerMoney += item.price; 
+                        message = 'أيقونة النجمة مفعلة بالفعل!';
+                        canAfford = false;
+                    } else {
+                        isStarIconActive = true;
+                        message = 'تهانينا! أضفت نجمة لامعة بجانب اسم أسطولك!';
+                    }
+                } else if (currentStoreItemKey === 'buyKeys') { 
+                    playerKeys += item.amount; 
+                    message = `تهانينا! لقد اشتريت ${item.amount} مفتاح مقابل ${formatNumber(item.price)} أموال.`;
+                }
             }
             
-            updateUIFromPlayerData();
+            updatePlayerStats();
             window.showMessage(message);
-            window.closeStoreItemDetailModal(true);
+            window.closeStoreItemDetailModal(true); 
         }
 
         window.openShipSelectionModal = function() {
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
             document.getElementById('shipExpansionModalPrice').innerHTML = `${formatNumber(storeItems.shipExpansion.price)} <i class="fas fa-key text-yellow-400"></i>`;
 
             let shipSelectionOptions = document.getElementById('shipSelectionOptions');
             shipSelectionOptions.innerHTML = '';
             const ships = [
-                { id: 'ship1', name: 'السفينة الأساسية', obj: playerData.ship1 },
-                { id: 'ship2', name: 'السفينة الثانية', obj: playerData.ship2 },
-                { id: 'ship3', name: 'السفينة الثالثة', obj: playerData.ship3 }
+                { id: 'ship1', name: 'السفينة الأساسية', obj: ship1 },
+                { id: 'ship2', name: 'السفينة الثانية', obj: ship2 },
+                { id: 'ship3', name: 'السفينة الثالثة', obj: ship3 }
             ];
 
             ships.forEach(s => {
@@ -3299,14 +2324,10 @@
 
         window.closeShipSelectionModal = function() {
             document.getElementById('shipSelectionModal').style.display = 'none';
-            window.showSection('store');
+            window.showSection('store'); 
         }
 
         async function confirmShipExpansion() {
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
             const selectedRadio = document.querySelector('input[name="selectedShip"]:checked');
             let message = '';
             let purchaseSuccessful = false;
@@ -3316,16 +2337,17 @@
             } else {
                 const selectedShipId = selectedRadio.value;
                 let targetShip;
-                if (selectedShipId === 'ship1') targetShip = playerData.ship1;
-                else if (selectedShipId === 'ship2') targetShip = playerData.ship2;
-                else if (selectedShipId === 'ship3') targetShip = playerData.ship3;
+                if (selectedShipId === 'ship1') targetShip = ship1;
+                else if (selectedShipId === 'ship2') targetShip = ship2;
+                else if (selectedShipId === 'ship3') targetShip = ship3;
 
                 const item = storeItems['shipExpansion'];
-                if (playerData.keys >= item.price) { 
-                    playerData.keys -= item.price; 
+                if (playerKeys >= item.price) { 
+                    playerKeys -= item.price; 
                     targetShip.maxPower += 5000;
-                    updateUIFromPlayerData();
-                    message = `تم توسيع ${targetShip.name === playerData.ship1.name ? 'السفينة الأساسية' : targetShip.name} بنجاح! الحد الأقصى الجديد: ${formatNumber(targetShip.maxPower)}.`;
+                    updatePlayerStats();
+                    updateAllShipCooldowns();
+                    message = `تم توسيع ${targetShip.name === ship1.name ? 'السفينة الأساسية' : targetShip.name} بنجاح! الحد الأقصى الجديد: ${formatNumber(targetShip.maxPower)}.`;
                     purchaseSuccessful = true;
                 } else {
                     message = `ليس لديك ما يكفي من المفاتيح لشراء توسيع السفينة (${formatNumber(item.price)} مفتاح).`; 
@@ -3333,47 +2355,24 @@
             }
             
             window.showMessage(message);
-            window.closeShipSelectionModal();
+            window.closeShipSelectionModal(); 
         }
 
-        function openChangeFleetNameModal() {
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
-            changeFleetNameInput.value = playerData.fleetName;
-            changeFleetNameModal.style.display = 'flex';
-        }
-
-        function closeChangeFleetNameModal() {
-            changeFleetNameModal.style.display = 'none';
-        }
-
-        async function confirmChangeFleetName() {
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
-            const newName = changeFleetNameInput.value.trim();
-            if (newName && newName !== playerData.fleetName) {
-                playerData.fleetName = newName;
-                updateUIFromPlayerData();
-                window.showMessage('تم تغيير اسم الأسطول بنجاح!');
-                closeChangeFleetNameModal();
-            } else if (newName === playerData.fleetName) {
-                window.showMessage('الاسم الجديد هو نفس الاسم الحالي.');
+        async function confirmInitialFleetName() {
+            const name = initialFleetNameInput.value.trim();
+            if (name) {
+                fleetName = name;
+                initialFleetNameModal.style.display = 'none';
+                updatePlayerStats();
+                await updateOnlineStatus(true);
+                window.showSection('mainMenu');
             } else {
-                window.showMessage('الرجاء إدخال اسم صالح لأسطولك.');
+                window.showMessage('الرجاء إدخال اسم صالح لأسطولك!');
             }
         }
 
         window.showSection = function(sectionId) {
-            if (!userId && sectionId !== 'hidden') {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
             const sections = [mainMenuSection, myFleetSection, storeSection, onlineSection, rouletteSection, developmentsSection, challengeLogSection, attackSection, onlinePlayersSection];
-
             sections.forEach(section => {
                 section.classList.remove('animate-fade-in-up');
                 section.classList.add('hidden');
@@ -3385,8 +2384,6 @@
                 targetSection.classList.add('animate-fade-in-up');
             }
 
-            currentActiveSectionId = sectionId;
-
             if (sectionId === 'mainMenu') {
                 resourceCollectionBtnWrapper.classList.remove('hidden');
             } else {
@@ -3397,47 +2394,31 @@
                 populateShipFormsList();
             }
             if (sectionId === 'attackSection') {
-                if (db) {
-                    const playersRef = ref(db, `artifacts/${appId}/public/onlinePlayers`);
-                    get(playersRef).then(snapshot => {
-                        const data = snapshot.val();
-                        const allPlayers = [];
-                        if (data) {
-                            for (const key in data) {
-                                allPlayers.push(data[key]);
-                            }
-                        }
-                        renderAttackablePlayers(allPlayers);
-                    }).catch(error => {
-                        console.error("Error fetching players for attack section:", error);
-                        window.showMessage("حدث خطأ أثناء تحميل قائمة اللاعبين للهجوم.");
-                    });
-                }
+                selectRandomOpponent();
             }
         }
 
         function updateRouletteCooldownUI() {
-            if (!userId) return;
             const currentTime = Date.now();
-            const remainingTime = playerData.rouletteCooldownEndTime - currentTime;
+            const remainingTime = rouletteCooldownEndTime - currentTime;
 
             if (remainingTime > 0) {
-                rouletteGameElements.classList.add('hidden');
-                rouletteCooldownDisplay.classList.remove('hidden');
+                rouletteGameElements.classList.add('hidden'); 
+                rouletteCooldownDisplay.classList.remove('hidden'); 
                 rouletteCooldownDisplay.textContent = `الجولة القادمة بعد: ${formatTime(remainingTime)}`;
             } else {
-                rouletteGameElements.classList.remove('hidden');
-                rouletteCooldownDisplay.classList.add('hidden');
+                rouletteGameElements.classList.remove('hidden'); 
+                rouletteCooldownDisplay.classList.add('hidden'); 
 
                 if (!gameActive) {
                     startGameBtn.classList.remove('hidden');
                     betAmountInput.disabled = false;
                     cashOutBtn.classList.add('hidden');
                     cashOutBtn.disabled = true;
-                    multiplierDisplay.textContent = '1.00x';
-                    potentialWinningsEl.textContent = '0';
-                    rouletteResult.classList.add('hidden');
-                    rouletteDisplayArea.classList.remove('crashed');
+                    multiplierDisplay.textContent = '1.00x'; 
+                    potentialWinningsEl.textContent = '0'; 
+                    rouletteResult.classList.add('hidden'); 
+                    rouletteDisplayArea.classList.remove('crashed'); 
                     
                     const currentDisplayAreaHeight = rouletteDisplayArea.clientHeight;
                     const planeHeight = planeSvg.offsetHeight;
@@ -3448,11 +2429,11 @@
 
         function generateCrashPoint() {
             const rand = Math.random();
-            if (rand < 0.60) {
+            if (rand < 0.60) { 
                 return 1.01 + Math.random() * (4.0 - 1.01);
-            } else if (rand < 0.80) {
+            } else if (rand < 0.80) { 
                 return 4.1 + Math.random() * (7.7 - 4.1);
-            } else {
+            } else { 
                 return 10.0 + Math.random() * (25.5 - 10.0);
             }
         }
@@ -3468,21 +2449,21 @@
             currentMultiplier += multiplierIncreaseRate * (deltaTime / 100);
 
             multiplierDisplay.textContent = currentMultiplier.toFixed(2) + 'x';
-            potentialWinningsEl.textContent = Math.round(betAmount * currentMultiplier);
+            potentialWinningsEl.textContent = Math.round(betAmount * currentMultiplier); 
 
             const displayAreaWidth = rouletteDisplayArea.clientWidth;
             const displayAreaHeight = rouletteDisplayArea.clientHeight;
             const planeWidth = planeSvg.offsetWidth; 
             const planeHeight = planeSvg.offsetHeight; 
             
-            const maxVisualMultiplier = 30;
-            const minMultiplierForVisual = 1.0;
+            const maxVisualMultiplier = 30; 
+            const minMultiplierForVisual = 1.0; 
 
             let normalizedMultiplier = (currentMultiplier - minMultiplierForVisual) / (maxVisualMultiplier - minMultiplierForVisual);
-            normalizedMultiplier = Math.max(0, Math.min(normalizedMultiplier, 1));
+            normalizedMultiplier = Math.max(0, Math.min(normalizedMultiplier, 1)); 
 
-            const paddingX = 20;
-            const paddingY = 15;
+            const paddingX = 20; 
+            const paddingY = 15; 
 
             let planeX = normalizedMultiplier * (displayAreaWidth - planeWidth - (2 * paddingX)) + paddingX;
 
@@ -3498,12 +2479,8 @@
         }
 
         function startPlaneGame() {
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
-            if (Date.now() < playerData.rouletteCooldownEndTime) {
-                window.showMessage(`الرجاء الانتظار حتى انتهاء فترة التهدئة: ${formatTime(playerData.rouletteCooldownEndTime - Date.now())}`);
+            if (Date.now() < rouletteCooldownEndTime) {
+                window.showMessage(`الرجاء الانتظار حتى انتهاء فترة التهدئة: ${formatTime(rouletteCooldownEndTime - Date.now())}`);
                 return;
             }
 
@@ -3513,13 +2490,13 @@
                 window.showMessage('الرجاء إدخال مبلغ رهان صالح بين 20 و 2000.');
                 return;
             }
-            if (playerData.money < betAmount) {
+            if (playerMoney < betAmount) {
                 window.showMessage('ليس لديك ما يكفي من الأموال للرهان!');
                 return;
             }
 
-            playerData.money -= betAmount;
-            updateUIFromPlayerData();
+            playerMoney -= betAmount; 
+            updatePlayerStats();
 
             gameActive = true;
             currentMultiplier = 1.00;
@@ -3529,11 +2506,11 @@
             multiplierDisplay.textContent = '1.00x';
             potentialWinningsEl.textContent = '0';
 
-            crashPoint = generateCrashPoint();
+            crashPoint = generateCrashPoint(); 
 
-            startGameBtn.classList.add('hidden');
+            startGameBtn.classList.add('hidden'); 
             betAmountInput.disabled = true;
-            cashOutBtn.classList.remove('hidden');
+            cashOutBtn.classList.remove('hidden'); 
             cashOutBtn.disabled = false;
 
             const currentDisplayAreaHeight = rouletteDisplayArea.clientHeight;
@@ -3545,10 +2522,6 @@
         }
 
         function cashOut() {
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
             if (!gameActive || hasCashedOut) {
                 return;
             }
@@ -3556,9 +2529,9 @@
             hasCashedOut = true;
             cancelAnimationFrame(animationFrameId);
 
-            const winnings = Math.round(betAmount * currentMultiplier);
-            playerData.money += winnings;
-            updateUIFromPlayerData();
+            const winnings = Math.round(betAmount * currentMultiplier); 
+            playerMoney += winnings;
+            updatePlayerStats();
 
             rouletteResult.textContent = `لقد استلمت ${winnings} أموال عند ${currentMultiplier.toFixed(2)}x!`;
             rouletteResult.classList.remove('hidden');
@@ -3568,10 +2541,6 @@
         }
 
         function handleCrash() {
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
             if (!gameActive || hasCashedOut) {
                 return;
             }
@@ -3579,122 +2548,34 @@
             cancelAnimationFrame(animationFrameId);
 
             rouletteDisplayArea.classList.add('crashed');
-            rouletteResult.textContent = `تحطمت الطائرة عند ${currentMultiplier.toFixed(2)}x! لقد خسرت ${betAmount} أموال.`;
+            rouletteResult.textContent = `تحطمت الطائرة عند ${currentMultiplier.toFixed(2)}x! لقد خسرت ${betAmount} أموال.`; 
             rouletteResult.classList.remove('hidden');
             window.showMessage(`تحطمت الطائرة عند ${currentMultiplier.toFixed(2)}x! لقد خسرت ${betAmount} أموال.`);
 
             endRound();
         }
 
-        async function endRound() {
-            if (!userId) return;
+        function endRound() {
             gameActive = false;
             cashOutBtn.classList.add('hidden');
             cashOutBtn.disabled = true;
             
-            playerData.rouletteCooldownEndTime = Date.now() + ROULETTE_COOLDOWN_MS;
-            updateUIFromPlayerData();
+            rouletteCooldownEndTime = Date.now() + ROULETTE_COOLDOWN_MS;
+            updateRouletteCooldownUI(); 
+            saveUserData();
         }
 
-        window.showPlayerProfile = function(playerDataProfile) {
-            if (!userId) {
-                window.showMessage("الرجاء تسجيل الدخول أولاً.");
-                return;
-            }
-            profileFleetNameEl.textContent = playerDataProfile.fleetName;
-            profileFleetNameEl.classList.remove('golden-text', 'pink-text', 'fiery-text', 'silver-text', 'blue-glow-text', 'emerald-text', 'royal-crimson-text');
-            if (playerDataProfile.isGoldenNameActive) {
-                profileFleetNameEl.classList.add('golden-text');
-            } else if (playerDataProfile.isPinkNameActive) {
-                profileFleetNameEl.classList.add('pink-text');
-            } else if (playerDataProfile.isFieryNameActive) {
-                profileFleetNameEl.classList.add('fiery-text');
-            } else if (playerDataProfile.isSilverNameActive) {
-                profileFleetNameEl.classList.add('silver-text');
-            } else if (playerDataProfile.isBlueGlowNameActive) {
-                profileFleetNameEl.classList.add('blue-glow-text');
-            } else if (playerDataProfile.isEmeraldNameActive) {
-                profileFleetNameEl.classList.add('emerald-text');
-            } else if (playerDataProfile.isRoyalCrimsonNameActive) {
-                profileFleetNameEl.classList.add('royal-crimson-text');
-            }
-
-            profileStarIconEl.classList.toggle('hidden', !playerDataProfile.isStarIconActive);
-            profileCrownIconEl.classList.toggle('hidden', !playerDataProfile.isCrownIconActive);
-            profileCrownIconEl.classList.toggle('animated-crown-icon', playerDataProfile.isCrownIconActive);
-            
-            profileLionIconEl.classList.toggle('hidden', playerDataProfile.lionCount === 0 || !playerDataProfile.isLionActive);
-            profileLionIconEl.classList.toggle('animated-lion-icon', playerDataProfile.isLionActive);
-            profileLionCountDisplayEl.classList.toggle('hidden', playerDataProfile.lionCount === 0 || !playerDataProfile.isLionActive);
-            profileLionCountDisplayEl.textContent = `x${playerDataProfile.lionCount}`;
-
-
-            profileStatusDotEl.classList.remove('online', 'offline');
-            profileStatusDotEl.classList.add(playerDataProfile.isOnline ? 'online' : 'offline');
-
-            let totalProfilePower = (playerDataProfile.ship1?.power || 0) + (playerDataProfile.ship2?.unlocked ? playerDataProfile.ship2.power : 0) + (playerDataProfile.ship3?.unlocked ? playerDataProfile.ship3.power : 0);
-            if (playerDataProfile.lionCount !== undefined) totalProfilePower += (playerDataProfile.lionCount * 7000);
-            profileTotalPowerEl.textContent = formatNumber(totalProfilePower);
-            profileUserIdEl.textContent = playerDataProfile.userId;
-
-            profileShipsListEl.innerHTML = '';
-            const ships = [
-                { id: 'ship1', name: 'السفينة الأساسية', data: playerDataProfile.ship1 },
-                { id: 'ship2', name: 'السفينة الثانية', data: playerDataProfile.ship2 },
-                { id: 'ship3', name: 'السفينة الثالثة', data: playerDataProfile.ship3 }
-            ];
-
-            ships.forEach(s => {
-                const shipCard = document.createElement('div');
-                shipCard.classList.add('profile-ship-card');
-
-                const shipLevel = s.data ? s.data.level : 0;
-                const shipPower = s.data ? s.data.power : 0;
-                const shipMaxPower = s.data ? s.data.maxPower : INITIAL_SHIP_MAX_POWER;
-                const shipUnlocked = (s.id === 'ship1') || (s.data ? s.data.unlocked : false);
-
-                const iconSrc = getShipIcon(shipLevel);
-                const iconClass = shipUnlocked ? 'unlocked' : 'locked';
-
-                let iconHtml = '';
-                if (iconSrc === 'font-awesome') {
-                    iconHtml = `<i class="fas fa-ship ${shipUnlocked ? 'text-blue-400' : 'text-gray-500'}"></i>`;
-                } else {
-                    iconHtml = `<img src="${iconSrc}" alt="Ship Icon" onerror="this.onerror=null;this.src='https://placehold.co/50x50/21262d/e2e8f0?text=X';" draggable="false" />`;
-                }
-
-                shipCard.innerHTML = `
-                    <div class="icon-container ${iconClass}">
-                        ${iconHtml}
-                    </div>
-                    <div class="info">
-                        <h4>${s.name}</h4>
-                        <p>القوة: ${formatNumber(shipPower)} / ${formatNumber(shipMaxPower)}</p>
-                        <p>المستوى: ${formatNumber(shipLevel)}</p>
-                    </div>
-                `;
-                profileShipsListEl.appendChild(shipCard);
-            });
-
-            playerProfileModal.style.display = 'flex';
-        }
-
-        window.closePlayerProfileModal = function() {
-            playerProfileModal.style.display = 'none';
-        }
-
-        function handleUpgradeShip1Click() { upgradeShip(playerData.ship1); }
-        function handleUpgradeShip2Click() { upgradeShip(playerData.ship2); }
-        function handleUpgradeShip3Click() { upgradeShip(playerData.ship3); }
+        function handleUpgradeShip1Click() { upgradeShip(ship1); }
+        function handleUpgradeShip2Click() { upgradeShip(ship2); }
+        function handleUpgradeShip3Click() { upgradeShip(ship3); }
         function handleCollectResourcesClick() { collectAccumulatedResources(); }
+        function handleConfirmInitialFleetNameClick() { confirmInitialFleetName(); }
         function handleBuyStoreItemClick() { buyStoreItem(); }
         function handleConfirmShipExpansionClick() { confirmShipExpansion(); }
         function handleStartGameClick() { startPlaneGame(); }
         function handleCashOutClick() { cashOut(); }
-        function handleLogoutClick() { logoutUser(); }
-        function handleChangeNameClick() { openChangeFleetNameModal(); }
-        function handleConfirmChangeFleetNameClick() { confirmChangeFleetName(); }
-
+        function handleSelectRandomOpponentClick() { selectRandomOpponent(); }
+        function handlePerformAttackClick() { performAttack(); }
 
         document.addEventListener('DOMContentLoaded', async () => {
             playerPowerEl = document.getElementById('playerPower');
@@ -3702,11 +2583,7 @@
             playerKeysEl = document.getElementById('playerKeys');
             fleetNameEl = document.getElementById('fleetName');
             fleetStarIconEl = document.getElementById('fleetStarIcon');
-            fleetCrownIconEl = document.getElementById('fleetCrownIcon'); 
-            fleetLionIconEl = document.getElementById('fleetLionIcon');
-            lionCountDisplayEl = document.getElementById('lionCountDisplay');
             logoutBtn = document.getElementById('logoutBtn');
-            changeNameBtn = document.getElementById('changeNameBtn');
 
             ship1PowerEl = document.getElementById('ship1Power'); 
             ship1LevelEl = document.getElementById('ship1Level');
@@ -3715,8 +2592,8 @@
             upgradeShip1Btn = document.getElementById('upgradeShip1');
             ship1CooldownDisplay = document.getElementById('ship1CooldownDisplay');
             ship1IconContainerEl = document.querySelector('#myFleet > div > div:nth-child(1) > .icon-container');
-            ship1IconIEl = document.getElementById('ship1IconI');
-            ship1IconImgEl = document.getElementById('ship1IconImg');
+            ship1IconIEl = ship1IconContainerEl.querySelector('i');
+            ship1IconImgEl = ship1IconContainerEl.querySelector('img');
 
             ship2Container = document.getElementById('ship2Container');
             ship2PowerEl = document.getElementById('ship2Power');
@@ -3726,8 +2603,8 @@
             upgradeShip2Btn = document.getElementById('upgradeShip2');
             ship2CooldownDisplay = document.getElementById('ship2CooldownDisplay');
             ship2IconContainerEl = document.querySelector('#ship2Container > .icon-container');
-            ship2IconIEl = document.getElementById('ship2IconI');
-            ship2IconImgEl = document.getElementById('ship2IconImg');
+            ship2IconIEl = ship2IconContainerEl.querySelector('i');
+            ship2IconImgEl = ship2IconContainerEl.querySelector('img');
 
             ship3Container = document.getElementById('ship3Container');
             ship3PowerEl = document.getElementById('ship3Power');
@@ -3737,8 +2614,8 @@
             upgradeShip3Btn = document.getElementById('upgradeShip3'); 
             ship3CooldownDisplay = document.getElementById('ship3CooldownDisplay');
             ship3IconContainerEl = document.querySelector('#ship3Container > .icon-container');
-            ship3IconIEl = document.getElementById('ship3IconI');
-            ship3IconImgEl = document.getElementById('ship3IconImg');
+            ship3IconIEl = ship3IconContainerEl.querySelector('i');
+            ship3IconImgEl = ship3IconContainerEl.querySelector('img');
 
             mainMenuSection = document.getElementById('mainMenu');
             myFleetSection = document.getElementById('myFleet');
@@ -3759,9 +2636,9 @@
             loginBtn = document.getElementById('loginBtn');
             registerBtn = document.getElementById('registerBtn');
 
-            changeFleetNameModal = document.getElementById('changeFleetNameModal');
-            changeFleetNameInput = document.getElementById('changeFleetNameInput');
-            confirmChangeFleetNameBtn = document.getElementById('confirmChangeFleetNameBtn');
+            initialFleetNameModal = document.getElementById('initialFleetNameModal');
+            initialFleetNameInput = document.getElementById('initialFleetNameInput');
+            confirmInitialFleetNameBtn = document.getElementById('confirmInitialFleetNameBtn');
 
             resourceCollectionBtnWrapper = document.getElementById('resourceCollectionBtnWrapper');
             resourceCollectionBtn = document.getElementById('resourceCollectionBtn');
@@ -3773,7 +2650,6 @@
             storeItemDetailModal = document.getElementById('storeItemDetailModal');
             storeItemTitle = document.getElementById('storeItemTitle');
             storeItemIcon = document.getElementById('storeItemIcon');
-            storeItemIconImg = document.getElementById('storeItemIconImg'); 
             storeItemDescription = document.getElementById('storeItemDescription');
             storeItemPrice = document.getElementById('storeItemPrice');
             buyStoreItemBtn = document.getElementById('buyStoreItemBtn');
@@ -3794,48 +2670,45 @@
             onlinePlayersListEl = document.getElementById('onlinePlayersList');
             offlinePlayersListEl = document.getElementById('offlinePlayersList');
             challengeLogListEl = document.getElementById('challengeLogList');
-            attackablePlayersListEl = document.getElementById('attackablePlayersList');
+            attackCooldownDisplayEl = document.getElementById('attackCooldownDisplay');
+            attackOpponentNameEl = document.getElementById('attackOpponentName');
+            attackOpponentPowerEl = document.getElementById('attackOpponentPower');
+            attackBtnEl = document.getElementById('attackBtn');
+            nextOpponentBtnEl = document.getElementById('nextOpponentBtn');
 
-            playerProfileModal = document.getElementById('playerProfileModal'); 
-            profileFleetNameEl = document.getElementById('profileFleetName'); 
-            profileStarIconEl = document.getElementById('profileStarIcon');
-            profileCrownIconEl = document.getElementById('profileCrownIcon');
-            profileLionIconEl = document.getElementById('profileLionIcon');
-            profileLionCountDisplayEl = document.getElementById('profileLionCountDisplay');
-            profileStatusDotEl = document.getElementById('profileStatusDot');
-            profileTotalPowerEl = document.getElementById('profileTotalPower');
-            profileShipsListEl = document.getElementById('profileShipsList');
-            profileUserIdEl = document.getElementById('profileUserId');
 
             upgradeShip1Btn.addEventListener('click', handleUpgradeShip1Click);
             upgradeShip2Btn.addEventListener('click', handleUpgradeShip2Click);
             upgradeShip3Btn.addEventListener('click', handleUpgradeShip3Click);
             resourceCollectionBtnWrapper.addEventListener('click', handleCollectResourcesClick);
+            confirmInitialFleetNameBtn.addEventListener('click', handleConfirmInitialFleetNameClick);
             buyStoreItemBtn.addEventListener('click', handleBuyStoreItemClick);
             document.getElementById('confirmShipExpansionBtn').addEventListener('click', handleConfirmShipExpansionClick); 
             startGameBtn.addEventListener('click', handleStartGameClick);
             cashOutBtn.addEventListener('click', handleCashOutClick);
-            logoutBtn.addEventListener('click', handleLogoutClick); 
-            loginBtn.addEventListener('click', handleLogin);
-            registerBtn.addEventListener('click', handleRegister);
-            changeNameBtn.addEventListener('click', handleChangeNameClick);
-            confirmChangeFleetNameBtn.addEventListener('click', handleConfirmChangeFleetNameClick);
+            attackBtnEl.addEventListener('click', handlePerformAttackClick); 
+            nextOpponentBtnEl.addEventListener('click', handleSelectRandomOpponentClick); 
 
-            setInterval(updateUIFromPlayerData, 1000); 
+            loginBtn.addEventListener('click', loginUser);
+            registerBtn.addEventListener('click', registerUser);
+            logoutBtn.addEventListener('click', logoutUser);
+
+            setInterval(updateAllShipCooldowns, 1000);
             setInterval(autoAccumulateResources, RESOURCE_ACCUMULATION_INTERVAL_MS);
+            setInterval(updateResourceButtonState, 1000); 
+            setInterval(updateRouletteCooldownUI, 1000); 
+            setInterval(updateAttackCooldownUI, 1000); 
 
+            const loadedFromLocal = loadDataFromLocalStorage();
+            if (!loadedFromLocal) {
+                authModal.style.display = 'flex';
+            }
             await initializeFirebase();
-
-            document.addEventListener('contextmenu', event => event.preventDefault());
-            document.addEventListener('dragstart', event => event.preventDefault());
-            document.addEventListener('selectstart', event => event.preventDefault());
         });
 
         window.addEventListener('beforeunload', async () => {
             if (userId) {
                 await updateOnlineStatus(false);
-                saveToLocalStorage();
-                await saveUserDataToFirebase();
             }
         });
     </script>
