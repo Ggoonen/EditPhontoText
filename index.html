@@ -1275,7 +1275,7 @@
             <div class="grid grid-cols-2 md:grid-cols-3 gap-6">
                 <!-- Essential Items -->
                 <div class="store-item bg-gray-700" onclick="showStoreItemDetail('completeUpgrade')">
-                    <img src="https://c.top4top.io/p_3482irls40.png" alt="Complete Upgrade Icon" draggable="false">
+                    <img src="https://e.top4top.io/p_348281x7t0.png" alt="Complete Upgrade Icon" draggable="false">
                     <h3>إكمال التطوير</h3>
                     <div class="price-display">
                         <span>3</span> <i class="fas fa-key"></i>
@@ -1296,7 +1296,7 @@
                     </div>
                 </div>
                 <div class="store-item bg-gray-700" onclick="showStoreItemDetail('vipBox')">
-                    <img src="https://c.top4top.io/p_3482irls40.png" alt="VIP Box Icon" draggable="false">
+                    <img src="https://e.top4top.io/p_348281x7t0.png" alt="VIP Box Icon" draggable="false">
                     <h3>صندوق VIP</h3>
                     <div class="price-display">
                         <span>3500</span> <i class="fas fa-dollar-sign"></i>
@@ -1468,7 +1468,7 @@
         <div class="modal-content">
             <span class="close-button" onclick="closeStoreItemDetailModal(true)">&times;</span>
             <h2 id="storeItemTitle"></h2>
-            <i id="storeItemIcon" class="item-icon"></i>
+            <i id="storeItemIcon" class="item-icon hidden"></i>
             <img id="storeItemIconImg" src="" alt="Item Icon" class="item-icon-img hidden" draggable="false">
             <p id="storeItemDescription" class="item-description"></p>
             <p id="storeItemPrice" class="item-price"></p>
@@ -1579,8 +1579,8 @@
         let isStarIconActive = false;
         let isCrownIconOwned = false; 
         let isCrownIconActive = false;
-        let isRareLionOwned = false; // New: Lion owned status
-        let isRareLionActive = false; // New: Lion active status (always active if owned)
+        let isRareLionOwned = false; 
+        let isRareLionActive = false; 
 
         const INITIAL_SHIP_MAX_POWER = 10000;
         const UPGRADE_COOLDOWN_MS = 3 * 60 * 1000;
@@ -1601,7 +1601,8 @@
         const storeItems = {
             completeUpgrade: {
                 title: 'إكمال التطوير',
-                icon: 'https://c.top4top.io/p_3482irls40.png', // Updated image URL
+                iconType: 'image', 
+                icon: 'https://e.top4top.io/p_348281x7t0.png', 
                 description: 'ينهي وقت انتظار تطوير السفن.',
                 price: 3, 
                 currency: 'key',
@@ -1609,6 +1610,7 @@
             },
             shipExpansion: {
                 title: 'توسيع السفينة',
+                iconType: 'font-awesome', 
                 icon: 'fas fa-expand-arrows-alt text-blue-400',
                 description: 'يزيد الحد الأقصى لقوة السفينة المختارة بمقدار 5000 نقطة قوة إضافية. يمكن شراء هذا التوسيع عدة مرات لأي سفينة.',
                 price: 50, 
@@ -1617,6 +1619,7 @@
             },
             buyKeys: { 
                 title: 'شراء مفاتيح',
+                iconType: 'font-awesome', 
                 icon: 'fas fa-key text-yellow-400',
                 description: 'احصل على المزيد من المفاتيح لفتح الميزات أو إكمال التطوير.',
                 price: 150, 
@@ -1624,9 +1627,10 @@
                 amount: 1,
                 type: 'utility'
             },
-            vipBox: { // New VIP Box item
+            vipBox: { 
                 title: 'صندوق VIP',
-                icon: 'https://c.top4top.io/p_3482irls40.png', 
+                iconType: 'image', 
+                icon: 'https://e.top4top.io/p_348281x7t0.png', 
                 description: 'احصل على مكافآت عشوائية قيمة!',
                 price: 3500,
                 currency: 'money',
@@ -1634,6 +1638,7 @@
             },
             goldenName: {
                 title: 'اسم ذهبي متحرك',
+                iconType: 'font-awesome', 
                 icon: 'fas fa-crown text-yellow-400',
                 description: 'اجعل اسم أسطولك يتوهج بالذهب.',
                 price: 1500,
@@ -1644,6 +1649,7 @@
             },
             pinkName: { 
                 title: 'اسم وردي متحرك',
+                iconType: 'font-awesome', 
                 icon: 'fas fa-heart text-pink-500',
                 description: 'اجعل اسم أسطولك يتوهج باللون الوردي.',
                 price: 1500,
@@ -1654,6 +1660,7 @@
             },
             fieryName: { 
                 title: 'اسم ناري ملتهب',
+                iconType: 'font-awesome', 
                 icon: 'fas fa-fire text-orange-500',
                 description: 'اجعل اسم أسطولك يتوهج بالنار.',
                 price: 2000,
@@ -1664,6 +1671,7 @@
             },
             starIcon: {
                 title: 'أيقونة النجمة',
+                iconType: 'font-awesome', 
                 icon: 'fas fa-star text-yellow-300',
                 description: 'أضف نجمة لامعة بجانب اسمك.',
                 price: 3000,
@@ -1674,6 +1682,7 @@
             },
             crownIcon: { 
                 title: 'أيقونة تاج ذهبي',
+                iconType: 'font-awesome', 
                 icon: 'fas fa-chess-king text-yellow-400',
                 description: 'أضف تاجاً ذهبياً متحركاً بجانب اسمك.',
                 price: 5000,
@@ -1701,7 +1710,7 @@
         let fleetNameEl;
         let fleetStarIconEl;
         let fleetCrownIconEl; 
-        let fleetLionIconEl; // New element for lion icon
+        let fleetLionIconEl; 
         let logoutBtn;
 
         let ship1PowerEl;
@@ -1771,7 +1780,7 @@
         let storeItemDetailModal;
         let storeItemTitle;
         let storeItemIcon;
-        let storeItemIconImg; // For image icons in modal
+        let storeItemIconImg; 
         let storeItemDescription;
         let storeItemPrice;
         let buyStoreItemBtn;
@@ -1799,13 +1808,13 @@
         let profileFleetNameEl; 
         let profileStarIconEl; 
         let profileCrownIconEl; 
-        let profileLionIconEl; // New element for lion icon in profile
+        let profileLionIconEl; 
         let profileStatusDotEl; 
         let profileTotalPowerEl; 
         let profileShipsListEl; 
         let profileUserIdEl; 
 
-        let rareLionModal; // New modal for rare lion acquisition
+        let rareLionModal; 
 
         const shipFormsData = [
             { levelRange: '1 - 1000', iconType: 'font-awesome', iconClass: 'fas fa-ship', imgSrc: '' },
@@ -2205,6 +2214,9 @@
                 if (playerData.ship1 && playerData.ship1.power !== undefined) totalPower += playerData.ship1.power;
                 if (playerData.ship2 && playerData.ship2.unlocked && playerData.ship2.power !== undefined) totalPower += playerData.ship2.power;
                 if (playerData.ship3 && playerData.ship3.unlocked && playerData.ship3.power !== undefined) totalPower += playerData.ship3.power;
+                if (playerData.isRareLionActive) { // Include lion power for other players
+                    totalPower += 5000;
+                }
                 return totalPower;
             };
 
@@ -2223,7 +2235,7 @@
                 if (player.isCrownIconActive) { 
                     fleetNameHtml += `<i class="fas fa-chess-king text-yellow-400 ml-1 animated-crown-icon"></i>`;
                 }
-                if (player.isRareLionActive) { // Display lion icon
+                if (player.isRareLionActive) { 
                     fleetNameHtml += `<img src="https://d.top4top.io/p_3482hpjya1.png" alt="Lion" class="w-5 h-5 inline-block ml-1" draggable="false">`;
                 }
 
@@ -2404,6 +2416,9 @@
 
             let win = false;
             const opponentTotalPower = (opponent.ship1?.power || 0) + (opponent.ship2?.unlocked ? opponent.ship2.power : 0) + (opponent.ship3?.unlocked ? opponent.ship3.power : 0);
+            if (opponent.isRareLionActive) {
+                opponentTotalPower += 5000;
+            }
 
             if (playerPower > opponentTotalPower) {
                 win = Math.random() < 0.9; 
@@ -2537,7 +2552,6 @@
 
         function updatePlayerStats() {
             playerPower = ship1.power + (ship2.unlocked ? ship2.power : 0) + (ship3.unlocked ? ship3.power : 0);
-            // Add power from rare lion if active
             if (isRareLionActive) {
                 playerPower += 5000;
             }
@@ -2568,7 +2582,7 @@
                 fleetCrownIconEl.classList.add('hidden');
                 fleetCrownIconEl.classList.remove('animated-crown-icon');
             }
-            if (isRareLionActive) { // Show/hide lion icon
+            if (isRareLionActive) { 
                 fleetLionIconEl.src = 'https://d.top4top.io/p_3482hpjya1.png';
                 fleetLionIconEl.classList.remove('hidden');
             } else {
@@ -2785,8 +2799,7 @@
 
             storeItemTitle.textContent = item.title;
             
-            // Handle icon display (Font Awesome vs Image)
-            if (item.icon.startsWith('fas ')) {
+            if (item.iconType === 'font-awesome') {
                 storeItemIcon.className = `item-icon ${item.icon}`;
                 storeItemIcon.classList.remove('hidden');
                 storeItemIconImg.classList.add('hidden');
@@ -2847,8 +2860,8 @@
         window.closeStoreItemDetailModal = function(returnToStore = false) {
             storeItemDetailModal.style.display = 'none';
             storeItemTitle.classList.remove('golden-text', 'pink-text', 'fiery-text'); 
-            storeItemIcon.classList.add('hidden'); // Hide font awesome icon
-            storeItemIconImg.classList.add('hidden'); // Hide image icon
+            storeItemIcon.classList.add('hidden'); 
+            storeItemIconImg.classList.add('hidden'); 
             currentStoreItemKey = null;
             if (returnToStore) {
                 window.showSection('store');
@@ -3320,7 +3333,7 @@
                 profileCrownIconEl.classList.add('hidden');
                 profileCrownIconEl.classList.remove('animated-crown-icon');
             }
-            if (playerData.isRareLionActive) { // Display lion icon in profile
+            if (playerData.isRareLionActive) { 
                 profileLionIconEl.src = 'https://d.top4top.io/p_3482hpjya1.png';
                 profileLionIconEl.classList.remove('hidden');
             } else {
@@ -3470,7 +3483,7 @@
             storeItemDetailModal = document.getElementById('storeItemDetailModal');
             storeItemTitle = document.getElementById('storeItemTitle');
             storeItemIcon = document.getElementById('storeItemIcon');
-            storeItemIconImg = document.getElementById('storeItemIconImg'); // Get new element
+            storeItemIconImg = document.getElementById('storeItemIconImg'); 
             storeItemDescription = document.getElementById('storeItemDescription');
             storeItemPrice = document.getElementById('storeItemPrice');
             buyStoreItemBtn = document.getElementById('buyStoreItemBtn');
