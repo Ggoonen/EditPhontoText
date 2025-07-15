@@ -255,6 +255,19 @@
         .header-logout-btn:hover {
             background-color: #ef4444;
         }
+        .change-name-btn {
+            background-color: #4a5568;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-right: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .change-name-btn:hover {
+            background-color: #6b7280;
+        }
 
         .pill-style-item {
             border-radius: 50px;
@@ -1125,6 +1138,9 @@
             padding: 24px;
             text-align: center;
         }
+        #changeFleetNameModal .modal-content {
+            max-width: 400px;
+        }
     </style>
 </head>
 <body class="bg-gray-900 min-h-screen flex flex-col" oncontextmenu="return false;">
@@ -1148,6 +1164,15 @@
         </div>
     </div>
 
+    <div id="changeFleetNameModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeChangeFleetNameModal()">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">تغيير اسم الأسطول</h2>
+            <input type="text" id="changeFleetNameInput" placeholder="اسم الأسطول الجديد" class="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="confirmChangeFleetNameBtn" class="btn btn-primary w-full">تأكيد التغيير</button>
+        </div>
+    </div>
+
     <header class="header-container w-full">
         <div class="header-stats-grid w-full max-w-4xl mx-auto">
             <div class="header-item">
@@ -1168,6 +1193,8 @@
             <i id="fleetStarIcon" class="fas fa-star text-yellow-300 hidden"></i>
             <i id="fleetCrownIcon" class="fas fa-chess-king text-yellow-400 hidden"></i>
             <img id="fleetLionIcon" src="https://d.top4top.io/p_3482hpjya1.png" alt="Lion Icon" class="w-6 h-6 ml-1 hidden animated-lion-icon" draggable="false">
+            <span id="lionCountDisplay" class="text-xs text-gray-400 ml-1 hidden">x0</span>
+            <button id="changeNameBtn" class="change-name-btn">تغيير الاسم</button>
         </div>
         <div class="text-center mt-2">
             <button id="logoutBtn" class="header-logout-btn">تسجيل الخروج</button>
@@ -1520,6 +1547,7 @@
                 <i id="profileStarIcon" class="fas fa-star text-yellow-300 hidden"></i>
                 <i id="profileCrownIcon" class="fas fa-chess-king text-yellow-400 hidden"></i>
                 <img id="profileLionIcon" src="https://d.top4top.io/p_3482hpjya1.png" alt="Lion Icon" class="w-6 h-6 ml-1 hidden animated-lion-icon" draggable="false">
+                <span id="profileLionCountDisplay" class="text-xs text-gray-400 ml-1 hidden">x0</span>
                 <div id="profileStatusDot" class="status-dot"></div>
             </div>
             <div class="profile-stats-grid">
@@ -1547,9 +1575,8 @@
         import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         // Firebase configuration provided directly by the user.
-        // تم تعيين إعدادات Firebase مباشرة من البيانات التي قدمتها أنت، لتجنب أي تضارب محتمل مع بيئة Canvas.
         const firebaseConfig = {
-            apiKey: "AIzaSyBAepZChU6qfWGTQDrzEpJm_TRIrr6vhq8", // مفتاح الـ API الصحيح الذي قدمته
+            apiKey: "AIzaSyBAepZChU6qfWGTQDrzEpJm_TRIrr6vhq8",
             authDomain: "mygame-7c747.firebaseapp.com",
             databaseURL: "https://mygame-7c747-default-rtdb.firebaseio.com",
             projectId: "mygame-7c747",
@@ -1559,8 +1586,6 @@
             measurementId: "G-XDP3YKZGH3"
         };
         
-        // استخدام projectId كـ appId
-        // Using projectId as appId
         const appId = firebaseConfig.projectId; 
 
         let app;
@@ -1586,12 +1611,12 @@
         let isStarIconActive = false;
         let isCrownIconOwned = false; 
         let isCrownIconActive = false;
-        let isLionOwned = false; // New: Lion ownership
-        let isLionActive = false; // New: Lion active state
+        let lionCount = 0; // Changed from isLionOwned to a count
+        let isLionActive = false; // Lion active state (for cosmetic display)
 
         const INITIAL_SHIP_MAX_POWER = 10000;
         const UPGRADE_COOLDOWN_MS = 3 * 60 * 1000;
-        const ATTACK_COOLDOWN_GLOBAL_MS = 5 * 60 * 1000; /* Changed to 5 minutes */
+        const ATTACK_COOLDOWN_GLOBAL_MS = 5 * 60 * 1000;
 
         let globalAttackCooldownEndTime = 0;
         let lastAttackedOpponentId = null; 
@@ -1609,9 +1634,9 @@
             completeUpgrade: {
                 title: 'إكمال التطوير',
                 iconType: 'image', 
-                icon: 'https://c.top4top.io/p_3482irls40.png', /* Updated icon */
+                icon: 'https://c.top4top.io/p_3482irls40.png',
                 description: 'ينهي وقت انتظار تطوير السفن.',
-                price: 2, /* Changed price to 2 keys */
+                price: 2,
                 currency: 'key',
                 type: 'utility'
             },
@@ -1648,7 +1673,7 @@
                 iconType: 'font-awesome', 
                 icon: 'fas fa-crown text-yellow-400',
                 description: 'اجعل اسم أسطولك يتوهج بالذهب.',
-                price: 3000, /* Changed price to 3000 money */
+                price: 3000,
                 currency: 'money',
                 type: 'name_cosmetic',
                 ownedKey: 'isGoldenNameOwned',
@@ -1706,7 +1731,7 @@
                 price: '-', // Not directly purchasable with money/keys
                 currency: 'none',
                 type: 'icon_cosmetic',
-                ownedKey: 'isLionOwned',
+                ownedKey: 'lionCount', // This will now refer to lionCount
                 activeKey: 'isLionActive'
             }
         };
@@ -1728,8 +1753,10 @@
         let fleetNameEl;
         let fleetStarIconEl;
         let fleetCrownIconEl; 
-        let fleetLionIconEl; // New: Lion icon element
+        let fleetLionIconEl;
+        let lionCountDisplayEl; // New element for lion count
         let logoutBtn;
+        let changeNameBtn; // New button for changing name
 
         let ship1PowerEl;
         let ship1LevelEl;
@@ -1786,6 +1813,10 @@
         let initialFleetNameInput;
         let confirmInitialFleetNameBtn;
 
+        let changeFleetNameModal; // New modal for changing fleet name
+        let changeFleetNameInput;
+        let confirmChangeFleetNameBtn;
+
         let resourceCollectionBtnWrapper;
         let resourceCollectionBtn;
         let accumulatedResourcesDisplay;
@@ -1826,7 +1857,8 @@
         let profileFleetNameEl; 
         let profileStarIconEl; 
         let profileCrownIconEl; 
-        let profileLionIconEl; // New: Lion icon element in profile
+        let profileLionIconEl;
+        let profileLionCountDisplayEl; // New element for lion count in profile
         let profileStatusDotEl; 
         let profileTotalPowerEl; 
         let profileShipsListEl; 
@@ -1861,18 +1893,14 @@
 
         async function initializeFirebase() {
             try {
-                // Initializing Firebase with the explicitly provided configuration
-                // تهيئة Firebase باستخدام الإعدادات المقدمة مباشرة
                 app = initializeApp(firebaseConfig);
                 db = getDatabase(app);
                 auth = getAuth(app);
 
                 // Set Firebase Auth persistence to LOCAL
-                // تعيين استمرارية مصادقة Firebase إلى LOCAL
                 await setPersistence(auth, browserLocalPersistence);
 
                 // Show auth modal initially, it will be hidden if user is already logged in
-                // عرض نافذة المصادقة في البداية، وسيتم إخفاؤها إذا كان المستخدم مسجلاً للدخول بالفعل
                 authModal.style.display = 'flex';
 
                 onAuthStateChanged(auth, async (user) => {
@@ -1887,7 +1915,6 @@
                         onDisconnect(lastSeenRef).set(serverTimestamp());
 
                         // Fetch or create user data BEFORE deciding to show fleet name modal or main menu
-                        // جلب أو إنشاء بيانات المستخدم قبل اتخاذ قرار عرض نافذة اسم الأسطول أو القائمة الرئيسية
                         await fetchOrCreateUserData(); 
 
                         await updateOnlineStatus(true); 
@@ -1896,7 +1923,7 @@
                         authModal.style.display = 'none'; // Hide auth modal once user data is loaded
 
                         // Only show initial fleet name modal if fleetName is still default/null after loading
-                        // عرض نافذة اسم الأسطول الأولية فقط إذا كان اسم الأسطول لا يزال افتراضياً/فارغاً بعد التحميل
+                        // This ensures that if a user logs in from another device, they don't get prompted again
                         if (fleetName === null || fleetName === "أسطولي العظيم") {
                             initialFleetNameModal.style.display = 'flex';
                         } else {
@@ -1955,7 +1982,6 @@
                 window.showMessage('تم تسجيل الخروج بنجاح!');
 
                 // Reset all local player data
-                // إعادة تعيين جميع بيانات اللاعب المحلية
                 playerMoney = 0;
                 playerKeys = 0;
                 playerPower = 0; 
@@ -1970,7 +1996,7 @@
                 isStarIconActive = false;
                 isCrownIconOwned = false; 
                 isCrownIconActive = false;
-                isLionOwned = false; // Reset lion ownership
+                lionCount = 0; // Reset lion count
                 isLionActive = false; // Reset lion active state
                 ship1 = { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
                 ship2 = { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
@@ -2015,7 +2041,7 @@
                     isStarIconActive = data.isStarIconActive !== undefined ? data.isStarIconActive : false;
                     isCrownIconOwned = data.isCrownIconOwned !== undefined ? data.isCrownIconOwned : false; 
                     isCrownIconActive = data.isCrownIconActive !== undefined ? data.isCrownIconActive : false; 
-                    isLionOwned = data.isLionOwned !== undefined ? data.isLionOwned : false; // Load lion ownership
+                    lionCount = data.lionCount !== undefined ? data.lionCount : 0; // Load lion count
                     isLionActive = data.isLionActive !== undefined ? data.isLionActive : false; // Load lion active state
 
                     ship1 = { 
@@ -2045,7 +2071,6 @@
 
                 } else {
                     // If no data exists, initialize with default values
-                    // إذا لم تكن هناك بيانات، قم بالتهيئة بالقيم الافتراضية
                     fleetName = "أسطولي العظيم"; // Default fleet name
                     playerMoney = 100;
                     playerKeys = 1;
@@ -2059,7 +2084,7 @@
                     isStarIconActive = false;
                     isCrownIconOwned = false;
                     isCrownIconActive = false;
-                    isLionOwned = false; // Default lion ownership
+                    lionCount = 0; // Default lion count
                     isLionActive = false; // Default lion active state
                     ship1 = { power: 0, level: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
                     ship2 = { power: 0, level: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER };
@@ -2082,7 +2107,7 @@
                         isStarIconActive: isStarIconActive,
                         isCrownIconOwned: isCrownIconOwned, 
                         isCrownIconActive: isCrownIconActive,
-                        isLionOwned: isLionOwned, // Save lion ownership
+                        lionCount: lionCount, // Save lion count
                         isLionActive: isLionActive, // Save lion active state
                         ship1: ship1,
                         ship2: ship2,
@@ -2116,7 +2141,7 @@
                     isStarIconActive: isStarIconActive,
                     isCrownIconOwned: isCrownIconOwned, 
                     isCrownIconActive: isCrownIconActive,
-                    isLionOwned: isLionOwned, // Save lion ownership
+                    lionCount: lionCount, // Save lion count
                     isLionActive: isLionActive, // Save lion active state
                     ship1: ship1,
                     ship2: ship2,
@@ -2137,7 +2162,7 @@
                 const dataToSave = {
                     userId: userId,
                     fleetName: fleetName,
-                    power: playerPower,
+                    power: playerPower, // This will include lion power
                     isOnline: isOnline,
                     lastSeen: Date.now(),
                     ship1: { power: ship1.power, level: ship1.level, unlocked: true, maxPower: ship1.maxPower }, 
@@ -2148,7 +2173,8 @@
                     isFieryNameActive: isFieryNameActive, 
                     isStarIconActive: isStarIconActive,
                     isCrownIconActive: isCrownIconActive,
-                    isLionActive: isLionActive // Include lion active state in public data
+                    isLionActive: isLionActive, // Include lion active state in public data
+                    lionCount: lionCount // Include lion count in public data
                 };
                 await set(playerStatusRef, dataToSave);
             } catch (error) {
@@ -2215,9 +2241,7 @@
                 if (playerData.ship1 && playerData.ship1.power !== undefined) totalPower += playerData.ship1.power;
                 if (playerData.ship2 && playerData.ship2.unlocked && playerData.ship2.power !== undefined) totalPower += playerData.ship2.power;
                 if (playerData.ship3 && playerData.ship3.unlocked && playerData.ship3.power !== undefined) totalPower += playerData.ship3.power;
-                // Lion power is not part of ship power, but part of player's total power
-                // قوة الأسد ليست جزءًا من قوة السفينة، ولكنها جزء من إجمالي قوة اللاعب
-                if (playerData.isLionActive) totalPower += 7000; 
+                if (playerData.lionCount !== undefined) totalPower += (playerData.lionCount * 7000); 
                 return totalPower;
             };
 
@@ -2236,8 +2260,9 @@
                 if (player.isCrownIconActive) { 
                     fleetNameHtml += `<i class="fas fa-chess-king text-yellow-400 ml-1 animated-crown-icon"></i>`;
                 }
-                if (player.isLionActive) { // Add lion icon to online players list
+                if (player.isLionActive && player.lionCount > 0) {
                     fleetNameHtml += `<img src="https://d.top4top.io/p_3482hpjya1.png" alt="Lion Icon" class="w-4 h-4 ml-1 animated-lion-icon" draggable="false">`;
+                    fleetNameHtml += `<span class="text-xs text-gray-400 ml-1">x${player.lionCount}</span>`;
                 }
 
                 const totalPower = getPlayerTotalPower(player);
@@ -2363,13 +2388,11 @@
 
             const cooldownActive = globalAttackCooldownEndTime > Date.now();
             if (cooldownActive && lastAttackedOpponentId) {
-                // If cooldown is active, only show the last attacked opponent if they are still online
-                // Otherwise, show all other players.
                 const lastOpponent = otherPlayers.find(p => p.userId === lastAttackedOpponentId);
                 if (lastOpponent) {
                     otherPlayers = [lastOpponent];
                 } else {
-                    otherPlayers = []; // If last opponent went offline, no one to attack during cooldown
+                    otherPlayers = [];
                 }
             }
 
@@ -2382,10 +2405,8 @@
                 const li = document.createElement('div');
                 li.className = 'attack-player-item';
 
-                const strongestPower = Math.max(opponent.ship1.power || 0, opponent.ship2.power || 0, opponent.ship3.power || 0);
-                // Add lion power to opponent's total power for display
-                // إضافة قوة الأسد إلى إجمالي قوة الخصم للعرض
-                if (opponent.isLionActive) strongestPower += 7000;
+                let opponentTotalPower = (opponent.ship1?.power || 0) + (opponent.ship2?.unlocked ? opponent.ship2.power : 0) + (opponent.ship3?.unlocked ? opponent.ship3.power : 0);
+                if (opponent.lionCount !== undefined) opponentTotalPower += (opponent.lionCount * 7000);
                 
                 const cooldownRemaining = globalAttackCooldownEndTime - Date.now();
                 const isOnCooldown = cooldownRemaining > 0;
@@ -2401,8 +2422,9 @@
                 if (opponent.isCrownIconActive) { 
                     fleetNameHtml += `<i class="fas fa-chess-king text-yellow-400 ml-1 animated-crown-icon"></i>`;
                 }
-                if (opponent.isLionActive) { // Add lion icon to attackable players list
+                if (opponent.isLionActive && opponent.lionCount > 0) {
                     fleetNameHtml += `<img src="https://d.top4top.io/p_3482hpjya1.png" alt="Lion Icon" class="w-4 h-4 ml-1 animated-lion-icon" draggable="false">`;
+                    fleetNameHtml += `<span class="text-xs text-gray-400 ml-1">x${opponent.lionCount}</span>`;
                 }
 
                 let shipsHtml = `<div class="online-player-ships">`;
@@ -2433,7 +2455,7 @@
                     <div class="player-info">
                         ${fleetNameHtml}
                         <p>
-                            <i class="fas fa-fist-raised text-red-500"></i> ${formatNumber(strongestPower)}
+                            <i class="fas fa-fist-raised text-red-500"></i> ${formatNumber(opponentTotalPower)}
                         </p>
                     </div>
                     <div class="attack-btn-wrapper">
@@ -2447,9 +2469,8 @@
                 const attackButton = li.querySelector('.attack-player-btn');
                 attackButton.addEventListener('click', () => performAttack(opponent));
 
-                // Add click listener to show player profile
                 li.querySelector('.player-info').addEventListener('click', (event) => {
-                    event.stopPropagation(); // Prevent attack button from being triggered if clicked on info
+                    event.stopPropagation();
                     showPlayerProfile(opponent);
                 });
             });
@@ -2467,7 +2488,7 @@
 
             let win = false;
             let opponentTotalPower = (opponent.ship1?.power || 0) + (opponent.ship2?.unlocked ? opponent.ship2.power : 0) + (opponent.ship3?.unlocked ? opponent.ship3.power : 0);
-            if (opponent.isLionActive) opponentTotalPower += 7000; // Add opponent's lion power to calculation
+            if (opponent.lionCount !== undefined) opponentTotalPower += (opponent.lionCount * 7000);
 
             if (playerPower > opponentTotalPower) {
                 win = Math.random() < 0.9; 
@@ -2597,8 +2618,8 @@
         }
 
         function updatePlayerStats() {
-            playerPower = ship1.power + (ship2.unlocked ? ship2.power : 0) + (ship3.unlocked ? ship3.power : 0);
-            if (isLionActive) playerPower += 7000; // Add lion power to total player power
+            let baseShipPower = ship1.power + (ship2.unlocked ? ship2.power : 0) + (ship3.unlocked ? ship3.power : 0);
+            playerPower = baseShipPower + (lionCount * 7000); // Add lion power to total player power
 
             playerPowerEl.textContent = formatNumber(playerPower);
             playerMoneyEl.textContent = formatNumber(playerMoney);
@@ -2615,12 +2636,14 @@
             }
 
             // Handle icon visibility and animation
-            // التعامل مع رؤية الأيقونة والرسوم المتحركة
             fleetStarIconEl.classList.toggle('hidden', !isStarIconActive);
             fleetCrownIconEl.classList.toggle('hidden', !isCrownIconActive);
             fleetCrownIconEl.classList.toggle('animated-crown-icon', isCrownIconActive);
-            fleetLionIconEl.classList.toggle('hidden', !isLionActive); // Show/hide lion icon
-            fleetLionIconEl.classList.toggle('animated-lion-icon', isLionActive); // Animate lion icon
+            
+            fleetLionIconEl.classList.toggle('hidden', lionCount === 0 || !isLionActive); // Show/hide lion icon based on count AND active state
+            fleetLionIconEl.classList.toggle('animated-lion-icon', isLionActive); // Animate if active
+            lionCountDisplayEl.classList.toggle('hidden', lionCount === 0 || !isLionActive); // Show/hide lion count
+            lionCountDisplayEl.textContent = `x${lionCount}`;
 
             saveUserData(); 
         }
@@ -2865,18 +2888,35 @@
 
             const buyBtn = document.getElementById('buyStoreItemBtn');
             if (item.type === 'name_cosmetic' || item.type === 'icon_cosmetic') {
-                const isOwned = window[item.ownedKey];
+                // For Lion, ownedKey is lionCount, not a boolean
+                const isOwned = (item.ownedKey === 'lionCount') ? (lionCount > 0) : window[item.ownedKey];
                 const isActive = window[item.activeKey];
 
                 if (isOwned) {
-                    if (isActive) {
-                        buyBtn.textContent = 'إلغاء تفعيل';
-                        buyBtn.classList.remove('bg-blue-600');
-                        buyBtn.classList.add('bg-gray-600');
-                    } else {
-                        buyBtn.textContent = 'تفعيل';
-                        buyBtn.classList.remove('bg-gray-600');
-                        buyBtn.classList.add('bg-blue-600');
+                    if (item.type === 'name_cosmetic') {
+                        isGoldenNameActive = false;
+                        isPinkNameActive = false;
+                        isFieryNameActive = false;
+                        if (!isActive) {
+                            window[item.activeKey] = true;
+                            buyBtn.textContent = 'تفعيل';
+                            buyBtn.classList.remove('bg-gray-600');
+                            buyBtn.classList.add('bg-blue-600');
+                        } else {
+                            buyBtn.textContent = 'إلغاء تفعيل';
+                            buyBtn.classList.remove('bg-blue-600');
+                            buyBtn.classList.add('bg-gray-600');
+                        }
+                    } else if (item.type === 'icon_cosmetic') {
+                        if (!isActive) {
+                            buyBtn.textContent = 'تفعيل';
+                            buyBtn.classList.remove('bg-gray-600');
+                            buyBtn.classList.add('bg-blue-600');
+                        } else {
+                            buyBtn.textContent = 'إلغاء تفعيل';
+                            buyBtn.classList.remove('bg-blue-600');
+                            buyBtn.classList.add('bg-gray-600');
+                        }
                     }
                     buyBtn.disabled = false; // Enable button for owned cosmetics
                 } else {
@@ -2884,7 +2924,6 @@
                     buyBtn.classList.remove('bg-gray-600');
                     buyBtn.classList.add('bg-blue-600');
                     // Disable buy button for lion if not owned (can only be won)
-                    // تعطيل زر الشراء للأسد إذا لم يكن مملوكًا (يمكن الفوز به فقط)
                     if (itemKey === 'lionIcon') {
                         buyBtn.disabled = true;
                         buyBtn.textContent = 'يمكن الحصول عليه من صندوق الحظ';
@@ -2892,7 +2931,7 @@
                         buyBtn.disabled = false;
                     }
                 }
-            } else {
+            } else { // Utility or Lucky Box
                 buyBtn.textContent = 'شراء';
                 buyBtn.classList.remove('bg-gray-600');
                 buyBtn.classList.add('bg-blue-600');
@@ -2944,17 +2983,9 @@
                     const rand = Math.random() * 100;
 
                     if (rand < 9) { // 9% chance for Lion
-                        if (!isLionOwned) {
-                            isLionOwned = true;
-                            isLionActive = true; // Activate lion upon winning
-                            message = prizeMessage + "الأسد المتوهج! (7000 قوة إضافية)";
-                        } else {
-                            // If already owned, give a fallback prize (e.g., more keys)
-                            // إذا كان مملوكًا بالفعل، امنح جائزة بديلة (مثل المزيد من المفاتيح)
-                            const keysGain = Math.floor(Math.random() * (25 - 14 + 1)) + 14;
-                            playerKeys += keysGain;
-                            message = prizeMessage + `${keysGain} مفتاح (كان لديك الأسد بالفعل).`;
-                        }
+                        lionCount++; // Increment lion count
+                        isLionActive = true; // Activate lion upon winning
+                        message = prizeMessage + `الأسد المتوهج! (7000 قوة إضافية). لديك الآن ${lionCount} أسد متوهج.`;
                     } else if (rand < (9 + 15)) { // 15% chance for Money
                         const moneyGain = Math.floor(Math.random() * (1900 - 500 + 1)) + 500;
                         playerMoney += moneyGain;
@@ -2973,13 +3004,13 @@
                     message = `ليس لديك ما يكفي من الأموال لشراء صندوق الحظ (${formatNumber(item.price)} أموال).`;
                 }
             } else if (item.type === 'name_cosmetic' || item.type === 'icon_cosmetic') {
-                const isOwned = window[item.ownedKey];
+                // For Lion, ownedKey is lionCount, not a boolean
+                const isOwned = (item.ownedKey === 'lionCount') ? (lionCount > 0) : window[item.ownedKey];
                 const isActive = window[item.activeKey];
 
                 if (isOwned) {
                     if (item.type === 'name_cosmetic') {
                         // Deactivate all name cosmetics first
-                        // إلغاء تفعيل جميع مستحضرات التجميل الاسمية أولاً
                         isGoldenNameActive = false;
                         isPinkNameActive = false;
                         isFieryNameActive = false;
@@ -2991,7 +3022,6 @@
                         }
                     } else if (item.type === 'icon_cosmetic') {
                         // Deactivate all icon cosmetics first
-                        // إلغاء تفعيل جميع مستحضرات التجميل الأيقونية أولاً
                         isStarIconActive = false;
                         isCrownIconActive = false;
                         isLionActive = false; // Deactivate lion icon too
@@ -3003,7 +3033,7 @@
                         }
                     }
                     canAfford = true; // No cost for activating/deactivating owned items
-                } else { // Not owned, attempt to buy
+                } else { // Not owned, attempt to buy (only for non-lion cosmetics)
                     if (item.currency === 'key') {
                         if (playerKeys >= item.price) {
                             playerKeys -= item.price;
@@ -3021,6 +3051,8 @@
                     }
 
                     if (canAfford) {
+                        // For lion, this path is not taken as it's won from lucky box
+                        // For other cosmetics, set owned to true and activate
                         window[item.ownedKey] = true;
                         if (item.type === 'name_cosmetic') {
                             isGoldenNameActive = false;
@@ -3056,12 +3088,12 @@
                         canAfford = false;
                     }
                 } else if (currentStoreItemKey === 'buyKeys') { 
-                    // This logic is now handled in the canAfford block for buyKeys
-                    // يتم الآن التعامل مع هذا المنطق في كتلة canAfford لـ buyKeys
+                    // Logic already handled in the canAfford block for buyKeys
                 }
             }
             
             updatePlayerStats();
+            updateAllShipCooldowns(); // In case power was added to ship1 from lucky box
             window.showMessage(message);
             window.closeStoreItemDetailModal(true);
         }
@@ -3143,6 +3175,29 @@
                 window.showSection('mainMenu');
             } else {
                 window.showMessage('الرجاء إدخال اسم صالح لأسطولك!');
+            }
+        }
+
+        function openChangeFleetNameModal() {
+            changeFleetNameInput.value = fleetName;
+            changeFleetNameModal.style.display = 'flex';
+        }
+
+        function closeChangeFleetNameModal() {
+            changeFleetNameModal.style.display = 'none';
+        }
+
+        async function confirmChangeFleetName() {
+            const newName = changeFleetNameInput.value.trim();
+            if (newName && newName !== fleetName) {
+                fleetName = newName;
+                updatePlayerStats();
+                window.showMessage('تم تغيير اسم الأسطول بنجاح!');
+                closeChangeFleetNameModal();
+            } else if (newName === fleetName) {
+                window.showMessage('الاسم الجديد هو نفس الاسم الحالي.');
+            } else {
+                window.showMessage('الرجاء إدخال اسم صالح لأسطولك.');
             }
         }
 
@@ -3371,17 +3426,19 @@
             profileStarIconEl.classList.toggle('hidden', !playerData.isStarIconActive);
             profileCrownIconEl.classList.toggle('hidden', !playerData.isCrownIconActive);
             profileCrownIconEl.classList.toggle('animated-crown-icon', playerData.isCrownIconActive);
-            profileLionIconEl.classList.toggle('hidden', !playerData.isLionActive); // Show/hide lion icon in profile
-            profileLionIconEl.classList.toggle('animated-lion-icon', playerData.isLionActive); // Animate lion icon in profile
+            
+            profileLionIconEl.classList.toggle('hidden', playerData.lionCount === 0 || !playerData.isLionActive);
+            profileLionIconEl.classList.toggle('animated-lion-icon', playerData.isLionActive);
+            profileLionCountDisplayEl.classList.toggle('hidden', playerData.lionCount === 0 || !playerData.isLionActive);
+            profileLionCountDisplayEl.textContent = `x${playerData.lionCount}`;
 
 
             profileStatusDotEl.classList.remove('online', 'offline');
             profileStatusDotEl.classList.add(playerData.isOnline ? 'online' : 'offline');
 
             // Calculate total power for profile, including lion power
-            // حساب إجمالي القوة للملف الشخصي، بما في ذلك قوة الأسد
             let totalProfilePower = (playerData.ship1?.power || 0) + (playerData.ship2?.unlocked ? playerData.ship2.power : 0) + (playerData.ship3?.unlocked ? playerData.ship3.power : 0);
-            if (playerData.isLionActive) totalProfilePower += 7000;
+            if (playerData.lionCount !== undefined) totalProfilePower += (playerData.lionCount * 7000);
             profileTotalPowerEl.textContent = formatNumber(totalProfilePower);
             profileUserIdEl.textContent = playerData.userId;
 
@@ -3441,6 +3498,8 @@
         function handleStartGameClick() { startPlaneGame(); }
         function handleCashOutClick() { cashOut(); }
         function handleLogoutClick() { logoutUser(); }
+        function handleChangeNameClick() { openChangeFleetNameModal(); }
+        function handleConfirmChangeFleetNameClick() { confirmChangeFleetName(); }
 
 
         document.addEventListener('DOMContentLoaded', async () => {
@@ -3450,8 +3509,10 @@
             fleetNameEl = document.getElementById('fleetName');
             fleetStarIconEl = document.getElementById('fleetStarIcon');
             fleetCrownIconEl = document.getElementById('fleetCrownIcon'); 
-            fleetLionIconEl = document.getElementById('fleetLionIcon'); // Get lion icon element
+            fleetLionIconEl = document.getElementById('fleetLionIcon');
+            lionCountDisplayEl = document.getElementById('lionCountDisplay');
             logoutBtn = document.getElementById('logoutBtn');
+            changeNameBtn = document.getElementById('changeNameBtn');
 
             ship1PowerEl = document.getElementById('ship1Power'); 
             ship1LevelEl = document.getElementById('ship1Level');
@@ -3508,6 +3569,10 @@
             initialFleetNameInput = document.getElementById('initialFleetNameInput');
             confirmInitialFleetNameBtn = document.getElementById('confirmInitialFleetNameBtn');
 
+            changeFleetNameModal = document.getElementById('changeFleetNameModal');
+            changeFleetNameInput = document.getElementById('changeFleetNameInput');
+            confirmChangeFleetNameBtn = document.getElementById('confirmChangeFleetNameBtn');
+
             resourceCollectionBtnWrapper = document.getElementById('resourceCollectionBtnWrapper');
             resourceCollectionBtn = document.getElementById('resourceCollectionBtn');
             accumulatedResourcesDisplay = document.getElementById('accumulatedResourcesDisplay');
@@ -3545,7 +3610,8 @@
             profileFleetNameEl = document.getElementById('profileFleetName'); 
             profileStarIconEl = document.getElementById('profileStarIcon');
             profileCrownIconEl = document.getElementById('profileCrownIcon');
-            profileLionIconEl = document.getElementById('profileLionIcon'); // Get lion icon element in profile
+            profileLionIconEl = document.getElementById('profileLionIcon');
+            profileLionCountDisplayEl = document.getElementById('profileLionCountDisplay');
             profileStatusDotEl = document.getElementById('profileStatusDot');
             profileTotalPowerEl = document.getElementById('profileTotalPower');
             profileShipsListEl = document.getElementById('profileShipsList');
@@ -3564,6 +3630,8 @@
             logoutBtn.addEventListener('click', handleLogoutClick); 
             loginBtn.addEventListener('click', handleLogin);
             registerBtn.addEventListener('click', handleRegister);
+            changeNameBtn.addEventListener('click', handleChangeNameClick);
+            confirmChangeFleetNameBtn.addEventListener('click', handleConfirmChangeFleetNameClick);
 
             setInterval(updateAllShipCooldowns, 1000);
             setInterval(autoAccumulateResources, RESOURCE_ACCUMULATION_INTERVAL_MS);
