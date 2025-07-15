@@ -1520,16 +1520,26 @@
         import { getDatabase, ref, set, get, update, onValue, push, query, orderByChild, onDisconnect, serverTimestamp, limitToLast } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            appId: "YOUR_APP_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            measurementId: "YOUR_MEASUREMENT_ID"
+        // User-provided Firebase configuration
+        const userFirebaseConfig = {
+            apiKey: "AIzaSyBAepZChU6qfWGTQDr3EpJm_TRIrr6vhq8",
+            authDomain: "mygame-7c747.firebaseapp.com",
+            databaseURL: "https://mygame-7c747-default-rtdb.firebaseio.com",
+            projectId: "mygame-7c747",
+            storageBucket: "mygame-7c747.firebasestorage.app",
+            messagingSenderId: "191691681571",
+            appId: "1:191691681571:web:8dbc3991cb550b5e026696",
+            measurementId: "G-XDP3YKZGH3"
         };
+
+        // Use the global __firebase_config if available, otherwise use userFirebaseConfig
+        const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) 
+            ? JSON.parse(__firebase_config) 
+            : userFirebaseConfig;
+        
+        // Log the actual config being used for debugging
+        console.log("Firebase config being used:", firebaseConfig);
+
         const appId = firebaseConfig.projectId; 
 
         let app;
@@ -2194,6 +2204,7 @@
                     </div>
                     ${shipsHtml}
                 `;
+                listItem.addEventListener('click', () => showPlayerProfile(player)); // Add click listener to show profile
                 return li;
             };
 
@@ -2202,7 +2213,6 @@
             } else {
                 online.forEach(player => {
                     const listItem = renderPlayerListItem(player, true);
-                    listItem.addEventListener('click', () => showPlayerProfile(player));
                     onlinePlayersListEl.appendChild(listItem);
                 });
             }
@@ -2212,7 +2222,6 @@
             } else {
                 offline.forEach(player => {
                     const listItem = renderPlayerListItem(player, false);
-                    listItem.addEventListener('click', () => showPlayerProfile(player));
                     offlinePlayersListEl.appendChild(listItem);
                 });
             }
