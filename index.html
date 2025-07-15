@@ -445,7 +445,7 @@
         @keyframes fiery-animation {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+            100% { background: position: 0% 50%; }
         }
         @keyframes crown-animation {
             0% { transform: scale(1) rotate(0deg); opacity: 1; }
@@ -1520,9 +1520,10 @@
         import { getDatabase, ref, set, get, update, onValue, push, query, orderByChild, onDisconnect, serverTimestamp, limitToLast } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
         import { getAuth, onAuthStateChanged, signOut, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // User-provided Firebase configuration
-        const userFirebaseConfig = {
-            apiKey: "AIzaSyBAepZChU6qfWGTQDr3EpJm_TRIrr6vhq8", // Corrected API Key based on your previous input
+        // Firebase configuration provided directly by the user.
+        // تم تعيين إعدادات Firebase مباشرة من البيانات التي قدمتها أنت، لتجنب أي تضارب محتمل مع بيئة Canvas.
+        const firebaseConfig = {
+            apiKey: "AIzaSyBAepZChU6qfWGTQDrzEpJm_TRIrr6vhq8", // مفتاح الـ API الصحيح الذي قدمته
             authDomain: "mygame-7c747.firebaseapp.com",
             databaseURL: "https://mygame-7c747-default-rtdb.firebaseio.com",
             projectId: "mygame-7c747",
@@ -1531,15 +1532,9 @@
             appId: "1:191691681571:web:8dbc3991cb550b5e026696",
             measurementId: "G-XDP3YKZGH3"
         };
-
-        // Use the global __firebase_config if available, otherwise use userFirebaseConfig
-        const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) 
-            ? JSON.parse(__firebase_config) 
-            : userFirebaseConfig;
         
-        // Log the actual config being used for debugging
-        console.log("Firebase config being used:", firebaseConfig);
-
+        // استخدام projectId كـ appId
+        // Using projectId as appId
         const appId = firebaseConfig.projectId; 
 
         let app;
@@ -1816,6 +1811,8 @@
 
         async function initializeFirebase() {
             try {
+                // Initializing Firebase with the explicitly provided configuration
+                // تهيئة Firebase باستخدام الإعدادات المقدمة مباشرة
                 app = initializeApp(firebaseConfig);
                 db = getDatabase(app);
                 auth = getAuth(app);
@@ -2204,7 +2201,7 @@
                     </div>
                     ${shipsHtml}
                 `;
-                listItem.addEventListener('click', () => showPlayerProfile(player)); // Add click listener to show profile
+                li.addEventListener('click', () => showPlayerProfile(player)); // Add click listener to show profile
                 return li;
             };
 
