@@ -1275,7 +1275,7 @@
                     <img src="https://c.top4top.io/p_3482irls40.png" alt="Image of Complete Upgrade Icon" draggable="false">
                     <h3>إكمال التطوير</h3>
                     <div class="price-display">
-                        <span>3</span> <i class="fas fa-key"></i>
+                        <span>2</span> <i class="fas fa-key"></i>
                     </div>
                 </div>
                 <div class="store-item bg-gray-700" onclick="showStoreItemDetail('shipExpansion')">
@@ -1297,7 +1297,7 @@
                     <i class="fas fa-crown text-yellow-400"></i>
                     <h3>اسم ذهبي متحرك</h3>
                     <div class="price-display">
-                        <span>1500</span> <i class="fas fa-dollar-sign"></i>
+                        <span>3000</span> <i class="fas fa-dollar-sign"></i>
                     </div>
                 </div>
                 <div class="store-item bg-gray-700" onclick="showStoreItemDetail('pinkName')">
@@ -1558,7 +1558,7 @@
 
         const INITIAL_SHIP_MAX_POWER = 10000;
         const UPGRADE_COOLDOWN_MS = 3 * 60 * 1000;
-        const ATTACK_COOLDOWN_GLOBAL_MS = 7 * 60 * 1000; 
+        const ATTACK_COOLDOWN_GLOBAL_MS = 5 * 60 * 1000; /* Changed to 5 minutes */
 
         let globalAttackCooldownEndTime = 0;
         let lastAttackedOpponentId = null; 
@@ -1576,9 +1576,9 @@
             completeUpgrade: {
                 title: 'إكمال التطوير',
                 iconType: 'image', 
-                icon: 'https://c.top4top.io/p_3482irls40.png', 
+                icon: 'https://c.top4top.io/p_3482irls40.png', /* Updated icon */
                 description: 'ينهي وقت انتظار تطوير السفن.',
-                price: 3, 
+                price: 2, /* Changed price to 2 keys */
                 currency: 'key',
                 type: 'utility'
             },
@@ -1606,7 +1606,7 @@
                 iconType: 'font-awesome', 
                 icon: 'fas fa-crown text-yellow-400',
                 description: 'اجعل اسم أسطولك يتوهج بالذهب.',
-                price: 1500,
+                price: 3000, /* Changed price to 3000 money */
                 currency: 'money',
                 type: 'name_cosmetic',
                 ownedKey: 'isGoldenNameOwned',
@@ -2188,7 +2188,7 @@
                 li.innerHTML = `
                     <div class="online-player-info">
                         ${fleetNameHtml}
-                        <span class="text-sm ${textColor}">
+                        <span class="text-sm ${textColor} mr-2">
                             <i class="fas fa-fist-raised text-red-500 ml-1"></i> ${formatNumber(totalPower)}
                         </span>
                     </div>
@@ -2283,7 +2283,14 @@
 
             const cooldownActive = globalAttackCooldownEndTime > Date.now();
             if (cooldownActive && lastAttackedOpponentId) {
-                otherPlayers = otherPlayers.filter(p => p.userId !== lastAttackedOpponentId);
+                // If cooldown is active, only show the last attacked opponent if they are still online
+                // Otherwise, show all other players.
+                const lastOpponent = otherPlayers.find(p => p.userId === lastAttackedOpponentId);
+                if (lastOpponent) {
+                    otherPlayers = [lastOpponent];
+                } else {
+                    otherPlayers = []; // If last opponent went offline, no one to attack during cooldown
+                }
             }
 
             if (otherPlayers.length === 0) {
@@ -2296,19 +2303,51 @@
                 li.className = 'attack-player-item';
 
                 const strongestPower = Math.max(opponent.ship1.power || 0, opponent.ship2.power || 0, opponent.ship3.power || 0);
-                const unlockedShipsCount = (opponent.ship2.unlocked ? 1 : 0) + (opponent.ship3.unlocked ? 1 : 0) + 1;
-
+                
                 const cooldownRemaining = globalAttackCooldownEndTime - Date.now();
                 const isOnCooldown = cooldownRemaining > 0;
                 const buttonText = isOnCooldown ? formatTime(cooldownRemaining) : 'هجوم';
                 const buttonDisabled = isOnCooldown ? 'disabled' : '';
 
+                const fleetNameClass = opponent.isGoldenNameActive ? 'golden-text' : (opponent.isPinkNameActive ? 'pink-text' : (opponent.isFieryNameActive ? 'fiery-text' : ''));
+                
+                let fleetNameHtml = `<h3 class="${fleetNameClass}">${opponent.fleetName}</h3>`;
+                if (opponent.isStarIconActive) {
+                    fleetNameHtml += `<i class="fas fa-star text-yellow-300 ml-1"></i>`;
+                }
+                if (opponent.isCrownIconActive) { 
+                    fleetNameHtml += `<i class="fas fa-chess-king text-yellow-400 ml-1 animated-crown-icon"></i>`;
+                }
+
+                let shipsHtml = `<div class="online-player-ships">`;
+                const opponentShips = [opponent.ship1, opponent.ship2, opponent.ship3];
+                opponentShips.forEach((shipData, index) => {
+                    const shipLevel = shipData ? shipData.level : 0;
+                    const shipUnlocked = (index === 0) || (shipData ? shipData.unlocked : false); 
+                    const iconSrc = getShipIcon(shipLevel);
+                    const iconClass = shipUnlocked ? 'unlocked' : 'locked';
+
+                    if (iconSrc === 'font-awesome') {
+                        shipsHtml += `
+                            <div class="online-player-ship-icon ${iconClass}">
+                                <i class="fas fa-ship ${shipUnlocked ? 'text-blue-400' : 'text-gray-500'}"></i>
+                            </div>
+                        `;
+                    } else {
+                        shipsHtml += `
+                            <div class="online-player-ship-icon ${iconClass}">
+                                <img src="${iconSrc}" alt="Ship ${index + 1} Icon" onerror="this.onerror=null;this.src='https://placehold.co/25x25/21262d/e2e8f0?text=X';" draggable="false" />
+                            </div>
+                        `;
+                    }
+                });
+                shipsHtml += `</div>`;
+
                 li.innerHTML = `
                     <div class="player-info">
-                        <h3>${opponent.fleetName}</h3>
+                        ${fleetNameHtml}
                         <p>
                             <i class="fas fa-fist-raised text-red-500"></i> ${formatNumber(strongestPower)}
-                            <i class="fas fa-ship text-blue-400"></i> ${unlockedShipsCount}
                         </p>
                     </div>
                     <div class="attack-btn-wrapper">
@@ -2321,6 +2360,12 @@
 
                 const attackButton = li.querySelector('.attack-player-btn');
                 attackButton.addEventListener('click', () => performAttack(opponent));
+
+                // Add click listener to show player profile
+                li.querySelector('.player-info').addEventListener('click', (event) => {
+                    event.stopPropagation(); // Prevent attack button from being triggered if clicked on info
+                    showPlayerProfile(opponent);
+                });
             });
         }
 
