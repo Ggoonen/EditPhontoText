@@ -1387,7 +1387,7 @@
                     <i class="fas fa-boxes"></i>
                     <span>مواردي</span>
                 </div>
-                <div class="quick-action" onclick="collectResource1()">استلام</div>
+                <div id="mainMenuResourceQuickAction" class="quick-action" onclick="collectResource1()">استلام (0)</div>
             </div>
             <div class="pill-style-item main-menu-item-bg-roulette" onclick="showSection('rouletteSection')">
                 <div class="content">
@@ -1405,7 +1405,7 @@
             <div class="space-y-6">
                 <div id="ship1Card" class="my-fleet-card">
                     <div class="ship-header">
-                        <h3>السفينة الأساسية</h3>
+                        <h3>السفينة الأساسية <i class="fas fa-info-circle text-blue-400 cursor-pointer mr-2" onclick="showShipForms('ship1')"></i></h3>
                     </div>
                     <div class="ship-icon-display">
                         <i id="ship1IconI" class="fas fa-ship"></i>
@@ -1423,7 +1423,7 @@
 
                 <div id="ship2Card" class="my-fleet-card locked">
                     <div class="ship-header">
-                        <h3 class="text-gray-400">السفينة الثانية</h3>
+                        <h3 class="text-gray-400">السفينة الثانية <i class="fas fa-info-circle text-blue-400 cursor-pointer mr-2" onclick="showShipForms('ship2')"></i></h3>
                     </div>
                     <div class="ship-icon-display">
                         <i id="ship2IconI" class="fas fa-ship text-gray-500"></i>
@@ -1442,7 +1442,7 @@
 
                 <div id="ship3Card" class="my-fleet-card locked">
                     <div class="ship-header">
-                        <h3 class="text-gray-400">السفينة الثالثة</h3>
+                        <h3 class="text-gray-400">السفينة الثالثة <i class="fas fa-info-circle text-blue-400 cursor-pointer mr-2" onclick="showShipForms('ship3')"></i></h3>
                     </div>
                     <div class="ship-icon-display">
                         <i id="ship3IconI" class="fas fa-ship text-gray-500"></i>
@@ -1708,7 +1708,7 @@
             <div id="cosmeticPreview" class="text-center my-4 hidden">
                 <p id="cosmeticNamePreview" class="text-3xl font-bold">اسم أسطولك</p>
                 <i id="cosmeticIconPreview" class="text-5xl my-2 hidden"></i>
-                <img id="cosmeticImagePreview" src="" class="w-20 h-20 mx-auto my-2 hidden" alt="Cosmetic Preview" draggable="false" />
+                <img id="cosmeticImagePreview" src="" class="w-20 h-20 mx-auto my-2 hidden" alt="Cosmetic Preview" draggable="false">
             </div>
 
             <div class="modal-actions">
@@ -1999,6 +1999,7 @@
         let freeBoxCooldownText;
 
         let allStoreItems; // New container for all store items
+        let mainMenuResourceQuickAction; // Reference to the quick action button on main menu
 
         let shipFormsModal;
         let shipFormsModalTitle;
@@ -2222,55 +2223,71 @@
             confirmNoBtn.addEventListener('click', handleCancel);
         }
 
-        // Saves player data to localStorage and syncs public data to Firebase
-        function savePlayerData() {
+        // Renamed and modified to save player data to Firebase
+        function savePlayerDataToFirebase() {
             try {
-                localStorage.setItem('playerData', JSON.stringify(playerData));
+                if (!userId) {
+                    console.warn("UID not available. Cannot save player data to Firebase.");
+                    return;
+                }
+                const userPlayerDataRef = ref(db, `users/${userId}/playerData`);
+                set(userPlayerDataRef, playerData)
+                    .then(() => {
+                        // console.log("Player data saved to Firebase successfully.");
+                    })
+                    .catch((error) => {
+                        console.error("Error saving player data to Firebase:", error);
+                        window.showMessage("An error occurred while saving your progress to the cloud.");
+                    });
                 // Only update public data if the player has changed their name
                 if (isAuthReady && hasChangedName) {
                     updatePublicPlayerData(); // Sync public data to Firebase
                 }
             } catch (error) {
-                console.error("Error saving player data to localStorage:", error);
-                window.showMessage("حدث خطأ أثناء حفظ بيانات اللعبة محلياً. قد لا يتم حفظ تقدمك.");
+                console.error("Error in savePlayerDataToFirebase:", error);
+                window.showMessage("An error occurred while saving your progress.");
             }
         }
 
-        // Loads player data from localStorage
-        function loadPlayerDataFromLocalStorage() {
-            try {
-                const storedData = localStorage.getItem('playerData');
-                if (storedData) {
-                    const parsedData = JSON.parse(storedData);
-                    // Merge loaded data with default structure to handle new properties
+        // Renamed and modified to load player data from Firebase
+        function loadPlayerDataFromFirebase() {
+            if (!userId) {
+                console.warn("UID not available yet. Cannot load player data from Firebase.");
+                return;
+            }
+
+            const userPlayerDataRef = ref(db, `users/${userId}/playerData`);
+
+            onValue(userPlayerDataRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const dataFromFirebase = snapshot.val();
                     playerData = {
                         ...DEFAULT_PLAYER_DATA,
-                        ...parsedData,
-                        ship1: { ...DEFAULT_PLAYER_DATA.ship1, ...parsedData.ship1 },
-                        ship2: { ...DEFAULT_PLAYER_DATA.ship2, ...parsedData.ship2 },
-                        ship3: { ...DEFAULT_PLAYER_DATA.ship3, ...parsedData.ship3 }
+                        ...dataFromFirebase,
+                        ship1: { ...DEFAULT_PLAYER_DATA.ship1, ...(dataFromFirebase.ship1 || {}) },
+                        ship2: { ...DEFAULT_PLAYER_DATA.ship2, ...(dataFromFirebase.ship2 || {}) },
+                        ship3: { ...DEFAULT_PLAYER_DATA.ship3, ...(dataFromFirebase.ship3 || {}) }
                     };
-                    // Set hasChangedName flag based on loaded data
-                    hasChangedName = playerData.isFleetNameSet;
-
                     // Clean up old/deprecated properties if necessary
                     ['ship1', 'ship2', 'ship3'].forEach(shipKey => {
                         if (playerData[shipKey] && playerData[shipKey].level !== undefined) {
                             delete playerData[shipKey].level;
                         }
                     });
+                    hasChangedName = playerData.isFleetNameSet;
+                    // console.log("Player data loaded from Firebase:", playerData);
                 } else {
-                    playerData = { ...DEFAULT_PLAYER_DATA }; // Initialize with default if no local data
-                    hasChangedName = false; // New player, hasn't changed name yet
+                    playerData = { ...DEFAULT_PLAYER_DATA };
+                    hasChangedName = false;
+                    // console.log("No player data in Firebase, initializing default data.");
+                    savePlayerDataToFirebase(); // Save initial default data to Firebase
                 }
                 updateUIFromPlayerData();
                 window.showSection('mainMenu'); // Show main menu after data is loaded/initialized
-            } catch (error) {
-                console.error("Error loading player data from localStorage:", error);
-                window.showMessage("حدث خطأ أثناء تحميل بيانات اللعبة من التخزين المحلي. سيتم بدء لعبة جديدة.");
-                playerData = { ...DEFAULT_PLAYER_DATA }; // Reset to default on error
-                savePlayerData(); // Save the reset data
-            }
+            }, (error) => {
+                console.error("Error reading player data from Firebase:", error);
+                window.showMessage("An error occurred while loading your progress from the cloud.");
+            });
         }
 
         // Sets up listeners for public Firebase data (other players, global attacks)
@@ -2296,14 +2313,14 @@
                             attacks.push({ id: childSnapshot.key, ...childSnapshot.val() });
                         });
                         globalAttacksLog = attacks.sort((a, b) => b.timestamp - a.timestamp);
-                        console.log("Global Attacks Log Updated:", globalAttacksLog); // Debugging
+                        // console.log("Global Attacks Log Updated:", globalAttacksLog);
                     }, (error) => {
                         console.error("Error reading global attacks log:", error);
                     });
                 }
             } catch (error) {
                 console.error("Critical error in setupPublicDataListeners:", error);
-                window.showMessage("حدث خطأ أثناء إعداد مستمعي البيانات العامة.");
+                window.showMessage("An error occurred while setting up public data listeners.");
             }
         }
 
@@ -2358,7 +2375,7 @@
                 }
             } catch (error) {
                 console.error("Critical error in updatePublicPlayerData:", error);
-                window.showMessage("حدث خطأ أثناء تحديث بيانات اللاعب العامة.");
+                window.showMessage("An error occurred while updating public player data.");
             }
         }
 
@@ -2407,6 +2424,8 @@
                 resource1Progress.style.width = `${(playerData.accumulatedResources1 / MAX_ACCUMULATED_RESOURCES_1) * 100}%`;
                 resource1Rate.textContent = `1-7 كل ${RESOURCE_ACCUMULATION_INTERVAL_MS_1 / 1000} ثواني`;
                 collectResource1Btn.disabled = playerData.accumulatedResources1 === 0;
+                mainMenuResourceQuickAction.textContent = `استلام (${formatNumber(playerData.accumulatedResources1)})`;
+
 
                 if (playerData.resource2Unlocked) {
                     resource2Card.classList.remove('opacity-50', 'pointer-events-none');
@@ -2432,10 +2451,10 @@
                     unlockResource2Btn.disabled = playerData.keys < RESOURCE2_UNLOCK_COST;
                 }
 
-                savePlayerData(); // Save to local storage and trigger public Firebase update
+                savePlayerDataToFirebase(); // Save to Firebase and trigger public Firebase update
             } catch (error) {
                 console.error("Critical error in updateUIFromPlayerData:", error);
-                window.showMessage("حدث خطأ أثناء تحديث واجهة المستخدم. يرجى إعادة تحميل الصفحة.");
+                window.showMessage("An error occurred while updating the user interface. Please reload the page.");
             }
         }
 
@@ -2520,7 +2539,7 @@
                 }
             } catch (error) {
                 console.error(`Error in updateShipUI for ship: ${ship.name}`, error);
-                window.showMessage("حدث خطأ أثناء تحديث واجهة سفينتك.");
+                window.showMessage("An error occurred while updating your ship's interface.");
             }
         }
 
@@ -2528,11 +2547,11 @@
             try {
                 const currentTime = Date.now();
                 if (ship.power >= ship.maxPower) {
-                    window.showMessage('هذه السفينة مطورة بالكامل بالفعل!');
+                    window.showMessage('This ship is already fully upgraded!');
                     return;
                 }
                 if (ship.cooldownEndTime > currentTime) {
-                    window.showMessage(`هذه السفينة في فترة انتظار. يرجى الانتظار ${formatTime(ship.cooldownEndTime - currentTime)}.`);
+                    window.showMessage(`This ship is on cooldown. Please wait ${formatTime(ship.cooldownEndTime - currentTime)}.`);
                     return;
                 }
 
@@ -2548,7 +2567,7 @@
                 updateUIFromPlayerData();
             } catch (error) {
                 console.error("Error in upgradeShip:", error);
-                window.showMessage("حدث خطأ أثناء محاولة تطوير السفينة.");
+                window.showMessage("An error occurred while trying to upgrade the ship.");
             }
         }
 
@@ -2558,13 +2577,13 @@
                     playerData.keys -= SHIP_UNLOCK_COST;
                     shipObj.unlocked = true;
                     updateUIFromPlayerData();
-                    window.showMessage(`تهانينا! لقد فتحت ${shipName} بنجاح!`);
+                    window.showMessage(`Congratulations! You have successfully unlocked ${shipName}!`);
                 } else {
-                    window.showMessage(`ليس لديك ما يكفي من المفاتيح لفتح هذه السفينة. تحتاج ${SHIP_UNLOCK_COST} مفتاح.`);
+                    window.showMessage(`You don't have enough keys to unlock this ship. You need ${SHIP_UNLOCK_COST} keys.`);
                 }
             } catch (error) {
                 console.error("Error in unlockShip:", error);
-                window.showMessage("حدث خطأ أثناء محاولة فتح السفينة.");
+                window.showMessage("An error occurred while trying to unlock the ship.");
             }
         }
 
@@ -2595,15 +2614,15 @@
             try {
                 if (playerData.accumulatedResources1 > 0) {
                     playerData.money += playerData.accumulatedResources1;
-                    window.showMessage(`لقد استلمت ${playerData.accumulatedResources1} من الموارد الأساسية!`);
+                    window.showMessage(`You collected ${playerData.accumulatedResources1} basic resources!`);
                     playerData.accumulatedResources1 = 0;
                     updateUIFromPlayerData();
                 } else {
-                    window.showMessage('لا توجد موارد أساسية لتجميعها حالياً!');
+                    window.showMessage('No basic resources to collect currently!');
                 }
             } catch (error) {
                 console.error("Error in collectResource1:", error);
-                window.showMessage("حدث خطأ أثناء محاولة استلام الموارد الأساسية.");
+                window.showMessage("An error occurred while trying to collect basic resources.");
             }
         }
 
@@ -2611,15 +2630,15 @@
             try {
                 if (playerData.accumulatedResources2 > 0) {
                     playerData.money += playerData.accumulatedResources2;
-                    window.showMessage(`لقد استلمت ${playerData.accumulatedResources2} من الموارد النادرة!`);
+                    window.showMessage(`You collected ${playerData.accumulatedResources2} rare resources!`);
                     playerData.accumulatedResources2 = 0;
                     updateUIFromPlayerData();
                 } else {
-                    window.showMessage('لا توجد موارد نادرة لتجميعها حالياً!');
+                    window.showMessage('No rare resources to collect currently!');
                 }
             } catch (error) {
                 console.error("Error in collectResource2:", error);
-                window.showMessage("حدث خطأ أثناء محاولة استلام الموارد النادرة.");
+                window.showMessage("An error occurred while trying to collect rare resources.");
             }
         }
 
@@ -2628,14 +2647,14 @@
                 if (playerData.keys >= RESOURCE2_UNLOCK_COST) {
                     playerData.keys -= RESOURCE2_UNLOCK_COST;
                     playerData.resource2Unlocked = true;
-                    window.showMessage(`تهانينا! لقد فتحت الموارد النادرة!`);
+                    window.showMessage(`Congratulations! You have unlocked rare resources!`);
                     updateUIFromPlayerData();
                 } else {
-                    window.showMessage(`ليس لديك ما يكفي من المفاتيح لفتح الموارد النادرة. تحتاج ${RESOURCE2_UNLOCK_COST} مفتاح.`);
+                    window.showMessage(`You don't have enough keys to unlock rare resources. You need ${RESOURCE2_UNLOCK_COST} keys.`);
                 }
             } catch (error) {
                 console.error("Error in unlockResource2:", error);
-                window.showMessage("حدث خطأ أثناء محاولة فتح الموارد النادرة.");
+                window.showMessage("An error occurred while trying to unlock rare resources.");
             }
         }
 
@@ -2717,7 +2736,7 @@
                     cosmeticPreviewEl.classList.remove('hidden');
                     cosmeticNamePreviewEl.classList.remove('hidden');
                     cosmeticNamePreviewEl.classList.add(item.cssClass);
-                    cosmeticNamePreviewEl.textContent = 'اسم أسطولك';
+                    cosmeticNamePreviewEl.textContent = 'Your Fleet Name';
                 } else if (item.type === 'icon_cosmetic') {
                     cosmeticPreviewEl.classList.remove('hidden');
                     if (item.iconType === 'font-awesome') {
@@ -2741,31 +2760,31 @@
 
                     if (isOwned) {
                         if (!isActive) { 
-                            buyBtn.textContent = 'تفعيل';
+                            buyBtn.textContent = 'Activate';
                             buyBtn.classList.remove('bg-gray-600');
                             buyBtn.classList.add('bg-blue-600');
                         } else { 
-                            buyBtn.textContent = 'إلغاء تفعيل';
+                            buyBtn.textContent = 'Deactivate';
                             buyBtn.classList.remove('bg-blue-600');
                             buyBtn.classList.add('bg-gray-600');
                         }
                         buyBtn.disabled = false; 
                     } else {
-                        buyBtn.textContent = 'شراء';
+                        buyBtn.textContent = 'Purchase';
                         buyBtn.classList.remove('bg-gray-600');
                         buyBtn.classList.add('bg-blue-600');
                         if (itemKey === 'lionIcon' || itemKey === 'glitchName') { 
                             buyBtn.disabled = true;
-                            buyBtn.textContent = 'يمكن الحصول عليه من صندوق الحظ';
+                            buyBtn.textContent = 'Obtainable from Lucky Box';
                         } else {
                             buyBtn.disabled = false;
                         }
                     }
                 } else if (item.type === 'free_box') {
-                    buyBtn.textContent = 'افتح الصندوق';
+                    buyBtn.textContent = 'Open Box';
                     buyBtn.disabled = false;
                 } else { 
-                    buyBtn.textContent = 'شراء';
+                    buyBtn.textContent = 'Purchase';
                     buyBtn.classList.remove('bg-gray-600');
                     buyBtn.classList.add('bg-blue-600');
                     buyBtn.disabled = false;
@@ -2774,7 +2793,7 @@
                 storeItemDetailModal.style.display = 'flex';
             } catch (error) {
                 console.error("Error in showStoreItemDetail:", error);
-                window.showMessage("حدث خطأ أثناء عرض تفاصيل العنصر.");
+                window.showMessage("An error occurred while displaying item details.");
             }
         }
 
@@ -2812,7 +2831,7 @@
         async function buyStoreItem() {
             try {
                 if (!currentStoreItemKey) {
-                    window.showMessage("لا يوجد عنصر محدد للشراء.");
+                    window.showMessage("No item selected for purchase.");
                     return;
                 }
 
@@ -2829,7 +2848,7 @@
                     if (playerData.ship3.unlocked && playerData.ship3.cooldownEndTime > currentTime) { shipsOnCooldown++; }
 
                     if (shipsOnCooldown === 0) {
-                        window.showMessage('لا توجد سفن في فترة انتظار حالياً لإكمال تطويرها.');
+                        window.showMessage('No ships currently on cooldown to complete their upgrade.');
                         return;
                     }
                 }
@@ -2843,13 +2862,13 @@
                     if (playerData.keys >= cost) {
                         hasEnoughCurrency = true;
                     } else {
-                        message = `ليس لديك ما يكفي من المفاتيح لشراء هذا العنصر (${formatNumber(cost)} مفتاح).`;
+                        message = `You don't have enough keys to purchase this item (${formatNumber(cost)} keys).`;
                     }
                 } else if (currencyType === 'money') {
                     if (playerData.money >= cost) {
                         hasEnoughCurrency = true;
                     } else {
-                        message = `ليس لديك ما يكفي من الأموال لشراء هذا العنصر (${formatNumber(cost)} أموال).`;
+                        message = `You don't have enough money to purchase this item (${formatNumber(cost)} money).`;
                     }
                 } else if (currencyType === 'none') {
                     hasEnoughCurrency = true;
@@ -2875,10 +2894,10 @@
 
                             if (!isActive) { 
                                 playerData[item.activeKey] = true; // Activate the selected one
-                                message = `تم تفعيل "${item.fullTitle}" بنجاح!`;
+                                message = `"${item.fullTitle}" activated successfully!`;
                             } else { 
                                 playerData[item.activeKey] = false; // Deactivate the selected one
-                                message = `تم إلغاء تفعيل "${item.fullTitle}".`;
+                                message = `"${item.fullTitle}" deactivated.`;
                             }
                         } else if (item.type === 'icon_cosmetic') {
                             // Deactivate all other icon cosmetics first
@@ -2886,10 +2905,10 @@
                             playerData.isLionActive = false; 
                             if (!isActive) { 
                                 playerData[item.activeKey] = true; // Activate the selected one
-                                message = `تم تفعيل "${item.fullTitle}" بنجاح!`;
+                                message = `"${item.fullTitle}" activated successfully!`;
                             } else { 
                                 playerData[item.activeKey] = false; // Deactivate the selected one
-                                message = `تم إلغاء تفعيل "${item.fullTitle}".`;
+                                message = `"${item.fullTitle}" deactivated.`;
                             }
                         }
                     } else { // Item is not owned, proceed with purchase and activation
@@ -2912,7 +2931,7 @@
                             playerData.isLionActive = false; 
                             playerData[item.activeKey] = true;
                         }
-                        message = `تهانينا! لقد اشتريت "${item.fullTitle}" وتم تفعيله!`;
+                        message = `Congratulations! You purchased and activated "${item.fullTitle}"!`;
                     }
                 } else if (item.type === 'lucky_box') { 
                     if (currencyType === 'key') {
@@ -2920,7 +2939,7 @@
                     } else if (currencyType === 'money') {
                         playerData.money -= cost;
                     }
-                    let prizeMessage = "لقد فتحت صندوق الحظ وحصلت على: ";
+                    let prizeMessage = "You opened the Lucky Box and received: ";
                     const rand = Math.random() * 100;
 
                     if (rand < 4) {
@@ -2930,42 +2949,42 @@
                         playerData.isFieryNameActive = false;
                         playerData.isRoyalCrimsonNameActive = false;
                         playerData.isGlitchNameActive = true; 
-                        message = prizeMessage + `الاسم المتقطع (Glitch)!`;
+                        message = prizeMessage + `Glitch Name!`;
                     } else if (rand < (4 + 9)) { 
                         playerData.lionCount++; 
                         playerData.isStarIconActive = false;
                         playerData.isLionActive = true; 
-                        message = prizeMessage + `الأسد المتوهج! (7000 قوة إضافية). لديك الآن ${playerData.lionCount} أسد متوهج.`;
+                        message = prizeMessage + `Glowing Lion! (+7000 power). You now have ${playerData.lionCount} glowing lions.`;
                     } else if (rand < (4 + 9 + 15)) { 
                         const moneyGain = Math.floor(Math.random() * (1900 - 500 + 1)) + 500;
                         playerData.money += moneyGain;
-                        message = prizeMessage + `${formatNumber(moneyGain)} أموال!`;
+                        message = prizeMessage + `${formatNumber(moneyGain)} money!`;
                     } else if (rand < (4 + 9 + 15 + 30)) { 
                         const powerGain = Math.floor(Math.random() * (2500 - 500 + 1)) + 500;
                         playerData.ship1.power += powerGain; 
-                        message = prizeMessage + `${formatNumber(powerGain)} قوة لسفينتك الأساسية!`;
+                        message = prizeMessage + `${formatNumber(powerGain)} power for your basic ship!`;
                     } else { 
                         const keysGain = Math.floor(Math.random() * (8 - 2 + 1)) + 2;
                         playerData.keys += keysGain;
-                        message = prizeMessage + `${keysGain} مفتاح!`;
+                        message = prizeMessage + `${keysGain} keys!`;
                     }
                 } else if (item.type === 'free_box') { 
                     if (playerData.freeBoxCooldownEndTime > currentTime) { 
-                        message = `الصندوق المجاني متاح بعد: ${formatTime(playerData.freeBoxCooldownEndTime - currentTime)}.`;
+                        message = `Free Box available in: ${formatTime(playerData.freeBoxCooldownEndTime - currentTime)}.`;
                         window.showMessage(message);
                         return;
                     }
-                    let prizeMessage = "لقد فتحت الصندوق المجاني وحصلت على: ";
+                    let prizeMessage = "You opened the Free Box and received: ";
                     const rand = Math.random() * 100;
 
                     if (rand < 90) { 
                         const moneyGain = Math.floor(Math.random() * (200 - 40 + 1)) + 40;
                         playerData.money += moneyGain;
-                        message = prizeMessage + `${formatNumber(moneyGain)} أموال!`;
+                        message = prizeMessage + `${formatNumber(moneyGain)} money!`;
                     } else { 
                         const keysGain = Math.floor(Math.random() * (8 - 2 + 1)) + 2;
                         playerData.keys += keysGain;
-                        message = prizeMessage + `${keysGain} مفتاح!`;
+                        message = prizeMessage + `${keysGain} keys!`;
                     }
                     playerData.freeBoxCooldownEndTime = currentTime + FREE_BOX_COOLDOWN_MS;
                 } else if (currentStoreItemKey === 'completeUpgrade') {
@@ -2977,7 +2996,7 @@
                     if (playerData.ship1.cooldownEndTime > currentTime) { playerData.ship1.cooldownEndTime = 0; }
                     if (playerData.ship2.unlocked && playerData.ship2.cooldownEndTime > currentTime) { playerData.ship2.cooldownEndTime = 0; }
                     if (playerData.ship3.unlocked && playerData.ship3.cooldownEndTime > currentTime) { playerData.ship3.cooldownEndTime = 0; }
-                    message = 'تم إكمال تطوير السفن بنجاح!';
+                    message = 'Ship upgrades completed successfully!';
                 } else if (currentStoreItemKey === 'buyKeys') {
                     if (currencyType === 'key') {
                         playerData.keys -= cost;
@@ -2985,7 +3004,7 @@
                         playerData.money -= cost;
                     }
                     playerData.keys += selectedKeyAmount;
-                    message = `لقد اشتريت ${selectedKeyAmount} مفتاحاً بنجاح!`;
+                    message = `You successfully purchased ${selectedKeyAmount} keys!`;
                 }
 
                 updateUIFromPlayerData();
@@ -2993,7 +3012,7 @@
                 window.closeStoreItemDetailModal(true); // Close and return to store
             } catch (error) {
                 console.error("Error in buyStoreItem:", error);
-                window.showMessage("حدث خطأ أثناء محاولة شراء العنصر.");
+                window.showMessage("An error occurred while trying to purchase the item.");
             }
         }
 
@@ -3004,9 +3023,9 @@
                 let shipSelectionOptions = document.getElementById('shipSelectionOptions');
                 shipSelectionOptions.innerHTML = '';
                 const ships = [
-                    { id: 'ship1', name: 'السفينة الأساسية', obj: playerData.ship1 },
-                    { id: 'ship2', name: 'السفينة الثانية', obj: playerData.ship2 }, 
-                    { id: 'ship3', name: 'السفينة الثالثة', obj: playerData.ship3 }
+                    { id: 'ship1', name: 'Basic Ship', obj: playerData.ship1 },
+                    { id: 'ship2', name: 'Second Ship', obj: playerData.ship2 }, 
+                    { id: 'ship3', name: 'Third Ship', obj: playerData.ship3 }
                 ];
 
                 ships.forEach(s => {
@@ -3014,7 +3033,7 @@
                         const optionDiv = document.createElement('div');
                         optionDiv.classList.add('ship-selection-option');
                         optionDiv.innerHTML = `
-                            <label for="select-${s.id}">${s.name} (القوة القصوى الحالية: ${formatNumber(s.obj.maxPower)})</label>
+                            <label for="select-${s.id}">${s.name} (Current Max Power: ${formatNumber(s.obj.maxPower)})</label>
                             <input type="radio" id="select-${s.id}" name="selectedShip" value="${s.id}">
                         `;
                         shipSelectionOptions.appendChild(optionDiv);
@@ -3030,7 +3049,7 @@
                 document.getElementById('shipSelectionModal').style.display = 'flex';
             } catch (error) {
                 console.error("Error in openShipSelectionModal:", error);
-                window.showMessage("حدث خطأ أثناء فتح نافذة اختيار السفينة.");
+                window.showMessage("An error occurred while opening the ship selection window.");
             }
         }
 
@@ -3051,7 +3070,7 @@
                 let message = '';
 
                 if (!selectedRadio) {
-                    message = 'الرجاء اختيار سفينة لتوسيعها.';
+                    message = 'Please select a ship to expand.';
                     window.showMessage(message);
                     return;
                 }
@@ -3067,30 +3086,30 @@
                     playerData.keys -= item.price; 
                     targetShip.maxPower += 5000;
                     updateUIFromPlayerData();
-                    message = `تم توسيع ${targetShip.name === playerData.ship1.name ? 'السفينة الأساسية' : targetShip.name} بنجاح! الحد الأقصى الجديد: ${formatNumber(targetShip.maxPower)}.`;
+                    message = `Successfully expanded ${targetShip.name === playerData.ship1.name ? 'Basic Ship' : targetShip.name}! New max: ${formatNumber(targetShip.maxPower)}.`;
                 } else {
-                    message = `ليس لديك ما يكفي من المفاتيح لشراء توسيع السفينة (${formatNumber(item.price)} مفتاح).`; 
+                    message = `You don't have enough keys to purchase ship expansion (${formatNumber(item.price)} keys).`; 
                 }
                 
                 window.showMessage(message);
                 window.closeShipSelectionModal();
             } catch (error) {
                 console.error("Error in confirmShipExpansion:", error);
-                window.showMessage("حدث خطأ أثناء تأكيد توسيع السفينة.");
+                window.showMessage("An error occurred while confirming ship expansion.");
             }
         }
 
         function openChangeFleetNameModal() {
             try {
                 if (playerData.isFleetNameSet) {
-                    window.showMessage("لا يمكن تغيير اسم الأسطول بعد تعيينه.");
+                    window.showMessage("Fleet name cannot be changed after it has been set.");
                     return;
                 }
                 changeFleetNameInput.value = playerData.fleetName;
                 changeFleetNameModal.style.display = 'flex';
             } catch (error) {
                 console.error("Error in openChangeFleetNameModal:", error);
-                window.showMessage("حدث خطأ أثناء فتح نافذة تغيير الاسم.");
+                window.showMessage("An error occurred while opening the name change window.");
             }
         }
 
@@ -3111,16 +3130,16 @@
                     playerData.isFleetNameSet = true;
                     hasChangedName = true; // Set flag to true after name is changed
                     updateUIFromPlayerData();
-                    window.showMessage('تم تغيير اسم الأسطول بنجاح!');
+                    window.showMessage('Fleet name changed successfully!');
                     closeChangeFleetNameModal();
                 } else if (newName === playerData.fleetName) {
-                    window.showMessage('الاسم الجديد هو نفس الاسم الحالي.');
+                    window.showMessage('The new name is the same as the current name.');
                 } else {
-                    window.showMessage('الرجاء إدخال اسم صالح لأسطولك.');
+                    window.showMessage('Please enter a valid name for your fleet.');
                 }
             } catch (error) {
                 console.error("Error in confirmChangeFleetName:", error);
-                window.showMessage("حدث خطأ أثناء تأكيد تغيير اسم الأسطول.");
+                window.showMessage("An error occurred while confirming fleet name change.");
             }
         }
 
@@ -3159,13 +3178,24 @@
                 }
             } catch (error) {
                 console.error("Error in showSection:", error);
-                window.showMessage("حدث خطأ أثناء الانتقال بين الأقسام.");
+                window.showMessage("An error occurred while navigating sections.");
             }
         }
 
         // Function to trigger pop-in animation for all store items
         function triggerAllStoreItemsPopIn() {
-            const items = allStoreItems.querySelectorAll('.store-item');
+            const items = Array.from(allStoreItems.querySelectorAll('.store-item'));
+            // Sort items by their 'order' property if defined, otherwise keep original order
+            items.sort((a, b) => {
+                const keyA = a.onclick.toString().match(/showStoreItemDetail\('([^']+)'\)/)[1];
+                const keyB = b.onclick.toString().match(/showStoreItemDetail\('([^']+)'\)/)[1];
+                return (storeItems[keyA].order || 999) - (storeItems[keyB].order || 999);
+            });
+
+            // Clear and re-append sorted items to maintain order in DOM
+            allStoreItems.innerHTML = '';
+            items.forEach(item => allStoreItems.appendChild(item));
+
             items.forEach((item, index) => {
                 item.style.animationDelay = `${index * 0.05}s`;
                 item.classList.remove('animate-pop-in'); // Reset animation
@@ -3182,7 +3212,7 @@
                 if (remainingTime > 0) {
                     rouletteGameElements.classList.add('hidden');
                     rouletteCooldownDisplay.classList.remove('hidden');
-                    rouletteCooldownDisplay.textContent = `الجولة القادمة بعد: ${formatTime(remainingTime)}`;
+                    rouletteCooldownDisplay.textContent = `Next round in: ${formatTime(remainingTime)}`;
                 } else {
                     rouletteGameElements.classList.remove('hidden');
                     rouletteCooldownDisplay.classList.add('hidden');
@@ -3190,6 +3220,7 @@
                     if (!gameActive) {
                         startGameBtn.classList.remove('hidden');
                         betAmountInput.disabled = false;
+                        betAllBtn.disabled = false; // Enable bet all button
                         cashOutBtn.classList.add('hidden');
                         cashOutBtn.disabled = true;
                         multiplierDisplay.textContent = '1.00x';
@@ -3206,7 +3237,7 @@
                 }
             } catch (error) {
                 console.error("Error in updateRouletteCooldownUI:", error);
-                window.showMessage("حدث خطأ أثناء تحديث مؤقت الروليت.");
+                window.showMessage("An error occurred while updating the roulette timer.");
             }
         }
 
@@ -3261,7 +3292,7 @@
                 }
             } catch (error) {
                 console.error("Error in animatePlane:", error);
-                window.showMessage("حدث خطأ أثناء تحريك الطائرة.");
+                window.showMessage("An error occurred while animating the plane.");
                 handleCrash(); // Force crash to prevent infinite loop
             }
         }
@@ -3269,18 +3300,18 @@
         function startPlaneGame() {
             try {
                 if (Date.now() < playerData.rouletteCooldownEndTime) {
-                    window.showMessage(`الرجاء الانتظار حتى انتهاء فترة التهدئة: ${formatTime(playerData.rouletteCooldownEndTime - Date.now())}`);
+                    window.showMessage(`Please wait until the cooldown period ends: ${formatTime(playerData.rouletteCooldownEndTime - Date.now())}`);
                     return;
                 }
 
                 betAmount = parseInt(betAmountInput.value);
 
                 if (isNaN(betAmount) || betAmount < 20 || betAmount > 2000) {
-                    window.showMessage('الرجاء إدخال مبلغ رهان صالح بين 20 و 2000.');
+                    window.showMessage('Please enter a valid bet amount between 20 and 2000.');
                     return;
                 }
                 if (playerData.money < betAmount) {
-                    window.showMessage('ليس لديك ما يكفي من الأموال للرهان!');
+                    window.showMessage('You do not have enough money to bet!');
                     return;
                 }
 
@@ -3313,7 +3344,7 @@
                 animationFrameId = requestAnimationFrame(animatePlane);
             } catch (error) {
                 console.error("Error in startPlaneGame:", error);
-                window.showMessage("حدث خطأ أثناء بدء لعبة الطائرة.");
+                window.showMessage("An error occurred while starting the plane game.");
             }
         }
 
@@ -3330,14 +3361,14 @@
                 playerData.money += winnings;
                 updateUIFromPlayerData();
 
-                rouletteResult.textContent = `لقد استلمت ${winnings} أموال عند ${currentMultiplier.toFixed(2)}x!`;
+                rouletteResult.textContent = `You cashed out ${winnings} money at ${currentMultiplier.toFixed(2)}x!`;
                 rouletteResult.classList.remove('hidden');
-                window.showMessage(`تهانينا! لقد استلمت ${winnings} أموال عند ${currentMultiplier.toFixed(2)}x!`);
+                window.showMessage(`Congratulations! You cashed out ${winnings} money at ${currentMultiplier.toFixed(2)}x!`);
 
                 endRound();
             } catch (error) {
                 console.error("Error in cashOut:", error);
-                window.showMessage("حدث خطأ أثناء محاولة استلام الأرباح.");
+                window.showMessage("An error occurred while trying to cash out.");
             }
         }
 
@@ -3350,14 +3381,14 @@
                 cancelAnimationFrame(animationFrameId);
 
                 rouletteDisplayArea.classList.add('crashed');
-                rouletteResult.textContent = `تحطمت الطائرة عند ${currentMultiplier.toFixed(2)}x! لقد خسرت ${betAmount} أموال.`;
+                rouletteResult.textContent = `The plane crashed at ${currentMultiplier.toFixed(2)}x! You lost ${betAmount} money.`;
                 rouletteResult.classList.remove('hidden');
-                window.showMessage(`تحطمت الطائرة عند ${currentMultiplier.toFixed(2)}x! لقد خسرت ${betAmount} أموال.`);
+                window.showMessage(`The plane crashed at ${currentMultiplier.toFixed(2)}x! You lost ${betAmount} money.`);
 
                 endRound();
             } catch (error) {
                 console.error("Error in handleCrash:", error);
-                window.showMessage("حدث خطأ أثناء معالجة تحطم الطائرة.");
+                window.showMessage("An error occurred while handling the plane crash.");
             }
         }
 
@@ -3374,7 +3405,7 @@
                 updateUIFromPlayerData();
             } catch (error) {
                 console.error("Error in endRound:", error);
-                window.showMessage("حدث خطأ أثناء إنهاء الجولة.");
+                window.showMessage("An error occurred while ending the round.");
             }
         }
 
@@ -3382,9 +3413,9 @@
             try {
                 const ship = playerData[shipId];
                 let shipName = '';
-                if (shipId === 'ship1') shipName = 'الأساسية';
-                else if (shipId === 'ship2') shipName = 'الثانية';
-                else if (shipId === 'ship3') shipName = 'الثالثة';
+                if (shipId === 'ship1') shipName = 'Basic';
+                else if (shipId === 'ship2') shipName = 'Second';
+                else if (shipId === 'ship3') shipName = 'Third';
 
                 currentShipNameInForms.textContent = shipName;
 
@@ -3409,7 +3440,7 @@
                 } else {
                     currentPowerRangeText = '1 - 1000';
                 }
-                currentShipFormPowerRange.textContent = `القوة: ${currentPowerRangeText}`; 
+                currentShipFormPowerRange.textContent = `Power: ${currentPowerRangeText}`; 
 
                 allShipFormsGrid.innerHTML = '';
                 shipFormsData.forEach(form => {
@@ -3427,7 +3458,7 @@
                     if (form.iconType === 'font-awesome') {
                         iconHtml = `<i class="${form.iconClass}"></i>`;
                     } else {
-                        iconHtml = `<img src="${form.imgSrc}" alt="Image of Ship Form" onerror="this.onerror=null;this.src='https://placehold.co/60x60/21262d/e2e8f0?text=X';" draggable="false" />`;
+                        iconHtml = `<img src="${form.imgSrc}" alt="Image of Ship Form" onerror="this.onerror=null;this.src='https://placehold.co/60x60/21262d/e2e8f0?text=X';" draggable="false">`;
                     }
 
                     itemDiv.innerHTML = `
@@ -3442,7 +3473,7 @@
                 shipFormsModal.style.display = 'flex';
             } catch (error) {
                 console.error("Error in showShipForms:", error);
-                window.showMessage("حدث خطأ أثناء عرض أشكال السفينة.");
+                window.showMessage("An error occurred while displaying ship forms.");
             }
         }
 
@@ -3456,7 +3487,7 @@
         }
 
         function formatTime(ms) {
-            if (ms <= 0) return 'جاهز';
+            if (ms <= 0) return 'Ready';
             const totalSeconds = Math.floor(ms / 1000);
             const minutes = Math.floor(totalSeconds / 60);
             const seconds = totalSeconds % 60;
@@ -3504,10 +3535,10 @@
             robButtons.forEach(button => {
                 if (remainingTime > 0) {
                     button.disabled = true;
-                    button.textContent = `تهدئة: ${formatTime(remainingTime)}`;
+                    button.textContent = `Cooldown: ${formatTime(remainingTime)}`;
                 } else {
                     button.disabled = false;
-                    button.textContent = 'سرقة';
+                    button.textContent = 'Rob';
                 }
             });
         }
@@ -3592,7 +3623,7 @@
                         if (player.activeCosmetics.iconType === 'font-awesome') {
                             iconHtml = `<i class="${player.activeCosmetics.iconClass}"></i>`;
                         } else if (player.activeCosmetics.iconType === 'image') {
-                            iconHtml = `<img src="${player.activeCosmetics.iconImgSrc}" class="${player.activeCosmetics.iconClass}" alt="Player Icon" draggable="false" />`;
+                            iconHtml = `<img src="${player.activeCosmetics.iconImgSrc}" class="${player.activeCosmetics.iconClass}" alt="Player Icon" draggable="false">`;
                         }
 
                         playerItem.innerHTML = `
@@ -3611,7 +3642,7 @@
                         `;
                         if (player.id !== userId) {
                             const robBtn = document.createElement('button');
-                            robBtn.textContent = 'سرقة';
+                            robBtn.textContent = 'Rob';
                             robBtn.classList.add('rob-btn');
                             robBtn.onclick = (e) => {
                                 e.stopPropagation();
@@ -3625,7 +3656,7 @@
                         onlinePlayersList.appendChild(playerItem);
                     });
                 } else {
-                    onlinePlayersList.innerHTML = '<p class="text-center text-gray-400 mt-2">لا يوجد لاعبون متصلون حالياً.</p>';
+                    onlinePlayersList.innerHTML = '<p class="text-center text-gray-400 mt-2">No online players currently.</p>';
                 }
 
                 // Render offline players
@@ -3640,7 +3671,7 @@
                         if (player.activeCosmetics.iconType === 'font-awesome') {
                             iconHtml = `<i class="${player.activeCosmetics.iconClass}"></i>`;
                         } else if (player.activeCosmetics.iconType === 'image') {
-                            iconHtml = `<img src="${player.activeCosmetics.iconImgSrc}" class="${player.activeCosmetics.iconClass}" alt="Player Icon" draggable="false" />`;
+                            iconHtml = `<img src="${player.activeCosmetics.iconImgSrc}" class="${player.activeCosmetics.iconClass}" alt="Player Icon" draggable="false">`;
                         }
 
                         playerItem.innerHTML = `
@@ -3659,7 +3690,7 @@
                         `;
                         if (player.id !== userId) {
                             const robBtn = document.createElement('button');
-                            robBtn.textContent = 'سرقة';
+                            robBtn.textContent = 'Rob';
                             robBtn.classList.add('rob-btn');
                             robBtn.onclick = (e) => {
                                 e.stopPropagation();
@@ -3673,14 +3704,14 @@
                         offlinePlayersList.appendChild(playerItem);
                     });
                 } else {
-                    offlinePlayersList.innerHTML = '<p class="text-center text-gray-400 mt-2">لا يوجد لاعبون غير متصلون حالياً.</p>';
+                    offlinePlayersList.innerHTML = '<p class="text-center text-gray-400 mt-2">No offline players currently.</p>';
                 }
 
                 updateRobberyCooldownUI(); // Update buttons after rendering
                 onlineStatusModal.style.display = 'flex';
             } catch (error) {
                 console.error("Error in showOnlineStatusModal:", error);
-                window.showMessage("حدث خطأ أثناء عرض حالة الاتصال.");
+                window.showMessage("An error occurred while displaying online status.");
             }
         }
 
@@ -3697,12 +3728,12 @@
             try {
                 const currentTime = Date.now();
                 if (currentTime < playerData.robberyCooldownEndTime) {
-                    window.showMessage(`أنت في فترة تهدئة. يمكنك السرقة مرة أخرى بعد: ${formatTime(playerData.robberyCooldownEndTime - currentTime)}.`);
+                    window.showMessage(`You are on cooldown. You can rob again in: ${formatTime(playerData.robberyCooldownEndTime - currentTime)}.`);
                     return;
                 }
 
                 if (targetId === userId) {
-                    window.showMessage("لا يمكنك سرقة نفسك!");
+                    window.showMessage("You cannot rob yourself!");
                     return;
                 }
 
@@ -3732,11 +3763,11 @@
                         playerData.keys += keyGain;
                     }
                     playerData.money += moneyGain;
-                    message = `لقد سرقت ${targetName} (قوة: ${formatNumber(targetPower)}) وفزت! حصلت على ${formatNumber(moneyGain)} أموال${keyGain > 0 ? ` و ${keyGain} مفتاح` : ''}.`;
+                    message = `You robbed ${targetName} (Power: ${formatNumber(targetPower)}) and won! You gained ${formatNumber(moneyGain)} money${keyGain > 0 ? ` and ${keyGain} key` : ''}.`;
                 } else {
                     outcome = 'loss';
                     playerData.losses++;
-                    message = `لقد حاولت سرقة ${targetName} (قوة: ${formatNumber(targetPower)}) ولكنك خسرت. لم تحصل على شيء.`;
+                    message = `You tried to rob ${targetName} (Power: ${formatNumber(targetPower)}) but you lost. You gained nothing.`;
                 }
 
                 playerData.robberyCooldownEndTime = currentTime + ROBBERY_COOLDOWN_MS;
@@ -3754,8 +3785,7 @@
                     timestamp: serverTimestamp()
                 };
                 push(globalAttacksRef, newAttack).catch(error => console.error("Error adding attack to global log:", error));
-                console.log("Attack logged:", newAttack); // Debugging
-
+                // console.log("Attack logged:", newAttack);
                 window.showMessage(message);
                 // Update the online status modal if it's open to reflect cooldown
                 if (onlineStatusModal.style.display === 'flex') {
@@ -3763,7 +3793,7 @@
                 }
             } catch (error) {
                 console.error("Error in robPlayer:", error);
-                window.showMessage("حدث خطأ أثناء محاولة السرقة.");
+                window.showMessage("An error occurred while trying to rob.");
             }
         }
 
@@ -3772,7 +3802,7 @@
             try {
                 globalAttacksList.innerHTML = '';
                 if (globalAttacksLog.length === 0) {
-                    globalAttacksList.innerHTML = '<p class="text-center text-gray-300">لا توجد هجمات عالمية مسجلة حالياً.</p>';
+                    globalAttacksList.innerHTML = '<p class="text-center text-gray-300">No global attacks recorded currently.</p>';
                 } else {
                     globalAttacksLog.forEach(attack => {
                         const attackItem = document.createElement('div');
@@ -3793,8 +3823,8 @@
                         }
 
                         attackItem.innerHTML = `
-                            <p><strong>${attackerNameDisplay}</strong> هاجم <strong>${defenderNameDisplay}</strong></p>
-                            <p>النتيجة: <span class="outcome ${outcomeClass}">${attack.outcome === 'win' ? 'فوز' : 'خسارة'}</span></p>
+                            <p><strong>${attackerNameDisplay}</strong> attacked <strong>${defenderNameDisplay}</strong></p>
+                            <p>Outcome: <span class="outcome ${outcomeClass}">${attack.outcome === 'win' ? 'Win' : 'Loss'}</span></p>
                             <p class="timestamp">${new Date(attack.timestamp).toLocaleString('ar-EG', { timeZone: 'Asia/Baghdad' })}</p>
                         `;
                         globalAttacksList.appendChild(attackItem);
@@ -3803,7 +3833,7 @@
                 recordModal.style.display = 'flex';
             } catch (error) {
                 console.error("Error in showRecordModal:", error);
-                window.showMessage("حدث خطأ أثناء عرض سجل الهجمات.");
+                window.showMessage("An error occurred while displaying attack records.");
             }
         }
 
@@ -3844,23 +3874,23 @@
                         }
                     };
                     shipDataForProfile = [
-                        { name: 'السفينة الأساسية', power: playerData.ship1.power, unlocked: true },
-                        { name: 'السفينة الثانية', power: playerData.ship2.power, unlocked: playerData.ship2.unlocked },
-                        { name: 'السفينة الثالثة', power: playerData.ship3.power, unlocked: playerData.ship3.unlocked }
+                        { name: 'Basic Ship', power: playerData.ship1.power, unlocked: true },
+                        { name: 'Second Ship', power: playerData.ship2.power, unlocked: playerData.ship2.unlocked },
+                        { name: 'Third Ship', power: playerData.ship3.power, unlocked: playerData.ship3.unlocked }
                     ];
 
                 } else {
                     // Other player's profile: use data from allPlayersData
                     player = allPlayersData[profileUserId];
                     if (!player) {
-                        window.showMessage("لا يمكن العثور على بيانات هذا اللاعب.");
+                        window.showMessage("Could not find this player's data.");
                         return;
                     }
                     // Use actual ship data from public profile if available
                     shipDataForProfile = [
-                        { name: 'السفينة الأساسية', power: player.ships?.ship1?.power || 0, unlocked: player.ships?.ship1?.unlocked ?? true },
-                        { name: 'السفينة الثانية', power: player.ships?.ship2?.power || 0, unlocked: player.ships?.ship2?.unlocked ?? false }, 
-                        { name: 'السفينة الثالثة', power: player.ships?.ship3?.power || 0, unlocked: player.ships?.ship3?.unlocked ?? false }
+                        { name: 'Basic Ship', power: player.ships?.ship1?.power || 0, unlocked: player.ships?.ship1?.unlocked ?? true },
+                        { name: 'Second Ship', power: player.ships?.ship2?.power || 0, unlocked: player.ships?.ship2?.unlocked ?? false }, 
+                        { name: 'Third Ship', power: player.ships?.ship3?.power || 0, unlocked: player.ships?.ship3?.unlocked ?? false }
                     ];
                 }
 
@@ -3886,7 +3916,7 @@
                         if (shipIconSrc === 'font-awesome') {
                             iconHtml = `<i class="fas fa-ship text-blue-400"></i>`;
                         } else {
-                            iconHtml = `<img src="${shipIconSrc}" alt="Image of Ship Form" onerror="this.onerror=null;this.src='https://placehold.co/50x50/1a202c/e2e8f0?text=X';" draggable="false" />`;
+                            iconHtml = `<img src="${shipIconSrc}" alt="Image of Ship Form" onerror="this.onerror=null;this.src='https://placehold.co/50x50/1a202c/e2e8f0?text=X';" draggable="false">`;
                         }
 
                         itemDiv.innerHTML = `
@@ -3894,7 +3924,7 @@
                                 ${iconHtml}
                             </div>
                             <p>${ship.name}</p>
-                            <p>القوة: ${formatNumber(ship.power)}</p>
+                            <p>Power: ${formatNumber(ship.power)}</p>
                         `;
                         profileShipFormsGrid.appendChild(itemDiv);
                     }
@@ -3903,7 +3933,7 @@
                 playerProfileModal.style.display = 'flex';
             } catch (error) {
                 console.error("Error in showPlayerProfileModal:", error);
-                window.showMessage("حدث خطأ أثناء عرض ملف تعريف اللاعب.");
+                window.showMessage("An error occurred while displaying player profile.");
             }
         }
 
@@ -3922,19 +3952,19 @@
                 if (playerData.money > 0) {
                     betAmountInput.value = playerData.money;
                 } else {
-                    window.showMessage("ليس لديك أموال للرهان!");
+                    window.showMessage("You don't have money to bet!");
                 }
             } catch (error) {
                 console.error("Error in handleBetAllClick:", error);
-                window.showMessage("حدث خطأ أثناء محاولة الرهان بكامل الأموال.");
+                window.showMessage("An error occurred while trying to bet all money.");
             }
         }
 
         function handleUpgradeShip1Click() { upgradeShip(playerData.ship1); }
         function handleUpgradeShip2Click() { upgradeShip(playerData.ship2); }
         function handleUpgradeShip3Click() { upgradeShip(playerData.ship3); }
-        function handleUnlockShip2Click() { unlockShip(playerData.ship2, 'السفينة الثانية'); } 
-        function handleUnlockShip3Click() { unlockShip(playerData.ship3, 'السفينة الثالثة'); } 
+        function handleUnlockShip2Click() { unlockShip(playerData.ship2, 'Second Ship'); } 
+        function handleUnlockShip3Click() { unlockShip(playerData.ship3, 'Third Ship'); } 
         function handleCollectResource1Click() { collectResource1(); }
         function handleCollectResource2Click() { collectResource2(); }
         function handleUnlockResource2Click() { unlockResource2(); }
@@ -3961,8 +3991,8 @@
                         globalAttacksRef = ref(db, `globalAttacks`);
                         isAuthReady = true;
                         
-                        // Load player data from local storage first
-                        loadPlayerDataFromLocalStorage(); 
+                        // Load player data from Firebase instead of local storage
+                        loadPlayerDataFromFirebase(); 
                         
                         // Setup listeners for public data
                         setupPublicDataListeners(); 
@@ -3978,7 +4008,7 @@
                     }
                 } catch (error) {
                     console.error("Firebase Auth Error during sign-in:", error);
-                    window.showMessage("فشل تسجيل الدخول إلى Firebase. قد لا تعمل الميزات بشكل صحيح.");
+                    window.showMessage("Firebase login failed. Features may not work correctly.");
                 }
             });
 
@@ -4086,6 +4116,8 @@
             freeBoxCooldownText = document.getElementById('freeBoxCooldownText');
 
             allStoreItems = document.getElementById('allStoreItems'); // Get the new combined store container
+            mainMenuResourceQuickAction = document.getElementById('mainMenuResourceQuickAction'); // Get the quick action button for resources
+
 
             shipFormsModal = document.getElementById('shipFormsModal');
             shipFormsModalTitle = document.getElementById('shipFormsModalTitle');
