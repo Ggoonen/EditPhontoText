@@ -1,0 +1,3952 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق الأسطول</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans Arabic', sans-serif;
+            background-color: #080a0d;
+            color: #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(13,17,23,0.8) 0%, rgba(8,10,13,1) 70%);
+            opacity: 0.7;
+            z-index: -1;
+        }
+        body::-webkit-scrollbar {
+            display: none;
+        }
+        body {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .btn {
+            @apply px-6 py-3 rounded-full font-bold text-lg transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg;
+        }
+        .btn-primary {
+            @apply bg-blue-600 text-white hover:bg-blue-700;
+        }
+        .btn-secondary {
+            @apply bg-gray-600 text-gray-100 hover:bg-gray-700;
+        }
+        .btn-success {
+            @apply bg-green-600 text-white hover:bg-green-700;
+        }
+        .btn-warning {
+            @apply bg-yellow-600 text-white hover:bg-yellow-700;
+        }
+        .btn-danger {
+            @apply bg-red-600 text-white hover:bg-red-700;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .modal-content {
+            background-color: #161b22;
+            color: #e2e8f0;
+            margin: auto;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.7);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            border: 1px solid #30363d;
+            animation: slideInUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+        }
+        .close-button {
+            color: #a0aec0;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            line-height: 1;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: #cbd5e0;
+            transform: rotate(90deg);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .section-container {
+            position: relative;
+            background-color: #161b22;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid #30363d;
+            padding: 1.5rem;
+        }
+        .header-container {
+            background-color: #161b22;
+            border-bottom: 4px solid #f39c12;
+            padding: 12px 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .header-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            padding: 0 16px;
+            width: 100%;
+            max-width: 4xl;
+            margin-bottom: 10px;
+        }
+        .header-item {
+            background-color: #21262d;
+            border-radius: 10px;
+            padding: 10px 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            min-width: 70px;
+        }
+        .header-item i {
+            font-size: 1.6rem;
+            margin-bottom: 2px;
+            text-shadow: none;
+        }
+        .header-item span {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #cbd5e0;
+            text-align: center;
+        }
+        .header-fleet-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 15px;
+            background-color: #21262d;
+            border-radius: 10px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            max-width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .header-fleet-name #fleetName {
+            margin-left: 8px;
+            margin-right: 8px;
+        }
+        .header-fleet-name #fleetStarIcon {
+            font-size: 1.2rem;
+        }
+        .change-name-btn {
+            background-color: #4a5568;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            margin-right: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+        .change-name-btn:hover {
+            background-color: #6b7280;
+            transform: translateY(-2px);
+        }
+
+        .bottom-nav-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            display: flex;
+            gap: 15px;
+        }
+
+        .bottom-nav-button {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #161b22;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        .bottom-nav-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.7);
+        }
+        .bottom-nav-button-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            animation: pulse-glow 2s infinite ease-in-out;
+            box-sizing: border-box;
+        }
+        @keyframes pulse-glow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
+                border-color: rgba(96, 165, 250, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(96, 165, 250, 0);
+                border-color: rgba(96, 165, 250, 0.8);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(96, 165, 250, 0.7);
+                border-color: rgba(96, 165, 250, 0.4);
+            }
+        }
+        .bottom-nav-button-icon {
+            font-size: 2.5rem;
+            color: #60a5fa;
+            position: relative;
+            z-index: 1;
+        }
+
+
+        .pill-style-item {
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4), inset 0 2px 5px rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            min-height: 100px;
+        }
+        .pill-style-item::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            z-index: 1;
+        }
+        .pill-style-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.6), inset 0 2px 5px rgba(255, 255, 255, 0.3);
+        }
+        .pill-style-item .content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+        .pill-style-item i {
+            font-size: 3rem;
+            margin-bottom: 0.25rem;
+            color: white;
+            text-shadow: none;
+        }
+        .pill-style-item span {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+        .pill-style-item .notification-dot {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 15px;
+            height: 15px;
+            background-color: #f39c12;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            z-index: 3;
+        }
+        .pill-style-item .quick-action {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+            cursor: pointer;
+        }
+        .pill-style-item .quick-action:hover {
+            opacity: 1;
+        }
+
+        .main-menu-item-bg-1 { background: linear-gradient(to bottom, #A0522D, #8B4513); }
+        .main-menu-item-bg-2 { background: linear-gradient(to bottom, #8BC34A, #6B8E23); }
+        .main-menu-item-bg-3 { background: linear-gradient(to bottom, #9370DB, #8A2BE2); }
+        .main-menu-item-bg-4 { background: linear-gradient(to bottom, #FF8C00, #FF4500); }
+        .main-menu-item-bg-5 { background: linear-gradient(to bottom, #4682B4, #4169E1); }
+        .main-menu-item-bg-6 { background: linear-gradient(to bottom, #20B2AA, #008B8B); }
+        .main-menu-item-bg-roulette { background: linear-gradient(to bottom, #DC143C, #8B0000); }
+        .main-menu-item-bg-resources { background: linear-gradient(to bottom, #6A5ACD, #483D8B); }
+
+
+        .store-item {
+            background: linear-gradient(145deg, #1a202c, #0d1117);
+            border-radius: 20px;
+            padding: 1rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7), inset 0 2px 5px rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+            min-height: 160px;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .store-item.animate-pop-in {
+            animation: pop-in 0.5s ease-out forwards;
+        }
+
+        @keyframes pop-in {
+            0% { opacity: 0; transform: scale(0.8); }
+            70% { opacity: 1; transform: scale(1.05); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .store-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .store-item:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), inset 0 2px 8px rgba(255, 255, 255, 0.15);
+        }
+
+        .store-item .item-visual {
+            position: relative;
+            z-index: 2;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 15px rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+        .store-item:hover .item-visual {
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.7), 0 0 25px rgba(255,255,255,0.2);
+        }
+
+        .store-item .item-visual i {
+            font-size: 3.5rem;
+            color: white;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+            margin: 0;
+        }
+        .store-item .item-visual img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(255,255,255,0.5));
+            margin: 0;
+        }
+
+        .store-item h3 {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #e2e8f0;
+            position: relative;
+            z-index: 2;
+            margin-bottom: 0.5rem;
+        }
+        .store-item .price-display {
+            background: linear-gradient(90deg, #30363d, #4a5568);
+            border-radius: 15px;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #cbd5e0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            position: relative;
+            z-index: 2;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .store-item .price-display i {
+            font-size: 1rem;
+            margin: 0;
+        }
+        .store-item .price-display i.fa-dollar-sign {
+            color: #4CAF50;
+        }
+        .store-item .price-display i.fa-key {
+            color: #FFD700;
+        }
+        .store-item .cooldown-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            font-weight: bold;
+            z-index: 5;
+            flex-direction: column;
+            gap: 8px;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
+        }
+        .store-item .cooldown-overlay i {
+            font-size: 2.5rem;
+            margin-bottom: 0;
+        }
+
+        @keyframes gold-animation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes pink-animation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes fiery-animation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes silver-animation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes blue-glow-animation { 0% { text-shadow: 0 0 5px #3b82f6, 0 0 10px #3b82f6, 0 0 15px #3b82f6; } 50% { text-shadow: 0 0 10px #2563eb, 0 0 20px #2563eb, 0 0 30px #2563eb; } 100% { text-shadow: 0 0 5px #3b82f6, 0 0 10px #3b82f6, 0 0 15px #3b82f6; } }
+        @keyframes emerald-animation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes royal-crimson-animation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes crown-animation { 0% { transform: scale(1) rotate(0deg); opacity: 1; } 25% { transform: scale(1.1) rotate(5deg); opacity: 0.9; } 50% { transform: scale(1) rotate(0deg); opacity: 1; } 75% { transform: scale(1.1) rotate(-5deg); opacity: 0.9; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+        @keyframes lion-animation { 0% { transform: scale(1) rotate(0deg); opacity: 1; } 50% { transform: scale(1.05) rotate(3deg); opacity: 0.95; } 100% { transform: scale(1) rotate(0deg); opacity: 1; } }
+        @keyframes glowing-icon { 0% { filter: drop-shadow(0 0 5px rgba(255,255,255,0.7)); } 50% { filter: drop-shadow(0 0 15px rgba(255,255,255,1)); } 100% { filter: drop-shadow(0 0 5px rgba(255,255,255,0.7)); } }
+        
+        @keyframes golden-lion-glow {
+            0% { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5)); }
+            50% { filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.9)); }
+            100% { filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.5)); }
+        }
+        .golden-lion-glow {
+            animation: golden-lion-glow 2s ease-in-out infinite;
+        }
+
+        /* Glitch Effect */
+        @keyframes glitch-color {
+            0% { color: #e2e8f0; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
+            20% { color: #ff00ff; text-shadow: 2px 2px 0px rgba(0,255,255,0.7); }
+            40% { color: #00ffff; text-shadow: -2px -2px 0px rgba(255,0,255,0.7); }
+            60% { color: #e2e8f0; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
+            80% { color: #ff00ff; text-shadow: 2px 2px 0px rgba(0,255,255,0.7); }
+            100% { color: #00ffff; text-shadow: -2px -2px 0px rgba(255,0,255,0.7); }
+        }
+
+        .glitch-text {
+            animation: glitch-color 0.5s infinite alternate;
+            font-family: 'Press Start 2P', cursive; /* A pixelated font for glitch effect */
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+
+        .golden-text { background: linear-gradient(90deg, #ffd700, #ffec8b, #ffd700, #ffec8b); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: gold-animation 3s linear infinite; }
+        .pink-text { background: linear-gradient(90deg, #ff69b4, #ffb6c1, #ff69b4, #ffb6c1); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: pink-animation 3s linear infinite; }
+        .fiery-text { background: linear-gradient(90deg, #ff4500, #ffa500, #ff4500, #ffa500); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: fiery-animation 3s linear infinite; }
+        .silver-text { background: linear-gradient(90deg, #c0c0c0, #e0e0e0, #c0c0c0, #e0e0e0); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: silver-animation 3s linear infinite; }
+        .blue-glow-text { color: #3b82f6; animation: blue-glow-animation 2s ease-in-out infinite; }
+        .emerald-text { background: linear-gradient(90deg, #00c9a7, #00e0b7, #00c9a7, #00e0b7); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: emerald-animation 3s linear infinite; }
+        .royal-crimson-text { background: linear-gradient(90deg, #8b0000, #dc143c, #8b0000, #dc143c); background-size: 200% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; animation: royal-crimson-animation 3s linear infinite; }
+        .animated-crown-icon { animation: crown-animation 2s ease-in-out infinite; }
+        .animated-lion-icon { animation: lion-animation 1.5s ease-in-out infinite; }
+        .glowing-icon { animation: glowing-icon 2s ease-in-out infinite; }
+
+        @keyframes fade-in-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in-up { animation: fade-in-up 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        #storeItemDetailModal .modal-content {
+            max-width: 500px;
+            padding: 30px;
+        }
+        #storeItemDetailModal h2 {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        #storeItemDetailModal .item-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+        #storeItemDetailModal .item-icon-img { 
+            width: 5rem;
+            height: 5rem;
+            margin: 0 auto 20px auto; 
+        }
+        #storeItemDetailModal .item-description {
+            font-size: 1.1rem;
+            color: #a0aec0;
+            margin-bottom: 25px;
+        }
+        #storeItemDetailModal .item-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #storeItemDetailModal .item-price i.fa-dollar-sign {
+            color: #4CAF50;
+            margin-left: 10px;
+            font-size: 1.8rem;
+        }
+        #storeItemDetailModal .item-price i.fa-key {
+            color: #FFD700;
+            margin-left: 10px;
+            font-size: 1.8rem;
+        }
+        #storeItemDetailModal .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .modal-actions .pill-modal-btn {
+            min-width: 120px; 
+        }
+
+        .pill-modal-btn {
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+        .pill-modal-btn::before {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            right: 1px;
+            bottom: 1px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1;
+        }
+        .pill-modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.25);
+        }
+        .pill-modal-btn.bg-blue-600 {
+            background: linear-gradient(to bottom, #3b82f6, #2563eb);
+        }
+        .pill-modal-btn.bg-gray-600 {
+            background: linear-gradient(to bottom, #6b7280, #4b5563);
+        }
+
+        /* My Fleet Redesign */
+        .my-fleet-card {
+            background-color: #1a202c; /* Darker background for contrast */
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7);
+            border: 2px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .my-fleet-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.9);
+        }
+        .my-fleet-card .ship-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+        .my-fleet-card .ship-header h3 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e2e8f0;
+            margin: 0 10px;
+        }
+        .my-fleet-card .ship-icon-display {
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 1rem;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.7), 0 0 20px rgba(255,255,255,0.1);
+        }
+        .my-fleet-card .ship-icon-display i {
+            font-size: 5rem;
+            color: #60a5fa;
+            position: absolute;
+        }
+        .my-fleet-card .ship-icon-display img {
+            width: 90%;
+            height: 90%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+        }
+        .my-fleet-card .ship-stats {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+        .my-fleet-card .stat-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            padding: 5px 10px;
+            background-color: #21262d;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+        }
+        .my-fleet-card .stat-line span:first-child {
+            color: #a0aec0;
+        }
+        .my-fleet-card .stat-line span:last-child {
+            font-weight: bold;
+            color: #e2e8f0;
+        }
+        .my-fleet-card .progress-bar-wrapper {
+            background-color: #4a5568;
+            border-radius: 10px;
+            height: 15px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+        }
+        .my-fleet-card .progress-bar {
+            background-color: #3b82f6;
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease-out;
+        }
+        .my-fleet-card .upgrade-btn {
+            @apply px-8 py-3 rounded-full font-bold text-lg transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg;
+            background: linear-gradient(to bottom, #3b82f6, #2563eb);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 250px;
+        }
+        .my-fleet-card .upgrade-btn::before {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            right: 1px;
+            bottom: 1px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1;
+        }
+        .my-fleet-card .upgrade-btn:hover {
+            transform: translateY(-2px);
+        }
+        .my-fleet-card .upgrade-btn.on-cooldown {
+            background: linear-gradient(to bottom, #6b7280, #4b5563);
+            cursor: not-allowed;
+            opacity: 0.8;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+            animation: none;
+        }
+        .my-fleet-card.locked {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .ship-form-btn {
+            background: none;
+            border: none;
+            color: #f39c12;
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: absolute;
+            top: 15px;
+            right: 15px; /* Adjusted for RTL */
+            z-index: 3;
+            transition: transform 0.2s ease;
+            display: block !important; /* Ensure visibility */
+        }
+        .ship-form-btn:hover {
+            transform: scale(1.1);
+        }
+        .unlock-ship-btn {
+            @apply px-8 py-3 rounded-full font-bold text-lg transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg;
+            background: linear-gradient(to bottom, #9370DB, #8A2BE2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            max-width: 250px;
+            margin-top: 1rem;
+        }
+        .unlock-ship-btn::before {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            right: 1px;
+            bottom: 1px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1;
+        }
+        .unlock-ship-btn:hover {
+            transform: translateY(-2px);
+        }
+        .unlock-ship-btn:disabled {
+            background: linear-gradient(to bottom, #6b7280, #4b5563);
+            cursor: not-allowed;
+            opacity: 0.8;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+            animation: none;
+        }
+
+
+        .resource-item-card {
+            background-color: #21262d;
+            border-radius: 50px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4), inset 0 2px 5px rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .resource-item-card::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            border-radius: 50px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            z-index: 1;
+        }
+        .resource-item-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.6), inset 0 2px 5px rgba(255, 255, 255, 0.3);
+        }
+        .resource-item-card .icon-container {
+            position: relative;
+            z-index: 2;
+            margin-right: 1.5rem;
+            padding-left: 10px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .resource-item-card .icon-container i {
+            font-size: 2.5rem;
+        }
+        .resource-item-card .info-container {
+            position: relative;
+            z-index: 2;
+            flex-grow: 1;
+        }
+        .resource-item-card h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #e2e8f0;
+            margin-bottom: 0.25rem;
+        }
+        .resource-item-card p {
+            font-size: 1rem;
+            color: #a0aec0;
+        }
+        .resource-item-card .progress-bar-wrapper {
+            background-color: #4a5568;
+            border-radius: 5px;
+            height: 8px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+        .resource-item-card .progress-bar {
+            background-color: #3b82f6;
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.3s ease-out;
+        }
+        .resource-item-card .level-text {
+            font-size: 0.85rem;
+            color: #cbd5e0;
+            margin-top: 0.25rem;
+        }
+        .resource-item-card .action-container {
+            position: relative;
+            z-index: 2;
+            margin-left: 1.5rem;
+        }
+        .resource-item-card .upgrade-btn {
+            @apply px-5 py-2 rounded-full font-bold text-base transition-all duration-300 ease-in-out transform hover:scale-105 shadow-lg;
+            background: linear-gradient(to bottom, #3b82f6, #2563eb);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .resource-item-card .upgrade-btn::before {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            right: 1px;
+            bottom: 1px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 1;
+        }
+        .resource-item-card .upgrade-btn:hover {
+            transform: translateY(-2px);
+        }
+        .resource-item-card .upgrade-btn:disabled {
+            background: linear-gradient(to bottom, #6b7280, #4b5563);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .roulette-container {
+            background-color: #21262d;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid #30363d;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .roulette-display-area {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            background-color: #1a202c;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 15px rgba(0,0,0,0.7);
+            border: 5px solid #30363d;
+            overflow: hidden;
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            background-image: linear-gradient(to right, #2d3748 1px, transparent 1px), linear-gradient(to bottom, #2d3748 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .multiplier-display-bottom-right {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+            z-index: 3;
+        }
+        .plane-path {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        .plane-path svg {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            color: #FFD700;
+            transition: transform linear;
+            transform-origin: center center;
+        }
+        @keyframes crash-shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
+        .roulette-display-area.crashed {
+            background-color: #FF0000 !important;
+            border-color: #CC0000 !important;
+            box-shadow: 0 0 25px rgba(255,0,0,0.9) !important;
+            animation: crash-shake 0.3s ease-in-out;
+        }
+        .roulette-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+        .roulette-controls input {
+            background-color: #3b4554;
+            border: 1px solid #4a5568;
+            border-radius: 8px;
+            padding: 0.75rem;
+            color: #e2e8f0;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .roulette-controls .spin-btn-style {
+            border-radius: 50px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3), inset 0 1px 3px rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+            color: white;
+            background: linear-gradient(to bottom, #3b82f6, #2563eb);
+        }
+        .roulette-controls .spin-btn-style:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4), inset 0 1px 3px rgba(255, 255, 255, 0.25);
+        }
+        .roulette-controls .cash-out-btn-style {
+            background: linear-gradient(to bottom, #FFD700, #DAA520);
+            color: #333;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+        }
+        .roulette-controls .cash-out-btn-style:hover {
+            background: linear-gradient(to bottom, #FFEB3B, #FFC107);
+        }
+        .roulette-result {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-top: 1.5rem;
+            color: #e2e8f0;
+        }
+        .roulette-cooldown-display {
+            font-size: 1rem;
+            color: #a0aec0;
+            margin-top: 0.5rem;
+        }
+
+        .ship-selection-option {
+            background-color: #21262d;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .ship-selection-option:hover {
+            background-color: #2b323b;
+        }
+        .ship-selection-option.selected {
+            border-color: #f39c12;
+            box-shadow: 0 0 10px rgba(243,156,18,0.5);
+        }
+        .ship-selection-option input[type="radio"] {
+            margin-left: 10px;
+            accent-color: #f39c12;
+        }
+        .ship-selection-option label {
+            flex-grow: 1;
+            text-align: right;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        #shipFormsModal .modal-content {
+            max-width: 500px;
+            padding: 30px;
+        }
+        #shipFormsModal h2 {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        #shipFormsModal .current-form-display {
+            background-color: #2b323b;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border: 2px solid #f39c12;
+            box-shadow: 0 0 15px rgba(243,156,18,0.5);
+        }
+        #shipFormsModal .current-form-display h3 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        #shipFormsModal .current-form-display .icon-display {
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 10px;
+        }
+        #shipFormsModal .current-form-display .icon-display i {
+            font-size: 4rem;
+            color: #60a5fa;
+            position: absolute;
+        }
+        #shipFormsModal .current-form-display .icon-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            position: absolute;
+        }
+        #shipFormsModal .current-form-display p {
+            font-size: 1.1rem;
+        }
+        #shipFormsModal .all-forms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+        #shipFormsModal .form-item-card {
+            background-color: #21262d;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            border: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #shipFormsModal .form-item-card.current {
+            border-color: #22c55e;
+            box-shadow: 0 0 10px rgba(34,197,94,0.5);
+        }
+        #shipFormsModal .form-item-card .icon-display {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 5px;
+        }
+        #shipFormsModal .form-item-card .icon-display i {
+            font-size: 3rem;
+            color: #60a5fa;
+            position: absolute;
+        }
+        #shipFormsModal .form-item-card .icon-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            position: absolute;
+        }
+        #shipFormsModal .form-item-card p {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            font-weight: bold;
+        }
+
+        #onlineStatusModal .modal-content, #recordModal .modal-content, #playerProfileModal .modal-content {
+            max-width: 400px;
+            padding: 20px;
+        }
+        #onlineStatusModal h2, #recordModal h2, #playerProfileModal h2 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .player-list-section {
+            margin-top: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #30363d;
+            margin-bottom: 15px;
+        }
+        .player-list-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .player-list-section h3 {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #cbd5e0;
+            margin-bottom: 10px;
+            text-align: right;
+        }
+        .player-status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #21262d;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            border: 1px solid #30363d;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .player-status-item:hover {
+            background-color: #2b323b;
+        }
+        .player-status-item.online {
+            border-right: 5px solid #22c55e;
+        }
+        .player-status-item.offline {
+            border-right: 5px solid #ef4444;
+            opacity: 0.7;
+        }
+        .player-status-item .status-info {
+            display: flex;
+            align-items: center;
+        }
+        .player-status-item .player-name-display {
+            font-size: 1rem;
+            font-weight: bold;
+            margin-left: 5px; /* Space between icon and name */
+        }
+        .player-status-item .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+        .player-status-item .power-info {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #cbd5e0;
+        }
+        .player-status-item .power-info i {
+            font-size: 0.9rem;
+            margin-left: 5px;
+        }
+        .player-status-item .attack-btn {
+            background-color: #ef4444;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .player-status-item .attack-btn:hover {
+            background-color: #dc2626;
+        }
+        .player-status-item .attack-btn:disabled {
+            background-color: #6b7280;
+            cursor: not-allowed;
+        }
+        .player-status-item .player-icon-display {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 5px;
+        }
+        .player-status-item .player-icon-display i {
+            font-size: 1rem;
+            margin: 0;
+        }
+        .player-status-item .player-icon-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+
+        .attack-item {
+            background-color: #21262d;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            border: 1px solid #30363d;
+            text-align: right;
+        }
+        .attack-item p {
+            margin-bottom: 5px;
+        }
+        .attack-item .outcome.win { color: #22c55e; font-weight: bold; }
+        .attack-item .outcome.loss { color: #ef4444; font-weight: bold; }
+        .attack-item .timestamp { font-size: 0.8em; color: #a0aec0; }
+
+        /* Player Profile Modal Specific Styles */
+        #playerProfileModal .profile-stat {
+            background-color: #21262d;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        #playerProfileModal .profile-stat span {
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+        #playerProfileModal .profile-stat p {
+            font-size: 0.9rem;
+            color: #a0aec0;
+        }
+        #playerProfileModal .profile-ship-forms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        #playerProfileModal .profile-form-item-card {
+            background-color: #1a202c;
+            border-radius: 10px;
+            padding: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            border: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #playerProfileModal .profile-form-item-card .icon-display {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 5px;
+        }
+        #playerProfileModal .profile-form-item-card .icon-display i {
+            font-size: 2.5rem;
+            color: #60a5fa;
+            position: absolute;
+        }
+        #playerProfileModal .profile-form-item-card .icon-display img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            position: absolute;
+        }
+        #playerProfileModal .profile-form-item-card p {
+            font-size: 0.7rem;
+            color: #a0aec0;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+<body class="bg-gray-900 min-h-screen flex flex-col" oncontextmenu="return false;">
+
+    <div id="changeFleetNameModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeChangeFleetNameModal()">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">تغيير اسم الأسطول</h2>
+            <input type="text" id="changeFleetNameInput" placeholder="اسم الأسطول الجديد" class="w-full p-3 rounded-lg bg-gray-700 text-white border border-gray-600 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="confirmChangeFleetNameBtn" class="btn btn-primary w-full">تأكيد التغيير</button>
+        </div>
+    </div>
+
+    <header class="header-container w-full">
+        <div class="header-stats-grid w-full max-w-4xl mx-auto">
+            <div class="header-item">
+                <i class="fas fa-fist-raised text-red-500"></i>
+                <span id="playerPower">0</span>
+            </div>
+            <div class="header-item">
+                <i class="fas fa-dollar-sign text-green-400"></i>
+                <span id="playerMoney">0</span>
+            </div>
+            <div class="header-item">
+                <i class="fas fa-key text-yellow-400"></i>
+                <span id="playerKeys">0</span>
+            </div>
+        </div>
+        <div class="header-fleet-name flex justify-between items-center px-4">
+            <span id="fleetName">أسطولي العظيم</span>
+            <i id="fleetStarIcon" class="fas fa-star text-yellow-300 hidden"></i>
+            <i id="fleetCrownIcon" class="fas fa-chess-king text-yellow-400 hidden"></i>
+            <img id="fleetLionIcon" src="https://d.top4top.io/p_3482hpjya1.png" alt="Lion Icon" class="w-6 h-6 ml-1 hidden animated-lion-icon" draggable="false">
+            <span id="lionCountDisplay" class="text-xs text-gray-400 ml-1 hidden">x0</span>
+            <button id="changeNameBtn" class="change-name-btn">تغيير الاسم</button>
+        </div>
+    </header>
+
+    <main class="flex-grow p-4 flex flex-col items-center justify-center relative">
+        <section id="mainMenu" class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-8 w-full max-w-4xl hidden">
+            <div class="pill-style-item main-menu-item-bg-1" onclick="showSection('myFleet')">
+                <div class="content">
+                    <i class="fas fa-ship"></i>
+                    <span>أسطولي</span>
+                </div>
+            </div>
+            <div class="pill-style-item main-menu-item-bg-2" onclick="showSection('store')">
+                <div class="content">
+                    <i class="fas fa-store"></i>
+                    <span>المتجر</span>
+                </div>
+            </div>
+            <div class="pill-style-item main-menu-item-bg-resources">
+                <div class="content" onclick="showSection('myResources')">
+                    <i class="fas fa-boxes"></i>
+                    <span>مواردي</span>
+                </div>
+                <div class="quick-action" onclick="collectResource1()">استلام</div>
+            </div>
+            <div class="pill-style-item main-menu-item-bg-3" onclick="showSection('playerRobberySection')">
+                <div class="content">
+                    <i class="fas fa-mask"></i>
+                    <span>سرقة اللاعبين</span>
+                </div>
+            </div>
+            <div class="pill-style-item main-menu-item-bg-roulette" onclick="showSection('rouletteSection')">
+                <div class="content">
+                    <i class="fas fa-dice"></i>
+                    <span>روليت</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="myFleet" class="hidden p-6 rounded-xl shadow-xl w-full max-w-2xl text-gray-100 section-container">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200" onclick="showSection('mainMenu')">
+                <i class="fas fa-arrow-right text-3xl"></i>
+            </button>
+            <h2 class="text-3xl font-bold text-center mb-6 text-gray-100">أسطولي</h2>
+            <div class="space-y-6">
+                <div id="ship1Card" class="my-fleet-card">
+                    <button class="ship-form-btn" onclick="showShipForms('ship1')"><i class="fas fa-exclamation-circle"></i></button>
+                    <div class="ship-header">
+                        <h3>السفينة الأساسية</h3>
+                    </div>
+                    <div class="ship-icon-display">
+                        <i id="ship1IconI" class="fas fa-ship"></i>
+                        <img id="ship1IconImg" src="" alt="Image of Ship Icon" style="display: none;" draggable="false">
+                    </div>
+                    <div class="ship-stats">
+                        <div class="stat-line"><span>القوة:</span> <span id="ship1Power">0</span></div>
+                        <div class="progress-bar-wrapper">
+                            <div id="ship1Progress" class="progress-bar" style="width: 0%;"></div>
+                        </div>
+                        <p class="level-text">القوة القصوى: <span id="ship1MaxPower">10000</span></p>
+                    </div>
+                    <button id="upgradeShip1" class="upgrade-btn">تطوير</button>
+                </div>
+
+                <div id="ship2Card" class="my-fleet-card locked">
+                    <button class="ship-form-btn" onclick="showShipForms('ship2')"><i class="fas fa-exclamation-circle"></i></button>
+                    <div class="ship-header">
+                        <h3 class="text-gray-400">السفينة الثانية</h3>
+                    </div>
+                    <div class="ship-icon-display">
+                        <i id="ship2IconI" class="fas fa-ship text-gray-500"></i>
+                        <img id="ship2IconImg" src="" alt="Image of Ship Icon" style="display: none;" draggable="false">
+                    </div>
+                    <div class="ship-stats">
+                        <div class="stat-line"><span>القوة:</span> <span id="ship2Power">0</span></div>
+                        <div class="progress-bar-wrapper">
+                            <div id="ship2Progress" class="progress-bar" style="width: 0%;"></div>
+                        </div>
+                        <p class="level-text">القوة القصوى: <span id="ship2MaxPower">10000</span></p>
+                    </div>
+                    <button id="upgradeShip2" class="upgrade-btn hidden">تطوير</button>
+                    <button id="unlockShip2Btn" class="unlock-ship-btn">فتح السفينة (100 مفتاح)</button>
+                </div>
+
+                <div id="ship3Card" class="my-fleet-card locked">
+                    <button class="ship-form-btn" onclick="showShipForms('ship3')"><i class="fas fa-exclamation-circle"></i></button>
+                    <div class="ship-header">
+                        <h3 class="text-gray-400">السفينة الثالثة</h3>
+                    </div>
+                    <div class="ship-icon-display">
+                        <i id="ship3IconI" class="fas fa-ship text-gray-500"></i>
+                        <img id="ship3IconImg" src="" alt="Image of Ship Icon" style="display: none;" draggable="false">
+                    </div>
+                    <div class="ship-stats">
+                        <div class="stat-line"><span>القوة:</span> <span id="ship3Power">0</span></div>
+                        <div class="progress-bar-wrapper">
+                            <div id="ship3Progress" class="progress-bar" style="width: 0%;"></div>
+                        </div>
+                        <p class="level-text">القوة القصوى: <span id="ship3MaxPower">10000</span></p>
+                    </div>
+                    <button id="upgradeShip3" class="upgrade-btn hidden">تطوير</button>
+                    <button id="unlockShip3Btn" class="unlock-ship-btn">فتح السفينة (100 مفتاح)</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="store" class="hidden p-6 rounded-xl shadow-xl w-full max-w-2xl text-gray-100 section-container">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200" onclick="showSection('mainMenu')">
+                <i class="fas fa-arrow-right text-3xl"></i>
+            </button>
+            <h2 class="text-3xl font-bold text-center mb-6 text-gray-100">المتجر</h2>
+            
+            <div class="store-category-nav flex justify-center gap-4 mb-8">
+                <button class="store-category-btn active px-6 py-2 rounded-full bg-blue-700 hover:bg-blue-800 text-white font-bold transition-colors" onclick="showStoreCategory('utility')">تطويرات</button>
+                <button class="store-category-btn px-6 py-2 rounded-full bg-gray-700 hover:bg-gray-800 text-white font-bold transition-colors" onclick="showStoreCategory('cosmetic')">عناصر تجميلية</button>
+                <button class="store-category-btn px-6 py-2 rounded-full bg-gray-700 hover:bg-gray-800 text-white font-bold transition-colors" onclick="showStoreCategory('box')">صناديق</button>
+            </div>
+
+            <div id="storeUtilityItems" class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <div class="store-item" onclick="showStoreItemDetail('completeUpgrade')">
+                    <div class="item-visual">
+                        <img src="https://c.top4top.io/p_3482irls40.png" alt="Image of Complete Upgrade Icon" draggable="false">
+                    </div>
+                    <h3>إكمال التطوير</h3>
+                    <div class="price-display">
+                        <span>2</span> <i class="fas fa-key"></i>
+                    </div>
+                </div>
+                <div class="store-item" onclick="showStoreItemDetail('shipExpansion')">
+                    <div class="item-visual">
+                        <i class="fas fa-expand-arrows-alt text-blue-400"></i>
+                    </div>
+                    <h3>توسيع السفينة</h3>
+                    <div class="price-display">
+                        <span>50</span> <i class="fas fa-key"></i>
+                    </div>
+                </div>
+                <div class="store-item" onclick="showStoreItemDetail('buyKeys')">
+                    <div class="item-visual">
+                        <i class="fas fa-key text-yellow-400"></i>
+                    </div>
+                    <h3>شراء مفاتيح</h3>
+                    <div class="price-display">
+                        <span>150</span> <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div id="storeCosmeticItems" class="grid grid-cols-2 md:grid-cols-3 gap-6 hidden">
+                <div class="store-item" onclick="showStoreItemDetail('goldenName')">
+                    <div class="item-visual">
+                        <i class="fas fa-crown text-yellow-400"></i>
+                    </div>
+                    <h3>اسم ذهبي</h3>
+                    <div class="price-display">
+                        <span>3000</span> <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+                <div class="store-item" onclick="showStoreItemDetail('pinkName')">
+                    <div class="item-visual">
+                        <i class="fas fa-heart text-pink-500"></i>
+                    </div>
+                    <h3>اسم وردي</h3>
+                    <div class="price-display">
+                        <span>1500</span> <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+                <div class="store-item" onclick="showStoreItemDetail('fieryName')">
+                    <div class="item-visual">
+                        <i class="fas fa-fire text-orange-500"></i>
+                    </div>
+                    <h3>اسم ناري</h3>
+                    <div class="price-display">
+                        <span>2000</span> <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+                <div class="store-item" onclick="showStoreItemDetail('royalCrimsonName')">
+                    <div class="item-visual">
+                        <i class="fas fa-shield-alt text-red-600"></i>
+                    </div>
+                    <h3>اسم قرمزي</h3>
+                    <div class="price-display">
+                        <span>9000</span> <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+                <div class="store-item" onclick="showStoreItemDetail('starIcon')">
+                    <div class="item-visual">
+                        <i class="fas fa-star text-yellow-300"></i>
+                    </div>
+                    <h3>أيقونة نجمة</h3>
+                    <div class="price-display">
+                        <span>3000</span> <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+                <div class="store-item" onclick="showStoreItemDetail('lionIcon')">
+                    <div class="item-visual">
+                        <img src="https://d.top4top.io/p_3482hpjya1.png" alt="Image of Lion Icon" draggable="false">
+                    </div>
+                    <h3>أيقونة أسد</h3>
+                    <div class="price-display">
+                        <span>-</span> <i class="fas fa-dollar-sign"></i> 
+                    </div>
+                </div>
+                <div class="store-item" onclick="showStoreItemDetail('glitchName')">
+                    <div class="item-visual">
+                        <i class="fas fa-cogs text-gray-400"></i> 
+                    </div>
+                    <h3>اسم متقطع (Glitch)</h3>
+                    <div class="price-display">
+                        <span>-</span> <i class="fas fa-dollar-sign"></i> 
+                    </div>
+                </div>
+            </div>
+
+            <div id="storeBoxItems" class="grid grid-cols-2 md:grid-cols-3 gap-6 hidden">
+                <div class="store-item" id="freeBoxStoreItem" onclick="showStoreItemDetail('freeBox')">
+                    <div class="item-visual">
+                        <img src="https://a.top4top.io/p_3483uplj00.png" alt="Image of Free Box" draggable="false">
+                    </div>
+                    <h3>صندوق مجاني</h3>
+                    <div class="price-display">
+                        <span>مجاني</span>
+                    </div>
+                    <div id="freeBoxCooldownOverlay" class="cooldown-overlay hidden">
+                        <i class="fas fa-hourglass-half"></i>
+                        <span id="freeBoxCooldownText"></span>
+                    </div>
+                </div>
+                <div class="store-item" onclick="showStoreItemDetail('luckyBox')">
+                    <div class="item-visual">
+                        <img src="https://e.top4top.io/p_348281x7t0.png" alt="Image of Lucky Box" draggable="false">
+                    </div>
+                    <h3>صندوق الحظ</h3>
+                    <div class="price-display">
+                        <span>3500</span> <i class="fas fa-dollar-sign"></i>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-center text-gray-300 mt-6">المزيد من العناصر قريباً!</p>
+        </section>
+
+        <section id="myResources" class="hidden p-6 rounded-xl shadow-xl w-full max-w-2xl text-gray-100 section-container">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200" onclick="showSection('mainMenu')">
+                <i class="fas fa-arrow-right text-3xl"></i>
+            </button>
+            <h2 class="text-3xl font-bold text-center mb-6 text-gray-100">مواردي</h2>
+            <div class="space-y-6">
+                <div id="resource1Card" class="resource-item-card">
+                    <div class="icon-container">
+                        <i class="fas fa-box-open text-green-400 glowing-icon"></i>
+                    </div>
+                    <div class="info-container">
+                        <h3>موارد أساسية</h3>
+                        <p>متاح: <span id="accumulatedResources1Display">0/200</span></p>
+                        <div class="progress-bar-wrapper">
+                            <div id="resource1Progress" class="progress-bar" style="width: 0%;"></div>
+                        </div>
+                        <p class="level-text">معدل التجميع: <span id="resource1Rate"></span></p>
+                    </div>
+                    <div class="action-container">
+                        <button id="collectResource1Btn" class="upgrade-btn">استلام</button>
+                    </div>
+                </div>
+
+                <div id="resource2Card" class="resource-item-card opacity-50 pointer-events-none">
+                    <div class="icon-container">
+                        <i class="fas fa-gem text-gray-500"></i>
+                    </div>
+                    <div class="info-container">
+                        <h3>موارد نادرة</h3>
+                        <p id="resource2Status">مغلق</p>
+                        <div class="progress-bar-wrapper hidden" id="resource2ProgressBarWrapper">
+                            <div id="resource2Progress" class="progress-bar" style="width: 0%;"></div>
+                        </div>
+                        <p class="level-text hidden" id="resource2RateDisplay"></p>
+                    </div>
+                    <div class="action-container">
+                        <button id="unlockResource2Btn" class="upgrade-btn">فتح (30 مفتاح)</button>
+                        <button id="collectResource2Btn" class="upgrade-btn hidden">استلام</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="playerRobberySection" class="hidden p-6 rounded-xl shadow-xl w-full max-w-2xl text-gray-100 section-container">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200" onclick="showSection('mainMenu')">
+                <i class="fas fa-arrow-right text-3xl"></i>
+            </button>
+            <h2 class="text-3xl font-bold text-center mb-6 text-gray-100">سرقة اللاعبين</h2>
+            <p class="text-center text-gray-300">ميزة سرقة اللاعبين قيد التطوير حالياً. ترقبوا المزيد!</p>
+        </section>
+
+        <section id="rouletteSection" class="hidden p-6 rounded-xl shadow-xl w-full max-w-2xl text-gray-100 section-container">
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200" onclick="showSection('mainMenu')">
+                <i class="fas fa-arrow-right text-3xl"></i>
+            </button>
+            <h2 class="text-3xl font-bold text-center mb-6 text-gray-100">لعبة الطائرة</h2>
+            <div class="roulette-container">
+                <div id="rouletteGameElements">
+                    <div id="rouletteDisplayArea" class="roulette-display-area">
+                        <div class="plane-path">
+                            <svg id="planeSvg" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9L2 14v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1V20.5L13 19v-2.5l8 2.5z"/>
+                            </svg>
+                        </div>
+                        <span id="multiplierDisplay" class="multiplier-display-bottom-right">1.00x</span>
+                    </div>
+
+                    <div class="roulette-controls">
+                        <input type="number" id="betAmountInput" placeholder="مبلغ الرهان (20-2000)" min="20" max="2000" class="w-full">
+                        <button id="startGameBtn" class="spin-btn-style">ابدأ الجولة</button>
+                        <button id="cashOutBtn" class="spin-btn-style cash-out-btn-style hidden" disabled>استلام الأرباح (<span id="potentialWinnings">0</span>)</button>
+                        <p id="rouletteResult" class="roulette-result hidden">النتيجة: </p>
+                    </div>
+                </div>
+                <p id="rouletteCooldownDisplay" class="roulette-cooldown-display hidden">الجولة القادمة بعد: </p>
+            </div>
+        </section>
+    </main>
+
+    <div class="bottom-nav-container">
+        <div class="bottom-nav-button" onclick="showOnlineStatusModal()">
+            <div class="bottom-nav-button-circle"></div>
+            <i class="fas fa-wifi bottom-nav-button-icon"></i>
+        </div>
+        <div class="bottom-nav-button" onclick="showRecordModal()">
+            <div class="bottom-nav-button-circle"></div>
+            <i class="fas fa-scroll bottom-nav-button-icon"></i>
+        </div>
+    </div>
+
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <p id="modalMessage" class="text-lg font-semibold"></p>
+            <button class="pill-modal-btn bg-blue-600 mt-4" onclick="closeModal()">حسناً</button>
+        </div>
+    </div>
+
+    <div id="confirmModal" class="modal">
+        <div class="modal-content">
+            <p id="confirmMessage" class="text-lg font-semibold mb-4"></p>
+            <div class="modal-actions">
+                <button id="confirmYesBtn" class="pill-modal-btn bg-blue-600">نعم</button>
+                <button id="confirmNoBtn" class="pill-modal-btn bg-gray-600">لا</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="storeItemDetailModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeStoreItemDetailModal(true)">&times;</span>
+            <h2 id="storeItemTitle"></h2>
+            <i id="storeItemIcon" class="item-icon hidden"></i>
+            <img id="storeItemIconImg" src="" alt="Item Icon" class="item-icon-img hidden" draggable="false">
+            <p id="storeItemDescription" class="item-description"></p>
+            
+            <div id="keyPurchaseOptions" class="key-options-grid hidden">
+            </div>
+
+            <p id="storeItemPrice" class="item-price"></p>
+            
+            <div id="cosmeticPreview" class="text-center my-4 hidden">
+                <p id="cosmeticNamePreview" class="text-3xl font-bold">اسم أسطولك</p>
+                <i id="cosmeticIconPreview" class="text-5xl my-2 hidden"></i>
+                <img id="cosmeticImagePreview" src="" class="w-20 h-20 mx-auto my-2 hidden" alt="Cosmetic Preview" draggable="false" />
+            </div>
+
+            <div class="modal-actions">
+                <button id="buyStoreItemBtn" class="pill-modal-btn bg-blue-600">شراء</button>
+                <button class="pill-modal-btn bg-gray-600" onclick="closeStoreItemDetailModal(true)">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="shipSelectionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeShipSelectionModal()">&times;</span>
+            <h2 class="text-2xl font-bold mb-4" id="shipExpansionModalTitle">توسيع السفينة</h2>
+            <i id="shipExpansionModalIcon" class="item-icon fas fa-expand-arrows-alt text-blue-400"></i>
+            <p id="shipExpansionModalDescription" class="item-description">يزيد الحد الأقصى لقوة السفينة المختارة بمقدار 5000 نقطة قوة إضافية. يمكن شراء هذا التوسيع عدة مرات لأي سفينة.</p>
+            <p id="shipExpansionModalPrice" class="item-price">10000 <i class="fas fa-dollar-sign text-green-400"></i></p>
+            
+            <h3 class="text-xl font-bold mb-3">اختر سفينة للتوسيع:</h3>
+            <div id="shipSelectionOptions" class="flex flex-col gap-3 mb-6">
+            </div>
+            <div class="modal-actions">
+                <button id="confirmShipExpansionBtn" class="pill-modal-btn bg-blue-600">تأكيد التوسيع</button>
+                <button class="pill-modal-btn bg-gray-600" onclick="closeShipSelectionModal()">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="shipFormsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeShipFormsModal()">&times;</span>
+            <h2 id="shipFormsModalTitle" class="text-2xl font-bold mb-4">أشكال السفينة</h2>
+            
+            <div class="current-form-display">
+                <h3>الشكل الحالي لسفينة <span id="currentShipNameInForms"></span></h3>
+                <div class="icon-display">
+                    <i id="currentShipFormIconI" class="hidden"></i>
+                    <img id="currentShipFormIconImg" src="" alt="Current Ship Form" class="hidden" draggable="false">
+                </div>
+                <p id="currentShipFormPowerRange" class="text-lg text-green-300 font-semibold"></p>
+            </div>
+
+            <h3 class="text-xl font-bold mb-3">جميع الأشكال المتاحة:</h3>
+            <div id="allShipFormsGrid" class="all-forms-grid">
+            </div>
+
+            <button class="pill-modal-btn bg-gray-600 mt-6" onclick="closeShipFormsModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <div id="onlineStatusModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeOnlineStatusModal()">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">حالة الاتصال</h2>
+            <div class="player-list-section">
+                <h3>المتصلون</h3>
+                <div id="onlinePlayersList"></div>
+            </div>
+            <div class="player-list-section">
+                <h3>غير المتصلين</h3>
+                <div id="offlinePlayersList"></div>
+            </div>
+            <button class="pill-modal-btn bg-blue-600 mt-4" onclick="closeOnlineStatusModal()">حسناً</button>
+        </div>
+    </div>
+
+    <div id="recordModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeRecordModal()">&times;</span>
+            <h2 class="text-2xl font-bold mb-4">سجل الهجمات العالمية</h2>
+            <div id="globalAttacksList"></div>
+            <button class="pill-modal-btn bg-blue-600 mt-4" onclick="closeRecordModal()">حسناً</button>
+        </div>
+    </div>
+
+    <div id="playerProfileModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closePlayerProfileModal()">&times;</span>
+            <h2 id="profilePlayerName" class="text-2xl font-bold mb-4"></h2>
+            
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="profile-stat">
+                    <span>الفوز: <span id="profileWins">0</span></span>
+                </div>
+                <div class="profile-stat">
+                    <span>الخسارة: <span id="profileLosses">0</span></span>
+                </div>
+            </div>
+            <div class="profile-stat">
+                <span>القوة الإجمالية: <span id="profileTotalPower">0</span></span>
+            </div>
+
+            <h3 class="text-xl font-bold mb-3 mt-4 text-right">أشكال السفن:</h3>
+            <div id="profileShipFormsGrid" class="profile-ship-forms-grid">
+            </div>
+
+            <button class="pill-modal-btn bg-blue-600 mt-6" onclick="closePlayerProfileModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getDatabase, ref, set, onValue, push, serverTimestamp, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+        const INITIAL_SHIP_MAX_POWER = 10000;
+        const UPGRADE_COOLDOWN_MS = 3 * 60 * 1000;
+        const FREE_BOX_COOLDOWN_MS = 1 * 60 * 60 * 1000;
+        const ROULETTE_COOLDOWN_MS = 1 * 60 * 1000;
+        const ATTACK_COOLDOWN_MS = 7 * 60 * 1000; // 7 minutes cooldown for attacks
+        const ONLINE_THRESHOLD_MS = 30 * 1000; // Consider online if last activity within 30 seconds
+
+        const MAX_ACCUMULATED_RESOURCES_1 = 200;
+        const RESOURCE_ACCUMULATION_INTERVAL_MS_1 = 5 * 1000;
+
+        const MAX_ACCUMULATED_RESOURCES_2 = 300;
+        const RESOURCE_ACCUMULATION_INTERVAL_MS_2 = 8 * 1000;
+        const RESOURCE2_GAIN_PER_INTERVAL = 10;
+        const RESOURCE2_UNLOCK_COST = 30;
+        const SHIP_UNLOCK_COST = 100; // Cost to unlock Ship 2 or Ship 3
+
+        let userId = null;
+        let currentStoreCategory = 'utility';
+
+        let app;
+        let auth;
+        let db;
+        let userRef; // Reference to the current user's data in RTDB
+        let playersRef; // Reference to the public players data
+        let globalAttacksRef; // Reference to the global attacks log
+        let isAuthReady = false; // Flag to indicate Firebase Auth is ready
+
+        // Use global variables provided by Canvas environment
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        // Initialize Firebase
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getDatabase(app);
+
+        let playerData = {
+            power: 0,
+            money: 0,
+            keys: 0,
+            fleetName: null, 
+            isFleetNameSet: false,
+            isGoldenNameOwned: false,
+            isGoldenNameActive: false,
+            isPinkNameOwned: false, 
+            isPinkNameActive: false,
+            isFieryNameOwned: false, 
+            isFieryNameActive: false,
+            isRoyalCrimsonNameOwned: false, 
+            isRoyalCrimsonNameActive: false, 
+            isStarIconOwned: false,
+            isStarIconActive: false,
+            lionCount: 0, 
+            isLionActive: false, 
+            isGlitchNameOwned: false, 
+            isGlitchNameActive: false, 
+            freeBoxCooldownEndTime: 0,
+            ship1: { power: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER }, 
+            ship2: { power: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER }, 
+            ship3: { power: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER }, 
+            rouletteCooldownEndTime: 0,
+            attackCooldownEndTime: 0, // New: Attack cooldown
+            wins: 0, // New: Wins count
+            losses: 0, // New: Losses count
+            accumulatedResources1: 0,
+            resource2Unlocked: false,
+            accumulatedResources2: 0,
+            lastUpdated: 0,
+            lastActivity: 0 // New: Timestamp for online status
+        };
+
+        let allPlayersData = {}; // To store public data of all players
+        let globalAttacksLog = []; // To store the last 5 global attacks
+
+        let gameActive = false;
+        let currentMultiplier = 1.00;
+        let crashPoint = 0;
+        let betAmount = 0;
+        let hasCashedOut = false;
+        let animationFrameId;
+        let lastFrameTime = 0;
+
+        let playerPowerEl;
+        let playerMoneyEl;
+        let playerKeysEl;
+        let fleetNameEl;
+        let fleetStarIconEl;
+        let fleetCrownIconEl; 
+        let fleetLionIconEl;
+        let lionCountDisplayEl; 
+        let changeNameBtn; 
+        let onlineStatusButtonContainerEl;
+        let recordButtonContainerEl;
+
+        let ship1Card;
+        let ship1PowerEl;
+        let ship1ProgressEl;
+        let upgradeShip1Btn;
+        let ship1IconContainerEl; 
+        let ship1IconIEl;
+        let ship1IconImgEl;
+        let ship1MaxPowerEl;
+
+        let ship2Card;
+        let ship2PowerEl;
+        let ship2ProgressEl;
+        let upgradeShip2Btn;
+        let ship2IconContainerEl; 
+        let ship2IconImgEl;
+        let ship2IconIEl;
+        let ship2MaxPowerEl;
+        let unlockShip2Btn; 
+
+        let ship3Card;
+        let ship3PowerEl;
+        let ship3ProgressEl;
+        let upgradeShip3Btn;
+        let ship3IconContainerEl; 
+        let ship3IconImgEl;
+        let ship3IconIEl;
+        let ship3MaxPowerEl;
+        let unlockShip3Btn; 
+
+        let mainMenuSection;
+        let myFleetSection;
+        let storeSection;
+        let playerRobberySection;
+        let rouletteSection;
+        let myResourcesSection; 
+
+        let messageModal;
+        let modalMessage;
+        let confirmModal;
+        let confirmMessage;
+        let confirmYesBtn;
+        let confirmNoBtn;
+
+        let changeFleetNameModal; 
+        let changeFleetNameInput;
+        let confirmChangeFleetNameBtn;
+
+        let resource1Card;
+        let accumulatedResources1Display;
+        let resource1Progress;
+        let resource1Rate;
+        let collectResource1Btn;
+
+        let resource2Card;
+        let resource2Status;
+        let resource2ProgressBarWrapper;
+        let resource2Progress;
+        let resource2RateDisplay;
+        let unlockResource2Btn;
+        let collectResource2Btn;
+
+        let storeItemDetailModal;
+        let storeItemTitle;
+        let storeItemIcon;
+        let storeItemIconImg; 
+        let storeItemDescription;
+        let storeItemPrice;
+        let buyStoreItemBtn;
+        let currentStoreItemKey = null;
+
+        let cosmeticPreviewEl;
+        let cosmeticNamePreviewEl;
+        let cosmeticIconPreviewEl;
+        let cosmeticImagePreviewEl;
+
+        let keyPurchaseOptionsContainer;
+        let selectedKeyAmount = 1;
+
+        let rouletteGameElements; 
+        let rouletteDisplayArea;
+        let multiplierDisplay;
+        let betAmountInput;
+        let startGameBtn;
+        let cashOutBtn;
+        let potentialWinningsEl;
+        let rouletteResult;
+        let rouletteCooldownDisplay;
+        let planeSvg;
+
+        let freeBoxStoreItem;
+        let freeBoxCooldownOverlay;
+        let freeBoxCooldownText;
+
+        let storeUtilityItems;
+        let storeCosmeticItems;
+        let storeBoxItems;
+        let storeCategoryButtons;
+
+        let shipFormsModal;
+        let shipFormsModalTitle;
+        let currentShipNameInForms;
+        let currentShipFormIconI;
+        let currentShipFormIconImg;
+        let currentShipFormPowerRange; 
+        let allShipFormsGrid;
+
+        let onlineStatusModal;
+        let onlinePlayersList;
+        let offlinePlayersList;
+
+        let recordModal;
+        let globalAttacksList;
+
+        let playerProfileModal;
+        let profilePlayerName;
+        let profileWins;
+        let profileLosses;
+        let profileTotalPower;
+        let profileShipFormsGrid;
+
+
+        const shipFormsData = [
+            { powerRange: '1 - 1000', iconType: 'font-awesome', iconClass: 'fas fa-ship', imgSrc: '' },
+            { powerRange: '1001 - 4000', iconType: 'image', iconClass: '', imgSrc: 'https://l.top4top.io/p_3482en0id0.png' },
+            { powerRange: '4001 - 9999', iconType: 'image', iconClass: '', imgSrc: 'https://b.top4top.io/p_3482vv1ax2.png' },
+            { powerRange: '10000+', iconType: 'image', iconClass: '', imgSrc: 'https://c.top4top.io/p_3482878s83.png' }
+        ];
+
+        const storeItems = {
+            completeUpgrade: {
+                title: 'إكمال التطوير',
+                iconType: 'image', 
+                icon: 'https://c.top4top.io/p_3482irls40.png',
+                description: 'ينهي وقت انتظار تطوير السفن.',
+                price: 2,
+                currency: 'key',
+                type: 'utility',
+                category: 'utility'
+            },
+            shipExpansion: {
+                title: 'توسيع السفينة',
+                iconType: 'font-awesome', 
+                icon: 'fas fa-expand-arrows-alt text-blue-400',
+                description: 'يزيد الحد الأقصى لقوة السفينة المختارة بمقدار 5000 نقطة قوة إضافية. يمكن شراء هذا التوسيع عدة مرات لأي سفينة.',
+                price: 50, 
+                currency: 'key',
+                type: 'utility',
+                category: 'utility'
+            },
+            buyKeys: { 
+                title: 'شراء مفاتيح',
+                iconType: 'font-awesome', 
+                icon: 'fas fa-key text-yellow-400',
+                description: 'احصل على المزيد من المفاتيح لفتح الميزات أو إكمال التطوير.',
+                basePrice: 150,
+                currency: 'money',
+                type: 'utility',
+                category: 'utility',
+                options: [1, 2, 3, 4, 5]
+            },
+            luckyBox: { 
+                title: 'صندوق الحظ',
+                iconType: 'image',
+                icon: 'https://e.top4top.io/p_348281x7t0.png',
+                description: 'جرب حظك واحصل على جوائز قيمة!',
+                price: 3500,
+                currency: 'money',
+                type: 'lucky_box',
+                category: 'box'
+            },
+            freeBox: { 
+                title: 'صندوق مجاني',
+                iconType: 'image',
+                icon: 'https://a.top4top.io/p_3483uplj00.png',
+                description: 'احصل على مكافآت مجانية كل ساعة!',
+                price: 0,
+                currency: 'none',
+                type: 'free_box',
+                category: 'box'
+            },
+            goldenName: {
+                title: 'اسم ذهبي',
+                fullTitle: 'اسم ذهبي متحرك',
+                iconType: 'font-awesome', 
+                icon: 'fas fa-crown text-yellow-400',
+                description: 'اجعل اسم أسطولك يتوهج بالذهب.',
+                price: 3000,
+                currency: 'money',
+                type: 'name_cosmetic',
+                ownedKey: 'isGoldenNameOwned',
+                activeKey: 'isGoldenNameActive',
+                cssClass: 'golden-text',
+                category: 'cosmetic'
+            },
+            pinkName: { 
+                title: 'اسم وردي',
+                fullTitle: 'اسم وردي متحرك',
+                iconType: 'font-awesome', 
+                icon: 'fas fa-heart text-pink-500',
+                description: 'اجعل اسم أسطولك يتوهج باللون الوردي.',
+                price: 1500,
+                currency: 'money',
+                type: 'name_cosmetic',
+                ownedKey: 'isPinkNameOwned',
+                activeKey: 'isPinkNameActive',
+                cssClass: 'pink-text',
+                category: 'cosmetic'
+            },
+            fieryName: { 
+                title: 'اسم ناري',
+                fullTitle: 'اسم ناري ملتهب',
+                iconType: 'font-awesome', 
+                icon: 'fas fa-fire text-orange-500',
+                description: 'اجعل اسم أسطولك يتوهج بالنار.',
+                price: 2000,
+                currency: 'money',
+                type: 'name_cosmetic',
+                ownedKey: 'isFieryNameOwned',
+                activeKey: 'isFieryNameActive',
+                cssClass: 'fiery-text',
+                category: 'cosmetic'
+            },
+            royalCrimsonName: { 
+                title: 'اسم قرمزي',
+                fullTitle: 'اسم قرمزي ملكي',
+                iconType: 'font-awesome',
+                icon: 'fas fa-shield-alt text-red-600',
+                description: 'اجعل اسم أسطولك يتوهج باللون القرمزي الملكي.',
+                price: 9000,
+                currency: 'money',
+                type: 'name_cosmetic',
+                ownedKey: 'isRoyalCrimsonNameOwned',
+                activeKey: 'isRoyalCrimsonNameActive',
+                cssClass: 'royal-crimson-text',
+                category: 'cosmetic'
+            },
+            starIcon: {
+                title: 'أيقونة نجمة',
+                fullTitle: 'أيقونة النجمة',
+                iconType: 'font-awesome', 
+                icon: 'fas fa-star text-yellow-300',
+                description: 'أضف نجمة لامعة بجانب اسمك.',
+                price: 3000,
+                currency: 'money',
+                type: 'icon_cosmetic',
+                ownedKey: 'isStarIconOwned',
+                activeKey: 'isStarIconActive',
+                category: 'cosmetic'
+            },
+            lionIcon: { 
+                title: 'أيقونة أسد',
+                fullTitle: 'أيقونة الأسد المتوهج',
+                iconType: 'image',
+                icon: 'https://d.top4top.io/p_3482hpjya1.png',
+                description: 'أيقونة أسد متوهجة تمنح 7000 قوة إضافية لأسطولك. يمكن الحصول عليها من صندوق الحظ.',
+                price: '-', 
+                currency: 'none',
+                type: 'icon_cosmetic',
+                ownedKey: 'lionCount', 
+                activeKey: 'isLionActive',
+                category: 'cosmetic'
+            },
+            glitchName: { 
+                title: 'اسم متقطع (Glitch)',
+                fullTitle: 'اسم متقطع (Glitch)',
+                iconType: 'font-awesome',
+                icon: 'fas fa-cogs text-gray-400',
+                description: 'اجعل اسم أسطولك يتوهج بألوان متقطعة وعصرية.',
+                price: '-',
+                currency: 'none',
+                type: 'name_cosmetic',
+                ownedKey: 'isGlitchNameOwned',
+                activeKey: 'isGlitchNameActive',
+                cssClass: 'glitch-text',
+                category: 'cosmetic'
+            }
+        };
+
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'm';
+            }
+            if (num >= 10000) {
+                return (num / 1000).toFixed(1) + 'k';
+            }
+            return num.toString();
+        }
+
+        window.showMessage = function(message) {
+            modalMessage.textContent = message;
+            modalMessage.classList.remove('hidden');
+            messageModal.style.display = 'flex';
+        }
+
+        window.closeModal = function() {
+            messageModal.style.display = 'none';
+        }
+
+        window.showConfirm = function(message, onConfirmCallback) {
+            confirmMessage.textContent = message;
+            confirmModal.style.display = 'flex';
+
+            const handleConfirm = () => {
+                onConfirmCallback(true);
+                confirmModal.style.display = 'none';
+                confirmYesBtn.removeEventListener('click', handleConfirm);
+                confirmNoBtn.removeEventListener('click', handleCancel);
+            };
+
+            const handleCancel = () => {
+                onConfirmCallback(false);
+                confirmModal.style.display = 'none';
+                confirmYesBtn.removeEventListener('click', handleConfirm);
+                confirmNoBtn.removeEventListener('click', handleCancel);
+            };
+
+            confirmYesBtn.addEventListener('click', handleConfirm);
+            confirmNoBtn.addEventListener('click', handleCancel);
+        }
+
+        function savePlayerData() {
+            if (userRef && isAuthReady) {
+                set(userRef, playerData)
+                    .catch(error => console.error("Error saving player data to Firebase:", error));
+            } else {
+                console.warn("Firebase not ready or userRef not set. Cannot save data.");
+            }
+        }
+
+        function loadPlayerDataFromFirebase() {
+            if (userRef) {
+                onValue(userRef, (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        // Merge loaded data with default structure to handle new properties
+                        playerData = {
+                            ...playerData, // Keep default initial values for new fields
+                            ...data,
+                            // Ensure nested objects are also merged properly if they exist
+                            ship1: { ...playerData.ship1, ...data.ship1 },
+                            ship2: { ...playerData.ship2, ...data.ship2 },
+                            ship3: { ...playerData.ship3, ...data.ship3 }
+                        };
+                        // Manually handle properties that might have been removed or changed type
+                        ['ship1', 'ship2', 'ship3'].forEach(shipKey => {
+                            if (playerData[shipKey] && playerData[shipKey].level !== undefined) {
+                                delete playerData[shipKey].level;
+                            }
+                        });
+                        // Initialize new properties if they don't exist in loaded data
+                        if (playerData.attackCooldownEndTime === undefined) playerData.attackCooldownEndTime = 0;
+                        if (playerData.wins === undefined) playerData.wins = 0;
+                        if (playerData.losses === undefined) playerData.losses = 0;
+                        if (playerData.lastActivity === undefined) playerData.lastActivity = 0;
+                        if (playerData.isGlitchNameOwned === undefined) playerData.isGlitchNameOwned = false;
+                        if (playerData.isGlitchNameActive === undefined) playerData.isGlitchNameActive = false;
+                    } else {
+                        // No data found, initialize with default and save
+                        playerData = {
+                            power: 0, money: 100, keys: 1, fleetName: "قائد جديد",
+                            isFleetNameSet: false,
+                            isGoldenNameOwned: false, isGoldenNameActive: false,
+                            isPinkNameOwned: false, isPinkNameActive: false,
+                            isFieryNameOwned: false, isFieryNameActive: false,
+                            isRoyalCrimsonNameOwned: false, isRoyalCrimsonNameActive: false,
+                            isStarIconOwned: false, isStarIconActive: false,
+                            lionCount: 0, isLionActive: false,
+                            isGlitchNameOwned: false, isGlitchNameActive: false,
+                            freeBoxCooldownEndTime: 0,
+                            ship1: { power: 0, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
+                            ship2: { power: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
+                            ship3: { power: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
+                            rouletteCooldownEndTime: 0,
+                            attackCooldownEndTime: 0,
+                            wins: 0,
+                            losses: 0,
+                            accumulatedResources1: 0,
+                            resource2Unlocked: false,
+                            accumulatedResources2: 0,
+                            lastUpdated: Date.now(),
+                            lastActivity: Date.now()
+                        };
+                        savePlayerData(); // Save initial data to Firebase
+                    }
+                    updateUIFromPlayerData();
+                    window.showSection('mainMenu'); // Show main menu after data is loaded/initialized
+                }, (error) => {
+                    console.error("Error reading player data from Firebase:", error);
+                    window.showMessage("فشل تحميل بيانات اللاعب من Firebase. قد لا تعمل الميزات بشكل صحيح.");
+                });
+            }
+        }
+
+        // Authentication listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                userRef = ref(db, `artifacts/${appId}/users/${userId}/playerData`);
+                playersRef = ref(db, `artifacts/${appId}/public/data/players`);
+                globalAttacksRef = ref(db, `artifacts/${appId}/public/data/globalAttacks`);
+                isAuthReady = true;
+                loadPlayerDataFromFirebase(); // Load data once authenticated
+                setupPublicDataListeners(); // Setup listeners for public data
+                setInterval(updatePublicPlayerData, 10000); // Update public data every 10 seconds
+            } else {
+                // Sign in anonymously if no user or token
+                try {
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Firebase Auth Error:", error);
+                    window.showMessage("فشل تسجيل الدخول إلى Firebase. قد لا تعمل الميزات بشكل صحيح.");
+                }
+            }
+        });
+
+        function setupPublicDataListeners() {
+            if (playersRef) {
+                onValue(playersRef, (snapshot) => {
+                    allPlayersData = snapshot.val() || {};
+                    // Filter out the current player from the allPlayersData for online/offline lists
+                    // The current player's data is managed directly via playerData object
+                    if (userId && allPlayersData[userId]) {
+                        delete allPlayersData[userId];
+                    }
+                }, (error) => {
+                    console.error("Error reading public players data:", error);
+                });
+            }
+
+            if (globalAttacksRef) {
+                // Use query to limit to last 5 attacks
+                const recentAttacksQuery = query(globalAttacksRef, limitToLast(5));
+                onValue(recentAttacksQuery, (snapshot) => {
+                    const attacks = [];
+                    snapshot.forEach((childSnapshot) => {
+                        attacks.push({ id: childSnapshot.key, ...childSnapshot.val() });
+                    });
+                    // Sort by timestamp in descending order to show most recent first
+                    globalAttacksLog = attacks.sort((a, b) => b.timestamp - a.timestamp);
+                }, (error) => {
+                    console.error("Error reading global attacks log:", error);
+                });
+            }
+        }
+
+        function updatePublicPlayerData() {
+            if (userId && isAuthReady && playerData.fleetName) {
+                const publicData = {
+                    name: playerData.fleetName,
+                    power: playerData.power,
+                    wins: playerData.wins,
+                    losses: playerData.losses,
+                    lastActivity: serverTimestamp(), // Use server timestamp for accuracy
+                    activeCosmetics: {
+                        nameClass: '',
+                        iconType: '',
+                        iconClass: '',
+                        iconImgSrc: '',
+                        iconCount: 0
+                    }
+                };
+
+                // Determine active name cosmetic
+                if (playerData.isGoldenNameActive) {
+                    publicData.activeCosmetics.nameClass = 'golden-text';
+                } else if (playerData.isPinkNameActive) {
+                    publicData.activeCosmetics.nameClass = 'pink-text';
+                } else if (playerData.isFieryNameActive) {
+                    publicData.activeCosmetics.nameClass = 'fiery-text';
+                } else if (playerData.isRoyalCrimsonNameActive) {
+                    publicData.activeCosmetics.nameClass = 'royal-crimson-text';
+                } else if (playerData.isGlitchNameActive) {
+                    publicData.activeCosmetics.nameClass = 'glitch-text';
+                }
+
+                // Determine active icon cosmetic
+                if (playerData.isStarIconActive) {
+                    publicData.activeCosmetics.iconType = 'font-awesome';
+                    publicData.activeCosmetics.iconClass = 'fas fa-star text-yellow-300';
+                } else if (playerData.isLionActive && playerData.lionCount > 0) {
+                    publicData.activeCosmetics.iconType = 'image';
+                    publicData.activeCosmetics.iconImgSrc = 'https://d.top4top.io/p_3482hpjya1.png';
+                    publicData.activeCosmetics.iconClass = 'animated-lion-icon golden-lion-glow'; // Apply classes for display
+                    publicData.activeCosmetics.iconCount = playerData.lionCount;
+                }
+
+                set(ref(db, `artifacts/${appId}/public/data/players/${userId}`), publicData)
+                    .catch(error => console.error("Error updating public player data:", error));
+            }
+        }
+
+        function updateUIFromPlayerData() {
+            playerData.power = playerData.ship1.power + (playerData.ship2.unlocked ? playerData.ship2.power : 0) + (playerData.ship3.unlocked ? playerData.ship3.power : 0);
+            playerData.power += (playerData.lionCount * 7000); 
+
+            playerPowerEl.textContent = formatNumber(playerData.power);
+            playerMoneyEl.textContent = formatNumber(playerData.money);
+            playerKeysEl.textContent = formatNumber(playerData.keys);
+            fleetNameEl.textContent = playerData.fleetName;
+            
+            fleetNameEl.classList.remove('golden-text', 'pink-text', 'fiery-text', 'royal-crimson-text', 'glitch-text'); 
+            
+            if (playerData.isGoldenNameActive) {
+                fleetNameEl.classList.add('golden-text');
+            } else if (playerData.isPinkNameActive) { 
+                fleetNameEl.classList.add('pink-text');
+            } else if (playerData.isFieryNameActive) { 
+                fleetNameEl.classList.add('fiery-text');
+            } else if (playerData.isRoyalCrimsonNameActive) { 
+                fleetNameEl.classList.add('royal-crimson-text');
+            } else if (playerData.isGlitchNameActive) { 
+                fleetNameEl.classList.add('glitch-text');
+            }
+
+            fleetStarIconEl.classList.toggle('hidden', !playerData.isStarIconActive);
+            fleetCrownIconEl.classList.toggle('hidden', !playerData.isCrownIconActive);
+            fleetCrownIconEl.classList.toggle('animated-crown-icon', playerData.isCrownIconActive);
+            
+            fleetLionIconEl.classList.toggle('hidden', playerData.lionCount === 0 || !playerData.isLionActive); 
+            fleetLionIconEl.classList.toggle('golden-lion-glow', playerData.isLionActive);
+            lionCountDisplayEl.classList.toggle('hidden', playerData.lionCount === 0 || !playerData.isLionActive); 
+            lionCountDisplayEl.textContent = `x${playerData.lionCount}`;
+
+            changeNameBtn.classList.toggle('hidden', playerData.isFleetNameSet);
+
+            updateShipUI(playerData.ship1, ship1PowerEl, ship1ProgressEl, upgradeShip1Btn, ship1IconContainerEl, ship1IconIEl, ship1IconImgEl, ship1MaxPowerEl, ship1Card, null);
+            updateShipUI(playerData.ship2, ship2PowerEl, ship2ProgressEl, upgradeShip2Btn, ship2IconContainerEl, ship2IconIEl, ship2IconImgEl, ship2MaxPowerEl, ship2Card, unlockShip2Btn);
+            updateShipUI(playerData.ship3, ship3PowerEl, ship3ProgressEl, upgradeShip3Btn, ship3IconContainerEl, ship3IconIEl, ship3IconImgEl, ship3MaxPowerEl, ship3Card, unlockShip3Btn);
+            
+            updateRouletteCooldownUI();
+            updateFreeBoxCooldownDisplay();
+
+            accumulatedResources1Display.textContent = `${playerData.accumulatedResources1}/${MAX_ACCUMULATED_RESOURCES_1}`;
+            resource1Progress.style.width = `${(playerData.accumulatedResources1 / MAX_ACCUMULATED_RESOURCES_1) * 100}%`;
+            resource1Rate.textContent = `1-7 كل ${RESOURCE_ACCUMULATION_INTERVAL_MS_1 / 1000} ثواني`;
+            collectResource1Btn.disabled = playerData.accumulatedResources1 === 0;
+
+            if (playerData.resource2Unlocked) {
+                resource2Card.classList.remove('opacity-50', 'pointer-events-none');
+                resource2Card.querySelector('.icon-container i').classList.remove('text-gray-500');
+                resource2Card.querySelector('.icon-container i').classList.add('text-yellow-400', 'glowing-icon');
+                resource2Status.textContent = `متاح: ${playerData.accumulatedResources2}/${MAX_ACCUMULATED_RESOURCES_2}`;
+                resource2ProgressBarWrapper.classList.remove('hidden');
+                resource2Progress.style.width = `${(playerData.accumulatedResources2 / MAX_ACCUMULATED_RESOURCES_2) * 100}%`;
+                resource2RateDisplay.classList.remove('hidden');
+                resource2RateDisplay.textContent = `${RESOURCE2_GAIN_PER_INTERVAL} كل ${RESOURCE_ACCUMULATION_INTERVAL_MS_2 / 1000} ثواني`;
+                unlockResource2Btn.classList.add('hidden');
+                collectResource2Btn.classList.remove('hidden');
+                collectResource2Btn.disabled = playerData.accumulatedResources2 === 0;
+            } else {
+                resource2Card.classList.add('opacity-50', 'pointer-events-none');
+                resource2Card.querySelector('.icon-container i').classList.add('text-gray-500');
+                resource2Card.querySelector('.icon-container i').classList.remove('text-yellow-400', 'glowing-icon');
+                resource2Status.textContent = 'مغلق';
+                resource2ProgressBarWrapper.classList.add('hidden');
+                resource2RateDisplay.classList.add('hidden');
+                unlockResource2Btn.classList.remove('hidden');
+                collectResource2Btn.classList.add('hidden');
+                unlockResource2Btn.disabled = playerData.keys < RESOURCE2_UNLOCK_COST;
+            }
+
+            savePlayerData();
+        }
+
+        function updateShipUI(ship, powerEl, progressEl, upgradeBtn, iconContainerEl, iconIEl, iconImgEl, maxPowerEl, cardEl, unlockBtn) {
+            powerEl.textContent = formatNumber(ship.power);
+            maxPowerEl.textContent = formatNumber(ship.maxPower);
+            const progress = (ship.power / ship.maxPower) * 100;
+            progressEl.style.width = `${progress}%`;
+
+            const currentTime = Date.now();
+            const remainingTime = ship.cooldownEndTime - currentTime;
+
+            if (ship.unlocked || ship === playerData.ship1) { // Ship 1 is always unlocked
+                cardEl.classList.remove('locked');
+                cardEl.querySelector('.ship-header h3').classList.remove('text-gray-400');
+                cardEl.querySelector('.ship-header h3').classList.add('text-blue-400');
+                
+                if (ship.power >= ship.maxPower) {
+                    upgradeBtn.disabled = true;
+                    upgradeBtn.textContent = 'مطور بالكامل';
+                    upgradeBtn.classList.remove('btn-primary', 'on-cooldown');
+                    upgradeBtn.classList.add('btn-success');
+                    upgradeBtn.classList.remove('hidden'); // Ensure it's visible
+                } else if (remainingTime > 0) {
+                    upgradeBtn.disabled = true;
+                    upgradeBtn.textContent = formatTime(remainingTime);
+                    upgradeBtn.classList.remove('btn-primary', 'btn-success');
+                    upgradeBtn.classList.add('on-cooldown');
+                    upgradeBtn.classList.remove('hidden'); // Ensure it's visible
+                } else {
+                    upgradeBtn.disabled = false;
+                    upgradeBtn.textContent = 'تطوير';
+                    upgradeBtn.classList.remove('btn-success', 'on-cooldown');
+                    upgradeBtn.classList.add('btn-primary');
+                    upgradeBtn.classList.remove('hidden'); // Ensure it's visible
+                }
+                if (unlockBtn) unlockBtn.classList.add('hidden'); // Hide unlock button if unlocked
+            } else { // Ship is locked
+                cardEl.classList.add('locked');
+                cardEl.querySelector('.ship-header h3').classList.remove('text-blue-400');
+                cardEl.querySelector('.ship-header h3').classList.add('text-gray-400');
+                upgradeBtn.classList.add('hidden'); // Hide upgrade button if locked
+                if (unlockBtn) {
+                    unlockBtn.classList.remove('hidden'); // Show unlock button
+                    unlockBtn.disabled = playerData.keys < SHIP_UNLOCK_COST;
+                }
+            }
+
+            const iconSrc = getShipIcon(ship.power); // Use power for icon
+
+            if (iconSrc === 'font-awesome') {
+                if (iconIEl) {
+                    iconIEl.style.display = '';
+                    iconIEl.className = 'fas fa-ship';
+                    if (ship.unlocked || ship === playerData.ship1) {
+                        iconIEl.classList.remove('text-gray-500');
+                        iconIEl.classList.add('text-blue-400');
+                        iconIEl.classList.add('glowing-icon'); 
+                    } else {
+                        iconIEl.classList.remove('text-blue-400');
+                        iconIEl.classList.add('text-gray-500');
+                        iconIEl.classList.remove('glowing-icon'); 
+                    }
+                }
+                if (iconImgEl) {
+                    iconImgEl.style.display = 'none';
+                }
+            } else {
+                if (iconIEl) {
+                    iconIEl.style.display = 'none';
+                }
+                if (iconImgEl) {
+                    iconImgEl.style.display = '';
+                    iconImgEl.src = iconSrc;
+                    if (ship.unlocked || ship === playerData.ship1) {
+                        iconImgEl.classList.add('glowing-icon'); 
+                    } else {
+                        iconImgEl.classList.remove('glowing-icon'); 
+                    }
+                }
+            }
+        }
+
+        function upgradeShip(ship) {
+            const currentTime = Date.now();
+            if (ship.power >= ship.maxPower) {
+                window.showMessage('هذه السفينة مطورة بالكامل بالفعل!');
+                return;
+            }
+            if (ship.cooldownEndTime > currentTime) {
+                window.showMessage(`هذه السفينة في فترة انتظار. يرجى الانتظار ${formatTime(ship.cooldownEndTime - currentTime)}.`);
+                return;
+            }
+
+            const powerGain = Math.floor(Math.random() * (325 - 45 + 1)) + 45;
+            ship.power += powerGain;
+
+            if (ship.power > ship.maxPower) {
+                ship.power = ship.maxPower;
+            }
+
+            ship.cooldownEndTime = currentTime + UPGRADE_COOLDOWN_MS;
+
+            updateUIFromPlayerData();
+        }
+
+        function unlockShip(shipObj, shipName) {
+            if (playerData.keys >= SHIP_UNLOCK_COST) {
+                playerData.keys -= SHIP_UNLOCK_COST;
+                shipObj.unlocked = true;
+                updateUIFromPlayerData();
+                window.showMessage(`تهانينا! لقد فتحت ${shipName} بنجاح!`);
+            } else {
+                window.showMessage(`ليس لديك ما يكفي من المفاتيح لفتح هذه السفينة. تحتاج ${SHIP_UNLOCK_COST} مفتاح.`);
+            }
+        }
+
+        function autoAccumulateResources1() {
+            if (playerData.accumulatedResources1 < MAX_ACCUMULATED_RESOURCES_1) {
+                const collectedAmount = Math.floor(Math.random() * 7) + 1;
+                playerData.accumulatedResources1 = Math.min(MAX_ACCUMULATED_RESOURCES_1, playerData.accumulatedResources1 + collectedAmount);
+                updateUIFromPlayerData();
+            }
+        }
+
+        function autoAccumulateResources2() {
+            if (playerData.resource2Unlocked && playerData.accumulatedResources2 < MAX_ACCUMULATED_RESOURCES_2) {
+                playerData.accumulatedResources2 = Math.min(MAX_ACCUMULATED_RESOURCES_2, playerData.accumulatedResources2 + RESOURCE2_GAIN_PER_INTERVAL);
+                updateUIFromPlayerData();
+            }
+        }
+
+        function collectResource1() {
+            if (playerData.accumulatedResources1 > 0) {
+                playerData.money += playerData.accumulatedResources1;
+                window.showMessage(`لقد استلمت ${playerData.accumulatedResources1} من الموارد الأساسية!`);
+                playerData.accumulatedResources1 = 0;
+                updateUIFromPlayerData();
+            } else {
+                window.showMessage('لا توجد موارد أساسية لتجميعها حالياً!');
+            }
+        }
+
+        function collectResource2() {
+            if (playerData.accumulatedResources2 > 0) {
+                playerData.money += playerData.accumulatedResources2;
+                window.showMessage(`لقد استلمت ${playerData.accumulatedResources2} من الموارد النادرة!`);
+                playerData.accumulatedResources2 = 0;
+                updateUIFromPlayerData();
+            } else {
+                window.showMessage('لا توجد موارد نادرة لتجميعها حالياً!');
+            }
+        }
+
+        function unlockResource2() {
+            if (playerData.keys >= RESOURCE2_UNLOCK_COST) {
+                playerData.keys -= RESOURCE2_UNLOCK_COST;
+                playerData.resource2Unlocked = true;
+                window.showMessage(`تهانينا! لقد فتحت الموارد النادرة!`);
+                updateUIFromPlayerData();
+            } else {
+                window.showMessage(`ليس لديك ما يكفي من المفاتيح لفتح الموارد النادرة. تحتاج ${RESOURCE2_UNLOCK_COST} مفتاح.`);
+            }
+        }
+
+        window.showStoreItemDetail = function(itemKey) {
+            currentStoreItemKey = itemKey;
+            const item = storeItems[itemKey];
+
+            // Special handling for shipExpansion to open a different modal
+            if (itemKey === 'shipExpansion') {
+                window.openShipSelectionModal();
+                return; 
+            }
+
+            cosmeticPreviewEl.classList.add('hidden');
+            cosmeticNamePreviewEl.classList.add('hidden');
+            cosmeticIconPreviewEl.classList.add('hidden');
+            cosmeticImagePreviewEl.classList.add('hidden');
+            cosmeticNamePreviewEl.classList.remove('golden-text', 'pink-text', 'fiery-text', 'royal-crimson-text', 'glitch-text'); 
+            cosmeticIconPreviewEl.classList.remove('animated-crown-icon', 'animated-lion-icon');
+            cosmeticImagePreviewEl.classList.remove('animated-lion-icon', 'golden-lion-glow');
+
+            keyPurchaseOptionsContainer.classList.add('hidden');
+            keyPurchaseOptionsContainer.innerHTML = '';
+            selectedKeyAmount = 1;
+
+
+            storeItemTitle.textContent = item.fullTitle || item.title;
+            
+            if (item.iconType === 'font-awesome') {
+                storeItemIcon.className = `item-icon ${item.icon}`;
+                storeItemIcon.classList.remove('hidden');
+                storeItemIconImg.classList.add('hidden');
+            } else {
+                storeItemIconImg.src = item.icon;
+                storeItemIconImg.classList.remove('hidden');
+                storeItemIcon.classList.add('hidden');
+            }
+
+            storeItemDescription.textContent = item.description;
+            
+            let priceHtml = '';
+            if (item.currency === 'none') {
+                priceHtml = item.price;
+            } else {
+                if (itemKey === 'buyKeys') {
+                    keyPurchaseOptionsContainer.classList.remove('hidden');
+                    item.options.forEach(amount => {
+                        const optionDiv = document.createElement('div');
+                        optionDiv.classList.add('key-option-item');
+                        if (amount === selectedKeyAmount) {
+                            optionDiv.classList.add('selected');
+                        }
+                        optionDiv.innerHTML = `
+                            <input type="radio" name="keyAmount" value="${amount}" ${amount === selectedKeyAmount ? 'checked' : ''}>
+                            <span class="key-amount">${amount}</span>
+                            <span class="key-price">${formatNumber(amount * item.basePrice)} <i class="fas fa-dollar-sign text-green-400"></i></span>
+                        `;
+                        optionDiv.addEventListener('click', () => {
+                            document.querySelectorAll('.key-option-item').forEach(opt => opt.classList.remove('selected'));
+                            optionDiv.classList.add('selected');
+                            selectedKeyAmount = amount;
+                            storeItemPrice.innerHTML = `${formatNumber(selectedKeyAmount * item.basePrice)} <i class="fas fa-dollar-sign text-green-400"></i>`;
+                        });
+                        keyPurchaseOptionsContainer.appendChild(optionDiv);
+                    });
+                    priceHtml = `${formatNumber(selectedKeyAmount * item.basePrice)} <i class="fas fa-dollar-sign text-green-400"></i>`;
+                } else {
+                    priceHtml = `${item.price} `;
+                    if (item.currency === 'key') {
+                        priceHtml += `<i class="fas fa-key text-yellow-400"></i>`;
+                    } else if (item.currency === 'money') {
+                        priceHtml += `<i class="fas fa-dollar-sign text-green-400"></i>`;
+                    }
+                }
+            }
+            storeItemPrice.innerHTML = priceHtml;
+
+            if (item.type === 'name_cosmetic') {
+                cosmeticPreviewEl.classList.remove('hidden');
+                cosmeticNamePreviewEl.classList.remove('hidden');
+                cosmeticNamePreviewEl.classList.add(item.cssClass);
+                cosmeticNamePreviewEl.textContent = 'اسم أسطولك';
+            } else if (item.type === 'icon_cosmetic') {
+                cosmeticPreviewEl.classList.remove('hidden');
+                if (item.iconType === 'font-awesome') {
+                    cosmeticIconPreviewEl.classList.remove('hidden');
+                    cosmeticIconPreviewEl.className = `text-5xl my-2 ${item.icon}`;
+                    if (itemKey === 'crownIcon') {
+                        cosmeticIconPreviewEl.classList.add('animated-crown-icon');
+                    }
+                } else {
+                    cosmeticImagePreviewEl.classList.remove('hidden');
+                    cosmeticImagePreviewEl.src = item.icon;
+                    if (itemKey === 'lionIcon') {
+                        cosmeticImagePreviewEl.classList.add('animated-lion-icon', 'golden-lion-glow');
+                    }
+                }
+            }
+
+            const buyBtn = document.getElementById('buyStoreItemBtn');
+            const currentTime = Date.now();
+
+            if (item.type === 'name_cosmetic' || item.type === 'icon_cosmetic') {
+                const isOwned = (item.ownedKey === 'lionCount') ? (playerData.lionCount > 0) : playerData[item.ownedKey];
+                const isActive = playerData[item.activeKey];
+
+                if (isOwned) {
+                    if (!isActive) { 
+                        buyBtn.textContent = 'تفعيل';
+                        buyBtn.classList.remove('bg-gray-600');
+                        buyBtn.classList.add('bg-blue-600');
+                    } else { 
+                        buyBtn.textContent = 'إلغاء تفعيل';
+                        buyBtn.classList.remove('bg-blue-600');
+                        buyBtn.classList.add('bg-gray-600');
+                    }
+                    buyBtn.disabled = false; 
+                } else {
+                    buyBtn.textContent = 'شراء';
+                    buyBtn.classList.remove('bg-gray-600');
+                    buyBtn.classList.add('bg-blue-600');
+                    if (itemKey === 'lionIcon' || itemKey === 'glitchName') { 
+                        buyBtn.disabled = true;
+                        buyBtn.textContent = 'يمكن الحصول عليه من صندوق الحظ';
+                    } else {
+                        buyBtn.disabled = false;
+                    }
+                }
+            } else if (item.type === 'free_box') {
+                buyBtn.textContent = 'افتح الصندوق';
+                buyBtn.disabled = false;
+            } else { 
+                buyBtn.textContent = 'شراء';
+                buyBtn.classList.remove('bg-gray-600');
+                buyBtn.classList.add('bg-blue-600');
+                buyBtn.disabled = false;
+            }
+
+            storeItemDetailModal.style.display = 'flex';
+        }
+
+        window.closeStoreItemDetailModal = function(returnToStore = false) {
+            storeItemDetailModal.style.display = 'none';
+            storeItemTitle.classList.remove('golden-text', 'pink-text', 'fiery-text', 'royal-crimson-text', 'glitch-text'); 
+            storeItemIcon.classList.add('hidden'); 
+            storeItemIconImg.classList.add('hidden'); 
+            currentStoreItemKey = null;
+
+            cosmeticPreviewEl.classList.add('hidden');
+            cosmeticNamePreviewEl.classList.add('hidden');
+            cosmeticIconPreviewEl.classList.add('hidden');
+            cosmeticImagePreviewEl.classList.add('hidden');
+            cosmeticNamePreviewEl.classList.remove('golden-text', 'pink-text', 'fiery-text', 'royal-crimson-text', 'glitch-text'); 
+            cosmeticIconPreviewEl.classList.remove('animated-crown-icon', 'animated-lion-icon');
+            cosmeticImagePreviewEl.classList.remove('animated-lion-icon', 'golden-lion-glow');
+
+            keyPurchaseOptionsContainer.classList.add('hidden');
+            keyPurchaseOptionsContainer.innerHTML = '';
+
+
+            if (returnToStore) {
+                window.showStoreCategory(currentStoreCategory);
+            }
+        }
+
+        async function buyStoreItem() {
+            if (!currentStoreItemKey) return;
+
+            const item = storeItems[currentStoreItemKey];
+            let message = '';
+            const currentTime = Date.now();
+            let cost = item.price;
+            let currencyType = item.currency;
+
+            // Special handling for 'completeUpgrade' to check cooldowns *before* deducting cost
+            if (currentStoreItemKey === 'completeUpgrade') {
+                let shipsOnCooldown = 0;
+                if (playerData.ship1.cooldownEndTime > currentTime) { shipsOnCooldown++; }
+                if (playerData.ship2.unlocked && playerData.ship2.cooldownEndTime > currentTime) { shipsOnCooldown++; }
+                if (playerData.ship3.unlocked && playerData.ship3.cooldownEndTime > currentTime) { shipsOnCooldown++; }
+
+                if (shipsOnCooldown === 0) {
+                    window.showMessage('لا توجد سفن في فترة انتظار حالياً لإكمال تطويرها.');
+                    return; // Exit, no transaction
+                }
+                // If there are ships on cooldown, proceed with cost deduction below
+            }
+
+            // Determine actual cost for 'buyKeys'
+            if (currentStoreItemKey === 'buyKeys') {
+                cost = selectedKeyAmount * item.basePrice;
+            }
+
+            // Check affordability
+            let hasEnoughCurrency = false;
+            if (currencyType === 'key') {
+                if (playerData.keys >= cost) {
+                    hasEnoughCurrency = true;
+                } else {
+                    message = `ليس لديك ما يكفي من المفاتيح لشراء هذا العنصر (${formatNumber(cost)} مفتاح).`;
+                }
+            } else if (currencyType === 'money') {
+                if (playerData.money >= cost) {
+                    hasEnoughCurrency = true;
+                } else {
+                    message = `ليس لديك ما يكفي من الأموال لشراء هذا العنصر (${formatNumber(cost)} أموال).`;
+                }
+            } else if (currencyType === 'none') { // Free items like freeBox or lionIcon (if obtained from box)
+                hasEnoughCurrency = true; // Always "can afford" if free
+            }
+
+            if (!hasEnoughCurrency) {
+                window.showMessage(message);
+                return; // Exit if not affordable
+            }
+
+            // Deduct cost
+            if (currencyType === 'key') {
+                playerData.keys -= cost;
+            } else if (currencyType === 'money') {
+                playerData.money -= cost;
+            }
+
+            // Apply item effects
+            if (currentStoreItemKey === 'completeUpgrade') {
+                if (playerData.ship1.cooldownEndTime > currentTime) { playerData.ship1.cooldownEndTime = 0; }
+                if (playerData.ship2.unlocked && playerData.ship2.cooldownEndTime > currentTime) { playerData.ship2.cooldownEndTime = 0; }
+                if (playerData.ship3.unlocked && playerData.ship3.cooldownEndTime > currentTime) { playerData.ship3.cooldownEndTime = 0; }
+                message = 'تم إكمال تطوير السفن بنجاح!';
+            } else if (currentStoreItemKey === 'buyKeys') {
+                playerData.keys += selectedKeyAmount;
+                message = `لقد اشتريت ${selectedKeyAmount} مفتاحاً بنجاح!`;
+            } else if (item.type === 'lucky_box') { 
+                let prizeMessage = "لقد فتحت صندوق الحظ وحصلت على: ";
+                const rand = Math.random() * 100;
+
+                if (rand < 4) { // 4% chance for Glitch Name
+                    playerData.isGlitchNameOwned = true;
+                    playerData.isGlitchNameActive = true;
+                    message = prizeMessage + `الاسم المتقطع (Glitch)!`;
+                } else if (rand < (4 + 9)) { 
+                    playerData.lionCount++; 
+                    playerData.isLionActive = true; 
+                    message = prizeMessage + `الأسد المتوهج! (7000 قوة إضافية). لديك الآن ${playerData.lionCount} أسد متوهج.`;
+                } else if (rand < (4 + 9 + 15)) { 
+                    const moneyGain = Math.floor(Math.random() * (1900 - 500 + 1)) + 500;
+                    playerData.money += moneyGain;
+                    message = prizeMessage + `${formatNumber(moneyGain)} أموال!`;
+                } else if (rand < (4 + 9 + 15 + 30)) { 
+                    const powerGain = Math.floor(Math.random() * (2500 - 500 + 1)) + 500;
+                    playerData.ship1.power += powerGain; 
+                    message = prizeMessage + `${formatNumber(powerGain)} قوة لسفينتك الأساسية!`;
+                } else { 
+                    const keysGain = Math.floor(Math.random() * (8 - 2 + 1)) + 2;
+                    playerData.keys += keysGain;
+                    message = prizeMessage + `${keysGain} مفتاح!`;
+                }
+            } else if (item.type === 'free_box') { 
+                if (playerData.freeBoxCooldownEndTime > currentTime) { 
+                    message = `الصندوق المجاني متاح بعد: ${formatTime(playerData.freeBoxCooldownEndTime - currentTime)}.`;
+                    if (currencyType === 'key') playerData.keys += cost;
+                    else if (currencyType === 'money') playerData.money += cost;
+                    window.showMessage(message);
+                    return;
+                }
+                let prizeMessage = "لقد فتحت الصندوق المجاني وحصلت على: ";
+                const rand = Math.random() * 100;
+
+                if (rand < 90) { 
+                    const moneyGain = Math.floor(Math.random() * (200 - 40 + 1)) + 40;
+                    playerData.money += moneyGain;
+                    message = prizeMessage + `${formatNumber(moneyGain)} أموال!`;
+                } else { 
+                    const keysGain = Math.floor(Math.random() * (8 - 2 + 1)) + 2;
+                    playerData.keys += keysGain;
+                    message = prizeMessage + `${keysGain} مفتاح!`;
+                }
+                playerData.freeBoxCooldownEndTime = currentTime + FREE_BOX_COOLDOWN_MS;
+            } else if (item.type === 'name_cosmetic' || item.type === 'icon_cosmetic') {
+                const isOwned = (item.ownedKey === 'lionCount') ? (playerData.lionCount > 0) : playerData[item.ownedKey];
+                const isActive = playerData[item.activeKey];
+
+                if (isOwned) { // If already owned, it's an activate/deactivate action
+                    if (item.type === 'name_cosmetic') {
+                        // Deactivate all name cosmetics first
+                        playerData.isGoldenNameActive = false;
+                        playerData.isPinkNameActive = false;
+                        playerData.isFieryNameActive = false;
+                        playerData.isRoyalCrimsonNameActive = false; 
+                        playerData.isGlitchNameActive = false; 
+
+                        if (!isActive) { 
+                            playerData[item.activeKey] = true;
+                            message = `تم تفعيل "${item.fullTitle}" بنجاح!`;
+                        } else { 
+                            message = `تم إلغاء تفعيل "${item.fullTitle}".`;
+                        }
+                    } else if (item.type === 'icon_cosmetic') {
+                        // Deactivate all icon cosmetics first
+                        playerData.isStarIconActive = false;
+                        playerData.isCrownIconActive = false;
+                        playerData.isLionActive = false; 
+                        if (!isActive) { 
+                            playerData[item.activeKey] = true;
+                            message = `تم تفعيل "${item.fullTitle}" بنجاح!`;
+                        } else { 
+                            message = `تم إلغاء تفعيل "${item.fullTitle}".`;
+                        }
+                    }
+                } else { // Not owned, this is a purchase
+                    playerData[item.ownedKey] = true;
+                    if (item.type === 'name_cosmetic') {
+                        playerData.isGoldenNameActive = false;
+                        playerData.isPinkNameActive = false;
+                        playerData.isFieryNameActive = false;
+                        playerData.isRoyalCrimsonNameActive = false; 
+                        playerData.isGlitchNameActive = false; 
+                        playerData[item.activeKey] = true;
+                    } else if (item.type === 'icon_cosmetic') {
+                        playerData.isStarIconActive = false;
+                        playerData.isCrownIconActive = false;
+                        playerData.isLionActive = false; 
+                        playerData[item.activeKey] = true;
+                    }
+                    message = `تهانينا! لقد اشتريت "${item.fullTitle}" وتم تفعيله!`;
+                }
+            }
+
+            updateUIFromPlayerData();
+            window.showMessage(message);
+            window.closeStoreItemDetailModal(true);
+        }
+
+        window.openShipSelectionModal = function() {
+            document.getElementById('shipExpansionModalPrice').innerHTML = `${formatNumber(storeItems.shipExpansion.price)} <i class="fas fa-key text-yellow-400"></i>`;
+
+            let shipSelectionOptions = document.getElementById('shipSelectionOptions');
+            shipSelectionOptions.innerHTML = '';
+            const ships = [
+                { id: 'ship1', name: 'السفينة الأساسية', obj: playerData.ship1 },
+                { id: 'ship2', name: 'السفينة الثانية', obj: playerData.ship2 },
+                { id: 'ship3', name: 'السفينة الثالثة', obj: playerData.ship3 }
+            ];
+
+            ships.forEach(s => {
+                // Only show ships that are unlocked or the base ship
+                if (s.obj.unlocked || s.id === 'ship1') {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.classList.add('ship-selection-option');
+                    optionDiv.innerHTML = `
+                        <label for="select-${s.id}">${s.name} (القوة القصوى الحالية: ${formatNumber(s.obj.maxPower)})</label>
+                        <input type="radio" id="select-${s.id}" name="selectedShip" value="${s.id}">
+                    `;
+                    shipSelectionOptions.appendChild(optionDiv);
+
+                    optionDiv.addEventListener('click', () => {
+                        document.querySelectorAll('.ship-selection-option').forEach(opt => opt.classList.remove('selected'));
+                        optionDiv.classList.add('selected');
+                        optionDiv.querySelector('input[type="radio"]').checked = true;
+                    });
+                }
+            });
+
+            document.getElementById('shipSelectionModal').style.display = 'flex';
+        }
+
+        window.closeShipSelectionModal = function() {
+            document.getElementById('shipSelectionModal').style.display = 'none';
+            window.showStoreCategory(currentStoreCategory);
+        }
+
+        async function confirmShipExpansion() {
+            const selectedRadio = document.querySelector('input[name="selectedShip"]:checked');
+            let message = '';
+
+            if (!selectedRadio) {
+                message = 'الرجاء اختيار سفينة لتوسيعها.';
+                window.showMessage(message);
+                return;
+            }
+
+            const selectedShipId = selectedRadio.value;
+            let targetShip;
+            if (selectedShipId === 'ship1') targetShip = playerData.ship1;
+            else if (selectedShipId === 'ship2') targetShip = playerData.ship2;
+            else if (selectedShipId === 'ship3') targetShip = playerData.ship3;
+
+            const item = storeItems['shipExpansion'];
+            if (playerData.keys >= item.price) { 
+                playerData.keys -= item.price; 
+                targetShip.maxPower += 5000;
+                updateUIFromPlayerData();
+                message = `تم توسيع ${targetShip.name === playerData.ship1.name ? 'السفينة الأساسية' : targetShip.name} بنجاح! الحد الأقصى الجديد: ${formatNumber(targetShip.maxPower)}.`;
+            } else {
+                message = `ليس لديك ما يكفي من المفاتيح لشراء توسيع السفينة (${formatNumber(item.price)} مفتاح).`; 
+            }
+            
+            window.showMessage(message);
+            window.closeShipSelectionModal();
+        }
+
+        function openChangeFleetNameModal() {
+            if (playerData.isFleetNameSet) {
+                window.showMessage("لا يمكن تغيير اسم الأسطول بعد تعيينه.");
+                return;
+            }
+            changeFleetNameInput.value = playerData.fleetName;
+            changeFleetNameModal.style.display = 'flex';
+        }
+
+        function closeChangeFleetNameModal() {
+            changeFleetNameModal.style.display = 'none';
+        }
+
+        async function confirmChangeFleetName() {
+            const newName = changeFleetNameInput.value.trim();
+            if (newName && newName !== playerData.fleetName) {
+                playerData.fleetName = newName;
+                playerData.isFleetNameSet = true;
+                updateUIFromPlayerData();
+                window.showMessage('تم تغيير اسم الأسطول بنجاح!');
+                closeChangeFleetNameModal();
+            } else if (newName === playerData.fleetName) {
+                window.showMessage('الاسم الجديد هو نفس الاسم الحالي.');
+            } else {
+                window.showMessage('الرجاء إدخال اسم صالح لأسطولك.');
+            }
+        }
+
+        window.showSection = function(sectionId) {
+            const sections = [mainMenuSection, myFleetSection, storeSection, playerRobberySection, rouletteSection, myResourcesSection];
+
+            sections.forEach(section => {
+                section.classList.remove('animate-fade-in-up');
+                section.classList.add('hidden');
+            });
+
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+                targetSection.classList.add('animate-fade-in-up');
+            }
+            
+            // Toggle visibility of bottom navigation buttons
+            const bottomNav = document.querySelector('.bottom-nav-container');
+            if (sectionId === 'mainMenu') {
+                bottomNav.style.display = 'flex';
+            } else {
+                bottomNav.style.display = 'none';
+            }
+
+            if (sectionId === 'store') {
+                updateFreeBoxCooldownDisplay(); 
+                showStoreCategory(currentStoreCategory);
+            } else {
+                document.querySelectorAll('#store .store-item').forEach(item => {
+                    item.classList.remove('animate-pop-in');
+                    item.style.opacity = '0';
+                    item.style.transform = 'scale(0.8)';
+                });
+            }
+        }
+
+        function showStoreCategory(category) {
+            currentStoreCategory = category;
+
+            storeUtilityItems.classList.add('hidden');
+            storeCosmeticItems.classList.add('hidden');
+            storeBoxItems.classList.add('hidden');
+
+            document.querySelectorAll('.store-category-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.remove('bg-blue-700', 'hover:bg-blue-800');
+                btn.classList.add('bg-gray-700', 'hover:bg-gray-800');
+            });
+
+            let itemsToShow = null;
+            if (category === 'utility') {
+                storeUtilityItems.classList.remove('hidden');
+                document.querySelector('.store-category-btn:nth-child(1)').classList.add('active', 'bg-blue-700', 'hover:bg-blue-800');
+                itemsToShow = storeUtilityItems.querySelectorAll('.store-item');
+            } else if (category === 'cosmetic') {
+                storeCosmeticItems.classList.remove('hidden');
+                document.querySelector('.store-category-btn:nth-child(2)').classList.add('active', 'bg-blue-700', 'hover:bg-blue-800');
+                itemsToShow = storeCosmeticItems.querySelectorAll('.store-item');
+            } else if (category === 'box') {
+                storeBoxItems.classList.remove('hidden');
+                document.querySelector('.store-category-btn:nth-child(3)').classList.add('active', 'bg-blue-700', 'hover:bg-blue-800');
+                itemsToShow = storeBoxItems.querySelectorAll('.store-item');
+            }
+
+            if (itemsToShow) {
+                itemsToShow.forEach((item, index) => {
+                    item.style.animationDelay = `${index * 0.05}s`;
+                    item.classList.remove('animate-pop-in');
+                    void item.offsetWidth;
+                    item.classList.add('animate-pop-in');
+                });
+            }
+        }
+
+        function updateRouletteCooldownUI() {
+            const currentTime = Date.now();
+            const remainingTime = playerData.rouletteCooldownEndTime - currentTime;
+
+            if (remainingTime > 0) {
+                rouletteGameElements.classList.add('hidden');
+                rouletteCooldownDisplay.classList.remove('hidden');
+                rouletteCooldownDisplay.textContent = `الجولة القادمة بعد: ${formatTime(remainingTime)}`;
+            } else {
+                rouletteGameElements.classList.remove('hidden');
+                rouletteCooldownDisplay.classList.add('hidden');
+
+                if (!gameActive) {
+                    startGameBtn.classList.remove('hidden');
+                    betAmountInput.disabled = false;
+                    cashOutBtn.classList.add('hidden');
+                    cashOutBtn.disabled = true;
+                    multiplierDisplay.textContent = '1.00x';
+                    potentialWinningsEl.textContent = '0';
+                    rouletteResult.classList.add('hidden');
+                    rouletteDisplayArea.classList.remove('crashed');
+                    
+                    const displayAreaWidth = rouletteDisplayArea.clientWidth;
+                    const displayAreaHeight = rouletteDisplayArea.clientHeight;
+                    const planeWidth = planeSvg.offsetWidth; 
+                    const planeHeight = planeSvg.offsetHeight; 
+                    planeSvg.style.transform = `translate(${(displayAreaWidth - planeWidth) / 2}px, ${(displayAreaHeight - planeHeight) / 2}px)`;
+                }
+            }
+        }
+
+        function generateCrashPoint() {
+            const rand = Math.random();
+            if (rand < 0.60) {
+                return 1.01 + Math.random() * (4.0 - 1.01);
+            } else if (rand < 0.80) {
+                return 4.1 + Math.random() * (7.7 - 4.1);
+            } else {
+                return 10.0 + Math.random() * (25.5 - 10.0);
+            }
+        }
+
+        function animatePlane(timestamp) {
+            if (!lastFrameTime) {
+                lastFrameTime = timestamp;
+            }
+            const deltaTime = timestamp - lastFrameTime;
+            lastFrameTime = timestamp;
+
+            const multiplierIncreaseRate = 0.007;
+            currentMultiplier += multiplierIncreaseRate * (deltaTime / 100);
+
+            multiplierDisplay.textContent = currentMultiplier.toFixed(2) + 'x';
+            potentialWinningsEl.textContent = Math.round(betAmount * currentMultiplier);
+
+            const displayAreaWidth = rouletteDisplayArea.clientWidth;
+            const displayAreaHeight = rouletteDisplayArea.clientHeight;
+            const planeWidth = planeSvg.offsetWidth; 
+            const planeHeight = planeSvg.offsetHeight; 
+            
+            const maxVisualMultiplier = 30;
+            const minMultiplierForVisual = 1.0;
+
+            let normalizedMultiplier = (currentMultiplier - minMultiplierForVisual) / (maxVisualMultiplier - minMultiplierForVisual);
+            normalizedMultiplier = Math.max(0, Math.min(normalizedMultiplier, 1));
+
+            const horizontalRange = displayAreaWidth - planeWidth - 40;
+            const verticalRange = (displayAreaHeight - planeHeight) / 2 - 10;
+
+            let planeX = 20 + normalizedMultiplier * horizontalRange;
+            let planeY = (displayAreaHeight - planeHeight) / 2 + Math.sin(currentMultiplier * 5) * verticalRange * 0.5;
+
+            planeSvg.style.transform = `translate(${planeX}px, ${planeY}px)`;
+
+            if (currentMultiplier < crashPoint && gameActive && !hasCashedOut) {
+                animationFrameId = requestAnimationFrame(animatePlane);
+            } else if (gameActive && !hasCashedOut) {
+                handleCrash();
+            }
+        }
+
+        function startPlaneGame() {
+            if (Date.now() < playerData.rouletteCooldownEndTime) {
+                window.showMessage(`الرجاء الانتظار حتى انتهاء فترة التهدئة: ${formatTime(playerData.rouletteCooldownEndTime - Date.now())}`);
+                return;
+            }
+
+            betAmount = parseInt(betAmountInput.value);
+
+            if (isNaN(betAmount) || betAmount < 20 || betAmount > 2000) {
+                window.showMessage('الرجاء إدخال مبلغ رهان صالح بين 20 و 2000.');
+                return;
+            }
+            if (playerData.money < betAmount) {
+                window.showMessage('ليس لديك ما يكفي من الأموال للرهان!');
+                return;
+            }
+
+            playerData.money -= betAmount;
+            updateUIFromPlayerData();
+
+            gameActive = true;
+            currentMultiplier = 1.00;
+            hasCashedOut = false;
+            rouletteDisplayArea.classList.remove('crashed');
+            rouletteResult.classList.add('hidden');
+            multiplierDisplay.textContent = '1.00x';
+            potentialWinningsEl.textContent = '0';
+
+            crashPoint = generateCrashPoint();
+
+            startGameBtn.classList.add('hidden');
+            betAmountInput.disabled = true;
+            cashOutBtn.classList.remove('hidden');
+            cashOutBtn.disabled = false;
+
+            const displayAreaWidth = rouletteDisplayArea.clientWidth;
+            const displayAreaHeight = rouletteDisplayArea.clientHeight;
+            const planeWidth = planeSvg.offsetWidth; 
+            const planeHeight = planeSvg.offsetHeight; 
+            planeSvg.style.transform = `translate(${(displayAreaWidth - planeWidth) / 2}px, ${(displayAreaHeight - planeHeight) / 2}px)`;
+
+            lastFrameTime = 0;
+            animationFrameId = requestAnimationFrame(animatePlane);
+        }
+
+        function cashOut() {
+            if (!gameActive || hasCashedOut) {
+                return;
+            }
+
+            hasCashedOut = true;
+            cancelAnimationFrame(animationFrameId);
+
+            const winnings = Math.round(betAmount * currentMultiplier);
+            playerData.money += winnings;
+            updateUIFromPlayerData();
+
+            rouletteResult.textContent = `لقد استلمت ${winnings} أموال عند ${currentMultiplier.toFixed(2)}x!`;
+            rouletteResult.classList.remove('hidden');
+            window.showMessage(`تهانينا! لقد استلمت ${winnings} أموال عند ${currentMultiplier.toFixed(2)}x!`);
+
+            endRound();
+        }
+
+        function handleCrash() {
+            if (!gameActive || hasCashedOut) {
+                return;
+            }
+            
+            cancelAnimationFrame(animationFrameId);
+
+            rouletteDisplayArea.classList.add('crashed');
+            rouletteResult.textContent = `تحطمت الطائرة عند ${currentMultiplier.toFixed(2)}x! لقد خسرت ${betAmount} أموال.`;
+            rouletteResult.classList.remove('hidden');
+            window.showMessage(`تحطمت الطائرة عند ${currentMultiplier.toFixed(2)}x! لقد خسرت ${betAmount} أموال.`);
+
+            endRound();
+        }
+
+        async function endRound() {
+            gameActive = false;
+            cashOutBtn.classList.add('hidden');
+            cashOutBtn.disabled = true;
+            
+            playerData.rouletteCooldownEndTime = Date.now() + ROULETTE_COOLDOWN_MS;
+            updateUIFromPlayerData();
+        }
+
+        window.showShipForms = function(shipId) {
+            const ship = playerData[shipId];
+            let shipName = '';
+            if (shipId === 'ship1') shipName = 'الأساسية';
+            else if (shipId === 'ship2') shipName = 'الثانية';
+            else if (shipId === 'ship3') shipName = 'الثالثة';
+
+            currentShipNameInForms.textContent = shipName;
+
+            const currentFormIconSrc = getShipIcon(ship.power); 
+            if (currentFormIconSrc === 'font-awesome') {
+                currentShipFormIconI.style.display = '';
+                currentShipFormIconI.className = 'fas fa-ship';
+                currentShipFormIconImg.style.display = 'none';
+            } else {
+                currentShipFormIconImg.style.display = '';
+                currentShipFormIconImg.src = currentFormIconSrc;
+                currentShipFormIconI.style.display = 'none';
+            }
+
+            let currentPowerRangeText = '';
+            if (ship.power >= 10000) {
+                currentPowerRangeText = '10000+';
+            } else if (ship.power >= 4001) {
+                currentPowerRangeText = '4001 - 9999';
+            } else if (ship.power >= 1001) {
+                currentPowerRangeText = '1001 - 4000';
+            } else {
+                currentPowerRangeText = '1 - 1000';
+            }
+            currentShipFormPowerRange.textContent = `القوة: ${currentPowerRangeText}`; 
+
+            allShipFormsGrid.innerHTML = '';
+            shipFormsData.forEach(form => {
+                const itemDiv = document.createElement('div');
+                itemDiv.classList.add('form-item-card');
+                
+                const currentShipIcon = getShipIcon(ship.power);
+                const isCurrentForm = (currentShipIcon === form.imgSrc) || (currentShipIcon === 'font-awesome' && form.iconType === 'font-awesome');
+
+                if (isCurrentForm) {
+                    itemDiv.classList.add('current');
+                }
+
+                let iconHtml = '';
+                if (form.iconType === 'font-awesome') {
+                    iconHtml = `<i class="${form.iconClass}"></i>`;
+                } else {
+                    iconHtml = `<img src="${form.imgSrc}" alt="Image of Ship Form" onerror="this.onerror=null;this.src='https://placehold.co/60x60/21262d/e2e8f0?text=X';" draggable="false" />`;
+                }
+
+                itemDiv.innerHTML = `
+                    <div class="icon-display">
+                        ${iconHtml}
+                    </div>
+                    <p>${form.powerRange}</p> 
+                `;
+                allShipFormsGrid.appendChild(itemDiv);
+            });
+
+            shipFormsModal.style.display = 'flex';
+        }
+
+        window.closeShipFormsModal = function() {
+            shipFormsModal.style.display = 'none';
+        }
+
+        function formatTime(ms) {
+            if (ms <= 0) return 'جاهز';
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function getShipIcon(power) { 
+            if (power >= 10000) {
+                return 'https://c.top4top.io/p_3482878s83.png'; 
+            } else if (power >= 4001) {
+                return 'https://b.top4top.io/p_3482vv1ax2.png'; 
+            } else if (power >= 1001) {
+                return 'https://l.top4top.io/p_3482en0id0.png'; 
+            } else {
+                return 'font-awesome'; 
+            }
+        }
+
+        function updateFreeBoxCooldownDisplay() {
+            const currentTime = Date.now();
+            const remainingTime = playerData.freeBoxCooldownEndTime - currentTime;
+
+            if (remainingTime > 0) {
+                freeBoxCooldownOverlay.classList.remove('hidden');
+                freeBoxCooldownText.textContent = formatTime(remainingTime);
+                freeBoxStoreItem.style.pointerEvents = 'none';
+                freeBoxStoreItem.style.opacity = '0.7';
+            } else {
+                freeBoxCooldownOverlay.classList.add('hidden');
+                freeBoxCooldownText.textContent = '';
+                freeBoxStoreItem.style.pointerEvents = 'auto';
+                freeBoxStoreItem.style.opacity = '1';
+            }
+        }
+
+        window.showOnlineStatusModal = function() {
+            onlinePlayersList.innerHTML = '';
+            offlinePlayersList.innerHTML = '';
+
+            const currentTime = Date.now();
+            const onlinePlayers = [];
+            const offlinePlayers = [];
+
+            // Add current player to the online list
+            onlinePlayers.push({
+                id: userId,
+                name: playerData.fleetName,
+                power: playerData.power,
+                wins: playerData.wins,
+                losses: playerData.losses,
+                isOnline: true,
+                activeCosmetics: {
+                    nameClass: playerData.isGoldenNameActive ? 'golden-text' : 
+                                 playerData.isPinkNameActive ? 'pink-text' :
+                                 playerData.isFieryNameActive ? 'fiery-text' :
+                                 playerData.isRoyalCrimsonNameActive ? 'royal-crimson-text' :
+                                 playerData.isGlitchNameActive ? 'glitch-text' : '', 
+                    iconType: playerData.isStarIconActive ? 'font-awesome' : 
+                              (playerData.isLionActive && playerData.lionCount > 0) ? 'image' : '',
+                    iconClass: playerData.isStarIconActive ? 'fas fa-star text-yellow-300' : 
+                               (playerData.isLionActive && playerData.lionCount > 0) ? 'animated-lion-icon golden-lion-glow' : '',
+                    iconImgSrc: (playerData.isLionActive && playerData.lionCount > 0) ? 'https://d.top4top.io/p_3482hpjya1.png' : '',
+                    iconCount: playerData.lionCount
+                }
+            });
+
+            // Iterate through all other players from public data
+            for (const pId in allPlayersData) {
+                if (pId === userId) continue; // Skip current player as already added
+
+                const player = allPlayersData[pId];
+                // Check if lastActivity is within the online threshold
+                const isOnline = (currentTime - player.lastActivity) <= ONLINE_THRESHOLD_MS;
+
+                const playerObj = {
+                    id: pId,
+                    name: player.name,
+                    power: player.power,
+                    wins: player.wins,
+                    losses: player.losses,
+                    isOnline: isOnline,
+                    activeCosmetics: player.activeCosmetics || {}
+                };
+
+                if (isOnline) {
+                    onlinePlayers.push(playerObj);
+                } else {
+                    offlinePlayers.push(playerObj);
+                }
+            }
+
+            // Render online players
+            if (onlinePlayers.length > 0) {
+                onlinePlayers.forEach(player => {
+                    const playerItem = document.createElement('div');
+                    playerItem.classList.add('player-status-item', player.isOnline ? 'online' : 'offline');
+                    playerItem.innerHTML = `
+                        <div class="status-info">
+                            <div class="player-icon-display">
+                                ${player.activeCosmetics.iconType === 'font-awesome' ? `<i class="${player.activeCosmetics.iconClass}"></i>` : 
+                                  player.activeCosmetics.iconType === 'image' ? `<img src="${player.activeCosmetics.iconImgSrc}" class="${player.activeCosmetics.iconClass}" alt="Player Icon" draggable="false" />` : ''}
+                            </div>
+                            <span class="player-name-display ${player.activeCosmetics.nameClass}">${player.name}</span>
+                            ${player.activeCosmetics.iconCount > 0 ? `<span class="text-xs text-gray-400 ml-1">x${player.activeCosmetics.iconCount}</span>` : ''}
+                            <span class="status-dot ${player.isOnline ? 'bg-green-500' : 'bg-red-500'}"></span>
+                        </div>
+                        <div class="power-info">
+                            <i class="fas fa-fist-raised text-red-500"></i>
+                            <span>${formatNumber(player.power)}</span>
+                        </div>
+                    `;
+                    if (player.id !== userId) { // Add attack button for other players
+                        const attackBtn = document.createElement('button');
+                        attackBtn.textContent = 'هجوم';
+                        attackBtn.classList.add('attack-btn');
+                        attackBtn.onclick = (e) => {
+                            e.stopPropagation(); // Prevent modal from opening when attacking
+                            attackPlayer(player.id, player.name, player.power);
+                        };
+                        // Disable attack button if on cooldown
+                        if (Date.now() < playerData.attackCooldownEndTime) {
+                            attackBtn.disabled = true;
+                            attackBtn.textContent = `تهدئة: ${formatTime(playerData.attackCooldownEndTime - Date.now())}`;
+                        }
+                        playerItem.appendChild(attackBtn);
+                    }
+                    playerItem.addEventListener('click', () => {
+                        showPlayerProfileModal(player.id);
+                    });
+                    onlinePlayersList.appendChild(playerItem);
+                });
+            } else {
+                onlinePlayersList.innerHTML = '<p class="text-center text-gray-400 mt-2">لا يوجد لاعبون متصلون حالياً.</p>';
+            }
+
+            // Render offline players
+            if (offlinePlayers.length > 0) {
+                offlinePlayers.forEach(player => {
+                    const playerItem = document.createElement('div');
+                    playerItem.classList.add('player-status-item', player.isOnline ? 'online' : 'offline');
+                    playerItem.innerHTML = `
+                        <div class="status-info">
+                            <div class="player-icon-display">
+                                ${player.activeCosmetics.iconType === 'font-awesome' ? `<i class="${player.activeCosmetics.iconClass}"></i>` : 
+                                  player.activeCosmetics.iconType === 'image' ? `<img src="${player.activeCosmetics.iconImgSrc}" class="${player.activeCosmetics.iconClass}" alt="Player Icon" draggable="false" />` : ''}
+                            </div>
+                            <span class="player-name-display ${player.activeCosmetics.nameClass}">${player.name}</span>
+                            ${player.activeCosmetics.iconCount > 0 ? `<span class="text-xs text-gray-400 ml-1">x${player.activeCosmetics.iconCount}</span>` : ''}
+                            <span class="status-dot ${player.isOnline ? 'bg-green-500' : 'bg-red-500'}"></span>
+                        </div>
+                        <div class="power-info">
+                            <i class="fas fa-fist-raised text-red-500"></i>
+                            <span>${formatNumber(player.power)}</span>
+                        </div>
+                    `;
+                    if (player.id !== userId) { // Add attack button for other players
+                        const attackBtn = document.createElement('button');
+                        attackBtn.textContent = 'هجوم';
+                        attackBtn.classList.add('attack-btn');
+                        attackBtn.onclick = (e) => {
+                            e.stopPropagation(); // Prevent modal from opening when attacking
+                            attackPlayer(player.id, player.name, player.power);
+                        };
+                        // Disable attack button if on cooldown
+                        if (Date.now() < playerData.attackCooldownEndTime) {
+                            attackBtn.disabled = true;
+                            attackBtn.textContent = `تهدئة: ${formatTime(playerData.attackCooldownEndTime - Date.now())}`;
+                        }
+                        playerItem.appendChild(attackBtn);
+                    }
+                    playerItem.addEventListener('click', () => {
+                        showPlayerProfileModal(player.id);
+                    });
+                    offlinePlayersList.appendChild(playerItem);
+                });
+            } else {
+                offlinePlayersList.innerHTML = '<p class="text-center text-gray-400 mt-2">لا يوجد لاعبون غير متصلون حالياً.</p>';
+            }
+
+            onlineStatusModal.style.display = 'flex';
+        }
+
+        window.closeOnlineStatusModal = function() {
+            onlineStatusModal.style.display = 'none';
+        }
+
+        async function attackPlayer(targetId, targetName, targetPower) {
+            const currentTime = Date.now();
+            if (currentTime < playerData.attackCooldownEndTime) {
+                window.showMessage(`أنت في فترة تهدئة. يمكنك الهجوم مرة أخرى بعد: ${formatTime(playerData.attackCooldownEndTime - currentTime)}.`);
+                return;
+            }
+
+            if (targetId === userId) {
+                window.showMessage("لا يمكنك مهاجمة نفسك!");
+                return;
+            }
+
+            let outcome;
+            let message;
+            if (playerData.power >= targetPower) {
+                outcome = 'win';
+                playerData.wins++;
+                message = `لقد هاجمت ${targetName} (قوة: ${formatNumber(targetPower)}) وفزت!`;
+            } else {
+                outcome = 'loss';
+                playerData.losses++;
+                message = `لقد هاجمت ${targetName} (قوة: ${formatNumber(targetPower)}) وخسرت.`;
+            }
+
+            playerData.attackCooldownEndTime = currentTime + ATTACK_COOLDOWN_MS;
+            updateUIFromPlayerData(); // Save wins/losses and cooldown
+
+            // Add attack to global log
+            const newAttack = {
+                attackerId: userId,
+                attackerName: playerData.fleetName,
+                attackerPower: playerData.power,
+                defenderId: targetId,
+                defenderName: targetName,
+                defenderPower: targetPower,
+                outcome: outcome,
+                timestamp: serverTimestamp()
+            };
+            push(globalAttacksRef, newAttack).then(() => {
+                // Firebase Realtime Database automatically handles the limitToLast(5) in the listener.
+                // No need for client-side trimming here.
+            }).catch(error => console.error("Error adding attack to global log:", error));
+
+            window.showMessage(message);
+            window.closeOnlineStatusModal(); // Close modal after attack
+        }
+
+
+        window.showRecordModal = function() {
+            globalAttacksList.innerHTML = '';
+            if (globalAttacksLog.length === 0) {
+                globalAttacksList.innerHTML = '<p class="text-center text-gray-300">لا توجد هجمات عالمية مسجلة حالياً.</p>';
+            } else {
+                globalAttacksLog.forEach(attack => {
+                    const attackItem = document.createElement('div');
+                    attackItem.classList.add('attack-item');
+                    const outcomeClass = attack.outcome === 'win' ? 'win' : 'loss';
+                    
+                    let attackerNameDisplay = attack.attackerName;
+                    let defenderNameDisplay = attack.defenderName;
+
+                    // Apply cosmetics if available in allPlayersData (for other players) or playerData (for self)
+                    const attackerPublicData = allPlayersData[attack.attackerId] || (attack.attackerId === userId ? playerData : null);
+                    const defenderPublicData = allPlayersData[attack.defenderId] || (attack.defenderId === userId ? playerData : null);
+
+                    if (attackerPublicData && attackerPublicData.activeCosmetics && attackerPublicData.activeCosmetics.nameClass) {
+                        attackerNameDisplay = `<span class="${attackerPublicData.activeCosmetics.nameClass}">${attackerNameDisplay}</span>`;
+                    }
+                    if (defenderPublicData && defenderPublicData.activeCosmetics && defenderPublicData.activeCosmetics.nameClass) {
+                        defenderNameDisplay = `<span class="${defenderPublicData.activeCosmetics.nameClass}">${defenderNameDisplay}</span>`;
+                    }
+
+                    attackItem.innerHTML = `
+                        <p><strong>${attackerNameDisplay}</strong> هاجم <strong>${defenderNameDisplay}</strong></p>
+                        <p>النتيجة: <span class="outcome ${outcomeClass}">${attack.outcome === 'win' ? 'فوز' : 'خسارة'}</span></p>
+                        <p class="timestamp">${new Date(attack.timestamp).toLocaleString('ar-EG', { timeZone: 'Asia/Baghdad' })}</p>
+                    `;
+                    globalAttacksList.appendChild(attackItem);
+                });
+            }
+            recordModal.style.display = 'flex';
+        }
+
+        window.closeRecordModal = function() {
+            recordModal.style.display = 'none';
+        }
+
+        window.showPlayerProfileModal = function(profileUserId) {
+            let player;
+            if (profileUserId === userId) {
+                player = {
+                    id: userId,
+                    name: playerData.fleetName,
+                    power: playerData.power,
+                    wins: playerData.wins,
+                    losses: playerData.losses,
+                    ships: [
+                        { name: 'السفينة الأساسية', power: playerData.ship1.power, unlocked: true },
+                        { name: 'السفينة الثانية', power: playerData.ship2.power, unlocked: playerData.ship2.unlocked },
+                        { name: 'السفينة الثالثة', power: playerData.ship3.power, unlocked: playerData.ship3.unlocked }
+                    ],
+                    activeCosmetics: {
+                        nameClass: playerData.isGoldenNameActive ? 'golden-text' : 
+                                     playerData.isPinkNameActive ? 'pink-text' :
+                                     playerData.isFieryNameActive ? 'fiery-text' :
+                                     playerData.isRoyalCrimsonNameActive ? 'royal-crimson-text' :
+                                     playerData.isGlitchNameActive ? 'glitch-text' : '', 
+                        iconType: playerData.isStarIconActive ? 'font-awesome' : 
+                                  (playerData.isLionActive && playerData.lionCount > 0) ? 'image' : '',
+                        iconClass: playerData.isStarIconActive ? 'fas fa-star text-yellow-300' : 
+                                   (playerData.isLionActive && playerData.lionCount > 0) ? 'animated-lion-icon golden-lion-glow' : '',
+                        iconImgSrc: (playerData.isLionActive && playerData.lionCount > 0) ? 'https://d.top4top.io/p_3482hpjya1.png' : '',
+                        iconCount: playerData.lionCount
+                    }
+                };
+            } else {
+                player = allPlayersData[profileUserId];
+                if (!player) {
+                    window.showMessage("لا يمكن العثور على بيانات هذا اللاعب.");
+                    return;
+                }
+                // For other players, we need to reconstruct their ship data for display
+                // This is a simplification as we don't store full ship details in public data
+                // For a real game, you'd fetch their full playerData or store more details publicly
+                player.ships = [
+                    { name: 'السفينة الأساسية', power: player.power / 3, unlocked: true }, // Placeholder power
+                    { name: 'السفينة الثانية', power: player.power / 3, unlocked: true }, // Assume unlocked for display
+                    { name: 'السفينة الثالثة', power: player.power / 3, unlocked: true }
+                ];
+            }
+
+            profilePlayerName.textContent = player.name;
+            profileWins.textContent = player.wins;
+            profileLosses.textContent = player.losses;
+            profileTotalPower.textContent = formatNumber(player.power);
+
+            // Apply cosmetic name class to profilePlayerName
+            profilePlayerName.classList.remove('golden-text', 'pink-text', 'fiery-text', 'royal-crimson-text', 'glitch-text'); 
+            if (player.activeCosmetics && player.activeCosmetics.nameClass) {
+                profilePlayerName.classList.add(player.activeCosmetics.nameClass);
+            }
+
+            profileShipFormsGrid.innerHTML = '';
+            player.ships.forEach(ship => {
+                // Only show unlocked ships and the base ship
+                if (ship.unlocked || ship.name === 'السفينة الأساسية') {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.classList.add('profile-form-item-card');
+                    
+                    let iconHtml = '';
+                    // For profile, we use the actual ship power to determine its form
+                    const shipIconSrc = getShipIcon(ship.power); 
+
+                    if (shipIconSrc === 'font-awesome') {
+                        iconHtml = `<i class="fas fa-ship ${ship.unlocked || ship.name === 'السفينة الأساسية' ? 'text-blue-400' : 'text-gray-500'}"></i>`;
+                    } else {
+                        iconHtml = `<img src="${shipIconSrc}" alt="Image of Ship Form" onerror="this.onerror=null;this.src='https://placehold.co/50x50/1a202c/e2e8f0?text=X';" draggable="false" />`;
+                    }
+
+                    itemDiv.innerHTML = `
+                        <div class="icon-display">
+                            ${iconHtml}
+                        </div>
+                        <p>${ship.name}</p>
+                        <p>القوة: ${formatNumber(ship.power)}</p>
+                    `;
+                    profileShipFormsGrid.appendChild(itemDiv);
+                }
+            });
+
+            playerProfileModal.style.display = 'flex';
+        }
+
+        window.closePlayerProfileModal = function() {
+            playerProfileModal.style.display = 'none';
+            profilePlayerName.classList.remove('golden-text', 'pink-text', 'fiery-text', 'royal-crimson-text', 'glitch-text'); 
+        }
+
+
+        function handleUpgradeShip1Click() { upgradeShip(playerData.ship1); }
+        function handleUpgradeShip2Click() { upgradeShip(playerData.ship2); }
+        function handleUpgradeShip3Click() { upgradeShip(playerData.ship3); }
+        function handleUnlockShip2Click() { unlockShip(playerData.ship2, 'السفينة الثانية'); } 
+        function handleUnlockShip3Click() { unlockShip(playerData.ship3, 'السفينة الثالثة'); } 
+        function handleCollectResource1Click() { collectResource1(); }
+        function handleCollectResource2Click() { collectResource2(); }
+        function handleUnlockResource2Click() { unlockResource2(); }
+        function handleBuyStoreItemClick() { buyStoreItem(); }
+        function handleConfirmShipExpansionClick() { confirmShipExpansion(); }
+        function handleStartGameClick() { startPlaneGame(); }
+        function handleCashOutClick() { cashOut(); }
+        function handleChangeNameClick() { openChangeFleetNameModal(); }
+        function handleConfirmChangeFleetNameClick() { confirmChangeFleetName(); }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            playerPowerEl = document.getElementById('playerPower');
+            playerMoneyEl = document.getElementById('playerMoney');
+            playerKeysEl = document.getElementById('playerKeys');
+            fleetNameEl = document.getElementById('fleetName');
+            fleetStarIconEl = document.getElementById('fleetStarIcon');
+            fleetCrownIconEl = document.getElementById('fleetCrownIcon'); 
+            fleetLionIconEl = document.getElementById('fleetLionIcon');
+            lionCountDisplayEl = document.getElementById('lionCountDisplay');
+            changeNameBtn = document.getElementById('changeNameBtn');
+            onlineStatusButtonContainerEl = document.querySelector('.bottom-nav-container div:nth-child(1)');
+            recordButtonContainerEl = document.querySelector('.bottom-nav-container div:nth-child(2)');
+
+            ship1Card = document.getElementById('ship1Card');
+            ship1PowerEl = document.getElementById('ship1Power'); 
+            ship1ProgressEl = document.getElementById('ship1Progress');
+            upgradeShip1Btn = document.getElementById('upgradeShip1');
+            ship1IconContainerEl = document.querySelector('#ship1Card .ship-icon-display');
+            ship1IconIEl = document.getElementById('ship1IconI');
+            ship1IconImgEl = document.getElementById('ship1IconImg');
+            ship1MaxPowerEl = document.getElementById('ship1MaxPower');
+
+            ship2Card = document.getElementById('ship2Card');
+            ship2PowerEl = document.getElementById('ship2Power');
+            ship2ProgressEl = document.getElementById('ship2Progress');
+            upgradeShip2Btn = document.getElementById('upgradeShip2');
+            ship2IconContainerEl = document.querySelector('#ship2Card .ship-icon-display');
+            ship2IconIEl = document.getElementById('ship2IconI');
+            ship2IconImgEl = document.getElementById('ship2IconImg');
+            ship2MaxPowerEl = document.getElementById('ship2MaxPower');
+            unlockShip2Btn = document.getElementById('unlockShip2Btn'); 
+
+            ship3Card = document.getElementById('ship3Card');
+            ship3PowerEl = document.getElementById('ship3Power');
+            ship3ProgressEl = document.getElementById('ship3Progress');
+            upgradeShip3Btn = document.getElementById('upgradeShip3'); 
+            ship3IconContainerEl = document.querySelector('#ship3Card .ship-icon-display');
+            ship3IconIEl = document.getElementById('ship3IconI');
+            ship3IconImgEl = document.getElementById('ship3IconImg');
+            ship3MaxPowerEl = document.getElementById('ship3MaxPower');
+            unlockShip3Btn = document.getElementById('unlockShip3Btn'); 
+
+            mainMenuSection = document.getElementById('mainMenu');
+            myFleetSection = document.getElementById('myFleet');
+            storeSection = document.getElementById('store');
+            playerRobberySection = document.getElementById('playerRobberySection');
+            rouletteSection = document.getElementById('rouletteSection');
+            myResourcesSection = document.getElementById('myResources'); 
+
+            messageModal = document.getElementById('messageModal');
+            modalMessage = document.getElementById('modalMessage');
+            confirmModal = document.getElementById('confirmModal');
+            confirmMessage = document.getElementById('confirmMessage');
+            confirmYesBtn = document.getElementById('confirmYesBtn');
+            confirmNoBtn = document.getElementById('confirmNoBtn');
+
+            changeFleetNameModal = document.getElementById('changeFleetNameModal');
+            changeFleetNameInput = document.getElementById('changeFleetNameInput');
+            confirmChangeFleetNameBtn = document.getElementById('confirmChangeFleetNameBtn');
+
+            resource1Card = document.getElementById('resource1Card');
+            accumulatedResources1Display = document.getElementById('accumulatedResources1Display');
+            resource1Progress = document.getElementById('resource1Progress');
+            resource1Rate = document.getElementById('resource1Rate');
+            collectResource1Btn = document.getElementById('collectResource1Btn');
+
+            resource2Card = document.getElementById('resource2Card');
+            resource2Status = document.getElementById('resource2Status');
+            resource2ProgressBarWrapper = document.getElementById('resource2ProgressBarWrapper');
+            resource2Progress = document.getElementById('resource2Progress');
+            resource2RateDisplay = document.getElementById('resource2RateDisplay');
+            unlockResource2Btn = document.getElementById('unlockResource2Btn');
+            collectResource2Btn = document.getElementById('collectResource2Btn');
+
+            storeItemDetailModal = document.getElementById('storeItemDetailModal');
+            storeItemTitle = document.getElementById('storeItemTitle');
+            storeItemIcon = document.getElementById('storeItemIcon');
+            storeItemIconImg = document.getElementById('storeItemIconImg'); 
+            storeItemDescription = document.getElementById('storeItemDescription');
+            storeItemPrice = document.getElementById('storeItemPrice');
+            buyStoreItemBtn = document.getElementById('buyStoreItemBtn');
+
+            cosmeticPreviewEl = document.getElementById('cosmeticPreview');
+            cosmeticNamePreviewEl = document.getElementById('cosmeticNamePreview');
+            cosmeticIconPreviewEl = document.getElementById('cosmeticIconPreview');
+            cosmeticImagePreviewEl = document.getElementById('cosmeticImagePreview');
+
+            keyPurchaseOptionsContainer = document.getElementById('keyPurchaseOptions');
+
+            rouletteGameElements = document.getElementById('rouletteGameElements'); 
+            rouletteDisplayArea = document.getElementById('rouletteDisplayArea');
+            multiplierDisplay = document.getElementById('multiplierDisplay');
+            betAmountInput = document.getElementById('betAmountInput');
+            startGameBtn = document.getElementById('startGameBtn');
+            cashOutBtn = document.getElementById('cashOutBtn');
+            potentialWinningsEl = document.getElementById('potentialWinnings');
+            rouletteResult = document.getElementById('rouletteResult');
+            rouletteCooldownDisplay = document.getElementById('rouletteCooldownDisplay');
+            planeSvg = document.getElementById('planeSvg');
+
+            freeBoxStoreItem = document.getElementById('freeBoxStoreItem');
+            freeBoxCooldownOverlay = document.getElementById('freeBoxCooldownOverlay');
+            freeBoxCooldownText = document.getElementById('freeBoxCooldownText');
+
+            storeUtilityItems = document.getElementById('storeUtilityItems');
+            storeCosmeticItems = document.getElementById('storeCosmeticItems');
+            storeBoxItems = document.getElementById('storeBoxItems');
+            storeCategoryButtons = document.querySelectorAll('.store-category-btn');
+
+            shipFormsModal = document.getElementById('shipFormsModal');
+            shipFormsModalTitle = document.getElementById('shipFormsModalTitle');
+            currentShipNameInForms = document.getElementById('currentShipNameInForms');
+            currentShipFormIconI = document.getElementById('currentShipFormIconI');
+            currentShipFormIconImg = document.getElementById('currentShipFormIconImg');
+            currentShipFormPowerRange = document.getElementById('currentShipFormPowerRange'); 
+            allShipFormsGrid = document.getElementById('allShipFormsGrid');
+
+            onlineStatusModal = document.getElementById('onlineStatusModal');
+            onlinePlayersList = document.getElementById('onlinePlayersList');
+            offlinePlayersList = document.getElementById('offlinePlayersList');
+
+            recordModal = document.getElementById('recordModal');
+            globalAttacksList = document.getElementById('globalAttacksList');
+
+            playerProfileModal = document.getElementById('playerProfileModal');
+            profilePlayerName = document.getElementById('profilePlayerName');
+            profileWins = document.getElementById('profileWins');
+            profileLosses = document.getElementById('profileLosses');
+            profileTotalPower = document.getElementById('profileTotalPower');
+            profileShipFormsGrid = document.getElementById('profileShipFormsGrid');
+
+
+            upgradeShip1Btn.addEventListener('click', handleUpgradeShip1Click);
+            upgradeShip2Btn.addEventListener('click', handleUpgradeShip2Click);
+            upgradeShip3Btn.addEventListener('click', handleUpgradeShip3Click);
+            
+            if (unlockShip2Btn) unlockShip2Btn.addEventListener('click', handleUnlockShip2Click);
+            if (unlockShip3Btn) unlockShip3Btn.addEventListener('click', handleUnlockShip3Click);
+            
+            collectResource1Btn.addEventListener('click', handleCollectResource1Click);
+            collectResource2Btn.addEventListener('click', handleCollectResource2Click);
+            unlockResource2Btn.addEventListener('click', handleUnlockResource2Click);
+
+            buyStoreItemBtn.addEventListener('click', handleBuyStoreItemClick);
+            document.getElementById('confirmShipExpansionBtn').addEventListener('click', handleConfirmShipExpansionClick); 
+            startGameBtn.addEventListener('click', handleStartGameClick);
+            cashOutBtn.addEventListener('click', handleCashOutClick);
+            changeNameBtn.addEventListener('click', handleChangeNameClick);
+            confirmChangeFleetNameBtn.addEventListener('click', handleConfirmChangeFleetNameClick);
+
+            setInterval(autoAccumulateResources1, RESOURCE_ACCUMULATION_INTERVAL_MS_1);
+            setInterval(autoAccumulateResources2, RESOURCE_ACCUMULATION_INTERVAL_MS_2);
+
+            setInterval(updateUIFromPlayerData, 1000); 
+
+            document.addEventListener('contextmenu', event => event.preventDefault());
+            document.addEventListener('dragstart', event => event.preventDefault());
+            document.addEventListener('selectstart', event => event.preventDefault());
+        });
+    </script>
+</body>
+</html>
