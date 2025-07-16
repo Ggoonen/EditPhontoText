@@ -1227,7 +1227,7 @@
             font-size: 0.9rem;
             margin-left: 5px;
         }
-        .player-status-item .attack-btn {
+        .player-status-item .rob-btn { /* Changed from attack-btn to rob-btn */
             background-color: #ef4444;
             color: white;
             padding: 4px 10px;
@@ -1237,10 +1237,10 @@
             cursor: pointer;
             transition: background-color 0.2s ease;
         }
-        .player-status-item .attack-btn:hover {
+        .player-status-item .rob-btn:hover {
             background-color: #dc2626;
         }
-        .player-status-item .attack-btn:disabled {
+        .player-status-item .rob-btn:disabled {
             background-color: #6b7280;
             cursor: not-allowed;
         }
@@ -1341,47 +1341,9 @@
             font-weight: bold;
         }
 
-        /* Loading Overlay Styles */
-        #loadingOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #080a0d; /* Match body background */
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000; /* Ensure it's on top */
-            color: #e2e8f0;
-            font-size: 1.8rem;
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(255,255,255,0.3);
-        }
-        #loadingOverlay .spinner {
-            border: 8px solid rgba(255,255,255,0.2);
-            border-top: 8px solid #60a5fa;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
     </style>
 </head>
 <body class="bg-gray-900 min-h-screen flex flex-col" oncontextmenu="return false;">
-
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay">
-        <div class="spinner"></div>
-        <p>جاري تحميل اللعبة...</p>
-    </div>
 
     <div id="changeFleetNameModal" class="modal">
         <div class="modal-content">
@@ -1703,7 +1665,9 @@
                 <i class="fas fa-arrow-right text-3xl"></i>
             </button>
             <h2 class="text-3xl font-bold text-center mb-6 text-gray-100">سرقة اللاعبين</h2>
-            <p class="text-center text-gray-300">ميزة سرقة اللاعبين قيد التطوير حالياً. ترقبوا المزيد!</p>
+            <div id="robberyPlayersList" class="space-y-4">
+                <p class="text-center text-gray-400">جاري تحميل اللاعبين...</p>
+            </div>
         </section>
 
         <section id="rouletteSection" class="hidden p-6 rounded-xl shadow-xl w-full max-w-2xl text-gray-100 section-container">
@@ -1795,7 +1759,7 @@
             <h2 class="text-2xl font-bold mb-4" id="shipExpansionModalTitle">توسيع السفينة</h2>
             <i id="shipExpansionModalIcon" class="item-icon fas fa-expand-arrows-alt text-blue-400"></i>
             <p id="shipExpansionModalDescription" class="item-description">يزيد الحد الأقصى لقوة السفينة المختارة بمقدار 5000 نقطة قوة إضافية. يمكن شراء هذا التوسيع عدة مرات لأي سفينة.</p>
-            <p id="shipExpansionModalPrice" class="item-price">10000 <i class="fas fa-dollar-sign text-green-400"></i></p>
+            <p id="shipExpansionModalPrice" class="item-price">10000 <i class="fas fa-key text-yellow-400"></i></p>
             
             <h3 class="text-xl font-bold mb-3">اختر سفينة للتوسيع:</h3>
             <div id="shipSelectionOptions" class="flex flex-col gap-3 mb-6">
@@ -1881,15 +1845,17 @@
 
     <script type="module">
         // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getDatabase, ref, set, onValue, push, serverTimestamp, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+        import { getDatabase, ref, set, onValue, push, serverTimestamp, query, limitToLast } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
 
         const INITIAL_SHIP_MAX_POWER = 10000;
         const UPGRADE_COOLDOWN_MS = 3 * 60 * 1000;
         const FREE_BOX_COOLDOWN_MS = 1 * 60 * 60 * 1000;
         const ROULETTE_COOLDOWN_MS = 1 * 60 * 1000;
-        const ATTACK_COOLDOWN_MS = 7 * 60 * 1000; // 7 minutes cooldown for attacks
+        const ROBBERY_COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes cooldown for robbery
+
         const ONLINE_THRESHOLD_MS = 30 * 1000; // Consider online if last activity within 30 seconds
 
         const MAX_ACCUMULATED_RESOURCES_1 = 200;
@@ -1907,15 +1873,22 @@
         let app;
         let auth;
         let db;
-        let userRef; // Reference to the current user's data in RTDB
+        let analytics;
         let playersRef; // Reference to the public players data
         let globalAttacksRef; // Reference to the global attacks log
         let isAuthReady = false; // Flag to indicate Firebase Auth is ready
 
-        // Use global variables provided by Canvas environment
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDo_xvTxKKBowV4TWGLSE-zpkw40BwXXCs",
+            authDomain: "intovip-c1ca4.firebaseapp.com",
+            databaseURL: "https://intovip-c1ca4-default-rtdb.firebaseio.com",
+            projectId: "intovip-c1ca4",
+            storageBucket: "intovip-c1ca4.firebasestorage.app",
+            messagingSenderId: "919609158743",
+            appId: "1:919609158743:web:405fa7d441f942e0b6c712",
+            measurementId: "G-DJG2D4CDNF"
+        };
 
         // Define a default player data structure for new users
         const DEFAULT_PLAYER_DATA = {
@@ -1933,14 +1906,13 @@
             ship2: { power: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
             ship3: { power: 0, unlocked: false, cooldownEndTime: 0, maxPower: INITIAL_SHIP_MAX_POWER },
             rouletteCooldownEndTime: 0,
-            attackCooldownEndTime: 0,
+            robberyCooldownEndTime: 0, // New cooldown for robbery
             wins: 0,
             losses: 0,
             accumulatedResources1: 0,
             resource2Unlocked: false,
             accumulatedResources2: 0,
-            lastUpdated: Date.now(),
-            lastActivity: Date.now()
+            lastUpdated: Date.now()
         };
 
         let playerData = { ...DEFAULT_PLAYER_DATA }; // Initialize with default data
@@ -2077,6 +2049,7 @@
         let onlineStatusModal;
         let onlinePlayersList;
         let offlinePlayersList;
+        let robberyPlayersList; // New element for robbery section
 
         let recordModal;
         let globalAttacksList;
@@ -2087,8 +2060,6 @@
         let profileLosses;
         let profileTotalPower;
         let profileShipFormsGrid;
-
-        let loadingOverlay;
 
 
         const shipFormsData = [
@@ -2290,103 +2261,65 @@
             confirmNoBtn.addEventListener('click', handleCancel);
         }
 
+        // Saves player data to localStorage and syncs public data to Firebase
         function savePlayerData() {
             try {
-                if (userRef && isAuthReady) {
-                    set(userRef, playerData)
-                        .catch(error => console.error("Error saving player data to Firebase:", error));
-                } else {
-                    // This warning is fine, as it means Firebase might not be fully ready yet.
-                    // The data will be saved once it is.
+                localStorage.setItem('playerData', JSON.stringify(playerData));
+                if (isAuthReady) {
+                    updatePublicPlayerData(); // Sync public data to Firebase
                 }
             } catch (error) {
-                console.error("Critical error in savePlayerData:", error);
-                window.showMessage("حدث خطأ أثناء حفظ بيانات اللعبة. قد لا يتم حفظ تقدمك.");
+                console.error("Error saving player data to localStorage:", error);
+                window.showMessage("حدث خطأ أثناء حفظ بيانات اللعبة محلياً. قد لا يتم حفظ تقدمك.");
             }
         }
 
-        function loadPlayerDataFromFirebase() {
+        // Loads player data from localStorage
+        function loadPlayerDataFromLocalStorage() {
             try {
-                if (userRef) {
-                    onValue(userRef, (snapshot) => {
-                        const data = snapshot.val();
-                        if (data) {
-                            // Merge loaded data with default structure to handle new properties
-                            playerData = {
-                                ...DEFAULT_PLAYER_DATA, // Start with full default structure
-                                ...data, // Overlay with loaded data
-                                // Ensure nested objects are also merged properly if they exist
-                                ship1: { ...DEFAULT_PLAYER_DATA.ship1, ...data.ship1 },
-                                ship2: { ...DEFAULT_PLAYER_DATA.ship2, ...data.ship2 },
-                                ship3: { ...DEFAULT_PLAYER_DATA.ship3, ...data.ship3 }
-                            };
-                            // Clean up old/deprecated properties if necessary
-                            ['ship1', 'ship2', 'ship3'].forEach(shipKey => {
-                                if (playerData[shipKey] && playerData[shipKey].level !== undefined) {
-                                    delete playerData[shipKey].level;
-                                }
-                            });
-                        } else {
-                            // No data found, initialize with default and save
-                            playerData = { ...DEFAULT_PLAYER_DATA };
-                            savePlayerData(); // Save initial data to Firebase
+                const storedData = localStorage.getItem('playerData');
+                if (storedData) {
+                    const parsedData = JSON.parse(storedData);
+                    // Merge loaded data with default structure to handle new properties
+                    playerData = {
+                        ...DEFAULT_PLAYER_DATA,
+                        ...parsedData,
+                        ship1: { ...DEFAULT_PLAYER_DATA.ship1, ...parsedData.ship1 },
+                        ship2: { ...DEFAULT_PLAYER_DATA.ship2, ...parsedData.ship2 },
+                        ship3: { ...DEFAULT_PLAYER_DATA.ship3, ...parsedData.ship3 }
+                    };
+                    // Clean up old/deprecated properties if necessary
+                    ['ship1', 'ship2', 'ship3'].forEach(shipKey => {
+                        if (playerData[shipKey] && playerData[shipKey].level !== undefined) {
+                            delete playerData[shipKey].level;
                         }
-                        updateUIFromPlayerData();
-                        window.showSection('mainMenu'); // Show main menu after data is loaded/initialized
-                        loadingOverlay.style.display = 'none'; // Hide loading overlay
-                    }, (error) => {
-                        console.error("Error reading player data from Firebase:", error);
-                        window.showMessage("فشل تحميل بيانات اللاعب من Firebase. قد لا تعمل الميزات بشكل صحيح.");
-                        loadingOverlay.style.display = 'none'; // Hide loading overlay even on error
                     });
                 } else {
-                    console.error("userRef is null. Cannot load player data.");
-                    window.showMessage("خطأ في تهيئة Firebase. يرجى إعادة تحميل الصفحة.");
-                    loadingOverlay.style.display = 'none'; // Hide loading overlay on critical error
+                    playerData = { ...DEFAULT_PLAYER_DATA }; // Initialize with default if no local data
                 }
+                updateUIFromPlayerData();
+                window.showSection('mainMenu'); // Show main menu after data is loaded/initialized
             } catch (error) {
-                console.error("Critical error in loadPlayerDataFromFirebase:", error);
-                window.showMessage("حدث خطأ غير متوقع أثناء تحميل بيانات اللعبة. يرجى إعادة تحميل الصفحة.");
-                loadingOverlay.style.display = 'none'; // Hide loading overlay on critical error
+                console.error("Error loading player data from localStorage:", error);
+                window.showMessage("حدث خطأ أثناء تحميل بيانات اللعبة من التخزين المحلي. سيتم بدء لعبة جديدة.");
+                playerData = { ...DEFAULT_PLAYER_DATA }; // Reset to default on error
+                savePlayerData(); // Save the reset data
             }
         }
 
-        // Authentication listener
-        onAuthStateChanged(auth, async (user) => {
-            try {
-                if (user) {
-                    userId = user.uid;
-                    userRef = ref(db, `artifacts/${appId}/users/${userId}/playerData`);
-                    playersRef = ref(db, `artifacts/${appId}/public/data/players`);
-                    globalAttacksRef = ref(db, `artifacts/${appId}/public/data/globalAttacks`);
-                    isAuthReady = true;
-                    loadPlayerDataFromFirebase(); // Load data once authenticated
-                    setupPublicDataListeners(); // Setup listeners for public data
-                    setInterval(updatePublicPlayerData, 10000); // Update public data every 10 seconds
-                } else {
-                    // Sign in anonymously if no user or token
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                }
-            } catch (error) {
-                console.error("Firebase Auth Error during sign-in:", error);
-                window.showMessage("فشل تسجيل الدخول إلى Firebase. قد لا تعمل الميزات بشكل صحيح.");
-                loadingOverlay.style.display = 'none'; // Hide loading overlay on auth error
-            }
-        });
-
+        // Sets up listeners for public Firebase data (other players, global attacks)
         function setupPublicDataListeners() {
             try {
                 if (playersRef) {
                     onValue(playersRef, (snapshot) => {
                         allPlayersData = snapshot.val() || {};
                         // Filter out the current player from the allPlayersData for online/offline lists
-                        // The current player's data is managed directly via playerData object
                         if (userId && allPlayersData[userId]) {
                             delete allPlayersData[userId];
+                        }
+                        // Update robbery section players list
+                        if (playerRobberySection.classList.contains('animate-fade-in-up')) {
+                            renderRobberyPlayersList();
                         }
                     }, (error) => {
                         console.error("Error reading public players data:", error);
@@ -2394,14 +2327,12 @@
                 }
 
                 if (globalAttacksRef) {
-                    // Use query to limit to last 5 attacks
                     const recentAttacksQuery = query(globalAttacksRef, limitToLast(5));
                     onValue(recentAttacksQuery, (snapshot) => {
                         const attacks = [];
                         snapshot.forEach((childSnapshot) => {
                             attacks.push({ id: childSnapshot.key, ...childSnapshot.val() });
                         });
-                        // Sort by timestamp in descending order to show most recent first
                         globalAttacksLog = attacks.sort((a, b) => b.timestamp - a.timestamp);
                     }, (error) => {
                         console.error("Error reading global attacks log:", error);
@@ -2413,6 +2344,7 @@
             }
         }
 
+        // Updates the current player's public data in Firebase
         function updatePublicPlayerData() {
             try {
                 if (userId && isAuthReady && playerData.fleetName) {
@@ -2421,7 +2353,7 @@
                         power: playerData.power,
                         wins: playerData.wins,
                         losses: playerData.losses,
-                        lastActivity: serverTimestamp(), // Use server timestamp for accuracy
+                        lastActivity: serverTimestamp(),
                         activeCosmetics: {
                             nameClass: '',
                             iconType: '',
@@ -2431,7 +2363,6 @@
                         }
                     };
 
-                    // Determine active name cosmetic
                     if (playerData.isGoldenNameActive) {
                         publicData.activeCosmetics.nameClass = 'golden-text';
                     } else if (playerData.isPinkNameActive) {
@@ -2444,18 +2375,17 @@
                         publicData.activeCosmetics.nameClass = 'glitch-text';
                     }
 
-                    // Determine active icon cosmetic
                     if (playerData.isStarIconActive) {
                         publicData.activeCosmetics.iconType = 'font-awesome';
                         publicData.activeCosmetics.iconClass = 'fas fa-star text-yellow-300';
                     } else if (playerData.isLionActive && playerData.lionCount > 0) {
                         publicData.activeCosmetics.iconType = 'image';
                         publicData.activeCosmetics.iconImgSrc = 'https://d.top4top.io/p_3482hpjya1.png';
-                        publicData.activeCosmetics.iconClass = 'animated-lion-icon golden-lion-glow'; // Apply classes for display
+                        publicData.activeCosmetics.iconClass = 'animated-lion-icon golden-lion-glow';
                         publicData.activeCosmetics.iconCount = playerData.lionCount;
                     }
 
-                    set(ref(db, `artifacts/${appId}/public/data/players/${userId}`), publicData)
+                    set(ref(db, `public/players/${userId}`), publicData)
                         .catch(error => console.error("Error updating public player data:", error));
                 }
             } catch (error) {
@@ -2505,6 +2435,7 @@
                 
                 updateRouletteCooldownUI();
                 updateFreeBoxCooldownDisplay();
+                updateRobberyCooldownUI(); // Update robbery cooldown display
 
                 accumulatedResources1Display.textContent = `${playerData.accumulatedResources1}/${MAX_ACCUMULATED_RESOURCES_1}`;
                 resource1Progress.style.width = `${(playerData.accumulatedResources1 / MAX_ACCUMULATED_RESOURCES_1) * 100}%`;
@@ -2535,7 +2466,7 @@
                     unlockResource2Btn.disabled = playerData.keys < RESOURCE2_UNLOCK_COST;
                 }
 
-                savePlayerData();
+                savePlayerData(); // Save to local storage and trigger public Firebase update
             } catch (error) {
                 console.error("Critical error in updateUIFromPlayerData:", error);
                 window.showMessage("حدث خطأ أثناء تحديث واجهة المستخدم. يرجى إعادة تحميل الصفحة.");
@@ -2747,7 +2678,6 @@
                 currentStoreItemKey = itemKey;
                 const item = storeItems[itemKey];
 
-                // Special handling for shipExpansion to open a different modal
                 if (itemKey === 'shipExpansion') {
                     window.openShipSelectionModal();
                     return; 
@@ -2924,7 +2854,6 @@
                 let cost = item.price;
                 let currencyType = item.currency;
 
-                // Special handling for 'completeUpgrade' to check cooldowns *before* deducting cost
                 if (currentStoreItemKey === 'completeUpgrade') {
                     let shipsOnCooldown = 0;
                     if (playerData.ship1.cooldownEndTime > currentTime) { shipsOnCooldown++; }
@@ -2933,17 +2862,14 @@
 
                     if (shipsOnCooldown === 0) {
                         window.showMessage('لا توجد سفن في فترة انتظار حالياً لإكمال تطويرها.');
-                        return; // Exit, no transaction
+                        return;
                     }
-                    // If there are ships on cooldown, proceed with cost deduction below
                 }
 
-                // Determine actual cost for 'buyKeys'
                 if (currentStoreItemKey === 'buyKeys') {
                     cost = selectedKeyAmount * item.basePrice;
                 }
 
-                // Check affordability
                 let hasEnoughCurrency = false;
                 if (currencyType === 'key') {
                     if (playerData.keys >= cost) {
@@ -2957,23 +2883,21 @@
                     } else {
                         message = `ليس لديك ما يكفي من الأموال لشراء هذا العنصر (${formatNumber(cost)} أموال).`;
                     }
-                } else if (currencyType === 'none') { // Free items like freeBox or lionIcon (if obtained from box)
-                    hasEnoughCurrency = true; // Always "can afford" if free
+                } else if (currencyType === 'none') {
+                    hasEnoughCurrency = true;
                 }
 
                 if (!hasEnoughCurrency) {
                     window.showMessage(message);
-                    return; // Exit if not affordable
+                    return;
                 }
 
-                // Deduct cost
                 if (currencyType === 'key') {
                     playerData.keys -= cost;
                 } else if (currencyType === 'money') {
                     playerData.money -= cost;
                 }
 
-                // Apply item effects
                 if (currentStoreItemKey === 'completeUpgrade') {
                     if (playerData.ship1.cooldownEndTime > currentTime) { playerData.ship1.cooldownEndTime = 0; }
                     if (playerData.ship2.unlocked && playerData.ship2.cooldownEndTime > currentTime) { playerData.ship2.cooldownEndTime = 0; }
@@ -2986,7 +2910,7 @@
                     let prizeMessage = "لقد فتحت صندوق الحظ وحصلت على: ";
                     const rand = Math.random() * 100;
 
-                    if (rand < 4) { // 4% chance for Glitch Name
+                    if (rand < 4) {
                         playerData.isGlitchNameOwned = true;
                         playerData.isGlitchNameActive = true;
                         message = prizeMessage + `الاسم المتقطع (Glitch)!`;
@@ -3032,9 +2956,8 @@
                     const isOwned = (item.ownedKey === 'lionCount') ? (playerData.lionCount > 0) : playerData[item.ownedKey];
                     const isActive = playerData[item.activeKey];
 
-                    if (isOwned) { // If already owned, it's an activate/deactivate action
+                    if (isOwned) {
                         if (item.type === 'name_cosmetic') {
-                            // Deactivate all name cosmetics first
                             playerData.isGoldenNameActive = false;
                             playerData.isPinkNameActive = false;
                             playerData.isFieryNameActive = false;
@@ -3048,7 +2971,6 @@
                                 message = `تم إلغاء تفعيل "${item.fullTitle}".`;
                             }
                         } else if (item.type === 'icon_cosmetic') {
-                            // Deactivate all icon cosmetics first
                             playerData.isStarIconActive = false;
                             playerData.isCrownIconActive = false;
                             playerData.isLionActive = false; 
@@ -3059,7 +2981,7 @@
                                 message = `تم إلغاء تفعيل "${item.fullTitle}".`;
                             }
                         }
-                    } else { // Not owned, this is a purchase
+                    } else {
                         playerData[item.ownedKey] = true;
                         if (item.type === 'name_cosmetic') {
                             playerData.isGoldenNameActive = false;
@@ -3095,12 +3017,11 @@
                 shipSelectionOptions.innerHTML = '';
                 const ships = [
                     { id: 'ship1', name: 'السفينة الأساسية', obj: playerData.ship1 },
-                    { id: 'ship2', name: 'السفينة الثانية', obj: playerData.ship2 },
+                    { id: 'ship2', name: 'السفينة الثانية', obj: playerData.ship2 }, 
                     { id: 'ship3', name: 'السفينة الثالثة', obj: playerData.ship3 }
                 ];
 
                 ships.forEach(s => {
-                    // Only show ships that are unlocked or the base ship
                     if (s.obj.unlocked || s.id === 'ship1') {
                         const optionDiv = document.createElement('div');
                         optionDiv.classList.add('ship-selection-option');
@@ -3228,7 +3149,6 @@
                     targetSection.classList.add('animate-fade-in-up');
                 }
                 
-                // Toggle visibility of bottom navigation buttons
                 const bottomNav = document.querySelector('.bottom-nav-container');
                 if (sectionId === 'mainMenu') {
                     bottomNav.style.display = 'flex';
@@ -3245,6 +3165,10 @@
                         item.style.opacity = '0';
                         item.style.transform = 'scale(0.8)';
                     });
+                }
+
+                if (sectionId === 'playerRobberySection') {
+                    renderRobberyPlayersList();
                 }
             } catch (error) {
                 console.error("Error in showSection:", error);
@@ -3613,6 +3537,22 @@
             }
         }
 
+        function updateRobberyCooldownUI() {
+            const currentTime = Date.now();
+            const remainingTime = playerData.robberyCooldownEndTime - currentTime;
+            const robButtons = document.querySelectorAll('.player-status-item .rob-btn');
+
+            robButtons.forEach(button => {
+                if (remainingTime > 0) {
+                    button.disabled = true;
+                    button.textContent = `تهدئة: ${formatTime(remainingTime)}`;
+                } else {
+                    button.disabled = false;
+                    button.textContent = 'سرقة';
+                }
+            });
+        }
+
         window.showOnlineStatusModal = function() {
             try {
                 onlinePlayersList.innerHTML = '';
@@ -3645,16 +3585,12 @@
                     }
                 });
 
-                // Iterate through all other players from public data
                 for (const pId in allPlayersData) {
-                    if (pId === userId) continue; // Skip current player as already added
+                    if (pId === userId) continue;
 
                     const player = allPlayersData[pId];
-                    // Check if lastActivity is within the online threshold
-                    // Note: player.lastActivity is a server timestamp, which might be an object {".sv": "timestamp"}
-                    // We need to ensure it's a number for comparison.
                     const lastActivityTime = typeof player.lastActivity === 'object' && player.lastActivity['.sv'] === 'timestamp' 
-                                            ? currentTime // Assume online if server timestamp not yet resolved
+                                            ? currentTime 
                                             : player.lastActivity;
 
                     const isOnline = (currentTime - lastActivityTime) <= ONLINE_THRESHOLD_MS;
@@ -3684,7 +3620,6 @@
                         
                         let iconHtml = '';
                         let nameClasses = player.activeCosmetics.nameClass || '';
-                        let iconClasses = player.activeCosmetics.iconClass || '';
 
                         if (player.activeCosmetics.iconType === 'font-awesome') {
                             iconHtml = `<i class="${player.activeCosmetics.iconClass}"></i>`;
@@ -3706,20 +3641,15 @@
                                 <span>${formatNumber(player.power)}</span>
                             </div>
                         `;
-                        if (player.id !== userId) { // Add attack button for other players
-                            const attackBtn = document.createElement('button');
-                            attackBtn.textContent = 'هجوم';
-                            attackBtn.classList.add('attack-btn');
-                            attackBtn.onclick = (e) => {
-                                e.stopPropagation(); // Prevent modal from opening when attacking
-                                attackPlayer(player.id, player.name, player.power);
+                        if (player.id !== userId) {
+                            const robBtn = document.createElement('button');
+                            robBtn.textContent = 'سرقة';
+                            robBtn.classList.add('rob-btn');
+                            robBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                robPlayer(player.id, player.name, player.power);
                             };
-                            // Disable attack button if on cooldown
-                            if (Date.now() < playerData.attackCooldownEndTime) {
-                                attackBtn.disabled = true;
-                                attackBtn.textContent = `تهدئة: ${formatTime(playerData.attackCooldownEndTime - Date.now())}`;
-                            }
-                            playerItem.appendChild(attackBtn);
+                            playerItem.appendChild(robBtn);
                         }
                         playerItem.addEventListener('click', () => {
                             showPlayerProfileModal(player.id);
@@ -3738,7 +3668,6 @@
                         
                         let iconHtml = '';
                         let nameClasses = player.activeCosmetics.nameClass || '';
-                        let iconClasses = player.activeCosmetics.iconClass || '';
 
                         if (player.activeCosmetics.iconType === 'font-awesome') {
                             iconHtml = `<i class="${player.activeCosmetics.iconClass}"></i>`;
@@ -3760,20 +3689,15 @@
                                 <span>${formatNumber(player.power)}</span>
                             </div>
                         `;
-                        if (player.id !== userId) { // Add attack button for other players
-                            const attackBtn = document.createElement('button');
-                            attackBtn.textContent = 'هجوم';
-                            attackBtn.classList.add('attack-btn');
-                            attackBtn.onclick = (e) => {
-                                e.stopPropagation(); // Prevent modal from opening when attacking
-                                attackPlayer(player.id, player.name, player.power);
+                        if (player.id !== userId) {
+                            const robBtn = document.createElement('button');
+                            robBtn.textContent = 'سرقة';
+                            robBtn.classList.add('rob-btn');
+                            robBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                robPlayer(player.id, player.name, player.power);
                             };
-                            // Disable attack button if on cooldown
-                            if (Date.now() < playerData.attackCooldownEndTime) {
-                                attackBtn.disabled = true;
-                                attackBtn.textContent = `تهدئة: ${formatTime(playerData.attackCooldownEndTime - Date.now())}`;
-                            }
-                            playerItem.appendChild(attackBtn);
+                            playerItem.appendChild(robBtn);
                         }
                         playerItem.addEventListener('click', () => {
                             showPlayerProfileModal(player.id);
@@ -3784,6 +3708,7 @@
                     offlinePlayersList.innerHTML = '<p class="text-center text-gray-400 mt-2">لا يوجد لاعبون غير متصلون حالياً.</p>';
                 }
 
+                updateRobberyCooldownUI(); // Update buttons after rendering
                 onlineStatusModal.style.display = 'flex';
             } catch (error) {
                 console.error("Error in showOnlineStatusModal:", error);
@@ -3800,32 +3725,128 @@
             }
         }
 
-        async function attackPlayer(targetId, targetName, targetPower) {
+        // New function for rendering players in the robbery section
+        function renderRobberyPlayersList() {
+            robberyPlayersList.innerHTML = '';
+            const currentTime = Date.now();
+            const availablePlayers = [];
+
+            for (const pId in allPlayersData) {
+                if (pId === userId) continue; // Do not list self
+
+                const player = allPlayersData[pId];
+                const lastActivityTime = typeof player.lastActivity === 'object' && player.lastActivity['.sv'] === 'timestamp' 
+                                        ? currentTime 
+                                        : player.lastActivity;
+                const isOnline = (currentTime - lastActivityTime) <= ONLINE_THRESHOLD_MS;
+
+                // Only list online players for robbery
+                if (isOnline) {
+                    availablePlayers.push({
+                        id: pId,
+                        name: player.name,
+                        power: player.power,
+                        wins: player.wins,
+                        losses: player.losses,
+                        activeCosmetics: player.activeCosmetics || {}
+                    });
+                }
+            }
+
+            if (availablePlayers.length === 0) {
+                robberyPlayersList.innerHTML = '<p class="text-center text-gray-400">لا يوجد لاعبون متاحون للسرقة حالياً.</p>';
+            } else {
+                availablePlayers.forEach(player => {
+                    const playerItem = document.createElement('div');
+                    playerItem.classList.add('player-status-item', 'online'); // Always online for robbery list
+                    
+                    let iconHtml = '';
+                    let nameClasses = player.activeCosmetics.nameClass || '';
+
+                    if (player.activeCosmetics.iconType === 'font-awesome') {
+                        iconHtml = `<i class="${player.activeCosmetics.iconClass}"></i>`;
+                    } else if (player.activeCosmetics.iconType === 'image') {
+                        iconHtml = `<img src="${player.activeCosmetics.iconImgSrc}" class="${player.activeCosmetics.iconClass}" alt="Player Icon" draggable="false" />`;
+                    }
+
+                    playerItem.innerHTML = `
+                        <div class="status-info">
+                            <div class="player-icon-display">
+                                ${iconHtml}
+                            </div>
+                            <span class="player-name-display ${nameClasses}">${player.name}</span>
+                            ${player.activeCosmetics.iconCount > 0 ? `<span class="text-xs text-gray-400 ml-1">x${player.activeCosmetics.iconCount}</span>` : ''}
+                        </div>
+                        <div class="power-info">
+                            <i class="fas fa-fist-raised text-red-500"></i>
+                            <span>${formatNumber(player.power)}</span>
+                        </div>
+                    `;
+                    const robBtn = document.createElement('button');
+                    robBtn.textContent = 'سرقة';
+                    robBtn.classList.add('rob-btn');
+                    robBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        robPlayer(player.id, player.name, player.power);
+                    };
+                    playerItem.appendChild(robBtn);
+                    playerItem.addEventListener('click', () => {
+                        showPlayerProfileModal(player.id);
+                    });
+                    robberyPlayersList.appendChild(playerItem);
+                });
+            }
+            updateRobberyCooldownUI(); // Apply cooldown state to robbery buttons
+        }
+
+
+        async function robPlayer(targetId, targetName, targetPower) {
             try {
                 const currentTime = Date.now();
-                if (currentTime < playerData.attackCooldownEndTime) {
-                    window.showMessage(`أنت في فترة تهدئة. يمكنك الهجوم مرة أخرى بعد: ${formatTime(playerData.attackCooldownEndTime - currentTime)}.`);
+                if (currentTime < playerData.robberyCooldownEndTime) {
+                    window.showMessage(`أنت في فترة تهدئة. يمكنك السرقة مرة أخرى بعد: ${formatTime(playerData.robberyCooldownEndTime - currentTime)}.`);
                     return;
                 }
 
                 if (targetId === userId) {
-                    window.showMessage("لا يمكنك مهاجمة نفسك!");
+                    window.showMessage("لا يمكنك سرقة نفسك!");
                     return;
                 }
 
                 let outcome;
+                let moneyGain = Math.floor(Math.random() * (400 - 50 + 1)) + 50; // Base money gain 50-400
+                let keyGain = 0;
                 let message;
+
+                // Determine win/loss based on power difference
                 if (playerData.power >= targetPower) {
                     outcome = 'win';
                     playerData.wins++;
-                    message = `لقد هاجمت ${targetName} (قوة: ${formatNumber(targetPower)}) وفزت!`;
+
+                    // Apply earnings reduction based on opponent's power
+                    if (targetPower >= 0 && targetPower <= 1500) {
+                        moneyGain *= 0.55; // 45% less
+                    } else if (targetPower >= 1501 && targetPower <= 3000) {
+                        moneyGain *= 0.76; // 24% less
+                    } else if (targetPower >= 3001 && targetPower <= 6000) {
+                        moneyGain *= 0.85; // 15% less
+                    }
+                    moneyGain = Math.round(moneyGain); // Round after applying reduction
+
+                    // 25% chance for a key
+                    if (Math.random() < 0.25) {
+                        keyGain = 1;
+                        playerData.keys += keyGain;
+                    }
+                    playerData.money += moneyGain;
+                    message = `لقد سرقت ${targetName} (قوة: ${formatNumber(targetPower)}) وفزت! حصلت على ${formatNumber(moneyGain)} أموال${keyGain > 0 ? ` و ${keyGain} مفتاح` : ''}.`;
                 } else {
                     outcome = 'loss';
                     playerData.losses++;
-                    message = `لقد هاجمت ${targetName} (قوة: ${formatNumber(targetPower)}) وخسرت.`;
+                    message = `لقد حاولت سرقة ${targetName} (قوة: ${formatNumber(targetPower)}) ولكنك خسرت. لم تحصل على شيء.`;
                 }
 
-                playerData.attackCooldownEndTime = currentTime + ATTACK_COOLDOWN_MS;
+                playerData.robberyCooldownEndTime = currentTime + ROBBERY_COOLDOWN_MS;
                 updateUIFromPlayerData(); // Save wins/losses and cooldown
 
                 // Add attack to global log
@@ -3842,10 +3863,11 @@
                 push(globalAttacksRef, newAttack).catch(error => console.error("Error adding attack to global log:", error));
 
                 window.showMessage(message);
-                window.closeOnlineStatusModal(); // Close modal after attack
+                // No need to close modal, just update the list
+                renderRobberyPlayersList();
             } catch (error) {
-                console.error("Error in attackPlayer:", error);
-                window.showMessage("حدث خطأ أثناء محاولة الهجوم.");
+                console.error("Error in robPlayer:", error);
+                window.showMessage("حدث خطأ أثناء محاولة السرقة.");
             }
         }
 
@@ -3864,7 +3886,6 @@
                         let attackerNameDisplay = attack.attackerName;
                         let defenderNameDisplay = attack.defenderName;
 
-                        // Apply cosmetics if available in allPlayersData (for other players) or playerData (for self)
                         const attackerPublicData = allPlayersData[attack.attackerId] || (attack.attackerId === userId ? playerData : null);
                         const defenderPublicData = allPlayersData[attack.defenderId] || (attack.defenderId === userId ? playerData : null);
 
@@ -3936,10 +3957,9 @@
                     }
                     // For other players, we need to reconstruct their ship data for display
                     // This is a simplification as we don't store full ship details in public data
-                    // For a real game, you'd fetch their full playerData or store more details publicly
                     player.ships = [
-                        { name: 'السفينة الأساسية', power: player.power / 3, unlocked: true }, // Placeholder power
-                        { name: 'السفينة الثانية', power: player.power / 3, unlocked: true }, // Assume unlocked for display
+                        { name: 'السفينة الأساسية', power: player.power / 3, unlocked: true }, 
+                        { name: 'السفينة الثانية', power: player.power / 3, unlocked: true }, 
                         { name: 'السفينة الثالثة', power: player.power / 3, unlocked: true }
                     ];
                 }
@@ -3949,7 +3969,6 @@
                 profileLosses.textContent = player.losses;
                 profileTotalPower.textContent = formatNumber(player.power);
 
-                // Apply cosmetic name class to profilePlayerName
                 profilePlayerName.classList.remove('golden-text', 'pink-text', 'fiery-text', 'royal-crimson-text', 'glitch-text'); 
                 if (player.activeCosmetics && player.activeCosmetics.nameClass) {
                     profilePlayerName.classList.add(player.activeCosmetics.nameClass);
@@ -3957,13 +3976,11 @@
 
                 profileShipFormsGrid.innerHTML = '';
                 player.ships.forEach(ship => {
-                    // Only show unlocked ships and the base ship
                     if (ship.unlocked || ship.name === 'السفينة الأساسية') {
                         const itemDiv = document.createElement('div');
                         itemDiv.classList.add('profile-form-item-card');
                         
                         let iconHtml = '';
-                        // For profile, we use the actual ship power to determine its form
                         const shipIconSrc = getShipIcon(ship.power); 
 
                         if (shipIconSrc === 'font-awesome') {
@@ -4017,9 +4034,40 @@
         function handleConfirmChangeFleetNameClick() { confirmChangeFleetName(); }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            loadingOverlay = document.getElementById('loadingOverlay');
-            loadingOverlay.style.display = 'flex'; // Show loading overlay immediately
+            // Initialize Firebase app and services
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getDatabase(app);
+            analytics = getAnalytics(app);
 
+            // Authentication listener
+            onAuthStateChanged(auth, async (user) => {
+                try {
+                    if (user) {
+                        userId = user.uid;
+                        // No userRef for full playerData from Firebase anymore
+                        playersRef = ref(db, `public/players`);
+                        globalAttacksRef = ref(db, `globalAttacks`);
+                        isAuthReady = true;
+                        
+                        // Load player data from local storage first
+                        loadPlayerDataFromLocalStorage(); 
+                        
+                        // Setup listeners for public data
+                        setupPublicDataListeners(); 
+                        
+                        // Periodically update public data in Firebase
+                        setInterval(updatePublicPlayerData, 10000); 
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Firebase Auth Error during sign-in:", error);
+                    window.showMessage("فشل تسجيل الدخول إلى Firebase. قد لا تعمل الميزات بشكل صحيح.");
+                }
+            });
+
+            // Initialize all DOM elements
             playerPowerEl = document.getElementById('playerPower');
             playerMoneyEl = document.getElementById('playerMoney');
             playerKeysEl = document.getElementById('playerKeys');
@@ -4139,6 +4187,7 @@
             onlineStatusModal = document.getElementById('onlineStatusModal');
             onlinePlayersList = document.getElementById('onlinePlayersList');
             offlinePlayersList = document.getElementById('offlinePlayersList');
+            robberyPlayersList = document.getElementById('robberyPlayersList'); // Get new element
 
             recordModal = document.getElementById('recordModal');
             globalAttacksList = document.getElementById('globalAttacksList');
