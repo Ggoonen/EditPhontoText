@@ -1880,9 +1880,11 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         // Initialize Firebase
+        console.log("Initializing Firebase app...");
         app = initializeApp(firebaseConfig);
         auth = getAuth(app);
         db = getDatabase(app);
+        console.log("Firebase app initialized.");
 
         let playerData = {
             power: 0,
@@ -2264,7 +2266,9 @@
 
         function savePlayerData() {
             if (userRef && isAuthReady) {
+                console.log("Attempting to save player data to Firebase...");
                 set(userRef, playerData)
+                    .then(() => console.log("Player data saved successfully."))
                     .catch(error => console.error("Error saving player data to Firebase:", error));
             } else {
                 console.warn("Firebase not ready or userRef not set. Cannot save data.");
@@ -2272,10 +2276,12 @@
         }
 
         function loadPlayerDataFromFirebase() {
+            console.log("Attempting to load player data from Firebase...");
             if (userRef) {
                 onValue(userRef, (snapshot) => {
                     const data = snapshot.val();
                     if (data) {
+                        console.log("Player data found in Firebase:", data);
                         // Merge loaded data with default structure to handle new properties
                         playerData = {
                             ...playerData, // Keep default initial values for new fields
@@ -2298,7 +2304,9 @@
                         if (playerData.lastActivity === undefined) playerData.lastActivity = 0;
                         if (playerData.isGlitchNameOwned === undefined) playerData.isGlitchNameOwned = false;
                         if (playerData.isGlitchNameActive === undefined) playerData.isGlitchNameActive = false;
+                        console.log("Player data merged:", playerData);
                     } else {
+                        console.log("No player data found in Firebase. Initializing new player data.");
                         // No data found, initialize with default and save
                         playerData = {
                             power: 0, money: 100, keys: 1, fleetName: "قائد جديد",
@@ -2325,13 +2333,17 @@
                             lastActivity: Date.now()
                         };
                         savePlayerData(); // Save initial data to Firebase
+                        console.log("New player data initialized and saved:", playerData);
                     }
                     updateUIFromPlayerData();
                     window.showSection('mainMenu'); // Show main menu after data is loaded/initialized
+                    console.log("UI updated and main menu shown.");
                 }, (error) => {
                     console.error("Error reading player data from Firebase:", error);
                     window.showMessage("فشل تحميل بيانات اللاعب من Firebase. قد لا تعمل الميزات بشكل صحيح.");
                 });
+            } else {
+                console.error("userRef is null. Cannot load player data.");
             }
         }
 
@@ -2343,28 +2355,34 @@
                 playersRef = ref(db, `artifacts/${appId}/public/data/players`);
                 globalAttacksRef = ref(db, `artifacts/${appId}/public/data/globalAttacks`);
                 isAuthReady = true;
+                console.log("User authenticated. User ID:", userId);
                 loadPlayerDataFromFirebase(); // Load data once authenticated
                 setupPublicDataListeners(); // Setup listeners for public data
                 setInterval(updatePublicPlayerData, 10000); // Update public data every 10 seconds
             } else {
+                console.log("No user authenticated. Attempting anonymous sign-in...");
                 // Sign in anonymously if no user or token
                 try {
                     if (initialAuthToken) {
                         await signInWithCustomToken(auth, initialAuthToken);
+                        console.log("Signed in with custom token.");
                     } else {
                         await signInAnonymously(auth);
+                        console.log("Signed in anonymously.");
                     }
                 } catch (error) {
-                    console.error("Firebase Auth Error:", error);
+                    console.error("Firebase Auth Error during sign-in:", error);
                     window.showMessage("فشل تسجيل الدخول إلى Firebase. قد لا تعمل الميزات بشكل صحيح.");
                 }
             }
         });
 
         function setupPublicDataListeners() {
+            console.log("Setting up public data listeners...");
             if (playersRef) {
                 onValue(playersRef, (snapshot) => {
                     allPlayersData = snapshot.val() || {};
+                    console.log("Public players data updated:", allPlayersData);
                     // Filter out the current player from the allPlayersData for online/offline lists
                     // The current player's data is managed directly via playerData object
                     if (userId && allPlayersData[userId]) {
@@ -2385,6 +2403,7 @@
                     });
                     // Sort by timestamp in descending order to show most recent first
                     globalAttacksLog = attacks.sort((a, b) => b.timestamp - a.timestamp);
+                    console.log("Global attacks log updated:", globalAttacksLog);
                 }, (error) => {
                     console.error("Error reading global attacks log:", error);
                 });
@@ -2393,6 +2412,7 @@
 
         function updatePublicPlayerData() {
             if (userId && isAuthReady && playerData.fleetName) {
+                console.log("Updating public player data...");
                 const publicData = {
                     name: playerData.fleetName,
                     power: playerData.power,
@@ -2433,6 +2453,7 @@
                 }
 
                 set(ref(db, `artifacts/${appId}/public/data/players/${userId}`), publicData)
+                    .then(() => console.log("Public player data updated successfully."))
                     .catch(error => console.error("Error updating public player data:", error));
             }
         }
@@ -3099,6 +3120,7 @@
         }
 
         window.showSection = function(sectionId) {
+            console.log(`Showing section: ${sectionId}`);
             const sections = [mainMenuSection, myFleetSection, storeSection, playerRobberySection, rouletteSection, myResourcesSection];
 
             sections.forEach(section => {
@@ -3480,7 +3502,13 @@
 
                 const player = allPlayersData[pId];
                 // Check if lastActivity is within the online threshold
-                const isOnline = (currentTime - player.lastActivity) <= ONLINE_THRESHOLD_MS;
+                // Note: player.lastActivity is a server timestamp, which might be an object {".sv": "timestamp"}
+                // We need to ensure it's a number for comparison.
+                const lastActivityTime = typeof player.lastActivity === 'object' && player.lastActivity['.sv'] === 'timestamp' 
+                                         ? currentTime // Assume online if server timestamp not yet resolved
+                                         : player.lastActivity;
+
+                const isOnline = (currentTime - lastActivityTime) <= ONLINE_THRESHOLD_MS;
 
                 const playerObj = {
                     id: pId,
@@ -3504,13 +3532,23 @@
                 onlinePlayers.forEach(player => {
                     const playerItem = document.createElement('div');
                     playerItem.classList.add('player-status-item', player.isOnline ? 'online' : 'offline');
+                    
+                    let iconHtml = '';
+                    let nameClasses = player.activeCosmetics.nameClass || '';
+                    let iconClasses = player.activeCosmetics.iconClass || '';
+
+                    if (player.activeCosmetics.iconType === 'font-awesome') {
+                        iconHtml = `<i class="${player.activeCosmetics.iconClass}"></i>`;
+                    } else if (player.activeCosmetics.iconType === 'image') {
+                        iconHtml = `<img src="${player.activeCosmetics.iconImgSrc}" class="${player.activeCosmetics.iconClass}" alt="Player Icon" draggable="false" />`;
+                    }
+
                     playerItem.innerHTML = `
                         <div class="status-info">
                             <div class="player-icon-display">
-                                ${player.activeCosmetics.iconType === 'font-awesome' ? `<i class="${player.activeCosmetics.iconClass}"></i>` : 
-                                  player.activeCosmetics.iconType === 'image' ? `<img src="${player.activeCosmetics.iconImgSrc}" class="${player.activeCosmetics.iconClass}" alt="Player Icon" draggable="false" />` : ''}
+                                ${iconHtml}
                             </div>
-                            <span class="player-name-display ${player.activeCosmetics.nameClass}">${player.name}</span>
+                            <span class="player-name-display ${nameClasses}">${player.name}</span>
                             ${player.activeCosmetics.iconCount > 0 ? `<span class="text-xs text-gray-400 ml-1">x${player.activeCosmetics.iconCount}</span>` : ''}
                             <span class="status-dot ${player.isOnline ? 'bg-green-500' : 'bg-red-500'}"></span>
                         </div>
@@ -3548,13 +3586,23 @@
                 offlinePlayers.forEach(player => {
                     const playerItem = document.createElement('div');
                     playerItem.classList.add('player-status-item', player.isOnline ? 'online' : 'offline');
+                    
+                    let iconHtml = '';
+                    let nameClasses = player.activeCosmetics.nameClass || '';
+                    let iconClasses = player.activeCosmetics.iconClass || '';
+
+                    if (player.activeCosmetics.iconType === 'font-awesome') {
+                        iconHtml = `<i class="${player.activeCosmetics.iconClass}"></i>`;
+                    } else if (player.activeCosmetics.iconType === 'image') {
+                        iconHtml = `<img src="${player.activeCosmetics.iconImgSrc}" class="${player.activeCosmetics.iconClass}" alt="Player Icon" draggable="false" />`;
+                    }
+
                     playerItem.innerHTML = `
                         <div class="status-info">
                             <div class="player-icon-display">
-                                ${player.activeCosmetics.iconType === 'font-awesome' ? `<i class="${player.activeCosmetics.iconClass}"></i>` : 
-                                  player.activeCosmetics.iconType === 'image' ? `<img src="${player.activeCosmetics.iconImgSrc}" class="${player.activeCosmetics.iconClass}" alt="Player Icon" draggable="false" />` : ''}
+                                ${iconHtml}
                             </div>
-                            <span class="player-name-display ${player.activeCosmetics.nameClass}">${player.name}</span>
+                            <span class="player-name-display ${nameClasses}">${player.name}</span>
                             ${player.activeCosmetics.iconCount > 0 ? `<span class="text-xs text-gray-400 ml-1">x${player.activeCosmetics.iconCount}</span>` : ''}
                             <span class="status-dot ${player.isOnline ? 'bg-green-500' : 'bg-red-500'}"></span>
                         </div>
@@ -3633,8 +3681,7 @@
                 timestamp: serverTimestamp()
             };
             push(globalAttacksRef, newAttack).then(() => {
-                // Firebase Realtime Database automatically handles the limitToLast(5) in the listener.
-                // No need for client-side trimming here.
+                console.log("Attack logged to global attacks.");
             }).catch(error => console.error("Error adding attack to global log:", error));
 
             window.showMessage(message);
