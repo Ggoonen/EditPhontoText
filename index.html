@@ -1,170 +1,3610 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قادمة قريبًا</title>
+    <title>كلاش ماينس - تصميم عصري</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap');
+        :root {
+            --bg-dark: #2C3333; /* Darker grey */
+            --bg-medium: #394040; /* Medium grey */
+            --bg-light: #4A5050; /* Lighter grey */
+            --accent-blue: #66CCFF; /* Brighter blue for accents */
+            --accent-green: #4CAF50;
+            --accent-red: #E74C3C;
+            --accent-yellow: #FFD700;
+            --text-light: #E0E0E0;
+            --text-dark: #FFFFFF;
+            --border-color: #212529; /* Almost black for borders */
+        }
 
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Cairo', sans-serif;
-            background-color: #1a1a2e; /* خلفية داكنة */
-            color: #e0e0e0; /* لون النص الفاتح */
+            font-family: 'Almarai', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1F2222 100%);
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            text-align: center;
+            margin: 0;
+            overflow: hidden;
+            color: var(--text-light);
+        }
+        .app-container {
+            width: 100%;
+            max-width: 900px;
+            height: 95vh;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-medium);
+            border-radius: 2rem;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .header-tabs {
+            background-color: var(--bg-light);
+            display: flex;
+            justify-content: space-around;
+            padding: 1.2rem 0;
+            border-bottom: 3px solid var(--border-color);
+            border-top-left-radius: 2rem;
+            border-top-right-radius: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .header-tab-item {
+            color: var(--text-light);
+            font-weight: bold;
+            padding: 1rem 1.8rem;
+            cursor: pointer;
+            border-radius: 1.2rem;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 1.1rem;
+            gap: 0.6rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .header-tab-item i {
+            font-size: 1.6rem;
+            color: #A0AEC0;
+            transition: color 0.3s ease;
+        }
+        .header-tab-item:hover {
+            background-color: #5A6060; /* Slightly lighter hover */
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        .header-tab-item.active {
+            background: linear-gradient(45deg, var(--accent-blue), #00AFFF);
+            color: var(--text-dark);
+            box-shadow: 0 6px 15px rgba(102, 204, 255, 0.6);
+            transform: translateY(-2px);
+        }
+        .header-tab-item.active i {
+            color: var(--text-dark);
+        }
+        .header-tab-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+            z-index: 0;
+        }
+        .header-tab-item:hover::before {
+            transform: translateX(0);
+        }
+        .header-tab-item span, .header-tab-item i {
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-area {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2A2A2A 25%, #1A1A1A 50%, #2A2A2A 75%, #1A1A1A 100%);
+            background-size: 400% 400%;
+            animation: smooth-slash-animation 15s ease infinite;
+            padding: 2rem;
+            color: var(--text-dark);
+            font-weight: bold;
+            border-bottom-left-radius: 2rem;
+            border-bottom-right-radius: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -8px 25px rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            flex-grow: 1;
             overflow: hidden;
         }
 
-        .container {
-            background-color: #2a2a4a; /* خلفية أغمق للكونتينر */
-            padding: 40px 60px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 2s ease-out;
+        @keyframes smooth-slash-animation {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
         }
 
-        h1 {
-            font-size: 3.5em;
-            margin-bottom: 25px;
-            color: #8be9fd; /* لون أزرق فاتح جميل للعنوان */
-            letter-spacing: 2px;
-            animation: slideInFromTop 1s ease-out;
+        .profile-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            flex-grow: 1;
+            margin-right: 2rem;
         }
-
-        .countdown {
+        .profile-area .stat-item {
             display: flex;
-            gap: 25px;
-            margin-top: 30px;
-            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.1rem;
+            white-space: nowrap;
+            background-color: rgba(255, 255, 255, 0.08);
+            padding: 0.7rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+        }
+        .icon-circle {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+            transition: box-shadow 0.3s ease;
+            overflow: hidden;
+            background-color: rgba(255, 255, 255, 0.08);
+            flex-shrink: 0;
+        }
+        .icon-circle i {
+            font-size: 1.2rem;
+        }
+        .icon-circle img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+        .icon-circle.user-icon { background-color: rgba(253, 224, 71, 0.2); }
+        .icon-circle.strength-icon-bg { background-color: rgba(147, 197, 253, 0.2); }
+        .icon-circle.coins-icon { background-color: rgba(245, 158, 11, 0.2); }
+        .icon-circle.gem-icon { background-color: rgba(192, 132, 252, 0.2); }
+        .icon-circle.soldiers-icon { background-color: rgba(106, 90, 205, 0.2); }
+
+        .stat-value {
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai for numbers */
+            font-size: 1.1rem;
+            font-weight: normal;
+            color: var(--text-dark);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+            letter-spacing: 0.5px;
+        }
+        .stat-text {
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+
+        .profile-right-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            flex-shrink: 0;
+        }
+        .info-icon-wrapper {
+            cursor: pointer;
+            color: #ADD8E6;
+            font-size: 1.8rem;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .info-icon-wrapper:hover {
+            color: var(--accent-blue);
+            transform: scale(1.1);
+        }
+        .profile-right-icon-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.6rem;
+            flex-shrink: 0;
+        }
+        .profile-right-icon-container img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+            transition: transform 0.3s ease;
+        }
+        .profile-right-icon-container img:hover {
+            transform: scale(1.05);
+        }
+        .profile-right-icon-container .strength-title-text {
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--text-dark);
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+            white-space: nowrap;
+        }
+        .lion-icon-in-profile {
+            width: 30px;
+            height: 30px;
+            margin-right: 5px; /* Space between lion icon and strength icon */
+            filter: drop-shadow(0 0 8px rgba(255, 165, 0, 0.8));
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: var(--bg-medium);
+            padding: 2rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            max-width: 450px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            border: 2px solid var(--border-color);
+            color: var(--text-light);
+            transform: translateY(30px);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.visible .modal-content {
+            transform: translateY(0);
+        }
+        .modal-close-button {
+            position: absolute;
+            top: 0.75rem;
+            left: 0.75rem;
+            font-size: 2.2rem;
+            color: #CBD5E0;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            line-height: 1;
+            transition: color 0.2s ease, transform 0.2s ease;
+        }
+        .modal-close-button:hover {
+            color: var(--accent-red);
+            transform: rotate(90deg);
+        }
+        .modal-title {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 1.8rem;
+            color: var(--text-dark);
+            text-shadow: 0 0 10px rgba(102, 204, 255, 0.4);
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+        }
+        .rank-item {
+            display: flex;
+            align-items: center;
+            background-color: var(--bg-light);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.8rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .rank-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        .rank-item img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+            margin-left: 1rem;
+            border-radius: 50%;
+            border: 2px solid var(--accent-blue);
+            padding: 3px;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(102, 204, 255, 0.5);
+        }
+        .rank-item .rank-details {
+            flex-grow: 1;
+        }
+        .rank-item .rank-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+        .rank-item .rank-power {
+            font-size: 1rem;
+            color: #CBD5E0;
+        }
+
+        .name-input-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+        .name-input-content {
+            background-color: var(--bg-medium);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
+            text-align: center;
+            color: var(--text-light);
+            max-width: 400px;
+            width: 90%;
+            border: 2px solid var(--border-color);
+        }
+        .name-input-content h2 {
+            font-size: 2.2rem;
+            margin-bottom: 1.8rem;
+            color: var(--text-dark);
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+        .name-input-content input {
+            width: calc(100% - 2rem);
+            padding: 0.9rem;
+            margin-bottom: 1.8rem;
+            border-radius: 0.75rem;
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+            font-size: 1.2rem;
+            text-align: center;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+        }
+        .name-input-content button {
+            background: linear-gradient(45deg, var(--accent-blue), #00AFFF);
+            color: var(--text-dark);
+            padding: 0.9rem 2rem;
+            border-radius: 0.75rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 204, 255, 0.4);
+            border: none;
+        }
+        .name-input-content button:hover {
+            background: linear-gradient(45deg, #00AFFF, var(--accent-blue));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 204, 255, 0.6);
+        }
+
+        .village-home-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            padding: 1.5rem;
+            flex-grow: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-blue) var(--bg-dark);
+        }
+        .village-home-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .village-home-container::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 10px;
+        }
+        .village-home-container::-webkit-scrollbar-thumb {
+            background-color: var(--accent-blue);
+            border-radius: 10px;
+            border: 2px solid var(--bg-medium);
+        }
+
+        .house-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            background-color: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 90%;
+        }
+
+        .house-stats {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 1.2rem;
+        }
+        .house-stats .stat-value {
+            font-size: 1.4rem;
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+        }
+        .upgrade-button {
+            background: linear-gradient(45deg, var(--accent-green), #4CAF50);
+            color: var(--text-dark);
+            padding: 0.9rem 2rem;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+            border: none;
+        }
+        .upgrade-button:hover:not(:disabled) {
+            background: linear-gradient(45deg, #4CAF50, var(--accent-green));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.6);
+        }
+        .upgrade-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+            transform: none;
+        }
+        .cooldown-timer {
+            font-size: 1.1rem;
+            color: var(--accent-yellow);
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+        }
+        .shop-item {
+            background-color: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .shop-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        .shop-item h3 {
+            font-size: 1.4rem;
+            color: var(--text-dark);
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+        }
+        .shop-item .gem-icon-shop {
+            font-size: 60px;
+            color: #C084FC;
+            filter: drop-shadow(0 0 10px rgba(192, 132, 252, 0.7));
+        }
+        .shop-item .item-price {
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+            font-size: 1.2rem;
+            color: var(--accent-yellow);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .shop-item button {
+            background: linear-gradient(45deg, var(--accent-blue), #00AFFF);
+            color: var(--text-dark);
+            padding: 0.7rem 1.5rem;
+            border-radius: 0.6rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(102, 204, 255, 0.3);
+            border: none;
+        }
+        .shop-item button:hover:not(:disabled) {
+            background: linear-gradient(45deg, #00AFFF, var(--accent-blue));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 204, 255, 0.5);
+        }
+        .shop-item button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .progress-bar-container {
+            width: 90%;
+            height: 25px;
+            background-color: var(--bg-dark);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--border-color);
+            margin-top: 1.2rem;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #4CAF50, #8BC34A);
+            border-radius: 10px;
+            transition: width 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-dark);
+            font-size: 0.9rem;
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .soldiers-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            margin-top: 2rem;
+            background-color: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 90%;
+        }
+        .soldiers-count {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--text-dark);
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+        }
+        .train-soldiers-button {
+            background: linear-gradient(45deg, #8B4513, #A0522D);
+            color: var(--text-dark);
+            padding: 0.9rem 2rem;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.4);
+            border: none;
+        }
+        .train-soldiers-button:hover:not(:disabled) {
+            background: linear-gradient(45deg, #A0522D, #8B4513);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(139, 69, 19, 0.6);
+        }
+        .train-soldiers-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+            transform: none;
+        }
+        .soldiers-cooldown-timer {
+            font-size: 1.1rem;
+            color: var(--accent-yellow);
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+            font-family: 'Almarai', sans-serif;
+        }
+
+        .cosmetic-items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.2rem;
+            padding: 1rem;
             justify-content: center;
         }
-
-        .countdown > div {
-            background-color: #4a4a6e; /* خلفية ألوان المؤقت */
-            padding: 20px 25px;
-            border-radius: 10px;
-            font-size: 2.5em;
+        .cosmetic-item {
+            background-color: var(--bg-light);
+            padding: 1rem;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .cosmetic-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
+        }
+        .cosmetic-item-name {
             font-weight: bold;
-            color: #f1fa8c; /* لون أصفر فاتح للوقت */
-            min-width: 120px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            animation: scaleIn 0.8s ease-out forwards;
-            opacity: 0; /* لإخفاء العناصر قبل بدء الأنميشن */
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+        }
+        .cosmetic-item-price {
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+            font-size: 1rem;
+            color: var(--accent-yellow);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .cosmetic-item button {
+            background: linear-gradient(45deg, var(--accent-blue), #00AFFF);
+            color: var(--text-dark);
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.6rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(102, 204, 255, 0.3);
+            border: none;
+        }
+        .cosmetic-item button:hover:not(:disabled) {
+            background: linear-gradient(45deg, #00AFFF, var(--accent-blue));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 204, 255, 0.5);
+        }
+        .cosmetic-item button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+            transform: none;
         }
 
-        .countdown > div:nth-child(1) { animation-delay: 0.2s; }
-        .countdown > div:nth-child(2) { animation-delay: 0.4s; }
-        .countdown > div:nth-child(3) { animation-delay: 0.6s; }
-        .countdown > div:nth-child(4) { animation-delay: 0.8s; }
-
-        .countdown span {
-            display: block;
-            font-size: 0.4em;
-            font-weight: normal;
-            margin-top: 5px;
-            color: #bd93f9; /* لون بنفسجي فاتح للنص السفلي */
+        @keyframes rainbow {
+            0% { color: #FF0000; } 16% { color: #FF7F00; } 33% { color: #FFFF00; }
+            50% { color: #00FF00; } 66% { color: #0000FF; } 83% { color: #4B0082; }
+            100% { color: #9400D3; }
+        }
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 8px #fff, 0 0 15px var(--accent-blue), 0 0 20px var(--accent-blue); }
+            50% { text-shadow: 0 0 12px #fff, 0 0 25px var(--accent-blue), 0 0 35px var(--accent-blue); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        @keyframes golden-shine {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+        @keyframes flaming-text {
+            0% { color: #FF4500; text-shadow: 0 0 5px #FF8C00, 0 0 10px #FF4500; }
+            50% { color: #FF8C00; text-shadow: 0 0 8px #FFD700, 0 0 15px #FF8C00; }
+            100% { color: #FF4500; text-shadow: 0 0 5px #FF8C00, 0 0 10px #FF4500; }
         }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .cosmetic-rainbow { animation: rainbow 5s infinite linear; }
+        .cosmetic-glow { animation: glow 2s infinite alternate; }
+        .cosmetic-pulse { animation: pulse 1.5s infinite alternate; }
+        .cosmetic-golden-animated {
+            background: linear-gradient(90deg, #FFD700 0%, #FFEF96 25%, #FFD700 50%, #FFEF96 75%, #FFD700 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% 100%;
+            animation: golden-shine 3s linear infinite;
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+        }
+        .cosmetic-flaming-lion { animation: flaming-text 1.5s infinite alternate; }
+
+
+        .war-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.8rem;
+            padding: 1.5rem;
+            flex-grow: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-blue) var(--bg-dark);
+        }
+        .war-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .war-container::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 10px;
+        }
+        .war-container::-webkit-scrollbar-thumb {
+            background-color: var(--accent-blue);
+            border-radius: 10px;
+            border: 2px solid var(--bg-medium);
+        }
+        .war-player-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+        .war-player-item {
+            background-color: var(--bg-light);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .war-player-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        .war-player-details {
+            display: flex;
+            align-items: center; /* Align items in center */
+            gap: 0.8rem; /* Space between icon and text */
+        }
+        .war-player-details img {
+            width: 30px; /* Size for strength icon */
+            height: 30px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.4));
+        }
+        .war-player-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--text-dark);
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+        }
+        .war-player-strength {
+            font-size: 1rem;
+            color: #CBD5E0;
+            margin-right: 0.5rem; /* Space between name and strength text */
+        }
+        .war-player-status {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-top: 0.2rem; /* Adjusted for better alignment */
+        }
+        .status-online { color: var(--accent-green); }
+        .status-offline { color: var(--accent-red); }
+        .attack-button {
+            background: linear-gradient(45deg, var(--accent-red), #E63946);
+            color: var(--text-dark);
+            padding: 0.7rem 1.5rem;
+            border-radius: 0.6rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(231, 76, 60, 0.3);
+            border: none;
+        }
+        .attack-button:hover:not(:disabled) {
+            background: linear-gradient(45deg, #E63946, var(--accent-red));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.5);
+        }
+        .attack-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+            transform: none;
+        }
+        .soldiers-required-text {
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-bottom: 0.8rem;
         }
 
-        @keyframes slideInFromTop {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        .roulette-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            padding: 1.5rem;
+            width: 100%;
+            flex-grow: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-blue) var(--bg-dark);
+        }
+        .roulette-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .roulette-container::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 10px;
+        }
+        .roulette-container::-webkit-scrollbar-thumb {
+            background-color: var(--accent-blue);
+            border-radius: 10px;
+            border: 2px solid var(--bg-medium);
+        }
+        .roulette-game-area {
+            background-color: var(--bg-dark);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            border: 2px solid var(--border-color);
+        }
+        .roulette-multiplier {
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+            font-size: 3.5rem;
+            color: var(--accent-green);
+            text-shadow: 0 0 15px var(--accent-green), 0 0 30px var(--accent-green);
+            margin-bottom: 1.5rem;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+        .roulette-multiplier.crashed {
+            color: var(--accent-red);
+            text-shadow: 0 0 15px var(--accent-red), 0 0 30px var(--accent-red);
+        }
+        .roulette-input-group {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            width: 100%;
+            justify-content: center;
+        }
+        .roulette-input-group label {
+            font-size: 1.1rem;
+            color: var(--text-light);
+        }
+        .roulette-input-group input {
+            width: 140px;
+            padding: 0.6rem;
+            border-radius: 0.6rem;
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-medium);
+            color: var(--text-dark);
+            font-size: 1.1rem;
+            text-align: center;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+        }
+        .roulette-button {
+            background: linear-gradient(45deg, var(--accent-blue), #00AFFF);
+            color: var(--text-dark);
+            padding: 0.8rem 1.8rem;
+            border-radius: 0.7rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 204, 255, 0.4);
+            border: none;
+        }
+        .roulette-button:hover:not(:disabled) {
+            background: linear-gradient(45deg, #00AFFF, var(--accent-blue));
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(102, 204, 255, 0.6);
+        }
+        .roulette-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+            transform: none;
+        }
+        .roulette-cashout-button {
+            background: linear-gradient(45deg, var(--accent-yellow), #FFD700);
+            color: var(--bg-dark);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+        }
+        .roulette-cashout-button:hover:not(:disabled) {
+            background: linear-gradient(45deg, #FFD700, var(--accent-yellow));
+            box-shadow: 0 6px 18px rgba(255, 215, 0, 0.6);
+        }
+        .roulette-cooldown-timer {
+            font-size: 1.1rem;
+            color: var(--accent-yellow);
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+            margin-top: 1rem;
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+        }
+        .roulette-status-message {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-top: 0.8rem;
+            text-align: center;
         }
 
-        @keyframes scaleIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        .gold-generator-container {
+            background-color: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
         }
+        .gold-generator-container h3 {
+            font-size: 1.4rem;
+            color: var(--text-dark);
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+        }
+        .gold-display {
+            font-family: 'Almarai', sans-serif; /* Changed to Almarai */
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--accent-yellow);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        .claim-gold-button {
+            background: linear-gradient(45deg, #FFD700, #FFA000);
+            color: var(--bg-dark);
+            padding: 0.9rem 2rem;
+            border-radius: 0.75rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            border: none;
+        }
+        .claim-gold-button:hover:not(:disabled) {
+            background: linear-gradient(45deg, #FFA000, #FFD700);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.6);
+        }
+        .claim-gold-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+            transform: none;
+        }
+        .gold-generator-message {
+            font-size: 0.9rem;
+            color: #A0AEC0;
+        }
+
+        .tasks-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            flex-grow: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-blue) var(--bg-dark);
+        }
+        .tasks-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .tasks-container::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 10px;
+        }
+        .tasks-container::-webkit-scrollbar-thumb {
+            background-color: var(--accent-blue);
+            border-radius: 10px;
+            border: 2px solid var(--bg-medium);
+        }
+        .task-item {
+            background-color: var(--bg-light);
+            padding: 1.2rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .task-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+        .task-item h3 {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+        .task-progress {
+            font-size: 1rem;
+            color: #CBD5E0;
+        }
+        .task-rewards {
+            font-size: 0.9rem;
+            color: var(--accent-yellow);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .task-rewards i {
+            font-size: 0.9rem;
+        }
+        .claim-task-button {
+            background: linear-gradient(45deg, #3498DB, #2980B9);
+            color: var(--text-dark);
+            padding: 0.7rem 1.5rem;
+            border-radius: 0.6rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(52, 152, 219, 0.3);
+            border: none;
+            margin-top: 0.8rem;
+        }
+        .claim-task-button:hover:not(:disabled) {
+            background: linear-gradient(45deg, #2980B9, #3498DB);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.5);
+        }
+        .claim-task-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* Attack Log Styles */
+        .attack-log-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1.5rem;
+            flex-grow: 1;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-blue) var(--bg-dark);
+        }
+        .attack-log-item {
+            background-color: var(--bg-light);
+            padding: 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .attack-log-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+        .attack-log-players {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .attack-log-outcome {
+            font-weight: bold;
+        }
+        .outcome-win { color: var(--accent-green); }
+        .outcome-loss { color: var(--accent-red); }
+        .attack-log-details {
+            font-size: 0.9rem;
+            color: #CBD5E0;
+        }
+        .attack-log-timestamp {
+            font-size: 0.8rem;
+            color: #A0AEC0;
+            text-align: left;
+        }
+
+        /* Chat Styles */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            padding: 1.5rem;
+        }
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+            margin-bottom: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-blue) var(--bg-dark);
+        }
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-messages::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 10px;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: var(--accent-blue);
+            border-radius: 10px;
+            border: 2px solid var(--bg-medium);
+        }
+        .chat-message-item {
+            background-color: var(--bg-light);
+            padding: 0.8rem 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.6rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            word-wrap: break-word; /* Ensure long words wrap */
+        }
+        .chat-message-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+            margin-bottom: 0.4rem;
+        }
+        .chat-message-sender {
+            color: var(--accent-blue);
+        }
+        .chat-message-timestamp {
+            font-size: 0.75rem;
+            color: #A0AEC0;
+            margin-left: auto; /* Push timestamp to the left */
+        }
+        .chat-message-content {
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+        .chat-input-group {
+            display: flex;
+            gap: 0.8rem;
+        }
+        .chat-input-group input {
+            flex-grow: 1;
+            padding: 0.8rem;
+            border-radius: 0.75rem;
+            border: 2px solid var(--border-color);
+            background-color: var(--bg-dark);
+            color: var(--text-dark);
+            font-size: 1rem;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
+        }
+        .chat-input-group button {
+            background: linear-gradient(45deg, var(--accent-green), #4CAF50);
+            color: var(--text-dark);
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+            border: none;
+        }
+        .chat-input-group button:hover {
+            background: linear-gradient(45deg, #4CAF50, var(--accent-green));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.5);
+        }
+        .chat-sender-icon {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+            margin-left: 5px;
+        }
+
+        /* My Items Styles */
+        .my-items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.2rem;
+            padding: 1rem;
+            justify-content: center;
+        }
+        .my-item-card {
+            background-color: var(--bg-light);
+            padding: 1rem;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .my-item-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.4);
+        }
+        .my-item-name {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+        .my-item-status {
+            font-size: 0.9rem;
+            color: var(--accent-green);
+        }
+        .my-item-card button {
+            background: linear-gradient(45deg, #3498DB, #2980B9);
+            color: var(--text-dark);
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.6rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(52, 152, 219, 0.3);
+            border: none;
+        }
+        .my-item-card button.unequip-button {
+            background: linear-gradient(45deg, #E74C3C, #C0392B);
+        }
+        .my-item-card button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.5);
+        }
+
+        /* Experience Box Preview Modal */
+        .experience-box-preview-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 1rem;
+        }
+        .preview-item {
+            background-color: var(--bg-dark);
+            padding: 0.8rem;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+        }
+        .preview-item-icon {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .preview-item-details {
+            flex-grow: 1;
+        }
+        .preview-item-name {
+            font-weight: bold;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+        }
+        .preview-item-chance {
+            font-size: 0.9rem;
+            color: var(--accent-green);
+        }
+        .preview-item-description {
+            font-size: 0.85rem;
+            color: #CBD5E0;
+        }
+
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5em;
+            .app-container {
+                height: 100vh;
+                border-radius: 0;
             }
-            .container {
-                padding: 30px 40px;
+            .header-tabs {
+                padding: 0.8rem 0;
+                border-top-left-radius: 0;
+                border-top-right-radius: 0;
+                overflow-x: auto; /* Allow horizontal scroll for many tabs */
+                justify-content: flex-start; /* Align tabs to start */
             }
-            .countdown > div {
-                font-size: 2em;
-                min-width: 90px;
-                padding: 15px 20px;
+            .header-tab-item {
+                padding: 0.8rem 0.6rem;
+                font-size: 0.9rem;
+                gap: 0.3rem;
+                min-width: 80px; /* Ensure tabs don't collapse too much */
             }
-        }
-
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.8em;
+            .header-tab-item i {
+                font-size: 1.3rem;
             }
-            .container {
-                padding: 20px 25px;
+            .profile-area {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                padding: 1.2rem;
+                flex-direction: column;
+                align-items: center;
+                gap: 1.5rem;
             }
-            .countdown {
-                gap: 15px;
+            .profile-stats-grid {
+                grid-template-columns: 1fr;
+                margin-right: 0;
+                width: 100%;
             }
-            .countdown > div {
-                font-size: 1.5em;
-                min-width: 70px;
-                padding: 10px 15px;
+            .profile-area .stat-item {
+                font-size: 1rem;
+                gap: 0.6rem;
+                justify-content: center;
+            }
+            .icon-circle {
+                width: 2rem;
+                height: 2rem;
+            }
+            .icon-circle i {
+                font-size: 1rem;
+            }
+            .stat-value {
+                font-size: 1rem;
+            }
+            .stat-text {
+                font-size: 1rem;
+            }
+            .profile-right-section {
+                margin-bottom: 0.8rem;
+            }
+            .profile-right-icon-container img {
+                width: 60px;
+                height: 60px;
+            }
+            .profile-right-icon-container .strength-title-text {
+                font-size: 1.1rem;
+            }
+            .info-icon-wrapper {
+                font-size: 1.6rem;
+            }
+            .modal-content {
+                padding: 1.5rem;
+            }
+            .modal-title {
+                font-size: 1.6rem;
+                margin-bottom: 1.2rem;
+            }
+            .rank-item img {
+                width: 38px;
+                height: 38px;
+            }
+            .rank-item .rank-name {
+                font-size: 1.1rem;
+            }
+            .rank-item .rank-power {
+                font-size: 0.9rem;
+            }
+            .village-home-container {
+                gap: 1.2rem;
+            }
+            .house-stats {
+                font-size: 1rem;
+                padding: 0.8rem 1rem;
+            }
+            .house-stats .stat-value {
+                font-size: 1.2rem;
+            }
+            .upgrade-button {
+                padding: 0.7rem 1.5rem;
+                font-size: 1rem;
+            }
+            .cooldown-timer {
+                font-size: 0.9rem;
+            }
+            .shop-item {
+                padding: 1rem;
+                gap: 0.7rem;
+            }
+            .shop-item h3 {
+                font-size: 1.2rem;
+            }
+            .shop-item .gem-icon-shop {
+                font-size: 50px;
+            }
+            .shop-item .item-price {
+                font-size: 1.1rem;
+            }
+            .shop-item button {
+                font-size: 0.9rem;
+                padding: 0.5rem 1rem;
+            }
+            .progress-bar-container {
+                width: 95%;
+                height: 22px;
+            }
+            .progress-bar-fill {
+                font-size: 0.8rem;
+            }
+            .soldiers-container {
+                padding: 1.2rem;
+                width: 95%;
+            }
+            .soldiers-count {
+                font-size: 1.1rem;
+            }
+            .train-soldiers-button {
+                padding: 0.7rem 1.5rem;
+                font-size: 1rem;
+            }
+            .cosmetic-items-grid {
+                grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+                gap: 1rem;
+            }
+            .cosmetic-item-name {
+                font-size: 1rem;
+            }
+            .cosmetic-item-price {
+                font-size: 0.9rem;
+            }
+            .cosmetic-item button {
+                font-size: 0.9rem;
+                padding: 0.5rem 1rem;
+            }
+            .war-player-name {
+                font-size: 1.1rem;
+            }
+            .war-player-strength {
+                font-size: 0.9rem;
+            }
+            .attack-button {
+                font-size: 0.9rem;
+                padding: 0.6rem 1.2rem;
+            }
+            .roulette-multiplier {
+                font-size: 3rem;
+            }
+            .roulette-input-group input {
+                width: 110px;
+                font-size: 1rem;
+            }
+            .roulette-button {
+                font-size: 1rem;
+                padding: 0.7rem 1.5rem;
+            }
+            .gold-generator-container {
+                padding: 1.2rem;
+                width: 95%;
+            }
+            .gold-generator-container h3 {
+                font-size: 1.2rem;
+            }
+            .gold-display {
+                font-size: 1.8rem;
+            }
+            .claim-gold-button {
+                padding: 0.7rem 1.5rem;
+                font-size: 1.1rem;
+            }
+            .task-item {
+                padding: 1rem;
+                gap: 0.6rem;
+            }
+            .task-item h3 {
+                font-size: 1.1rem;
+            }
+            .task-progress {
+                font-size: 0.9rem;
+            }
+            .task-rewards {
+                font-size: 0.8rem;
+            }
+            .claim-task-button {
+                font-size: 0.9rem;
+                padding: 0.6rem 1.2rem;
+            }
+            .chat-input-group input {
+                padding: 0.6rem;
+                font-size: 0.9rem;
+            }
+            .chat-input-group button {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>قادمة قريبًا</h1>
-        <div class="countdown">
-            <div id="days">00<span>يوم</span></div>
-            <div id="hours">00<span>ساعة</span></div>
-            <div id="minutes">00<span>دقيقة</span></div>
-            <div id="seconds">00<span>ثانية</span></div>
+    <div id="name-input-modal" class="name-input-modal">
+        <div class="name-input-content">
+            <h2>أهلاً بك في كلاش ماينس!</h2>
+            <p class="text-lg mb-6">الرجاء إدخال اسم المحارب الخاص بك:</p>
+            <input type="text" id="player-name-input" placeholder="اسم المحارب" maxlength="20">
+            <button id="start-game-button">بدء اللعب</button>
         </div>
     </div>
 
-    <script>
-        const targetDate = new Date('2025-07-27T00:00:00').getTime();
+    <div class="app-container">
+        <div class="header-tabs">
+            <div id="my-village-tab" class="header-tab-item" onclick="showTabModal('my-village')">
+                <i class="fas fa-home"></i>
+                <span>قريتي</span>
+            </div>
+            <div id="shop-tab" class="header-tab-item" onclick="showTabModal('shop')">
+                <i class="fas fa-store"></i>
+                <span>متجر</span>
+            </div>
+            <div id="war-tab" class="header-tab-item" onclick="showTabModal('war')">
+                <i class="fas fa-crosshairs"></i>
+                <span>الحرب</span>
+            </div>
+            <div id="roulette-tab" class="header-tab-item" onclick="showTabModal('roulette')">
+                <i class="fas fa-dice-d6"></i>
+                <span>الروليت</span>
+            </div>
+            <div id="tasks-tab" class="header-tab-item" onclick="showTabModal('tasks')">
+                <i class="fas fa-clipboard-list"></i>
+                <span>المهام</span>
+            </div>
+            <!-- New Tabs -->
+            <div id="attack-log-tab" class="header-tab-item" onclick="showTabModal('attack-log')">
+                <i class="fas fa-history"></i>
+                <span>سجل الهجمات</span>
+            </div>
+            <div id="chat-tab" class="header-tab-item" onclick="showTabModal('chat')">
+                <i class="fas fa-comments"></i>
+                <span>الدردشة</span>
+            </div>
+            <div id="my-items-tab" class="header-tab-item" onclick="showTabModal('my-items')">
+                <i class="fas fa-box"></i>
+                <span>عناصري</span>
+            </div>
+        </div>
 
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const distance = targetDate - now;
+        <div id="profile-area" class="profile-area">
+            <div class="profile-right-section">
+                <div id="rank-info-trigger" class="info-icon-wrapper">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div class="profile-right-icon-container">
+                    <img id="main-warrior-icon" src="https://l.top4top.io/p_3486ymahw0.png" alt="Strength Icon" onerror="this.onerror=null; this.src='https://placehold.co/60x60/FF0000/FFFFFF?text=القوة';">
+                    <span id="main-warrior-title" class="strength-title-text">المحارب المبتدئ</span>
+                </div>
+            </div>
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            <div class="profile-stats-grid">
+                <div class="stat-item">
+                    <div class="icon-circle user-icon">
+                        <i class="fas fa-user" style="color: #FDE047;"></i>
+                    </div>
+                    <span id="player-name-display" class="stat-text">لاعب كلاش ماينس</span>
+                </div>
+                <div class="stat-item">
+                    <div class="icon-circle strength-icon-bg">
+                        <img id="player-strength-icon" src="https://l.top4top.io/p_3486ymahw0.png" alt="Strength Icon" onerror="this.onerror=null; this.src='https://placehold.co/60x60/FF0000/FFFFFF?text=القوة';">
+                    </div>
+                    <span id="player-strength-value" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <div class="icon-circle coins-icon">
+                        <i class="fas fa-coins" style="color: #F59E0B;"></i>
+                    </div>
+                    <span id="player-gold-value" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <div class="icon-circle gem-icon">
+                        <i class="fas fa-gem" style="color: #C084FC;"></i>
+                    </div>
+                    <span id="player-gems-value" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <div class="icon-circle soldiers-icon">
+                        <i class="fas fa-users" style="color: #6A5ACD;"></i>
+                    </div>
+                    <span id="player-soldiers-value" class="stat-value">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            document.getElementById('days').innerHTML = formatTime(days) + '<span>يوم</span>';
-            document.getElementById('hours').innerHTML = formatTime(hours) + '<span>ساعة</span>';
-            document.getElementById('minutes').innerHTML = formatTime(minutes) + '<span>دقيقة</span>';
-            document.getElementById('seconds').innerHTML = formatTime(seconds) + '<span>ثانية</span>';
+    <div id="warrior-ranks-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-button" onclick="closeModal('warrior-ranks-modal')">
+                &times;
+            </button>
+            <h2 class="modal-title">مستويات المحارب</h2>
+            <div id="ranks-list"></div>
+        </div>
+    </div>
 
-            if (distance < 0) {
-                clearInterval(countdownInterval);
-                document.querySelector('.countdown').innerHTML = '<h2>لقد وصلنا!</h2>';
-                document.getElementById('days').style.display = 'none';
-                document.getElementById('hours').style.display = 'none';
-                document.getElementById('minutes').style.display = 'none';
-                document.getElementById('seconds').style.display = 'none';
+    <div id="my-village-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-button" onclick="closeModal('my-village-modal')">&times;</button>
+            <h2 class="modal-title">قريتي</h2>
+            <div class="village-home-container">
+                <div class="house-container">
+                    <h3>المنزل الرئيسي</h3>
+                    <div class="house-stats">
+                        <p>مستوى المنزل: <span id="main-house-level" class="stat-value">0</span></p>
+                    </div>
+                    <button id="upgrade-main-house-button" class="upgrade-button">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>تطوير المنزل (1 حجر كريم)</span>
+                    </button>
+                    <p id="main-house-cooldown-timer" class="cooldown-timer hidden">مؤقت التهدئة: 02:00</p>
+                    <p id="main-house-upgrade-message" class="text-sm text-yellow-300 hidden"></p>
+                </div>
+
+                <div class="soldiers-container">
+                    <h3>الجنود</h3>
+                    <p class="soldiers-count">عدد الجنود: <span id="soldiers-count-display" class="stat-value">0</span></p>
+                    <button id="train-soldier-button" class="train-soldiers-button">
+                        <i class="fas fa-user-plus"></i>
+                        <span>تدريب 3 جنود (50 ذهب)</span>
+                    </button>
+                    <p id="soldiers-cooldown-timer" class="soldiers-cooldown-timer hidden">مؤقت التهدئة: 00:30</p>
+                    <p id="train-soldier-message" class="text-sm text-yellow-300 hidden"></p>
+                </div>
+
+                <div class="gold-generator-container">
+                    <h3>مولد الذهب</h3>
+                    <div class="gold-display flex items-center gap-2">
+                        <i class="fas fa-coins"></i>
+                        <span id="generated-gold-display">0</span> / 300
+                    </div>
+                    <button id="claim-gold-button" class="claim-gold-button">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <span>استلام الذهب</span>
+                    </button>
+                    <p id="gold-generator-message" class="gold-generator-message">يولد 1-3 ذهب كل ثانيتين</p>
+                </div>
+
+                <div class="gold-generator-container">
+                    <h3>مولد موارد إضافي</h3>
+                    <div class="gold-display flex items-center gap-2">
+                        <i class="fas fa-coins"></i>
+                        <span id="second-generated-gold-display">0</span> / 300
+                    </div>
+                    <button id="claim-second-gold-button" class="claim-gold-button">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <span>استلام الذهب</span>
+                    </button>
+                    <p id="second-gold-generator-message" class="gold-generator-message">يولد 1 ذهب كل 5 ثواني</p>
+                </div>
+
+                <div class="soldiers-container">
+                    <h3>مولد جنود مجاني</h3>
+                    <p class="soldiers-count">عدد الجنود: <span id="free-soldiers-count-display" class="stat-value">0</span></p>
+                    <button id="train-free-soldier-button" class="train-soldiers-button">
+                        <i class="fas fa-user-plus"></i>
+                        <span>تدريب 1 جندي (مجاني)</span>
+                    </button>
+                    <p id="free-soldiers-cooldown-timer" class="soldiers-cooldown-timer hidden">مؤقت التهدئة: 05:00</p>
+                    <p id="train-free-soldier-message" class="text-sm text-yellow-300 hidden"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="shop-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-button" onclick="closeModal('shop-modal')">&times;</button>
+            <h2 class="modal-title">متجر</h2>
+            <div class="shop-item">
+                <h3>حجر كريم واحد</h3>
+                <i class="fas fa-gem gem-icon-shop"></i>
+                <p class="item-price">
+                    <span id="gem-price">100</span>
+                    <i class="fas fa-coins text-yellow-500"></i>
+                </p>
+                <button id="buy-gem-button">شراء</button>
+            </div>
+
+            <div class="shop-item">
+                <h3>صندوق الحظ</h3>
+                <i class="fas fa-box-open gem-icon-shop" style="color: #FFD700;"></i>
+                <p class="item-price">
+                    <span id="luck-box-price">3</span>
+                    <i class="fas fa-gem text-purple-400"></i>
+                </p>
+                <button id="buy-luck-box-button">فتح الصندوق</button>
+            </div>
+
+            <!-- New: Experience Box -->
+            <div class="shop-item">
+                <h3>صندوق الخبرة</h3>
+                <img src="https://e.top4top.io/p_34942j4mc0.png" alt="Experience Box" class="gem-icon-shop" onerror="this.onerror=null; this.src='https://placehold.co/60x60/FFD700/000000?text=XP';">
+                <p class="item-price">
+                    <span id="experience-box-price">1000</span>
+                    <i class="fas fa-coins text-yellow-500"></i>
+                </p>
+                <button id="buy-experience-box-button">فتح الصندوق</button>
+                <button id="preview-experience-box-button" class="upgrade-button !bg-gray-600 !hover:bg-gray-700 !shadow-none !text-sm !py-2 !px-4 mt-2">معاينة الجوائز</button>
+            </div>
+
+            <h3 class="modal-title mt-8">عناصر جمالية للاسم</h3>
+            <div class="cosmetic-items-grid" id="cosmetic-shop-items">
+                <!-- Cosmetic items will be rendered here by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <div id="war-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-button" onclick="closeModal('war-modal')">&times;</button>
+            <h2 class="modal-title">الحرب</h2>
+            <div class="war-container">
+                <p class="soldiers-required-text">جنود متاحون: <span id="war-soldiers-display" class="stat-value">0</span> / 3 مطلوبون للهجوم</p>
+                <div id="war-player-list" class="war-player-list">
+                    <p class="text-center text-gray-400">تحميل اللاعبين...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="roulette-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-button" onclick="closeModal('roulette-modal')">&times;</button>
+            <h2 class="modal-title">الروليت</h2>
+            <div class="roulette-container">
+                <div class="roulette-game-area">
+                    <p class="roulette-multiplier" id="roulette-multiplier">1.00x</p>
+                    <div class="roulette-input-group">
+                        <label for="bet-amount">الرهان:</label>
+                        <input type="number" id="bet-amount" value="50" min="50" max="10000">
+                    </div>
+                    <button id="place-bet-button" class="roulette-button">وضع الرهان</button>
+                    <button id="cash-out-button" class="roulette-button roulette-cashout-button hidden">سحب الأرباح</button>
+                    <p id="roulette-status-message" class="roulette-status-message"></p>
+                    <p id="roulette-cooldown-timer" class="roulette-cooldown-timer hidden">مؤقت التهدئة: 01:00</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tasks-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-button" onclick="closeModal('tasks-modal')">&times;</button>
+            <h2 class="modal-title">المهام اليومية</h2>
+            <p id="daily-tasks-reset-timer" class="text-center text-sm text-gray-400 mb-4">تحديث المهام بعد: --:--:--</p>
+            <div id="tasks-list" class="tasks-container">
+                <!-- Tasks will be rendered here by JavaScript -->
+                <p class="text-center text-gray-400">تحميل المهام...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- New: Attack Log Modal -->
+    <div id="attack-log-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-button" onclick="closeModal('attack-log-modal')">&times;</button>
+            <h2 class="modal-title">سجل الهجمات العالمية</h2>
+            <div id="attack-logs-list" class="attack-log-container">
+                <p class="text-center text-gray-400">تحميل سجل الهجمات...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- New: Chat Modal -->
+    <div id="chat-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-button" onclick="closeModal('chat-modal')">&times;</button>
+            <h2 class="modal-title">الدردشة العالمية</h2>
+            <p class="text-center text-sm text-gray-400 mb-4">الرسائل تُحذف كل ساعة (تُعرض الرسائل الأخيرة فقط)</p>
+            <div id="chat-messages-list" class="chat-messages">
+                <p class="text-center text-gray-400">تحميل الرسائل...</p>
+            </div>
+            <div class="chat-input-group">
+                <input type="text" id="chat-message-input" placeholder="اكتب رسالتك..." maxlength="100">
+                <button id="send-chat-message-button">إرسال</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New: My Items Modal -->
+    <div id="my-items-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-button" onclick="closeModal('my-items-modal')">&times;</button>
+            <h2 class="modal-title">عناصري</h2>
+            <div id="my-items-list" class="my-items-grid">
+                <p class="text-center text-gray-400">لا تملك أي عناصر جمالية.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- New: Experience Box Preview Modal -->
+    <div id="experience-box-preview-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <button class="modal-close-button" onclick="closeModal('experience-box-preview-modal')">&times;</button>
+            <h2 class="modal-title">معاينة جوائز صندوق الخبرة</h2>
+            <div class="experience-box-preview-content">
+                <div class="preview-item">
+                    <i class="fas fa-gem gem-icon-shop !text-purple-400 !text-3xl preview-item-icon"></i>
+                    <div class="preview-item-details">
+                        <p class="preview-item-name">أحجار كريمة</p>
+                        <p class="preview-item-chance">الاحتمال: 60%</p>
+                        <p class="preview-item-description">تحصل على 10 إلى 50 حجر كريم.</p>
+                    </div>
+                </div>
+                <div class="preview-item">
+                    <i class="fas fa-users soldiers-icon !text-blue-400 !text-3xl preview-item-icon"></i>
+                    <div class="preview-item-details">
+                        <p class="preview-item-name">جنود مجهزون</p>
+                        <p class="preview-item-chance">الاحتمال: 30%</p>
+                        <p class="preview-item-description">تحصل على 10 إلى 30 جندي مجهز.</p>
+                    </div>
+                </div>
+                <div class="preview-item">
+                    <img src="https://l.top4top.io/p_3486ymahw0.png" alt="Strength Icon" class="preview-item-icon" onerror="this.onerror=null; this.src='https://placehold.co/30x30/FF0000/FFFFFF?text=P';">
+                    <div class="preview-item-details">
+                        <p class="preview-item-name">زيادة القوة</p>
+                        <p class="preview-item-chance">الاحتمال: 15%</p>
+                        <p class="preview-item-description">تزيد قوتك من 200 إلى 1000 نقطة.</p>
+                    </div>
+                </div>
+                <div class="preview-item">
+                    <i class="fas fa-magic gem-icon-shop !text-yellow-300 !text-3xl preview-item-icon"></i>
+                    <div class="preview-item-details">
+                        <p class="preview-item-name">عنصر جمالي عشوائي</p>
+                        <p class="preview-item-chance">الاحتمال: 5%</p>
+                        <p class="preview-item-description">تحصل على أحد العناصر الجمالية المتوفرة في المتجر.</p>
+                    </div>
+                </div>
+                <div class="preview-item">
+                    <img src="https://l.top4top.io/p_3494ba9to0.png" alt="Flaming Lion Icon" class="preview-item-icon" onerror="this.onerror=null; this.src='https://placehold.co/30x30/FF4500/FFFFFF?text=FL';">
+                    <div class="preview-item-details">
+                        <p class="preview-item-name cosmetic-flaming-lion">عنصر الأسد الملتهب</p>
+                        <p class="preview-item-chance">الاحتمال: 3%</p>
+                        <p class="preview-item-description">اسم ناري ملتهب، أيقونة خاصة بجانب قوتك في ملفك الشخصي والدردشة، وزيادة 1000 قوة.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="message-box-overlay" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 id="message-box-title" class="modal-title"></h2>
+            <p id="message-box-text" class="text-center mb-4"></p>
+            <button class="upgrade-button mx-auto block" onclick="hideMessageBox()">موافق</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+        import { getDatabase, ref, set, onValue, update, onDisconnect, push, query, limitToLast } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-database.js";
+
+        // Global variables for Firebase configuration from Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let userId = null;
+        let playerRef = null;
+        const playersRef = ref(db, `artifacts/${appId}/players`);
+        const attackLogsRef = ref(db, `artifacts/${appId}/attackLogs`);
+        const chatMessagesRef = ref(db, `artifacts/${appId}/chatMessages`);
+
+        let playerName = "";
+        let playerStrength = 0;
+        let playerGold = 0;
+        let playerGems = 0;
+        let playerSoldiers = 0;
+        let mainHouseUpgradeCount = 0;
+        let mainHouseUpgradeCooldown = false;
+        let soldierTrainingCooldown = false;
+        let freeSoldierGeneratorCooldown = false;
+        let mainHouseCooldownIntervalId = null;
+        let soldierTrainingCooldownIntervalId = null;
+        let freeSoldierGeneratorCooldownIntervalId = null;
+        let rouletteCooldown = false;
+        let rouletteCooldownIntervalId = null;
+        let rouletteGameActive = false;
+        let currentMultiplier = 1.00;
+        let rouletteGameInterval = null;
+        let betAmount = 0;
+        let cosmeticApplied = null;
+        let lionCosmetic = false; // New: For Flaming Lion cosmetic
+        let purchasedCosmetics = []; // New: Array to store all owned cosmetic IDs/values
+        let rouletteCrashPoint = 0;
+
+        // Gold Generator variables
+        let generatedGold = 0;
+        let goldGenerationIntervalId = null;
+        const MAX_GENERATED_GOLD = 300;
+        const GOLD_GENERATION_INTERVAL_SECONDS = 2;
+
+        // Second Gold Generator variables
+        let secondGeneratedGold = 0;
+        let secondGoldGenerationIntervalId = null;
+        const SECOND_MAX_GENERATED_GOLD = 300;
+        const SECOND_GOLD_GENERATION_INTERVAL_SECONDS = 5;
+
+        // Daily Quests variables
+        let lastDailyQuestResetDate = ""; // YYYY-MM-DD string
+        let dailyQuestsProgress = {}; // { taskId: { current: 0, claimed: false } }
+        let dailyTasksResetTimerIntervalId = null; // New: for daily tasks countdown
+
+        const UPGRADE_GEM_COST = 1;
+        const GEM_GOLD_COST = 100;
+        const TRAIN_SOLDIER_COST = 50;
+        const SOLDIERS_PER_TRAINING = 3;
+        const FREE_SOLDIERS_PER_TRAINING = 1;
+        const SOLDIER_TRAINING_COOLDOWN_SECONDS = 30;
+        const FREE_SOLDIER_GENERATOR_COOLDOWN_SECONDS = 300;
+        const COOLDOWN_DURATION_SECONDS = 120;
+        const ROULETTE_COOLDOWN_SECONDS = 60;
+        const ROULETTE_MIN_BET = 50;
+        const LUCK_BOX_GEM_COST = 3;
+        const EXPERIENCE_BOX_GOLD_COST = 1000; // New: Cost for Experience Box
+
+        const playerNameInput = document.getElementById('player-name-input');
+        const startGameButton = document.getElementById('start-game-button');
+        const nameInputModal = document.getElementById('name-input-modal');
+        const playerNameDisplay = document.getElementById('player-name-display');
+        const playerStrengthValueElement = document.getElementById('player-strength-value');
+        const playerStrengthIcon = document.getElementById('player-strength-icon'); // New: for lion cosmetic
+        const playerGoldValueElement = document.getElementById('player-gold-value');
+        const playerGemsValueElement = document.getElementById('player-gems-value');
+        const playerSoldiersValueElement = document.getElementById('player-soldiers-value');
+        const mainWarriorIcon = document.getElementById('main-warrior-icon');
+        const mainWarriorTitle = document.getElementById('main-warrior-title');
+
+        const mainHouseLevelElement = document.getElementById('main-house-level');
+        const upgradeMainHouseButton = document.getElementById('upgrade-main-house-button');
+        const mainHouseCooldownTimerElement = document.getElementById('main-house-cooldown-timer');
+        const mainHouseUpgradeMessageElement = document.getElementById('main-house-upgrade-message');
+
+        const soldiersCountDisplay = document.getElementById('soldiers-count-display');
+        const trainSoldierButton = document.getElementById('train-soldier-button');
+        const trainSoldierMessage = document.getElementById('train-soldier-message');
+        const soldiersCooldownTimerElement = document.getElementById('soldiers-cooldown-timer');
+
+        const freeSoldiersCountDisplay = document.getElementById('free-soldiers-count-display');
+        const trainFreeSoldierButton = document.getElementById('train-free-soldier-button');
+        const trainFreeSoldierMessage = document.getElementById('train-free-soldier-message');
+        const freeSoldiersCooldownTimerElement = document.getElementById('free-soldiers-cooldown-timer');
+
+        const buyGemButton = document.getElementById('buy-gem-button');
+        const buyLuckBoxButton = document.getElementById('buy-luck-box-button');
+        const buyExperienceBoxButton = document.getElementById('buy-experience-box-button'); // New
+        const previewExperienceBoxButton = document.getElementById('preview-experience-box-button'); // New
+        const cosmeticShopItemsContainer = document.getElementById('cosmetic-shop-items'); // New
+
+        const warPlayersList = document.getElementById('war-player-list');
+        const warSoldiersDisplay = document.getElementById('war-soldiers-display');
+
+        const rouletteMultiplierDisplay = document.getElementById('roulette-multiplier');
+        const betAmountInput = document.getElementById('bet-amount');
+        const placeBetButton = document.getElementById('place-bet-button');
+        const cashOutButton = document.getElementById('cash-out-button');
+        const rouletteStatusMessage = document.getElementById('roulette-status-message');
+        const rouletteCooldownTimerElement = document.getElementById('roulette-cooldown-timer');
+
+        // Gold Generator DOM elements
+        const generatedGoldDisplay = document.getElementById('generated-gold-display');
+        const claimGoldButton = document.getElementById('claim-gold-button');
+        const goldGeneratorMessage = document.getElementById('gold-generator-message');
+
+        // Second Gold Generator DOM elements
+        const secondGeneratedGoldDisplay = document.getElementById('second-generated-gold-display');
+        const claimSecondGoldButton = document.getElementById('claim-second-gold-button');
+        const secondGoldGeneratorMessage = document.getElementById('second-gold-generator-message');
+
+        const tasksListElement = document.getElementById('tasks-list');
+        const dailyTasksResetTimerElement = document.getElementById('daily-tasks-reset-timer'); // New
+
+        const attackLogsList = document.getElementById('attack-logs-list'); // New
+        const chatMessagesList = document.getElementById('chat-messages-list'); // New
+        const chatMessageInput = document.getElementById('chat-message-input'); // New
+        const sendChatMessageButton = document.getElementById('send-chat-message-button'); // New
+        const myItemsList = document.getElementById('my-items-list'); // New
+
+        let allPlayersGlobalData = {}; // Global variable to store all players data for War tab
+
+        const warriorRanks = [
+            { name: "محارب مبتدئ", minPower: 0, icon: "https://l.top4top.io/p_3486ymahw0.png" },
+            { name: "محارب طموح", minPower: 400, icon: "https://a.top4top.io/p_3486c6d4t1.png" },
+            { name: "محارب جيد", minPower: 2200, icon: "https://b.top4top.io/p_3486kr8q92.png" },
+            { name: "محارب قوي", minPower: 4000, icon: "https://i.top4top.io/p_3486150c40.png" },
+            { name: "محارب شجاع", minPower: 6500, icon: "https://d.top4top.io/p_34862hxh70.png" },
+            { name: "محارب اسطوري", minPower: 9000, icon: "https://e.top4top.io/p_3486wyol61.png" },
+            { name: "ملك الحروب", minPower: 13000, icon: "https://f.top4top.io/p_3486sz2a62.png" }
+        ];
+
+        const cosmeticItems = [
+            { id: "rainbow", name: "اسم قوس قزح", price: 2000, type: "animation", value: "cosmetic-rainbow" },
+            { id: "glow", name: "اسم متوهج", price: 3500, type: "animation", value: "cosmetic-glow" },
+            { id: "pulse", name: "اسم نابض", price: 4000, type: "animation", value: "cosmetic-pulse" },
+            { id: "cyber", name: "اسم سيبراني", price: 5000, type: "color", value: "#00FFFF", style: "color: #00FFFF; text-shadow: 0 0 5px #00FFFF;" },
+            { id: "neon-pink", name: "اسم وردي نيون", price: 8000, type: "color", value: "#FF1493", style: "color: #FF1493; text-shadow: 0 0 5px #FF1493;" },
+            { id: "golden-animated", name: "اسم ذهبي متحرك", price: 10000, type: "animation", value: "cosmetic-golden-animated" }
+        ];
+
+        const flamingLionCosmetic = {
+            id: "flaming-lion",
+            name: "عنصر الأسد الملتهب",
+            type: "animation",
+            value: "cosmetic-flaming-lion",
+            icon: "https://l.top4top.io/p_3494ba9to0.png"
+        };
+
+        const dailyQuests = [
+            { id: "upgradeHouse", name: "طور المنزل 3 مرات", target: 3, rewards: { gold: 300, strength: 25, gems: 2 } },
+            { id: "attackOpponent", name: "اهجم 5 مرات", target: 5, rewards: { gold: 200, strength: 50, gems: 3 } },
+            { id: "buyFromShop", name: "اشترِ أي شيء من المتجر", target: 1, rewards: { gold: 100, strength: 100, gems: 3 } },
+            { id: "trainSoldiers", name: "جهز جنود 5 مرات", target: 5, rewards: { gold: 200, strength: 50, gems: 2 } }
+        ];
+
+        // Function to get current KSA date string (YYYY-MM-DD)
+        function getKsaDateString() {
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000); // Convert to UTC milliseconds
+            const ksaTime = new Date(utc + (3 * 3600 * 1000)); // Add 3 hours for KSA (UTC+3)
+            return ksaTime.toISOString().split('T')[0]; // YYYY-MM-DD
+        }
+
+        // This function will be called by the onValue listener for the current player's data
+        function updatePlayerDataFromSnapshot(data) {
+            playerName = data.name || "لاعب كلاش ماينس";
+            playerStrength = data.strength || 0;
+            playerGold = data.gold || 0;
+            playerGems = data.gems || 0;
+            playerSoldiers = data.soldiers || 0;
+            mainHouseUpgradeCount = data.mainHouseUpgradeCount || 0;
+            cosmeticApplied = data.cosmeticApplied || null;
+            lionCosmetic = data.lionCosmetic || false; // Load lion cosmetic status
+            purchasedCosmetics = data.purchasedCosmetics || []; // Load purchased cosmetics
+
+            generatedGold = data.generatedGold || 0;
+            const lastGoldGenerationTime = data.lastGoldGenerationTime || Date.now();
+            const timeElapsed = (Date.now() - lastGoldGenerationTime) / 1000;
+            const potentialGenerations = Math.floor(timeElapsed / GOLD_GENERATION_INTERVAL_SECONDS);
+            let goldFromOffline = 0;
+            for (let i = 0; i < potentialGenerations; i++) {
+                goldFromOffline += Math.floor(Math.random() * 3) + 1;
+            }
+            generatedGold = Math.min(generatedGold + goldFromOffline, MAX_GENERATED_GOLD);
+            startGoldGeneration();
+
+            // Second Gold Generator Load
+            secondGeneratedGold = data.secondGeneratedGold || 0;
+            const secondLastGoldGenerationTime = data.secondLastGoldGenerationTime || Date.now();
+            const secondTimeElapsed = (Date.now() - secondLastGoldGenerationTime) / 1000;
+            const secondPotentialGenerations = Math.floor(secondTimeElapsed / SECOND_GOLD_GENERATION_INTERVAL_SECONDS);
+            let secondGoldFromOffline = 0;
+            for (let i = 0; i < secondPotentialGenerations; i++) {
+                secondGoldFromOffline += 1; // Generates 1 gold
+            }
+            secondGeneratedGold = Math.min(secondGeneratedGold + secondGoldFromOffline, SECOND_MAX_GENERATED_GOLD);
+            startSecondGoldGeneration();
+
+            // Daily Quests Load and Reset Logic
+            const currentKsaDate = getKsaDateString();
+            lastDailyQuestResetDate = data.lastDailyQuestResetDate || currentKsaDate;
+            dailyQuestsProgress = data.dailyQuestsProgress || {};
+
+            if (lastDailyQuestResetDate !== currentKsaDate) {
+                resetDailyQuests();
+            } else {
+                // Ensure all quests exist in progress, initialize if missing (e.g., new quest added)
+                dailyQuests.forEach(quest => {
+                    if (!dailyQuestsProgress[quest.id]) {
+                        dailyQuestsProgress[quest.id] = { current: 0, claimed: false };
+                    }
+                });
+            }
+
+            // Handle cooldowns from loaded data
+            const now = Date.now();
+            // Main House Cooldown
+            if (data.mainHouseCooldownEndTime && data.mainHouseCooldownEndTime > now) {
+                if (!mainHouseUpgradeCooldown || (mainHouseCooldownIntervalId === null)) {
+                    startCooldownTimer('main', (data.mainHouseCooldownEndTime - now) / 1000);
+                }
+            } else {
+                mainHouseUpgradeCooldown = false;
+                if (mainHouseCooldownIntervalId) clearInterval(mainHouseCooldownIntervalId);
+                mainHouseCooldownIntervalId = null;
+                mainHouseCooldownTimerElement.classList.add('hidden');
+            }
+
+            // Soldier Training Cooldown
+            if (data.soldierTrainingCooldownEndTime && data.soldierTrainingCooldownEndTime > now) {
+                if (!soldierTrainingCooldown || (soldierTrainingCooldownIntervalId === null)) {
+                    startSoldierTrainingCooldown((data.soldierTrainingCooldownEndTime - now) / 1000);
+                }
+            } else {
+                soldierTrainingCooldown = false;
+                if (soldierTrainingCooldownIntervalId) clearInterval(soldierTrainingCooldownIntervalId);
+                soldierTrainingCooldownIntervalId = null;
+                soldiersCooldownTimerElement.classList.add('hidden');
+            }
+
+            // Free Soldier Generator Cooldown
+            if (data.freeSoldierGeneratorCooldownEndTime && data.freeSoldierGeneratorCooldownEndTime > now) {
+                if (!freeSoldierGeneratorCooldown || (freeSoldierGeneratorCooldownIntervalId === null)) {
+                    startFreeSoldierGeneratorCooldown((data.freeSoldierGeneratorCooldownEndTime - now) / 1000);
+                }
+            } else {
+                freeSoldierGeneratorCooldown = false;
+                if (freeSoldierGeneratorCooldownIntervalId) clearInterval(freeSoldierGeneratorCooldownIntervalId);
+                freeSoldierGeneratorCooldownIntervalId = null;
+                freeSoldiersCooldownTimerElement.classList.add('hidden');
+            }
+
+            // Roulette Cooldown
+            if (data.rouletteCooldownEndTime && data.rouletteCooldownEndTime > now) {
+                if (!rouletteCooldown || (rouletteCooldownIntervalId === null)) {
+                    startRouletteCooldown((data.rouletteCooldownEndTime - now) / 1000);
+                }
+            } else {
+                rouletteCooldown = false;
+                if (rouletteCooldownIntervalId) clearInterval(rouletteCooldownIntervalId);
+                rouletteCooldownIntervalId = null;
+                rouletteCooldownTimerElement.classList.add('hidden');
+            }
+
+            updateDisplay();
+            nameInputModal.classList.add('hidden');
+        }
+
+        async function savePlayerData() {
+            if (userId && playerRef) {
+                const dataToSave = {
+                    name: playerName,
+                    strength: playerStrength,
+                    gold: playerGold,
+                    gems: playerGems,
+                    soldiers: playerSoldiers,
+                    mainHouseUpgradeCount: mainHouseUpgradeCount,
+                    cosmeticApplied: cosmeticApplied,
+                    lionCosmetic: lionCosmetic, // Save lion cosmetic status
+                    purchasedCosmetics: purchasedCosmetics, // Save purchased cosmetics array
+                    generatedGold: generatedGold,
+                    lastGoldGenerationTime: Date.now(),
+                    secondGeneratedGold: secondGeneratedGold,
+                    secondLastGoldGenerationTime: Date.now(),
+                    lastDailyQuestResetDate: lastDailyQuestResetDate,
+                    dailyQuestsProgress: dailyQuestsProgress,
+                    online: true,
+                    lastOnline: Date.now()
+                };
+                if (mainHouseUpgradeCooldown) {
+                    dataToSave.mainHouseCooldownEndTime = Date.now() + (COOLDOWN_DURATION_SECONDS * 1000);
+                } else {
+                    dataToSave.mainHouseCooldownEndTime = null;
+                }
+                if (soldierTrainingCooldown) {
+                    dataToSave.soldierTrainingCooldownEndTime = Date.now() + (SOLDIER_TRAINING_COOLDOWN_SECONDS * 1000);
+                } else {
+                    dataToSave.soldierTrainingCooldownEndTime = null;
+                }
+                if (freeSoldierGeneratorCooldown) {
+                    dataToSave.freeSoldierGeneratorCooldownEndTime = Date.now() + (FREE_SOLDIER_GENERATOR_COOLDOWN_SECONDS * 1000);
+                } else {
+                    dataToSave.freeSoldierGeneratorCooldownEndTime = null;
+                }
+                if (rouletteCooldown) {
+                    dataToSave.rouletteCooldownEndTime = Date.now() + (ROULETTE_COOLDOWN_SECONDS * 1000);
+                } else {
+                    dataToSave.rouletteCooldownEndTime = null;
+                }
+
+                await update(playerRef, dataToSave);
             }
         }
 
-        function formatTime(time) {
-            return time < 10 ? '0' + time : time;
+        function updateDisplay() {
+            if (playerNameDisplay) {
+                playerNameDisplay.textContent = playerName;
+                // Reset all cosmetic classes and inline styles first
+                playerNameDisplay.className = 'stat-text';
+                playerNameDisplay.style.color = '';
+                playerNameDisplay.style.textShadow = '';
+
+                // Apply currently active cosmetic
+                if (cosmeticApplied) {
+                    const cosmetic = cosmeticItems.find(item => item.value === cosmeticApplied);
+                    if (cosmetic) {
+                        if (cosmetic.type === 'animation') {
+                            playerNameDisplay.classList.add(cosmetic.value);
+                        } else if (cosmetic.type === 'color') {
+                            playerNameDisplay.style.color = cosmetic.value;
+                            playerNameDisplay.style.textShadow = `0 0 5px ${cosmetic.value}`;
+                        }
+                    }
+                }
+                // Apply Flaming Lion cosmetic if active (overrides other animations/colors)
+                if (lionCosmetic) {
+                    playerNameDisplay.classList.add(flamingLionCosmetic.value);
+                    playerNameDisplay.style.color = ''; // Let animation define color
+                    playerNameDisplay.style.textShadow = ''; // Let animation define text-shadow
+                }
+            }
+            if (playerStrengthValueElement) playerStrengthValueElement.textContent = playerStrength;
+            if (playerGoldValueElement) playerGoldValueElement.textContent = playerGold;
+            if (playerGemsValueElement) playerGemsValueElement.textContent = playerGems;
+            if (playerSoldiersValueElement) playerSoldiersValueElement.textContent = playerSoldiers;
+
+            // Display lion icon next to strength if active
+            if (playerStrengthIcon) {
+                const existingLionIcon = playerStrengthIcon.previousElementSibling;
+                if (lionCosmetic && !existingLionIcon?.classList.contains('lion-icon-in-profile')) {
+                    const img = document.createElement('img');
+                    img.src = flamingLionCosmetic.icon;
+                    img.alt = flamingLionCosmetic.name;
+                    img.className = 'lion-icon-in-profile';
+                    playerStrengthIcon.parentNode.insertBefore(img, playerStrengthIcon);
+                } else if (!lionCosmetic && existingLionIcon?.classList.contains('lion-icon-in-profile')) {
+                    existingLionIcon.remove();
+                }
+            }
+
+
+            // Main House: Display upgrade count
+            if (mainHouseLevelElement) {
+                mainHouseLevelElement.textContent = mainHouseUpgradeCount;
+            }
+
+            if (soldiersCountDisplay) soldiersCountDisplay.textContent = playerSoldiers;
+            if (warSoldiersDisplay) warSoldiersDisplay.textContent = playerSoldiers;
+            if (generatedGoldDisplay) generatedGoldDisplay.textContent = generatedGold;
+            if (secondGeneratedGoldDisplay) secondGeneratedGoldDisplay.textContent = secondGeneratedGold;
+            if (freeSoldiersCountDisplay) freeSoldiersCountDisplay.textContent = playerSoldiers;
+
+            updateWarriorRankDisplay();
+            updateUpgradeButtonState('main');
+            updateTrainSoldierButtonState();
+            updateFreeSoldierGeneratorButtonState();
+            updateBuyGemButtonState();
+            updateLuckBoxButtonState();
+            updateExperienceBoxButtonState(); // New
+            renderCosmeticShopItems(); // Render shop items with "Owned" status
+            renderTasks();
+            updateDailyQuestTimer(); // Update daily quest timer
         }
 
-        const countdownInterval = setInterval(updateCountdown, 1000);
-        updateCountdown(); // Call immediately to avoid initial flicker
+        function updateWarriorRankDisplay() {
+            let currentRank = warriorRanks[0];
+            for (let i = warriorRanks.length - 1; i >= 0; i--) {
+                if (playerStrength >= warriorRanks[i].minPower) {
+                    currentRank = warriorRanks[i];
+                    break;
+                }
+            }
+            if (mainWarriorIcon) {
+                mainWarriorIcon.src = currentRank.icon;
+                mainWarriorIcon.alt = `${currentRank.name} Icon`;
+            }
+            if (mainWarriorTitle) {
+                mainWarriorTitle.textContent = currentRank.name;
+            }
+        }
+
+        function getWarriorRankIcon(strength) {
+            let currentRank = warriorRanks[0];
+            for (let i = warriorRanks.length - 1; i >= 0; i--) {
+                if (strength >= warriorRanks[i].minPower) {
+                    currentRank = warriorRanks[i];
+                    break;
+                }
+            }
+            return currentRank.icon;
+        }
+
+        function updateUpgradeButtonState(type) {
+            let button, cooldownElement, messageElement, currentGems, cooldownStatus;
+            if (type === 'main') {
+                button = upgradeMainHouseButton;
+                cooldownElement = mainHouseCooldownTimerElement;
+                messageElement = mainHouseUpgradeMessageElement;
+                currentGems = playerGems;
+                cooldownStatus = mainHouseUpgradeCooldown;
+            } else {
+                return;
+            }
+
+            if (button) {
+                if (cooldownStatus) {
+                    button.disabled = true;
+                    button.textContent = "مؤقت التهدئة...";
+                    cooldownElement.classList.remove('hidden');
+                } else if (currentGems < UPGRADE_GEM_COST) {
+                    button.disabled = true;
+                    button.innerHTML = `<i class="fas fa-arrow-up"></i> <span>تطوير المنزل (1 حجر كريم)</span>`;
+                    messageElement.textContent = "لا يوجد لديك أحجار كريمة كافية!";
+                    messageElement.classList.remove('hidden');
+                    cooldownElement.classList.add('hidden');
+                } else {
+                    button.disabled = false;
+                    button.innerHTML = `<i class="fas fa-arrow-up"></i> <span>تطوير المنزل (1 حجر كريم)</span>`;
+                    messageElement.classList.add('hidden');
+                    cooldownElement.classList.add('hidden');
+                }
+            }
+        }
+
+        function startCooldownTimer(type, initialTimeLeft) {
+            let timeLeft = Math.max(0, Math.floor(initialTimeLeft));
+            let cooldownElement, cooldownVar, intervalIdVar;
+
+            if (type === 'main') {
+                cooldownElement = mainHouseCooldownTimerElement;
+                cooldownVar = 'mainHouseUpgradeCooldown';
+                intervalIdVar = 'mainHouseCooldownIntervalId';
+            } else {
+                return;
+            }
+
+            window[cooldownVar] = true;
+            updateUpgradeButtonState(type);
+            cooldownElement.classList.remove('hidden');
+
+            if (window[intervalIdVar]) {
+                clearInterval(window[intervalIdVar]);
+            }
+
+            window[intervalIdVar] = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = Math.floor(timeLeft % 60);
+                cooldownElement.textContent = `مؤقت التهدئة: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(window[intervalIdVar]);
+                    window[intervalIdVar] = null;
+                    window[cooldownVar] = false;
+                    updateUpgradeButtonState(type);
+                    cooldownElement.classList.add('hidden');
+                    showMessageBox("جاهز للتطوير!", `يمكنك الآن تطوير منزلك الرئيسي مرة أخرى.`);
+                    savePlayerData();
+                }
+            }, 1000);
+            savePlayerData();
+        }
+
+        function upgradeHouse() {
+            if (mainHouseUpgradeCooldown) {
+                showMessageBox("مؤقت التهدئة نشط", `الرجاء الانتظار حتى ينتهي مؤقت التهدئة قبل تطوير المنزل الرئيسي مرة أخرى.`);
+                return;
+            }
+            if (playerGems < UPGRADE_GEM_COST) {
+                showMessageBox("أحجار كريمة غير كافية", `تحتاج إلى ${UPGRADE_GEM_COST} حجر كريم لتطوير المنزل الرئيسي.`);
+                return;
+            }
+
+            playerGems -= UPGRADE_GEM_COST;
+            mainHouseUpgradeCount += 1;
+            const strengthIncrease = Math.floor(Math.random() * (35 - 5 + 1)) + 5;
+            playerStrength += strengthIncrease;
+
+            if (dailyQuestsProgress.upgradeHouse && !dailyQuestsProgress.upgradeHouse.claimed) {
+                dailyQuestsProgress.upgradeHouse.current = Math.min(dailyQuestsProgress.upgradeHouse.current + 1, dailyQuests.find(q => q.id === "upgradeHouse").target);
+            }
+            
+            updateDisplay();
+            startCooldownTimer('main', COOLDOWN_DURATION_SECONDS);
+            showMessageBox("تم التطوير بنجاح!", `لقد قمت بتطوير المنزل الرئيسي! زادت قوتك بـ ${strengthIncrease}.`);
+            savePlayerData();
+
+            const button = upgradeMainHouseButton;
+            const originalButtonText = button.innerHTML;
+            button.innerHTML = `<i class="fas fa-check"></i><span>تم التطوير!</span>`;
+            setTimeout(() => {
+                button.innerHTML = originalButtonText;
+                updateUpgradeButtonState('main');
+            }, 1500);
+        }
+
+        function updateTrainSoldierButtonState() {
+            if (trainSoldierButton) {
+                if (soldierTrainingCooldown) {
+                    trainSoldierButton.disabled = true;
+                    trainSoldierButton.textContent = "مؤقت التهدئة...";
+                    soldiersCooldownTimerElement.classList.remove('hidden');
+                } else if (playerGold < TRAIN_SOLDIER_COST) {
+                    trainSoldierButton.disabled = true;
+                    trainSoldierButton.innerHTML = `<i class="fas fa-user-plus"></i> <span>تدريب ${SOLDIERS_PER_TRAINING} جنود (${TRAIN_SOLDIER_COST} ذهب)</span>`;
+                    trainSoldierMessage.textContent = "لا يوجد لديك ذهب كافٍ!";
+                    trainSoldierMessage.classList.remove('hidden');
+                    soldiersCooldownTimerElement.classList.add('hidden');
+                } else {
+                    trainSoldierButton.disabled = false;
+                    trainSoldierButton.innerHTML = `<i class="fas fa-user-plus"></i> <span>تدريب ${SOLDIERS_PER_TRAINING} جنود (${TRAIN_SOLDIER_COST} ذهب)</span>`;
+                    trainSoldierMessage.classList.add('hidden');
+                    soldiersCooldownTimerElement.classList.add('hidden');
+                }
+            }
+        }
+
+        function startSoldierTrainingCooldown(initialTimeLeft) {
+            let timeLeft = Math.max(0, Math.floor(initialTimeLeft));
+            soldierTrainingCooldown = true;
+            updateTrainSoldierButtonState();
+            soldiersCooldownTimerElement.classList.remove('hidden');
+
+            if (soldierTrainingCooldownIntervalId) {
+                clearInterval(soldierTrainingCooldownIntervalId);
+            }
+
+            soldierTrainingCooldownIntervalId = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = Math.floor(timeLeft % 60);
+                soldiersCooldownTimerElement.textContent = `مؤقت التهدئة: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(soldierTrainingCooldownIntervalId);
+                    soldierTrainingCooldownIntervalId = null;
+                    soldierTrainingCooldown = false;
+                    updateTrainSoldierButtonState();
+                    soldiersCooldownTimerElement.classList.add('hidden');
+                    showMessageBox("جاهز للتدريب!", `يمكنك الآن تدريب جنود مرة أخرى.`);
+                    savePlayerData();
+                }
+            }, 1000);
+            savePlayerData();
+        }
+
+        function trainSoldier() {
+            if (soldierTrainingCooldown) {
+                showMessageBox("مؤقت التهدئة نشط", `الرجاء الانتظار حتى ينتهي مؤقت تهدئة تدريب الجنود.`);
+                return;
+            }
+            if (playerGold < TRAIN_SOLDIER_COST) {
+                showMessageBox("ذهب غير كافٍ", `تحتاج إلى ${TRAIN_SOLDIER_COST} ذهب لتدريب ${SOLDIERS_PER_TRAINING} جنود.`);
+                return;
+            }
+            playerGold -= TRAIN_SOLDIER_COST;
+            playerSoldiers += SOLDIERS_PER_TRAINING;
+            
+            if (dailyQuestsProgress.trainSoldiers && !dailyQuestsProgress.trainSoldiers.claimed) {
+                dailyQuestsProgress.trainSoldiers.current = Math.min(dailyQuestsProgress.trainSoldiers.current + 1, dailyQuests.find(q => q.id === "trainSoldiers").target);
+            }
+
+            updateDisplay();
+            showMessageBox("تم التدريب بنجاح!", `لقد قمت بتدريب ${SOLDIERS_PER_TRAINING} جنود.`);
+            startSoldierTrainingCooldown(SOLDIER_TRAINING_COOLDOWN_SECONDS);
+            savePlayerData();
+        }
+
+        function updateFreeSoldierGeneratorButtonState() {
+            if (trainFreeSoldierButton) {
+                if (freeSoldierGeneratorCooldown) {
+                    trainFreeSoldierButton.disabled = true;
+                    trainFreeSoldierButton.textContent = "مؤقت التهدئة...";
+                    freeSoldiersCooldownTimerElement.classList.remove('hidden');
+                } else {
+                    trainFreeSoldierButton.disabled = false;
+                    trainFreeSoldierButton.innerHTML = `<i class="fas fa-user-plus"></i> <span>تدريب ${FREE_SOLDIERS_PER_TRAINING} جندي (مجاني)</span>`;
+                    freeSoldiersCooldownTimerElement.classList.add('hidden');
+                }
+            }
+        }
+
+        function startFreeSoldierGeneratorCooldown(initialTimeLeft) {
+            let timeLeft = Math.max(0, Math.floor(initialTimeLeft));
+            freeSoldierGeneratorCooldown = true;
+            updateFreeSoldierGeneratorButtonState();
+            freeSoldiersCooldownTimerElement.classList.remove('hidden');
+
+            if (freeSoldierGeneratorCooldownIntervalId) {
+                clearInterval(freeSoldierGeneratorCooldownIntervalId);
+            }
+
+            freeSoldierGeneratorCooldownIntervalId = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = Math.floor(timeLeft % 60);
+                freeSoldiersCooldownTimerElement.textContent = `مؤقت التهدئة: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(freeSoldierGeneratorCooldownIntervalId);
+                    freeSoldierGeneratorCooldownIntervalId = null;
+                    freeSoldierGeneratorCooldown = false;
+                    updateFreeSoldierGeneratorButtonState();
+                    freeSoldiersCooldownTimerElement.classList.add('hidden');
+                    showMessageBox("جاهز للتدريب المجاني!", `يمكنك الآن تدريب جنود مجاناً مرة أخرى.`);
+                    savePlayerData();
+                }
+            }, 1000);
+            savePlayerData();
+        }
+
+        function trainFreeSoldier() {
+            if (freeSoldierGeneratorCooldown) {
+                showMessageBox("مؤقت التهدئة نشط", `الرجاء الانتظار حتى ينتهي مؤقت تهدئة مولد الجنود المجاني.`);
+                return;
+            }
+            playerSoldiers += FREE_SOLDIERS_PER_TRAINING;
+            updateDisplay();
+            showMessageBox("تم التدريب المجاني بنجاح!", `لقد قمت بتدريب ${FREE_SOLDIERS_PER_TRAINING} جندي مجاناً.`);
+            startFreeSoldierGeneratorCooldown(FREE_SOLDIER_GENERATOR_COOLDOWN_SECONDS);
+            savePlayerData();
+        }
+
+        function updateBuyGemButtonState() {
+            if (buyGemButton) {
+                buyGemButton.disabled = playerGold < GEM_GOLD_COST;
+            }
+        }
+
+        function buyGem() {
+            if (playerGold < GEM_GOLD_COST) {
+                showMessageBox("ذهب غير كافٍ", `تحتاج إلى ${GEM_GOLD_COST} ذهب لشراء حجر كريم واحد.`);
+                return;
+            }
+            playerGold -= GEM_GOLD_COST;
+            playerGems += 1;
+
+            if (dailyQuestsProgress.buyFromShop && !dailyQuestsProgress.buyFromShop.claimed) {
+                dailyQuestsProgress.buyFromShop.current = Math.min(dailyQuestsProgress.buyFromShop.current + 1, dailyQuests.find(q => q.id === "buyFromShop").target);
+            }
+
+            updateDisplay();
+            showMessageBox("تم الشراء بنجاح!", "لقد حصلت على حجر كريم واحد.");
+            savePlayerData();
+        }
+
+        function updateLuckBoxButtonState() {
+            if (buyLuckBoxButton) {
+                buyLuckBoxButton.disabled = playerGems < LUCK_BOX_GEM_COST;
+            }
+        }
+
+        function buyLuckBox() {
+            if (playerGems < LUCK_BOX_GEM_COST) {
+                showMessageBox("أحجار كريمة غير كافية", `تحتاج إلى ${LUCK_BOX_GEM_COST} أحجار كريمة لفتح صندوق الحظ.`);
+                return;
+            }
+
+            playerGems -= LUCK_BOX_GEM_COST;
+
+            const goldReward = Math.floor(Math.random() * 61); // 0-60
+            const strengthReward = Math.floor(Math.random() * 96) + 5; // 5-100
+            const gemReward = Math.floor(Math.random() * 2); // 0 or 1
+
+            playerGold += goldReward;
+            playerStrength += strengthReward;
+            playerGems += gemReward;
+
+            if (dailyQuestsProgress.buyFromShop && !dailyQuestsProgress.buyFromShop.claimed) {
+                dailyQuestsProgress.buyFromShop.current = Math.min(dailyQuestsProgress.buyFromShop.current + 1, dailyQuests.find(q => q.id === "buyFromShop").target);
+            }
+
+            updateDisplay();
+            showMessageBox("صندوق الحظ!", `لقد حصلت على: ${goldReward} ذهب، ${strengthReward} قوة، ${gemReward} حجر كريم.`);
+            savePlayerData();
+        }
+
+        // New: Experience Box functions
+        function updateExperienceBoxButtonState() {
+            if (buyExperienceBoxButton) {
+                buyExperienceBoxButton.disabled = playerGold < EXPERIENCE_BOX_GOLD_COST;
+            }
+        }
+
+        function buyExperienceBox() {
+            if (playerGold < EXPERIENCE_BOX_GOLD_COST) {
+                showMessageBox("ذهب غير كافٍ", `تحتاج إلى ${EXPERIENCE_BOX_GOLD_COST} ذهب لفتح صندوق الخبرة.`);
+                return;
+            }
+
+            playerGold -= EXPERIENCE_BOX_GOLD_COST;
+            let rewardMessage = "لقد حصلت على: ";
+
+            const roll = Math.random() * 100; // Roll from 0 to 99.99...
+
+            if (roll < 3) { // 3% chance for Flaming Lion
+                if (!lionCosmetic) { // Only grant if not already owned
+                    lionCosmetic = true;
+                    playerStrength += 1000;
+                    if (!purchasedCosmetics.includes(flamingLionCosmetic.id)) {
+                        purchasedCosmetics.push(flamingLionCosmetic.id);
+                    }
+                    rewardMessage += `عنصر الأسد الملتهب (+1000 قوة)!`;
+                } else { // If already owned, give a fallback reward
+                    const strengthReward = Math.floor(Math.random() * (1000 - 200 + 1)) + 200;
+                    playerStrength += strengthReward;
+                    rewardMessage += `زيادة قوة كبيرة (${strengthReward} قوة) (لأنك تملك الأسد الملتهب بالفعل)!`;
+                }
+            } else if (roll < (3 + 5)) { // 5% chance for Random Cosmetic
+                const availableCosmetics = cosmeticItems.filter(c => !purchasedCosmetics.includes(c.id));
+                if (availableCosmetics.length > 0) {
+                    const randomCosmetic = availableCosmetics[Math.floor(Math.random() * availableCosmetics.length)];
+                    if (!purchasedCosmetics.includes(randomCosmetic.id)) {
+                        purchasedCosmetics.push(randomCosmetic.id);
+                    }
+                    rewardMessage += `${randomCosmetic.name}!`;
+                } else { // If all cosmetics owned, give fallback
+                    const strengthReward = Math.floor(Math.random() * (500 - 100 + 1)) + 100;
+                    playerStrength += strengthReward;
+                    rewardMessage += `زيادة قوة (${strengthReward} قوة) (لأنك تملك كل العناصر الجمالية)!`;
+                }
+            } else if (roll < (3 + 5 + 15)) { // 15% chance for Strength
+                const strengthReward = Math.floor(Math.random() * (1000 - 200 + 1)) + 200;
+                playerStrength += strengthReward;
+                rewardMessage += `${strengthReward} قوة!`;
+            } else if (roll < (3 + 5 + 15 + 30)) { // 30% chance for Soldiers
+                const soldiersReward = Math.floor(Math.random() * (30 - 10 + 1)) + 10;
+                playerSoldiers += soldiersReward;
+                rewardMessage += `${soldiersReward} جندي مجهز!`;
+            } else { // 60% chance for Gems (remaining percentage)
+                const gemsReward = Math.floor(Math.random() * (50 - 10 + 1)) + 10;
+                playerGems += gemsReward;
+                rewardMessage += `${gemsReward} حجر كريم!`;
+            }
+
+            if (dailyQuestsProgress.buyFromShop && !dailyQuestsProgress.buyFromShop.claimed) {
+                dailyQuestsProgress.buyFromShop.current = Math.min(dailyQuestsProgress.buyFromShop.current + 1, dailyQuests.find(q => q.id === "buyFromShop").target);
+            }
+
+            updateDisplay();
+            showMessageBox("صندوق الخبرة!", rewardMessage);
+            savePlayerData();
+        }
+
+        function renderCosmeticShopItems() {
+            cosmeticShopItemsContainer.innerHTML = '';
+            const allCosmetics = [...cosmeticItems]; // Copy of original cosmetics
+
+            allCosmetics.forEach(cosmetic => {
+                const isOwned = purchasedCosmetics.includes(cosmetic.id);
+                const isApplied = cosmeticApplied === cosmetic.value;
+
+                const cosmeticItemDiv = document.createElement('div');
+                cosmeticItemDiv.className = 'cosmetic-item';
+                cosmeticItemDiv.innerHTML = `
+                    <span class="cosmetic-item-name ${cosmetic.type === 'animation' ? cosmetic.value : ''}" ${cosmetic.type === 'color' ? `style="${cosmetic.style}"` : ''}>${cosmetic.name}</span>
+                    <p class="cosmetic-item-price">
+                        ${isOwned ? 'مملوك' : `${cosmetic.price} <i class="fas fa-coins text-yellow-500"></i>`}
+                    </p>
+                    <button data-cosmetic-id="${cosmetic.id}" data-cosmetic-type="${cosmetic.type}" data-cosmetic-value="${cosmetic.value}" ${isOwned ? 'disabled' : ''}>
+                        ${isOwned ? 'مملوك' : 'شراء'}
+                    </button>
+                `;
+                cosmeticShopItemsContainer.appendChild(cosmeticItemDiv);
+            });
+
+            document.querySelectorAll('#cosmetic-shop-items button').forEach(button => {
+                button.addEventListener('click', buyCosmetic);
+            });
+        }
+
+        function buyCosmetic(event) {
+            const button = event.target;
+            const cosmeticId = button.dataset.cosmeticId;
+            const cosmeticValue = button.dataset.cosmeticValue;
+            const cosmetic = cosmeticItems.find(item => item.id === cosmeticId);
+
+            if (!cosmetic) return;
+
+            if (purchasedCosmetics.includes(cosmeticId)) {
+                showMessageBox("عنصر مملوك", `أنت تملك هذا العنصر الجمالي بالفعل.`);
+                return;
+            }
+
+            if (playerGold < cosmetic.price) {
+                showMessageBox("ذهب غير كافٍ", `تحتاج إلى ${cosmetic.price} ذهب لشراء هذا العنصر الجمالي.`);
+                return;
+            }
+            playerGold -= cosmetic.price;
+            purchasedCosmetics.push(cosmetic.id); // Add to purchased list
+            cosmeticApplied = cosmeticValue; // Apply immediately upon purchase
+
+            if (dailyQuestsProgress.buyFromShop && !dailyQuestsProgress.buyFromShop.claimed) {
+                dailyQuestsProgress.buyFromShop.current = Math.min(dailyQuestsProgress.buyFromShop.current + 1, dailyQuests.find(q => q.id === "buyFromShop").target);
+            }
+
+            updateDisplay();
+            showMessageBox("تم الشراء بنجاح!", `لقد قمت بشراء "${cosmetic.name}".`);
+            savePlayerData();
+        }
+
+        function updateWarPlayersList() {
+            warPlayersList.innerHTML = '';
+            const otherPlayers = Object.keys(allPlayersGlobalData)
+                .filter(id => id !== userId && allPlayersGlobalData[id])
+                .map(id => ({ id, ...allPlayersGlobalData[id] }));
+
+            if (otherPlayers.length === 0) {
+                warPlayersList.innerHTML = '<p class="text-center text-gray-400">لا يوجد لاعبون آخرون حالياً.</p>';
+                return;
+            }
+
+            // Sort by strength descending
+            otherPlayers.sort((a, b) => b.strength - a.strength);
+
+            otherPlayers.forEach(opponent => {
+                const opponentRankIcon = getWarriorRankIcon(opponent.strength || 0);
+                const playerItem = document.createElement('div');
+                playerItem.className = 'war-player-item';
+                playerItem.dataset.opponentId = opponent.id;
+                playerItem.dataset.opponentStrength = opponent.strength;
+                
+                let opponentNameHtml = opponent.name;
+                // Apply cosmetic to opponent's name
+                if (opponent.lionCosmetic) {
+                    opponentNameHtml = `<span class="${flamingLionCosmetic.value}">${opponent.name}</span>`;
+                } else if (opponent.cosmeticApplied) {
+                    const cosmetic = cosmeticItems.find(item => item.value === opponent.cosmeticApplied);
+                    if (cosmetic) {
+                        if (cosmetic.type === 'animation') {
+                            opponentNameHtml = `<span class="${cosmetic.value}">${opponent.name}</span>`;
+                        } else if (cosmetic.type === 'color') {
+                            opponentNameHtml = `<span style="${cosmetic.style}">${opponent.name}</span>`;
+                        }
+                    }
+                }
+
+                playerItem.innerHTML = `
+                    <div class="war-player-details">
+                        <img src="${opponentRankIcon}" alt="Rank Icon" onerror="this.onerror=null; this.src='https://placehold.co/30x30/FF0000/FFFFFF?text=Icon';">
+                        <div>
+                            <p class="war-player-name">${opponentNameHtml}</p>
+                            <p class="war-player-strength">القوة: ${opponent.strength}</p>
+                            <p class="war-player-status ${opponent.online ? 'status-online' : 'status-offline'}">
+                                ${opponent.online ? 'متصل' : 'غير متصل'}
+                            </p>
+                        </div>
+                    </div>
+                    <button class="attack-button" data-opponent-id="${opponent.id}" data-opponent-strength="${opponent.strength}">
+                        هجوم
+                    </button>
+                `;
+                warPlayersList.appendChild(playerItem);
+            });
+
+            document.querySelectorAll('.war-player-item').forEach(item => {
+                item.addEventListener('click', (event) => {
+                    if (event.target.classList.contains('attack-button')) {
+                        return;
+                    }
+                    const opponentStrength = parseInt(item.dataset.opponentStrength);
+                    showWinProbability(opponentStrength);
+                });
+            });
+
+            document.querySelectorAll('.attack-button').forEach(button => {
+                button.addEventListener('click', handleAttack);
+            });
+        }
+
+        function showWinProbability(opponentStrength) {
+            const winProbability = (playerStrength / (playerStrength + opponentStrength)) * 100;
+            showMessageBox("نسبة الفوز", `نسبة فوزك المحتملة ضد هذا اللاعب هي: ${winProbability.toFixed(2)}%`);
+        }
+
+        async function handleAttack(event) {
+            const opponentId = event.target.dataset.opponentId;
+            const opponentStrength = parseInt(event.target.dataset.opponentStrength);
+            const opponentName = event.target.closest('.war-player-item').querySelector('.war-player-name').textContent;
+
+            if (playerSoldiers < 3) {
+                showMessageBox("جنود غير كافين", "تحتاج إلى 3 جنود على الأقل للهجوم.");
+                return;
+            }
+            if (playerStrength <= opponentStrength) {
+                showMessageBox("قوتك غير كافية", "يجب أن تكون قوتك أعلى من قوة الخصم للهجوم.");
+                return;
+            }
+
+            playerSoldiers -= 3;
+            
+            if (dailyQuestsProgress.attackOpponent && !dailyQuestsProgress.attackOpponent.claimed) {
+                dailyQuestsProgress.attackOpponent.current = Math.min(dailyQuestsProgress.attackOpponent.current + 1, dailyQuests.find(q => q.id === "attackOpponent").target);
+            }
+
+            updateDisplay();
+            savePlayerData();
+
+            const winChance = 0.7;
+            let outcome = "خسارة";
+            let rewards = { gold: 0, strength: 0, gems: 0 };
+            let losses = { strength: 0, gold: 0 };
+
+            if (Math.random() < winChance) {
+                outcome = "فوز";
+                const strengthFactor = opponentStrength / 1000;
+                rewards.gems = Math.floor(Math.random() * 6) + 1 + Math.floor(strengthFactor * 0.5);
+                rewards.strength = Math.floor(Math.random() * 21) + 10 + Math.floor(strengthFactor * 2);
+                rewards.gold = Math.floor(Math.random() * 25) + 1 + Math.floor(strengthFactor * 5);
+
+                playerGems += rewards.gems;
+                playerStrength += rewards.strength;
+            } else {
+                losses.strength = Math.floor(Math.random() * 5) + 1;
+                losses.gold = Math.floor(Math.random() * 10) + 1;
+
+                playerStrength = Math.max(0, playerStrength - losses.strength);
+                playerGold = Math.max(0, playerGold - losses.gold);
+            }
+            updateDisplay();
+            savePlayerData();
+
+            // Record attack in global log
+            await recordAttack(
+                userId, playerName, playerStrength,
+                opponentId, opponentName, opponentStrength,
+                outcome, rewards, losses
+            );
+
+            if (outcome === "فوز") {
+                showMessageBox("فوز!", `لقد فزت بالمعركة! حصلت على: ${rewards.gems} حجر كريم، ${rewards.strength} قوة، ${rewards.gold} ذهب.`);
+            } else {
+                showMessageBox("خسارة!", `لقد خسرت المعركة! خسرت: ${losses.strength} قوة، ${losses.gold} ذهب.`);
+            }
+        }
+
+        // New: Record Attack Function
+        async function recordAttack(attackerId, attackerName, attackerStrength, defenderId, defenderName, defenderStrength, outcome, rewards, losses) {
+            try {
+                await push(attackLogsRef, {
+                    attackerId,
+                    attackerName,
+                    attackerStrength,
+                    defenderId,
+                    defenderName,
+                    defenderStrength,
+                    outcome,
+                    rewards,
+                    losses,
+                    timestamp: Date.now()
+                });
+            } catch (error) {
+                console.error("Error recording attack:", error);
+            }
+        }
+
+        // New: Render Attack Logs
+        function renderAttackLogs(logs) {
+            attackLogsList.innerHTML = '';
+            if (logs.length === 0) {
+                attackLogsList.innerHTML = '<p class="text-center text-gray-400">لا يوجد سجل هجمات حالياً.</p>';
+                return;
+            }
+
+            logs.forEach(log => {
+                const logItem = document.createElement('div');
+                logItem.className = 'attack-log-item';
+
+                const date = new Date(log.timestamp);
+                const timeString = date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: true });
+                const dateString = date.toLocaleDateString('ar-SA');
+
+                let details = '';
+                if (log.outcome === "فوز") {
+                    details = `+${log.rewards.gold} ذهب, +${log.rewards.strength} قوة, +${log.rewards.gems} أحجار كريمة`;
+                } else {
+                    details = `-${log.losses.gold} ذهب, -${log.losses.strength} قوة`;
+                }
+
+                logItem.innerHTML = `
+                    <div class="attack-log-header">
+                        <div class="attack-log-players">
+                            <span>${log.attackerName}</span>
+                            <i class="fas fa-fist-raised text-red-500"></i>
+                            <span>${log.defenderName}</span>
+                        </div>
+                        <span class="attack-log-outcome ${log.outcome === 'فوز' ? 'outcome-win' : 'outcome-loss'}">${log.outcome}</span>
+                    </div>
+                    <p class="attack-log-details">المكافآت/الخسائر: ${details}</p>
+                    <p class="attack-log-timestamp">${dateString} ${timeString}</p>
+                `;
+                attackLogsList.appendChild(logItem);
+            });
+        }
+
+        function startRouletteCooldown(initialTimeLeft) {
+            let timeLeft = Math.max(0, Math.floor(initialTimeLeft));
+            rouletteCooldown = true;
+            placeBetButton.disabled = true;
+            rouletteCooldownTimerElement.classList.remove('hidden');
+
+            if (rouletteCooldownIntervalId) {
+                clearInterval(rouletteCooldownIntervalId);
+            }
+
+            rouletteCooldownIntervalId = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = Math.floor(timeLeft % 60);
+                rouletteCooldownTimerElement.textContent = `مؤقت التهدئة: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(rouletteCooldownIntervalId);
+                    rouletteCooldownIntervalId = null;
+                    rouletteCooldown = false;
+                    placeBetButton.disabled = false;
+                    rouletteCooldownTimerElement.classList.add('hidden');
+                    rouletteStatusMessage.textContent = "جاهز لجولة جديدة!";
+                    savePlayerData();
+                }
+            }, 1000);
+            savePlayerData();
+        }
+
+        function calculateCrashPoint() {
+            const rand = Math.random();
+            if (rand < 0.50) {
+                return parseFloat((Math.random() * (2.0 - 1.0) + 1.0).toFixed(2));
+            } else if (rand < 0.80) {
+                return parseFloat((Math.random() * (3.5 - 2.1) + 2.1).toFixed(2));
+            } else if (rand < 0.97) {
+                return parseFloat((Math.random() * (5.0 - 3.6) + 3.6).toFixed(2));
+            } else {
+                return parseFloat((Math.random() * (20.2 - 5.0) + 5.0).toFixed(2));
+            }
+        }
+
+        function startGame() {
+            if (rouletteCooldown) {
+                showMessageBox("مؤقت التهدئة نشط", "الرجاء الانتظار حتى تنتهي الجولة السابقة.");
+                return;
+            }
+            betAmount = parseInt(betAmountInput.value);
+            if (isNaN(betAmount) || betAmount < ROULETTE_MIN_BET || betAmount > 10000) {
+                showMessageBox("رهان غير صالح", `الرجاء إدخال مبلغ رهان بين ${ROULETTE_MIN_BET} و 10000 ذهب.`);
+                return;
+            }
+            if (playerGold < betAmount) {
+                showMessageBox("ذهب غير كافٍ", "لا يوجد لديك ذهب كافٍ لوضع هذا الرهان.");
+                return;
+            }
+
+            playerGold -= betAmount;
+            updateDisplay();
+            savePlayerData();
+
+            rouletteGameActive = true;
+            placeBetButton.disabled = true;
+            cashOutButton.classList.remove('hidden');
+            cashOutButton.disabled = false;
+            rouletteStatusMessage.textContent = "الطائرة تصعد...";
+            currentMultiplier = 1.00;
+            rouletteCrashPoint = calculateCrashPoint();
+            rouletteMultiplierDisplay.textContent = currentMultiplier.toFixed(2) + 'x';
+            rouletteMultiplierDisplay.classList.remove('crashed');
+
+            rouletteGameInterval = setInterval(() => {
+                currentMultiplier += 0.01;
+                rouletteMultiplierDisplay.textContent = currentMultiplier.toFixed(2) + 'x';
+
+                if (currentMultiplier >= rouletteCrashPoint) {
+                    clearInterval(rouletteGameInterval);
+                    rouletteGameActive = false;
+                    cashOutButton.classList.add('hidden');
+                    rouletteStatusMessage.textContent = `تحطمت عند ${rouletteCrashPoint.toFixed(2)}x! خسرت رهانك.`;
+                    rouletteMultiplierDisplay.classList.add('crashed');
+                    startRouletteCooldown(ROULETTE_COOLDOWN_SECONDS);
+                }
+            }, 100);
+        }
+
+        function cashOut() {
+            if (!rouletteGameActive) return;
+
+            clearInterval(rouletteGameInterval);
+            rouletteGameActive = false;
+            cashOutButton.classList.add('hidden');
+            
+            const winnings = Math.floor(betAmount * currentMultiplier);
+            playerGold += winnings;
+            updateDisplay();
+            savePlayerData();
+
+            rouletteStatusMessage.textContent = `لقد سحبت أرباحك عند ${currentMultiplier.toFixed(2)}x! فزت بـ ${winnings} ذهب.`;
+            startRouletteCooldown(ROULETTE_COOLDOWN_SECONDS);
+        }
+
+        // Gold Generator Functions
+        function startGoldGeneration() {
+            if (goldGenerationIntervalId) clearInterval(goldGenerationIntervalId);
+
+            goldGenerationIntervalId = setInterval(() => {
+                if (generatedGold < MAX_GENERATED_GOLD) {
+                    const goldToAdd = Math.floor(Math.random() * 3) + 1;
+                    generatedGold = Math.min(generatedGold + goldToAdd, MAX_GENERATED_GOLD);
+                    updateDisplay();
+                    savePlayerData();
+                }
+            }, GOLD_GENERATION_INTERVAL_SECONDS * 1000);
+        }
+
+        function claimGeneratedGold() {
+            if (generatedGold > 0) {
+                playerGold += generatedGold;
+                showMessageBox("ذهب مستلم!", `لقد استلمت ${generatedGold} ذهب من المولد.`);
+                generatedGold = 0;
+                updateDisplay();
+                savePlayerData();
+            } else {
+                showMessageBox("لا يوجد ذهب", "لا يوجد ذهب للاستلام حالياً.");
+            }
+        }
+
+        // Second Gold Generator Functions
+        function startSecondGoldGeneration() {
+            if (secondGoldGenerationIntervalId) clearInterval(secondGoldGenerationIntervalId);
+
+            secondGoldGenerationIntervalId = setInterval(() => {
+                if (secondGeneratedGold < SECOND_MAX_GENERATED_GOLD) {
+                    secondGeneratedGold = Math.min(secondGeneratedGold + 1, SECOND_MAX_GENERATED_GOLD);
+                    updateDisplay();
+                    savePlayerData();
+                }
+            }, SECOND_GOLD_GENERATION_INTERVAL_SECONDS * 1000);
+        }
+
+        function claimSecondGeneratedGold() {
+            if (secondGeneratedGold > 0) {
+                playerGold += secondGeneratedGold;
+                showMessageBox("ذهب مستلم!", `لقد استلمت ${secondGeneratedGold} ذهب من المولد الإضافي.`);
+                secondGeneratedGold = 0;
+                updateDisplay();
+                savePlayerData();
+            } else {
+                showMessageBox("لا يوجد ذهب", "لا يوجد ذهب للاستلام حالياً من المولد الإضافي.");
+            }
+        }
+
+        // Daily Quests Functions
+        function resetDailyQuests() {
+            dailyQuestsProgress = {};
+            dailyQuests.forEach(quest => {
+                dailyQuestsProgress[quest.id] = { current: 0, claimed: false };
+            });
+            lastDailyQuestResetDate = getKsaDateString();
+            showMessageBox("مهام جديدة!", "تم تحديث المهام اليومية! ابدأ في إكمالها الآن.");
+            savePlayerData();
+            renderTasks();
+        }
+
+        function renderTasks() {
+            tasksListElement.innerHTML = '';
+            dailyQuests.forEach(quest => {
+                const progress = dailyQuestsProgress[quest.id] || { current: 0, claimed: false };
+                const isCompleted = progress.current >= quest.target;
+                const isClaimed = progress.claimed;
+
+                const taskItem = document.createElement('div');
+                taskItem.className = 'task-item';
+                taskItem.innerHTML = `
+                    <h3>${quest.name}</h3>
+                    <p class="task-progress">التقدم: ${progress.current} / ${quest.target}</p>
+                    <p class="task-rewards">
+                        المكافآت: ${quest.rewards.gold} <i class="fas fa-coins text-yellow-500"></i>,
+                        ${quest.rewards.strength} <img src="https://l.top4top.io/p_3486ymahw0.png" alt="Strength Icon" class="inline-block w-4 h-4" onerror="this.onerror=null; this.src='https://placehold.co/16x16/FF0000/FFFFFF?text=P';">,
+                        ${quest.rewards.gems} <i class="fas fa-gem text-purple-400"></i>
+                    </p>
+                    <button class="claim-task-button" data-task-id="${quest.id}" ${(!isCompleted || isClaimed) ? 'disabled' : ''}>
+                        ${isClaimed ? 'تم الاستلام' : 'استلام المكافأة'}
+                    </button>
+                `;
+                tasksListElement.appendChild(taskItem);
+            });
+
+            document.querySelectorAll('.claim-task-button').forEach(button => {
+                button.addEventListener('click', claimTaskReward);
+            });
+        }
+
+        function claimTaskReward(event) {
+            const taskId = event.target.dataset.taskId;
+            const quest = dailyQuests.find(q => q.id === taskId);
+            const progress = dailyQuestsProgress[taskId];
+
+            if (!quest || !progress || progress.current < quest.target || progress.claimed) {
+                showMessageBox("خطأ", "لا يمكن استلام المكافأة لهذه المهمة.");
+                return;
+            }
+
+            playerGold += quest.rewards.gold;
+            playerStrength += quest.rewards.strength;
+            playerGems += quest.rewards.gems;
+            progress.claimed = true;
+
+            updateDisplay();
+            showMessageBox("مكافأة المهمة!", `لقد استلمت مكافأة مهمة "${quest.name}"!`);
+            savePlayerData();
+        }
+
+        // New: Daily Tasks Reset Timer
+        function updateDailyQuestTimer() {
+            if (!dailyTasksResetTimerElement) return;
+
+            const now = new Date();
+            const utc = now.getTime() + (now.getTimezoneOffset() * 60000); // Convert to UTC milliseconds
+            const ksaTime = new Date(utc + (3 * 3600 * 1000)); // Add 3 hours for KSA (UTC+3)
+
+            // Calculate next midnight in KSA time
+            const nextMidnightKsa = new Date(ksaTime);
+            nextMidnightKsa.setDate(ksaTime.getDate() + 1);
+            nextMidnightKsa.setHours(0, 0, 0, 0);
+
+            let timeLeft = Math.floor((nextMidnightKsa.getTime() - ksaTime.getTime()) / 1000);
+
+            if (timeLeft < 0) { // If it's already past midnight KSA, reset immediately
+                resetDailyQuests();
+                // Recalculate for the *new* next midnight
+                const newNow = new Date();
+                const newUtc = newNow.getTime() + (newNow.getTimezoneOffset() * 60000);
+                const newKsaTime = new Date(newUtc + (3 * 3600 * 1000));
+                const newNextMidnightKsa = new Date(newKsaTime);
+                newNextMidnightKsa.setDate(newKsaTime.getDate() + 1);
+                newNextMidnightKsa.setHours(0, 0, 0, 0);
+                timeLeft = Math.floor((newNextMidnightKsa.getTime() - newKsaTime.getTime()) / 1000);
+            }
+
+            const hours = Math.floor(timeLeft / 3600);
+            const minutes = Math.floor((timeLeft % 3600) / 60);
+            const seconds = Math.floor(timeLeft % 60);
+
+            dailyTasksResetTimerElement.textContent = `تحديث المهام بعد: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+
+        function populateWarriorRanksModal() {
+            const ranksList = document.getElementById('ranks-list');
+            ranksList.innerHTML = '';
+            warriorRanks.forEach(rank => {
+                const rankItem = document.createElement('div');
+                rankItem.className = 'rank-item';
+                rankItem.innerHTML = `
+                    <img src="${rank.icon}" alt="${rank.name} Icon" onerror="this.onerror=null; this.src='https://placehold.co/40x40/FF0000/FFFFFF?text=Icon';">
+                    <div class="rank-details">
+                        <p class="rank-name">${rank.name}</p>
+                        <p class="rank-power">القوة المطلوبة: <span class="font-semibold">${rank.minPower === 0 ? 'افتراضي' : rank.minPower}</span></p>
+                    </div>
+                `;
+                ranksList.appendChild(rankItem);
+            });
+        }
+
+        let currentOpenModalId = null;
+
+        function showModal(modalId) {
+            if (currentOpenModalId && currentOpenModalId !== modalId) {
+                document.getElementById(currentOpenModalId).classList.remove('visible');
+                document.getElementById(currentOpenModalId).classList.add('hidden');
+            }
+
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modal.classList.add('visible');
+                }, 10);
+                currentOpenModalId = modalId;
+            }
+        }
+
+        window.closeModal = function(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('visible');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    if (currentOpenModalId === modalId) {
+                        currentOpenModalId = null;
+                    }
+                }, 300);
+            }
+        }
+
+        function showWarriorRanksModal() {
+            populateWarriorRanksModal();
+            showModal('warrior-ranks-modal');
+        }
+
+        function showMessageBox(title, message) {
+            const messageBoxOverlay = document.getElementById('message-box-overlay');
+            const messageBoxTitle = document.getElementById('message-box-title');
+            const messageBoxText = document.getElementById('message-box-text');
+
+            if (messageBoxTitle) messageBoxTitle.textContent = title;
+            if (messageBoxText) messageBoxText.textContent = message;
+            showModal('message-box-overlay');
+        }
+
+        window.hideMessageBox = function() {
+            closeModal('message-box-overlay');
+        }
+
+        window.showTabModal = function(tabId) {
+            const tabs = document.querySelectorAll('.header-tab-item');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+
+            let modalIdToOpen = '';
+            switch (tabId) {
+                case 'my-village':
+                    modalIdToOpen = 'my-village-modal';
+                    break;
+                case 'shop':
+                    modalIdToOpen = 'shop-modal';
+                    renderCosmeticShopItems(); // Re-render shop items on tab open
+                    break;
+                case 'war':
+                    modalIdToOpen = 'war-modal';
+                    updateWarPlayersList();
+                    break;
+                case 'roulette':
+                    modalIdToOpen = 'roulette-modal';
+                    break;
+                case 'tasks':
+                    modalIdToOpen = 'tasks-modal';
+                    renderTasks();
+                    updateDailyQuestTimer(); // Ensure timer starts/updates
+                    break;
+                case 'attack-log': // New tab
+                    modalIdToOpen = 'attack-log-modal';
+                    // Fetch and display logs when tab is opened
+                    onValue(query(attackLogsRef, limitToLast(10)), (snapshot) => {
+                        const logs = [];
+                        snapshot.forEach(childSnapshot => {
+                            logs.push(childSnapshot.val());
+                        });
+                        logs.reverse(); // Display newest first
+                        renderAttackLogs(logs);
+                    });
+                    break;
+                case 'chat': // New tab
+                    modalIdToOpen = 'chat-modal';
+                    // Listen for chat messages
+                    onValue(chatMessagesRef, (snapshot) => {
+                        const messages = [];
+                        const oneHourAgo = Date.now() - (60 * 60 * 1000); // 1 hour in milliseconds
+                        snapshot.forEach(childSnapshot => {
+                            const msg = childSnapshot.val();
+                            if (msg.timestamp > oneHourAgo) { // Only show messages from the last hour
+                                messages.push(msg);
+                            }
+                        });
+                        messages.sort((a, b) => a.timestamp - b.timestamp); // Sort by time
+                        renderChatMessages(messages);
+                    });
+                    break;
+                case 'my-items': // New tab
+                    modalIdToOpen = 'my-items-modal';
+                    renderMyItems(); // Render owned items
+                    break;
+                default:
+                    break;
+            }
+
+            if (modalIdToOpen) {
+                showModal(modalIdToOpen);
+            }
+        }
+
+        // New: Chat Functions
+        async function sendChatMessage() {
+            const messageText = chatMessageInput.value.trim();
+            if (messageText) {
+                try {
+                    await push(chatMessagesRef, {
+                        senderId: userId,
+                        senderName: playerName,
+                        message: messageText,
+                        timestamp: Date.now(),
+                        cosmeticApplied: cosmeticApplied, // Include current cosmetic
+                        lionCosmetic: lionCosmetic // Include lion cosmetic status
+                    });
+                    chatMessageInput.value = ''; // Clear input
+                } catch (error) {
+                    console.error("Error sending message:", error);
+                    showMessageBox("خطأ في الإرسال", "تعذر إرسال الرسالة.");
+                }
+            }
+        }
+
+        function renderChatMessages(messages) {
+            chatMessagesList.innerHTML = '';
+            if (messages.length === 0) {
+                chatMessagesList.innerHTML = '<p class="text-center text-gray-400">لا توجد رسائل حالياً.</p>';
+                return;
+            }
+
+            messages.forEach(msg => {
+                const messageItem = document.createElement('div');
+                messageItem.className = 'chat-message-item';
+
+                const date = new Date(msg.timestamp);
+                const timeString = date.toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit', hour12: true });
+
+                let senderNameHtml = msg.senderName;
+                let senderIconHtml = '';
+
+                // Apply Flaming Lion cosmetic if active
+                if (msg.lionCosmetic) {
+                    senderNameHtml = `<span class="${flamingLionCosmetic.value}">${msg.senderName}</span>`;
+                    senderIconHtml = `<img src="${flamingLionCosmetic.icon}" alt="Lion Icon" class="chat-sender-icon" onerror="this.onerror=null; this.src='https://placehold.co/20x20/FF4500/FFFFFF?text=FL';">`;
+                } else if (msg.cosmeticApplied) {
+                    // Apply other cosmetics
+                    const cosmetic = cosmeticItems.find(item => item.value === msg.cosmeticApplied);
+                    if (cosmetic) {
+                        if (cosmetic.type === 'animation') {
+                            senderNameHtml = `<span class="${cosmetic.value}">${msg.senderName}</span>`;
+                        } else if (cosmetic.type === 'color') {
+                            senderNameHtml = `<span style="${cosmetic.style}">${msg.senderName}</span>`;
+                        }
+                    }
+                }
+
+                messageItem.innerHTML = `
+                    <div class="chat-message-header">
+                        ${senderNameHtml}
+                        ${senderIconHtml}
+                        <span class="chat-message-timestamp">${timeString}</span>
+                    </div>
+                    <p class="chat-message-content">${msg.message}</p>
+                `;
+                chatMessagesList.appendChild(messageItem);
+            });
+            chatMessagesList.scrollTop = chatMessagesList.scrollHeight; // Scroll to bottom
+        }
+
+        // New: My Items Functions
+        function renderMyItems() {
+            myItemsList.innerHTML = '';
+            if (purchasedCosmetics.length === 0 && !lionCosmetic) {
+                myItemsList.innerHTML = '<p class="text-center text-gray-400">لا تملك أي عناصر جمالية.</p>';
+                return;
+            }
+
+            // Combine all cosmetic items, including Flaming Lion
+            const allAvailableCosmetics = [...cosmeticItems];
+            if (!allAvailableCosmetics.some(c => c.id === flamingLionCosmetic.id)) {
+                allAvailableCosmetics.push(flamingLionCosmetic);
+            }
+
+            // Filter to show only owned items
+            const ownedItems = allAvailableCosmetics.filter(item => purchasedCosmetics.includes(item.id));
+
+            // Add Flaming Lion directly if owned via box but not in purchasedCosmetics array (for backward compatibility)
+            if (lionCosmetic && !ownedItems.some(item => item.id === flamingLionCosmetic.id)) {
+                ownedItems.push(flamingLionCosmetic);
+            }
+
+            ownedItems.forEach(item => {
+                const isCurrentlyApplied = (item.type === 'animation' && cosmeticApplied === item.value) ||
+                                           (item.type === 'color' && cosmeticApplied === item.value) ||
+                                           (item.id === 'flaming-lion' && lionCosmetic);
+
+                const itemCard = document.createElement('div');
+                itemCard.className = 'my-item-card';
+
+                let itemNameHtml = item.name;
+                if (item.type === 'animation') {
+                    itemNameHtml = `<span class="${item.value}">${item.name}</span>`;
+                } else if (item.type === 'color' && item.style) {
+                    itemNameHtml = `<span style="${item.style}">${item.name}</span>`;
+                }
+
+                itemCard.innerHTML = `
+                    ${item.id === 'flaming-lion' ? `<img src="${item.icon}" alt="Lion Icon" class="w-16 h-16 object-contain filter drop-shadow-lg" onerror="this.onerror=null; this.src='https://placehold.co/60x60/FF4500/FFFFFF?text=FL';">` : `<i class="fas fa-magic gem-icon-shop !text-yellow-300 !text-3xl"></i>`}
+                    <p class="my-item-name">${itemNameHtml}</p>
+                    <p class="my-item-status">${isCurrentlyApplied ? 'مطبق حالياً' : ''}</p>
+                    <button data-item-id="${item.id}" data-item-type="${item.type}" data-item-value="${item.value}" class="${isCurrentlyApplied ? 'unequip-button' : ''}">
+                        ${isCurrentlyApplied ? 'إلغاء التعيين' : 'تعيين'}
+                    </button>
+                `;
+                myItemsList.appendChild(itemCard);
+            });
+
+            document.querySelectorAll('#my-items-list button').forEach(button => {
+                button.addEventListener('click', toggleEquipCosmetic);
+            });
+        }
+
+        function toggleEquipCosmetic(event) {
+            const button = event.target;
+            const itemId = button.dataset.itemId;
+            const itemType = button.dataset.itemType;
+            const itemValue = button.dataset.itemValue;
+
+            if (button.classList.contains('unequip-button')) {
+                // Unequip
+                cosmeticApplied = null;
+                lionCosmetic = false;
+                showMessageBox("تم إلغاء التعيين", "تم إلغاء تعيين العنصر الجمالي.");
+            } else {
+                // Equip
+                if (itemId === 'flaming-lion') {
+                    lionCosmetic = true;
+                    cosmeticApplied = null; // Unset other cosmetic if lion is applied
+                } else {
+                    lionCosmetic = false;
+                    cosmeticApplied = itemValue;
+                }
+                showMessageBox("تم التعيين", `تم تعيين "${button.parentNode.querySelector('.my-item-name').textContent}" بنجاح!`);
+            }
+            updateDisplay();
+            savePlayerData();
+            renderMyItems(); // Re-render my items to update button states
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    playerRef = ref(db, `artifacts/${appId}/players/${userId}`);
+                    onDisconnect(ref(db, `artifacts/${appId}/players/${userId}/online`)).set(false);
+                    onDisconnect(ref(db, `artifacts/${appId}/players/${userId}/lastOnline`)).set(Date.now());
+
+                    await update(playerRef, { online: true, lastOnline: Date.now() });
+
+                    onValue(playerRef, (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            updatePlayerDataFromSnapshot(data);
+                        } else {
+                            nameInputModal.classList.remove('hidden');
+                        }
+                    });
+
+                    onValue(playersRef, (snapshot) => {
+                        allPlayersGlobalData = snapshot.val() || {};
+                        // Only update war list if war modal is open
+                        if (currentOpenModalId === 'war-modal') {
+                            updateWarPlayersList();
+                        }
+                    });
+
+                } else {
+                    nameInputModal.classList.remove('hidden');
+                }
+            });
+
+            // Set up interval for daily tasks reset timer
+            dailyTasksResetTimerIntervalId = setInterval(updateDailyQuestTimer, 1000);
+
+            if (upgradeMainHouseButton) {
+                upgradeMainHouseButton.addEventListener('click', upgradeHouse);
+            }
+            if (trainSoldierButton) {
+                trainSoldierButton.addEventListener('click', trainSoldier);
+            }
+            if (trainFreeSoldierButton) {
+                trainFreeSoldierButton.addEventListener('click', trainFreeSoldier);
+            }
+            if (buyGemButton) {
+                buyGemButton.addEventListener('click', buyGem);
+            }
+            if (buyLuckBoxButton) {
+                buyLuckBoxButton.addEventListener('click', buyLuckBox);
+            }
+            if (buyExperienceBoxButton) { // New
+                buyExperienceBoxButton.addEventListener('click', buyExperienceBox);
+            }
+            if (previewExperienceBoxButton) { // New
+                previewExperienceBoxButton.addEventListener('click', () => showModal('experience-box-preview-modal'));
+            }
+            // Cosmetic buy buttons are now handled by renderCosmeticShopItems()
+            if (document.getElementById('rank-info-trigger')) {
+                document.getElementById('rank-info-trigger').addEventListener('click', showWarriorRanksModal);
+            }
+            if (placeBetButton) {
+                placeBetButton.addEventListener('click', startGame);
+            }
+            if (cashOutButton) {
+                cashOutButton.addEventListener('click', cashOut);
+            }
+            if (claimGoldButton) {
+                claimGoldButton.addEventListener('click', claimGeneratedGold);
+            }
+            if (claimSecondGoldButton) {
+                claimSecondGoldButton.addEventListener('click', claimSecondGeneratedGold);
+            }
+            if (sendChatMessageButton) { // New
+                sendChatMessageButton.addEventListener('click', sendChatMessage);
+                chatMessageInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        sendChatMessage();
+                    }
+                });
+            }
+
+            startGameButton.addEventListener('click', async () => {
+                const inputName = playerNameInput.value.trim();
+                if (inputName) {
+                    if (!userId) {
+                        try {
+                            const userCredential = await signInAnonymously(auth);
+                            userId = userCredential.user.uid;
+                            playerRef = ref(db, `artifacts/${appId}/players/${userId}`);
+                            onDisconnect(ref(db, `artifacts/${appId}/players/${userId}/online`)).set(false);
+                            onDisconnect(ref(db, `artifacts/${appId}/players/${userId}/lastOnline`)).set(Date.now());
+                        } catch (error) {
+                            console.error("Error signing in anonymously:", error);
+                            showMessageBox("خطأ في المصادقة", "تعذر تسجيل الدخول. الرجاء المحاولة لاحقاً.");
+                            return;
+                        }
+                    }
+
+                    playerName = inputName;
+                    playerStrength = 0;
+                    playerGold = 300;
+                    playerGems = 3;
+                    playerSoldiers = 0;
+                    mainHouseUpgradeCount = 0;
+                    cosmeticApplied = null;
+                    lionCosmetic = false;
+                    purchasedCosmetics = [];
+                    generatedGold = 0;
+                    secondGeneratedGold = 0;
+                    lastDailyQuestResetDate = getKsaDateString();
+                    dailyQuestsProgress = {};
+                    dailyQuests.forEach(quest => {
+                        dailyQuestsProgress[quest.id] = { current: 0, claimed: false };
+                    });
+
+                    await set(playerRef, {
+                        name: playerName,
+                        strength: playerStrength,
+                        gold: playerGold,
+                        gems: playerGems,
+                        soldiers: playerSoldiers,
+                        mainHouseUpgradeCount: mainHouseUpgradeCount,
+                        cosmeticApplied: cosmeticApplied,
+                        lionCosmetic: lionCosmetic,
+                        purchasedCosmetics: purchasedCosmetics,
+                        online: true,
+                        lastOnline: Date.now(),
+                        generatedGold: generatedGold,
+                        lastGoldGenerationTime: Date.now(),
+                        secondGeneratedGold: secondGeneratedGold,
+                        secondLastGoldGenerationTime: Date.now(),
+                        lastDailyQuestResetDate: lastDailyQuestResetDate,
+                        dailyQuestsProgress: dailyQuestsProgress
+                    });
+
+                    nameInputModal.classList.add('hidden');
+                } else {
+                    showMessageBox("خطأ", "الرجاء إدخال اسم المحارب الخاص بك.");
+                }
+            });
+        });
     </script>
 </body>
 </html>
