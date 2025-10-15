@@ -26,15 +26,18 @@
             -ms-user-select: none;      
             user-select: none;          
             min-height: 100vh;
-            background: linear-gradient(-45deg, #0F172A, #2D3748, #0F172A, #1E293B);
-            background-size: 400% 400%;
-            animation: gradientShift 15s ease infinite;
+            /* اللون الثابت هو الأزرق الداكن */
+            background-color: #0F172A; 
+            /* السلاش اللوني الذهبي */
+            background-image: linear-gradient(90deg, transparent 40%, rgba(184, 134, 11, 0.1) 50%, transparent 60%);
+            background-size: 300% 100%;
+            /* حركة ذهاب وإياب سلسة كل 4 ثواني */
+            animation: goldFlash 4s linear infinite alternate;
         }
         
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        @keyframes goldFlash {
+            0% { background-position: 0% 0; }   /* بدء الحركة من اليسار */
+            100% { background-position: 100% 0; } /* إنهاء الحركة في اليمين (alternate يجعلها تعود لليسار سلسة) */
         }
         
         .image-card-wrapper {
@@ -80,7 +83,6 @@
             background-size: 200% auto;
             animation: text-glow-move 4s linear infinite;
 
-            /* NEW: Truncate to 2 lines */
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
@@ -262,12 +264,20 @@
                 
                 <div class="space-y-6 text-center">
                     <div class="bg-gray-900/70 p-5 rounded-xl border border-green-500 shadow-xl">
-                        <p class="text-lg font-bold text-gray-400 mb-1">تاريخ آخر مراجعة للمحتوى:</p>
-                        <p class="text-4xl font-extrabold text-green-400">14/10/2025</p>
-                        <ul class="text-base text-gray-300 mt-4 text-right space-y-2 list-disc list-inside">
-                            <li>تمت إضافة **4 برومبتات** جديدة (**2 للرجال، 2 للبنات**).</li>
-                            <li>تمت ترجمة برومبت عربي سابق إلى الإنجليزية.</li>
-                            <li>تم إزالة وسم "جديد" من الصور القديمة.</li>
+                        <p class="text-xs font-bold text-gray-400 mb-1">تاريخ آخر مراجعة:</p>
+                        <p class="text-xl font-extrabold text-green-400">15/10/2025</p>
+                        <ul class="text-lg text-gray-300 mt-4 text-center space-y-2">
+                            <li class="flex items-center justify-center space-x-2 space-x-reverse">
+                                <span>+1 صورة للبنات</span>
+                                <span class="text-xs font-black bg-red-600 text-white px-2 py-0.5 rounded-full">تحديث</span>
+                            </li>
+                            <li class="flex items-center justify-center space-x-2 space-x-reverse">
+                                <span>+1 صورة للرجال</span>
+                                <span class="text-xs font-black bg-red-600 text-white px-2 py-0.5 rounded-full">جديد</span>
+                            </li>
+                            <li class="text-sm text-gray-500 mt-4 border-t border-gray-700 pt-2">
+                                تم تحديث الخلفية إلى تصميم الوميض الذهبي/الأزرق (حركة ذهاب وإياب).
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -277,34 +287,45 @@
     
     <script>
         const NOW_MS = Date.now();
-        const TEN_HOURS_IN_MS = 10 * 60 * 60 * 1000;
+        const TEN_HOURS_IN_MS = 100 * 60 * 60 * 1000; 
         const OLD_TIME_MS = NOW_MS - (TEN_HOURS_IN_MS * 100); 
+        
+        const LATEST_UPDATE_MS = new Date('2025-10-15T00:00:00Z').getTime();
+
 
         let currentGalleryData = []; 
         let activeTab = 'men';
         
         const allPrompts = [
+            
             // ====================================================================
-            // NEW GIRLS PROMPTS (Added 14/10/2025)
+            // NEW GIRLS PROMPTS (Added 15/10/2025 - UPDATED)
+            // ====================================================================
+            {
+                category: 'girls',
+                text: `Make my night photo captivating. A young, attractive woman stands outside a shiny black luxury sedan, the back door slightly open. The woman is wearing a stylish and modern black outfit, consisting of a chic cropped jacket with white details and tight pants, and is carrying a small, elegant handbag in silver or white. Her hair is dark, long, and wavy, and her makeup is bold with red lipstick. The ambient lighting is dim, highlighting the distant lights of the city's skyscrapers at night, giving a sense of luxury and upscale nightlife. Without changing features`,
+                imageSrc: "https://g.top4top.io/p_3575tijwz0.jpg",
+                thumbnailSrc: "https://g.top4top.io/p_3575tijwz0.jpg",
+                timestamp: LATEST_UPDATE_MS
+            },
+            
+            // ====================================================================
+            // OLD GIRLS PROMPTS (TIMESTAMPS SET TO OLD_TIME_MS)
             // ====================================================================
             {
                 category: 'girls',
                 text: `A 4K ultra-realistic portrait of a young girl, framed from the chest up (not full body), designed for Instagram story or profile picture. The background is a luxurious Persian red carpet design (only behind her, not on the ground). Sunlight shines from one side, casting natural warm light across half of her face. She is wearing an elegant dress inspired by Persian carpet patterns, with authentic Iranian colors and motifs. Her facial features remain unchanged. She is holding a Persian cat in her hands`,
                 imageSrc: "https://h.top4top.io/p_3574nlkqs0.jpg",
                 thumbnailSrc: "https://h.top4top.io/p_3574nlkqs0.jpg",
-                timestamp: NOW_MS 
+                timestamp: OLD_TIME_MS
             },
             {
                 category: 'girls',
                 text: `Make me standing in an art gallery, with my hands placed behind my back as I look at a painting on the wall. My hair falls softly around my shoulders, and the calm lighting highlights the details of the artwork. The painting in front of me isn’t just any portrait—it’s a drawing of my own face, captured beautifully by the artist, as if I’m seeing myself through a different perspective within a frame of art.`,
                 imageSrc: "https://i.top4top.io/p_3574g6lmy1.jpg",
                 thumbnailSrc: "https://i.top4top.io/p_3574g6lmy1.jpg",
-                timestamp: NOW_MS 
+                timestamp: OLD_TIME_MS
             },
-            
-            // ====================================================================
-            // OLD GIRLS PROMPTS (TIMESTAMPS SET TO OLD_TIME_MS)
-            // ====================================================================
             {
                 category: 'girls',
                 text: `✨:Create a photo of me in a warm, candid shot of young women with long wavy dark brown hair, seen from the chest up applying lipgloss in a bathroom mirror.her reflection is visible in the foreground on the left, showing the back of her head and shoulder. The woman in the reflection is looking intently at her lips while applying gloss with a wand. She has a natural makeup look with a focus on defined eyes and soft full lips Her skin is clear with a healthy glow She is wearing a simple dark top like a tank top or camisole. On her left arm, she wears a delicate bracelet and a ring on her ring finger the bathroom setting is dimly lit with warm ambient light, giving the image a soft, slightly grainy and intimate feel. The mirror has a dark frame.and behind her in the background out of focus, are dark tiles and some toiletries on shelf including a small bottle she is holding in her left hand possibly more makeup the overall aesthetic is natural, relaxed and slightly retro due to the film like quality. Keep the facial details correctly please do not alter my facial features and leave the head positioning as is in the reflection and the primary view.`,
@@ -365,22 +386,21 @@ A wide cinematic shot of a woman standing in the dark against a gradient orange 
                 thumbnailSrc: "https://i.top4top.io/p_35733cd150.jpg",
                 timestamp: OLD_TIME_MS
             },
+            
             // ====================================================================
-            // NEW MEN PROMPTS (Added 14/10/2025)
+            // NEW MEN PROMPTS (Added 15/10/2025 - UPDATED)
             // ====================================================================
             {
                 category: 'men',
-                text: `Portrait of a young man standing on the beach during sunset, cinematic and aesthetic style. He has short slightly messy black hair, smooth skin, and a calm expression while looking back over his shoulder toward the camera. He is wearing a loose light blue shirt that reflects the soft flash lighting. The background shows a dramatic twilight sky with deep purple and pink gradients blending into orange near the horizon, with scattered dark clouds above the ocean. The atmosphere is moody yet serene, with a strong contrast between the softly lit subject in the foreground and the dark beach around him.`,
-                imageSrc: "https://j.top4top.io/p_35740pbso2.jpg",
-                thumbnailSrc: "https://j.top4top.io/p_35740pbso2.jpg",
-                timestamp: NOW_MS 
-            },
-            {
-                category: 'men',
-                text: `Of course! Here is a picture of the man standing in the Real Madrid stadium, wearing a Real Madrid kit with a white hat, behind him the blonde girls and the white Real Madrid banner, and he looks smiling and happy at the enthusiastic atmosphere of the match.`,
-                imageSrc: "https://k.top4top.io/p_3574zyssq3.jpg",
-                thumbnailSrc: "https://k.top4top.io/p_3574zyssq3.jpg",
-                timestamp: NOW_MS 
+                text: `Cinematic photographic portrait of a person standing on a Parisian bridge at night. Using the reference image as a STRICT source, preserve the EXACT likeness of the person. This includes EXACT facial features, hair style, and body proportions.
+The person wears a dark wool coat over a cream-colored sweater and light-colored pants. They lean against the bridge railing, with the Eiffel Tower in the background - its lights softly diffused and subdued, creating a gentle glow rather than a distracting sparkle.
+The background lights are muted and atmospheric, serving as a subtle backdrop that enhances rather than competes with the person. Their expression is contemplative, looking slightly downward as if lost in thought. The lighting emphasizes the person's face and expression, with the Eiffel Tower lights providing just enough context to establish the Parisian setting.
+Shallow depth of field keeps the person sharply in focus while the background remains softly blurred and non-distracting.
+The subject's appearance must be IDENTICAL to the reference photo. Only the clothing, pose, and setting are suggested by this text.
+cinematic photography, Paris at night, subtle background, atmospheric lighting, portrait focus, muted tones, intimate moment --v 6.0 --style raw --rw 1.5 --ar 3:4`,
+                imageSrc: "https://h.top4top.io/p_3575i2sf91.jpg",
+                thumbnailSrc: "https://h.top4top.io/p_3575i2sf91.jpg",
+                timestamp: LATEST_UPDATE_MS
             },
             
             // ====================================================================
@@ -388,7 +408,20 @@ A wide cinematic shot of a woman standing in the dark against a gradient orange 
             // ====================================================================
             {
                 category: 'men',
-                // This is the translated prompt
+                text: `Portrait of a young man standing on the beach during sunset, cinematic and aesthetic style. He has short slightly messy black hair, smooth skin, and a calm expression while looking back over his shoulder toward the camera. He is wearing a loose light blue shirt that reflects the soft flash lighting. The background shows a dramatic twilight sky with deep purple and pink gradients blending into orange near the horizon, with scattered dark clouds above the ocean. The atmosphere is moody yet serene, with a strong contrast between the softly lit subject in the foreground and the dark beach around him.`,
+                imageSrc: "https://j.top4top.io/p_35740pbso2.jpg",
+                thumbnailSrc: "https://j.top4top.io/p_35740pbso2.jpg",
+                timestamp: OLD_TIME_MS
+            },
+            {
+                category: 'men',
+                text: `Of course! Here is a picture of the man standing in the Real Madrid stadium, wearing a Real Madrid kit with a white hat, behind him the blonde girls and the white Real Madrid banner, and he looks smiling and happy at the enthusiastic atmosphere of the match.`,
+                imageSrc: "https://k.top4top.io/p_3574zyssq3.jpg",
+                thumbnailSrc: "https://k.top4top.io/p_3574zyssq3.jpg",
+                timestamp: OLD_TIME_MS
+            },
+            {
+                category: 'men',
                 text: `Generate an ultra-realistic 16K image using the uploaded photo's face with maximum fidelity to all facial features and details. Subject and Pose: The subject is leaning their body and head towards the white column/wall on their right, adopting a comfortable, relaxed, or perhaps posed stance, conveying a sense of confidence and reliance. Hand Usage: The camera focuses on the extended right arm, resting the hand or forearm on the ledge. This stance reinforces the impression of deliberate relaxation. Fingers and forearm are clearly visible. A wristwatch with a wide, dark strap is worn on the wrist, adding a functional and elegant touch. Head Angle and Gaze: The head is slightly tilted to the right (towards the wall), while the gaze is directed to the left, away from the camera and outside the frame. This side glance suggests mystery or contemplation, making the subject seem preoccupied, which enhances the scene's appeal. Attire and Accessories: Clothing: • Shirt: The subject wears a button-down shirt in a rich, dark maroon/burgundy color. The color is strong, suggesting classic yet contemporary elegance. The top buttons are undone, adding a casual touch. • Trousers: Dark brown or very dark black trousers (may appear dark due to lighting). This dark color complements the burgundy shirt well, maintaining a near-monochromatic look below. Accessories: • Sunglasses: Round sunglasses with light metallic frames are worn. They cover a significant portion of the eyes, enhancing the mystery and modern style. They are the most prominent facial accessory. • Watch: As mentioned, a wristwatch with a wide, dark strap. Composition and Visual Techniques (Photography): Camera Angle: The camera angle appears close to eye-level or slightly lower (Low Angle), which adds power and stature to the person, but generally focuses on nearly the entire body. Focus and Depth of Field: • Focus: The focus is sharp and precise on the main subject in the foreground, especially the shirt and hand. • Depth of Field: There is a slight to moderate separation (isolation) of the background (wall and column) from the subject. This visual separation keeps the viewer focused on the person without distraction, yet it's not an exaggerated 'bokeh'. • Negative Space: • The light background (wall and column) serves as the main negative space. It is simple and neutral, acting as a consistent backdrop that makes the burgundy shirt color strongly stand out. • The bright light on the wall reflects a strong natural illumination. Lighting and Effects: • The lighting appears naturally strong, perhaps midday or in a brightly lit outdoor space. • A slight glare (Flare) or diffused light appears on the left side of the image, adding warmth and a subtle dramatic atmosphere to the scene, highlighting the shirt's color gradients. Framing and Composition: The subject is well-placed within the frame, occupying a large portion, making them the main focus. The leaning posture against the wall helps visually divide the frame between the strong and elegant (the subject) and the neutral and static (the background).`,
                 imageSrc: "https://h.top4top.io/p_3573aac6s0.jpg",
                 thumbnailSrc: "https://h.top4top.io/p_3573aac6s0.jpg",
@@ -403,7 +436,7 @@ A wide cinematic shot of a woman standing in the dark against a gradient orange 
             },
             {
                 category: 'men',
-                text: `A close-up selfie of a young adult using the face from the provided reference image, keeping 100% of all facial features (entire face, eyes, nose, mouth, jawline, neck, and accessories). He is wearing vibrant blue mirrored ski goggles pushed up on his head, slightly held by his hand, revealing part of his eyes and a bit of his nose. His head is slightly tilted to the side, with a black, fluffy balaclava covering his neck and lower face, leaving the upper face visible. The ski helmet beanie is visible on top of his head. Exposed skin is slightly pink from the cold. The image captures the texture of the balaclava, the reflective shine of the goggles, and the slight grip of the hand on the goggles. Background: A snowy landscape with soft, realistic snow coverage and scattered trees, under an overcast sky. The background is detailed but subtle, keeping the focus on the subject while enhancing realism. Pose & Camera: Maintain exact head position, hand position, and angle of the goggles on the head. Only the part of the eyes and nose visible in the reference pose should appear. Use a single camera lens and perspective — no changes in pose, tilt, or framing. Photorealistic style, with detailed lighting, textures, and facial features exactly matching the reference image. Technical photography settings: Portrait orientation 4:5, iPhone-style shot, chest height, f/19, 1/30s, ISO 800. Slight, natural motion blur. No color grading, no stylization, no cinematic look. Background fully sharp and in focus, no bokeh, no depth-of-field effect. Framing off-center, slightly crooked, part of the face sharply captured. Negative Prompt: No distortion, no extra faces, no exaggerated features, no anime or cartoon style, no blurred details, no obscured eyes, no large hair covering the face, maintain 100% fidelity to original facial features, beard, accessories, neck, pose, and camera angle.`,
+                text: `A close-up selfie of a young adult using the face from the provided reference image, keeping 100% of all facial features (entire face, eyes, nose, mouth, jawline, neck, and accessories). He is wearing vibrant blue mirrored ski goggles pushed up on his head, slightly held by his hand, revealing part of his eyes and a bit of his nose. His head is slightly tilted to the side, with a black, fluffy balaclava covering his neck and lower face, leaving the upper face visible. The ski helmet beanie is visible on top of his head. Exposed skin is slightly pink from the cold. The image captures the texture of the balaclava, the reflective shine of the goggles, and the slight grip of the hand on the goggles. Background: A snowy landscape with soft, realistic snow coverage and scattered trees, under an overcast sky. The background is detailed but subtle, keeping the focus on the subject while enhancing realism. Pose & Camera: Maintain exact head position, hand position, and angle of the goggles on the head. Only the part of the eyes and nose visible in the reference pose should appear. Use a single camera lens and perspective — no changes in pose, tilt, or framing. Photorealistic style, with detailed lighting, textures, and facial features exactly matching the reference image. Technical photography settings: Portrait orientation 4:5, iPhone-style shot, chest height, f/19, 1/30s, ISO 800. Slight, natural motion blur. No color grading, no stylization, no cinematic look. Background fully sharp and in focus, no bokeh, no depth-of-field effect. Negative Prompt: No distortion, no extra faces, no exaggerated features, no anime or cartoon style, no blurred details, no obscured eyes, no large hair covering the face, maintain 100% fidelity to original facial features, beard, accessories, neck, pose, and camera angle.`,
                 imageSrc: "https://g.top4top.io/p_35743aoki1.jpg",
                 thumbnailSrc: "https://g.top4top.io/p_35743aoki1.jpg",
                 timestamp: OLD_TIME_MS 
@@ -561,12 +594,10 @@ man reclining against a horse-drawn carriage, black frock coat, boots,smoking a 
         const newBadgeAlert = document.getElementById('newBadgeAlert');
 
         function isNew(timestamp) {
-            // Check if the item was added in the current session (or very recently)
-            return (NOW_MS - timestamp) < TEN_HOURS_IN_MS;
+            return timestamp === LATEST_UPDATE_MS;
         }
 
         function updateNewBadgeAlert(dataArray) {
-            // Check all prompts, not just the currently displayed tab
             const hasNew = allPrompts.some(data => isNew(data.timestamp));
             newBadgeAlert.style.display = hasNew ? 'block' : 'none';
         }
@@ -579,7 +610,6 @@ man reclining against a horse-drawn carriage, black frock coat, boots,smoking a 
                 return;
             }
 
-            // Sort data so the newest items appear first
             dataArray.sort((a, b) => b.timestamp - a.timestamp);
 
             dataArray.forEach((data, i) => {
