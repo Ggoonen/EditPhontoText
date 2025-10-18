@@ -1,0 +1,1294 @@
+
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { createRoot } from 'react-dom/client';
+
+// --- CONSTANTS ---
+const STARTING_POINTS = 1325;
+const POINTS_SET_WIN = 13;
+const POINTS_SET_LOSS = -6;
+const POINTS_MATCH_WIN = 21;
+const POINTS_MATCH_LOSS = -3;
+const POINTS_TOURNAMENT_WIN = 31;
+const POINTS_TOURNAMENT_LAST = -11;
+const ADMIN_PASSWORD = 'Ali@2468';
+
+// --- TYPESCRIPT INTERFACES ---
+interface Team {
+  id: string;
+  name: string;
+  logo: string | null;
+}
+
+interface TeamStats {
+  played: number;
+  wins: number;
+  losses: number;
+  tournamentsWon: number;
+  setsWon: number;
+  setsLost: number;
+  points: number;
+}
+
+interface Match {
+  id: string;
+  team1Id: string;
+  team2Id: string;
+  sets: ('team1' | 'team2' | null)[];
+  winnerId: string | null;
+  group?: 'A' | 'B';
+}
+
+interface Tournament {
+  id: string;
+  name: string;
+  type: 'League' | 'Cup' | 'GroupStage' | 'SingleSetCup';
+  teams: string[];
+  rounds: Match[][]; // For League, Cup (initial rounds), and Group Stage matches
+  knockoutRounds: Match[][]; // For stages after groups
+  groups: { A: string[], B: string[] } | null;
+  currentStage: 'groups' | 'knockout' | 'finished';
+  isComplete: boolean;
+  winnerId?: string | null;
+  lastPlaceIds?: string[];
+}
+
+
+// --- UTILITY HOOKS & FUNCTIONS ---
+const useLocalStorage = (key, initialValue) => {
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error)
+    {
+      console.error(error);
+      return initialValue;
+    }
+  });
+
+  const setValue = value => {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      window.localStorage.setItem(key, JSON.stringify(valueToStore));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return [storedValue, setValue];
+};
+
+const generateId = () => `id_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+// --- STYLING (Yalla Shoot Inspired) ---
+const ACCENT_COLOR = '#00e676'; // Vibrant Green
+const BG_COLOR = '#121212';
+const CARD_COLOR = '#1E1E1E';
+const BORDER_COLOR = '#333333';
+const TEXT_PRIMARY = '#FFFFFF';
+const TEXT_SECONDARY = '#AAAAAA';
+
+const styles: { [key: string]: React.CSSProperties } = {
+  // Layout
+  appContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100vh',
+    background: BG_COLOR,
+    color: TEXT_PRIMARY,
+  },
+  mainContent: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '20px',
+    paddingBottom: '80px',
+  },
+  nav: {
+    display: 'flex',
+    justifyContent: 'space-around',
+    padding: '5px 0',
+    background: 'rgba(30, 30, 30, 0.8)',
+    borderTop: `1px solid ${BORDER_COLOR}`,
+    position: 'fixed',
+    bottom: 0,
+    width: '100%',
+    backdropFilter: 'blur(10px)',
+  },
+  navButton: {
+    background: 'none',
+    border: 'none',
+    color: TEXT_SECONDARY,
+    fontFamily: 'Tajawal, sans-serif',
+    fontSize: '12px',
+    cursor: 'pointer',
+    padding: '8px 12px',
+    borderRadius: '8px',
+    transition: 'all 0.3s ease',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '4px',
+  },
+  navButtonActive: {
+    color: ACCENT_COLOR,
+  },
+  // Common
+  card: {
+    background: CARD_COLOR,
+    borderRadius: '12px',
+    padding: '16px',
+    marginBottom: '16px',
+    border: `1px solid ${BORDER_COLOR}`,
+    transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+  },
+  cardHover: {
+    transform: 'translateY(-3px)',
+    boxShadow: `0 6px 12px rgba(0, 230, 118, 0.1)`,
+    borderColor: ACCENT_COLOR,
+    cursor: 'pointer',
+  },
+  title: {
+    fontSize: '24px',
+    fontWeight: 'bold',
+    marginBottom: '20px',
+    color: ACCENT_COLOR,
+    borderBottom: `2px solid ${BORDER_COLOR}`,
+    paddingBottom: '10px',
+  },
+  button: {
+    background: ACCENT_COLOR,
+    color: '#000',
+    border: 'none',
+    padding: '12px 20px',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontWeight: 'bold',
+    fontSize: '16px',
+    fontFamily: 'Tajawal, sans-serif',
+    transition: 'all 0.2s ease',
+  },
+  input: {
+    width: 'calc(100% - 24px)',
+    padding: '12px',
+    background: '#2A2A2A',
+    border: `1px solid ${BORDER_COLOR}`,
+    borderRadius: '8px',
+    color: TEXT_PRIMARY,
+    fontSize: '16px',
+    fontFamily: 'Tajawal, sans-serif',
+    marginBottom: '10px',
+    outlineColor: ACCENT_COLOR,
+  },
+  // Team List
+  teamItem: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '12px',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s, transform 0.2s ease',
+    borderRadius: '8px',
+  },
+  teamLogo: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    marginLeft: '15px',
+    objectFit: 'cover',
+    backgroundColor: '#333',
+    border: '2px solid #555',
+  },
+  smallTeamLogo: {
+    width: '24px',
+    height: '24px',
+    borderRadius: '50%',
+    objectFit: 'cover',
+    backgroundColor: '#333',
+    margin: '0 8px',
+  },
+  // Modal
+  modalBackdrop: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backdropFilter: 'blur(5px)',
+    zIndex: 1000,
+  },
+  modalContent: {
+    width: '90%',
+    maxWidth: '600px',
+    maxHeight: '90vh',
+    overflowY: 'auto',
+    background: CARD_COLOR,
+    borderRadius: '16px',
+    padding: '24px',
+    border: `1px solid ${BORDER_COLOR}`,
+  },
+    // Match
+  matchContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '10px 0',
+    cursor: 'pointer',
+    borderRadius: '8px',
+    transition: 'background-color 0.2s ease',
+  },
+  matchTeam: {
+    flex: 1,
+    textAlign: 'center',
+    fontWeight: 'bold',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '10px',
+  },
+};
+
+const defaultLogo = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZHTaPSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTIgM2wzLjA5IDYuMjYgNi45MSAxLjI1LTMuOTggNC40Mi45NCA2Ljg4TDEyIDE3LjI1bC02LjA2IDQuNTYgMS41LTYuOTUtMy45OC00LjQyIDYuOTEgMS4yNUwxMiAzWiIvPjwvc3ZnPg==';
+
+// --- COMPONENTS ---
+
+const NavIcon = ({ path, color = 'currentColor' }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d={path} />
+  </svg>
+);
+
+const navIcons = {
+    teams: <NavIcon path="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />,
+    tournaments: <NavIcon path="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z M19.42 12c.28-.6.42-1.25.42-1.95 0-2.22-1.21-4.15-3-5.19l-1.42 1.42c1.25.81 2 2.17 2 3.77 0 .5-.1.98-.28 1.42l1.28.58z M4.58 12c-.28.6-.42 1.25-.42 1.95 0 2.22 1.21 4.15 3 5.19l1.42-1.42c-1.25-.81-2-2.17-2-3.77 0-.5.1-.98.28-1.42l-1.28-.58z M12 4.58c-.6.28-1.25.42-1.95.42-2.22 0-4.15-1.21-5.19-3l-1.42 1.42c.81 1.25 2.17 2 3.77 2 .5 0 .98-.1 1.42-.28l.58 1.28z M12 19.42c.6-.28 1.25-.42 1.95-.42 2.22 0 4.15 1.21 5.19 3l1.42-1.42c-.81-1.25-2.17-2-3.77-2-.5 0-.98.1-1.42.28l-.58-1.28z" />,
+    classifications: <NavIcon path="M12 20V10 M18 20V4 M6 20V16" />,
+    add_team: <NavIcon path="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2 M8.5 3.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8z M20 8v6 M17 11h6" />,
+    control: <NavIcon path="M19.14,12.94a10,10,0,0,0-1.64-4.54l-1.4,1.4A8,8,0,0,1,17.42,12a8.1,8.1,0,0,1-2.1,5.39l1.4,1.42A10,10,0,0,0,19.14,12.94Z M12,14a2,2,0,1,1,2-2A2,2,0,0,1,12,14Z M14.86,4.86l-1.4,1.4A8,8,0,0,1,12,6.58a8.1,8.1,0,0,1-5.39,2.1L5.18,7.26A10,10,0,0,0,12,2,10,10,0,0,0,4.86,4.86Z M20,12a8,8,0,0,1-8,8,8.23,8.23,0,0,1-3.12-.6l-1.83,1.83A10,10,0,0,0,12,22,10,10,0,0,0,22,12Z"/>
+};
+
+const PointsHistoryChart = ({ history }) => {
+    if (!history || history.length < 2) return <div style={{height: 150, display: 'flex', alignItems: 'center', justifyContent: 'center', color: TEXT_SECONDARY}}>لا يوجد سجل نقاط كافي للعرض</div>;
+
+    const width = 300;
+    const height = 150;
+    const padding = 20;
+
+    const maxPoints = Math.max(...history.map(p => p.points));
+    const minPoints = Math.min(...history.map(p => p.points));
+
+    const getX = (index) => (index / (history.length - 1)) * (width - padding * 2) + padding;
+    const getY = (points) => height - ((points - minPoints) / (maxPoints - minPoints)) * (height - padding * 2) - padding;
+
+    const pathData = history.map((point, i) => `${i === 0 ? 'M' : 'L'} ${getX(i)} ${getY(point.points)}`).join(' ');
+
+    return (
+        <svg viewBox={`0 0 ${width} ${height}`} style={{width: '100%', height: 'auto'}}>
+            <path d={pathData} fill="none" stroke={ACCENT_COLOR} strokeWidth="2" />
+            <circle cx={getX(history.length - 1)} cy={getY(history[history.length - 1].points)} r="3" fill={ACCENT_COLOR} />
+        </svg>
+    );
+};
+
+
+const HeadToHeadComparison = ({ team1Id, teams, tournaments }) => {
+    const [team2Id, setTeam2Id] = useState('');
+    const getTeam = (id) => teams.find(t => t.id === id);
+
+    const { stats, matches } = useMemo(() => {
+        if (!team2Id) return { stats: null, matches: [] };
+
+        let team1Wins = 0;
+        let team2Wins = 0;
+        const allMatches = tournaments.flatMap(t => [...t.rounds.flat(), ...t.knockoutRounds.flat()]);
+        
+        const relevantMatches = allMatches.filter(match => {
+             const isMatchBetween = (match.team1Id === team1Id && match.team2Id === team2Id) || (match.team1Id === team2Id && match.team2Id === team1Id);
+             if (isMatchBetween && match.winnerId) {
+                 if (match.winnerId === team1Id) team1Wins++;
+                 else if (match.winnerId === team2Id) team2Wins++;
+             }
+             return isMatchBetween && match.winnerId;
+        });
+
+        return { stats: { team1Wins, team2Wins, played: relevantMatches.length }, matches: relevantMatches.reverse() };
+    }, [team1Id, team2Id, tournaments]);
+
+    return (
+        <div style={{ marginTop: '20px' }}>
+            <h3 style={{ ...styles.title, fontSize: '18px', border: 'none', padding: 0, marginBottom: '10px' }}>مقارنة المواجهات المباشرة</h3>
+            <select style={styles.input} value={team2Id} onChange={e => setTeam2Id(e.target.value)}>
+                <option value="">اختر فريق للمقارنة</option>
+                {teams.filter(t => t.id !== team1Id).map(t => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+            </select>
+            {stats && (
+                <>
+                    <div style={{ ...styles.card, display: 'flex', justifyContent: 'space-around', textAlign: 'center', background: '#2a2a2a' }}>
+                        <div><p style={{ margin: 0, fontSize: '20px', fontWeight: 'bold' }}>{stats.team1Wins}</p><p style={{ margin: 0, color: TEXT_SECONDARY }}>{getTeam(team1Id)?.name}</p></div>
+                        <div><p style={{ margin: 0, fontSize: '20px', fontWeight: 'bold' }}>{stats.played}</p><p style={{ margin: 0, color: TEXT_SECONDARY }}>مجموع المباريات</p></div>
+                        <div><p style={{ margin: 0, fontSize: '20px', fontWeight: 'bold' }}>{stats.team2Wins}</p><p style={{ margin: 0, color: TEXT_SECONDARY }}>{getTeam(team2Id)?.name}</p></div>
+                    </div>
+                    <div style={{maxHeight: '200px', overflowY: 'auto', marginTop: '10px'}}>
+                        {matches.map(match => {
+                            const team1 = getTeam(match.team1Id);
+                            const team2 = getTeam(match.team2Id);
+                            const team1Sets = match.sets.filter(s => s === 'team1').length;
+                            const team2Sets = match.sets.filter(s => s === 'team2').length;
+                            const tournament = tournaments.find(t => t.rounds.flat().some(m => m.id === match.id) || t.knockoutRounds.flat().some(m => m.id === match.id));
+                            return (
+                                <div key={match.id} style={{...styles.card, padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderLeft: `3px solid ${match.winnerId === team1Id ? ACCENT_COLOR : '#f00'}` }}>
+                                    <div style={{display: 'flex', alignItems: 'center', fontWeight: 'bold', color: match.winnerId === match.team1Id ? TEXT_PRIMARY : TEXT_SECONDARY}}>
+                                        <img src={team1?.logo || defaultLogo} style={{...styles.smallTeamLogo, margin: '0 8px 0 0'}} />
+                                        <span>{team1?.name.substring(0,10)}</span>
+                                    </div>
+                                    <div style={{fontWeight: 'bold'}}>{team1Sets} - {team2Sets}</div>
+                                    <div style={{display: 'flex', alignItems: 'center', fontWeight: 'bold', color: match.winnerId === match.team2Id ? TEXT_PRIMARY : TEXT_SECONDARY}}>
+                                        <span>{team2?.name.substring(0,10)}</span>
+                                        <img src={team2?.logo || defaultLogo} style={styles.smallTeamLogo}/>
+                                    </div>
+                                    <div style={{fontSize: '10px', color: TEXT_SECONDARY, textAlign: 'left', minWidth: '50px'}}>{tournament?.name.substring(0, 10)}</div>
+                                </div>
+                            )
+                        })}
+                    </div>
+                </>
+            )}
+        </div>
+    );
+};
+
+const TeamDetailsModal = ({ team, stats, onClose, onLogoChange, allMatches, teams, tournaments, teamRank, canEdit }) => {
+    if (!team) return null;
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (event) => onLogoChange(team.id, event.target.result as string);
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    };
+    
+    const pointsHistory = useMemo(() => {
+        let currentPoints = STARTING_POINTS;
+        const history = [{ points: currentPoints }];
+        // Reverse allMatches to calculate chronologically
+        [...allMatches].reverse().forEach(match => {
+            const isTeam1 = match.team1Id === team.id;
+            const teamSets = match.sets.filter(s => s === (isTeam1 ? 'team1' : 'team2')).length;
+            const opponentSets = match.sets.filter(s => s !== (isTeam1 ? 'team1' : 'team2') && s !== null).length;
+            
+            currentPoints += (teamSets * POINTS_SET_WIN) + (opponentSets * POINTS_SET_LOSS);
+            if (match.winnerId === team.id) currentPoints += POINTS_MATCH_WIN;
+            else currentPoints += POINTS_MATCH_LOSS;
+            
+            history.push({ points: currentPoints });
+        });
+        // We need to re-add points from tournament wins/losses as they are not match-based
+        const wonTournaments = tournaments.filter(t => t.isComplete && t.winnerId === team.id).length;
+        const lastPlaceTournaments = tournaments.filter(t => t.isComplete && t.lastPlaceIds?.includes(team.id)).length;
+        const finalPoints = history[history.length - 1].points + (wonTournaments * POINTS_TOURNAMENT_WIN) + (lastPlaceTournaments * POINTS_TOURNAMENT_LAST);
+
+        // Simple check to align final calculated points with stats points. This isn't perfect but helps bridge the gap.
+        if (history.length > 1) {
+             history[history.length - 1].points = finalPoints;
+        }
+
+        return history;
+    }, [allMatches, team.id, tournaments]);
+
+
+    const wonTournamentsList = tournaments.filter(t => t.isComplete && t.winnerId === team.id);
+
+    return (
+        <div style={styles.modalBackdrop} onClick={onClose}>
+            <div style={{...styles.card, ...styles.modalContent}} onClick={(e) => e.stopPropagation()}>
+                {/* Header */}
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '24px', gap: '20px' }}>
+                    <div style={{position: 'relative'}}>
+                       <img src={team.logo || defaultLogo} alt={team.name} style={{...styles.teamLogo, width: '80px', height: '80px', border: `3px solid ${ACCENT_COLOR}`}} />
+                       {canEdit && <>
+                           <input type="file" id="logo-upload" style={{ display: 'none' }} onChange={handleFileChange} accept="image/*" />
+                           <label htmlFor="logo-upload" style={{ position: 'absolute', bottom: 0, right: 0, background: TEXT_PRIMARY, color: BG_COLOR, borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', border: `2px solid ${CARD_COLOR}` }}>
+                             <NavIcon path="M12 5l-1.42 1.42L12 7.83l1.42-1.41L12 5zm7.12 7.12l-1.41 1.42L19.17 12l1.41-1.42L20.54 12zM4.88 16.12l1.42-1.41L4.83 12l-1.42 1.41L4.88 16.12zM12 19l1.42-1.42L12 16.17l-1.42 1.41L12 19zM12 2c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" color={BG_COLOR} />
+                           </label>
+                        </>}
+                    </div>
+                    <div>
+                        <h2 style={{ ...styles.title, border: 'none', padding: 0, margin: 0, color: TEXT_PRIMARY, fontSize: '28px' }}>{team.name}</h2>
+                        <p style={{ margin: '5px 0 0', color: ACCENT_COLOR, fontWeight: 'bold' }}>{stats.points} نقطة | التصنيف: {teamRank}</p>
+                    </div>
+                </div>
+
+                {/* Key Stats Grid */}
+                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px'}}>
+                    <div style={{...styles.card, margin: 0, background: '#2A2A2A', textAlign: 'center'}}><p style={{fontSize: '22px', margin: '0 0 5px 0', fontWeight: 'bold'}}>{stats.played > 0 ? Math.round((stats.wins / stats.played) * 100) : 0}%</p><p style={{margin: 0, color: TEXT_SECONDARY, fontSize: '14px'}}>نسبة الفوز</p></div>
+                    <div style={{...styles.card, margin: 0, background: '#2A2A2A', textAlign: 'center'}}><p style={{fontSize: '22px', margin: '0 0 5px 0', fontWeight: 'bold'}}>{stats.wins} <span style={{color: TEXT_SECONDARY}}>/</span> {stats.losses}</p><p style={{margin: 0, color: TEXT_SECONDARY, fontSize: '14px'}}>فوز / خسارة</p></div>
+                    <div style={{...styles.card, margin: 0, background: '#2A2A2A', textAlign: 'center'}}><p style={{fontSize: '22px', margin: '0 0 5px 0', fontWeight: 'bold'}}>{stats.setsWon - stats.setsLost}</p><p style={{margin: 0, color: TEXT_SECONDARY, fontSize: '14px'}}>فارق الأشواط</p></div>
+                    <div style={{...styles.card, margin: 0, background: '#2A2A2A', textAlign: 'center'}}><p style={{fontSize: '22px', margin: '0 0 5px 0', fontWeight: 'bold'}}>{stats.tournamentsWon}</p><p style={{margin: 0, color: TEXT_SECONDARY, fontSize: '14px'}}>البطولات</p></div>
+                </div>
+
+                {/* Points History */}
+                <h3 style={{...styles.title, fontSize: '18px', border: 'none', padding: 0, marginBottom: '10px' }}>سجل النقاط</h3>
+                <div style={{...styles.card, padding: '10px', background: '#2A2A2A', marginBottom: '24px'}}>
+                   <PointsHistoryChart history={pointsHistory} />
+                </div>
+                
+                 {/* Trophy Cabinet */}
+                {wonTournamentsList.length > 0 && (
+                    <>
+                        <h3 style={{...styles.title, fontSize: '18px', border: 'none', padding: 0, marginBottom: '10px' }}>سجل البطولات</h3>
+                        <div style={{display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px'}}>
+                            {wonTournamentsList.map(t => (
+                                <div key={t.id} style={{...styles.card, margin: 0, padding: '10px', background: '#2A2A2A', textAlign: 'center', flexShrink: 0, width: '100px'}}>
+                                    <span style={{fontSize: '32px'}}>🏆</span>
+                                    <p style={{margin: '5px 0 0', fontSize: '12px', color: TEXT_SECONDARY, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{t.name}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
+
+
+                <HeadToHeadComparison team1Id={team.id} teams={teams} tournaments={tournaments} />
+
+                <button style={{ ...styles.button, marginTop: '20px', background: '#333', color: '#fff', width: '100%' }} onClick={onClose}>إغلاق</button>
+            </div>
+        </div>
+    );
+};
+
+const AddTeamTab = ({ onAddTeam }) => {
+    const [name, setName] = useState('');
+    
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (name.trim()) {
+            onAddTeam(name.trim());
+            setName('');
+        }
+    };
+
+    return (
+        <div>
+            <h1 style={styles.title}>إضافة فريق جديد</h1>
+            <form onSubmit={handleSubmit} style={styles.card}>
+                <input
+                    style={styles.input}
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="اسم الفريق"
+                />
+                <button type="submit" style={{...styles.button, width: '100%'}}>إضافة الفريق</button>
+            </form>
+        </div>
+    );
+};
+
+const TeamsTab = ({ teams, onTeamSelect }) => (
+    <div>
+        <h1 style={styles.title}>الفرق</h1>
+        {teams.length === 0 ? <p>لم تتم إضافة أي فرق بعد.</p> :
+            <div style={styles.card}>
+                {[...teams].reverse().map(team => (
+                    <div key={team.id} style={styles.teamItem} onClick={() => onTeamSelect(team.id)} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#282828'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                        <img src={team.logo || defaultLogo} alt={team.name} style={styles.teamLogo} />
+                        <span>{team.name}</span>
+                    </div>
+                ))}
+            </div>
+        }
+    </div>
+);
+
+const TournamentsTab = ({ teams, tournaments, createTournament, selectTournament, canEdit }) => {
+    const [showCreate, setShowCreate] = useState(false);
+    const [name, setName] = useState('');
+    const [type, setType] = useState<'League' | 'Cup' | 'GroupStage' | 'SingleSetCup'>('League');
+    const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
+    const [hovered, setHovered] = useState<string | null>(null);
+
+
+    const handleTeamToggle = (teamId: string) => {
+        setSelectedTeams(prev => 
+            prev.includes(teamId) ? prev.filter(id => id !== teamId) : [...prev, teamId]
+        );
+    };
+
+    const handleCreate = () => {
+        if (!name.trim() || selectedTeams.length < 2) {
+            alert('يجب إدخال اسم واختيار فريقين على الأقل.');
+            return;
+        }
+        if ((type === 'Cup' || type === 'SingleSetCup') && selectedTeams.length % 2 !== 0) {
+             alert('بطولات الكأس تتطلب عدد زوجي من الفرق.');
+             return;
+        }
+        if (type === 'GroupStage' && selectedTeams.length < 4) {
+            alert('بطولات المجموعات تتطلب 4 فرق على الأقل.');
+            return;
+        }
+
+        createTournament(name, type, selectedTeams);
+        setName('');
+        setType('League');
+        setSelectedTeams([]);
+        setShowCreate(false);
+    };
+    
+    return (
+      <div>
+        <h1 style={styles.title}>البطولات</h1>
+        {canEdit && <button style={{...styles.button, width: '100%'}} onClick={() => setShowCreate(!showCreate)}>
+          {showCreate ? 'إلغاء' : 'إنشاء بطولة جديدة'}
+        </button>}
+
+        {showCreate && canEdit && (
+            <div style={{...styles.card, marginTop: '20px'}}>
+                <input style={styles.input} value={name} onChange={e => setName(e.target.value)} placeholder="اسم البطولة"/>
+                <select style={styles.input} value={type} onChange={e => setType(e.target.value as any)}>
+                    <option value="League">دوري</option>
+                    <option value="Cup">كأس</option>
+                    <option value="SingleSetCup">بطولة الشوط الواحد</option>
+                    <option value="GroupStage">مجموعات</option>
+                </select>
+                <h3 style={{marginTop: '20px'}}>اختر الفرق المشاركة:</h3>
+                <div style={{maxHeight: '200px', overflowY: 'auto', background: '#2A2A2A', padding: '10px', borderRadius: '8px'}}>
+                {teams.map(team => (
+                    <div key={team.id} style={{padding: '5px'}}>
+                        <input type="checkbox" id={`team-${team.id}`} checked={selectedTeams.includes(team.id)} onChange={() => handleTeamToggle(team.id)} />
+                        <label htmlFor={`team-${team.id}`} style={{marginRight: '10px'}}>{team.name}</label>
+                    </div>
+                ))}
+                </div>
+                <button style={{...styles.button, marginTop: '20px', width: '100%'}} onClick={handleCreate}>إنشاء</button>
+            </div>
+        )}
+        
+        <div style={{marginTop: '20px'}}>
+            {[...tournaments].reverse().map(t => (
+                <div key={t.id} style={{ ...styles.card, ...(hovered === t.id ? styles.cardHover : {}) }} onClick={() => selectTournament(t.id)} onMouseEnter={() => setHovered(t.id)} onMouseLeave={() => setHovered(null)}>
+                    <h3>{t.name} ({ {League: 'دوري', Cup: 'كأس', GroupStage: 'مجموعات', SingleSetCup: 'شوط واحد'}[t.type] })</h3>
+                    <p>{t.teams.length} فريق مشارك</p>
+                    {t.isComplete && <p style={{color: ACCENT_COLOR, fontWeight: 'bold'}}>🏆 مكتملة</p>}
+                </div>
+            ))}
+        </div>
+      </div>
+    )
+};
+
+const MatchUpdateModal = ({ match, teams, onSave, onClose }) => {
+    const [localSets, setLocalSets] = useState([...match.sets]);
+    const team1 = teams.find(t => t.id === match.team1Id);
+    const team2 = teams.find(t => t.id === match.team2Id);
+
+    const handleSetWinner = (setIndex, winner) => {
+        const newSets = [...localSets];
+        newSets[setIndex] = newSets[setIndex] === winner ? null : winner; // Toggle
+        setLocalSets(newSets);
+    };
+
+    const handleSave = () => {
+        const team1Wins = localSets.filter(s => s === 'team1').length;
+        const team2Wins = localSets.filter(s => s === 'team2').length;
+        const setsToWin = match.sets.length === 1 ? 1 : 2;
+        let winnerId = null;
+
+        if (team1Wins >= setsToWin) winnerId = match.team1Id;
+        if (team2Wins >= setsToWin) winnerId = match.team2Id;
+
+        onSave({ ...match, sets: localSets, winnerId });
+        onClose();
+    };
+
+    if (!team1 || !team2) return null;
+
+    return (
+        <div style={styles.modalBackdrop} onClick={onClose}>
+            <div style={{...styles.card, ...styles.modalContent}} onClick={e => e.stopPropagation()}>
+                <h2 style={{textAlign: 'center', marginBottom: '20px'}}>{team1.name} ضد {team2.name}</h2>
+                {localSets.map((_set, setIndex) => {
+                    const isTeam1Winner = localSets[setIndex] === 'team1';
+                    const isTeam2Winner = localSets[setIndex] === 'team2';
+                    return (
+                        <div key={setIndex} style={{marginBottom: '15px'}}>
+                            <h4 style={{textAlign: 'center', margin: '0 0 10px 0', color: TEXT_SECONDARY}}>
+                                {localSets.length > 1 ? `الشوط ${setIndex + 1}` : 'الشوط الحاسم'}
+                            </h4>
+                            <div style={{display: 'flex', justifyContent: 'center', gap: '10px', alignItems: 'center'}}>
+                                <div onClick={() => handleSetWinner(setIndex, 'team1')} style={{...styles.button, flex: 1, textAlign: 'center', background: isTeam1Winner ? ACCENT_COLOR : '#333', color: isTeam1Winner ? '#000' : '#fff'}}>{team1.name}</div>
+                                <span style={{fontWeight: 'bold'}}>أو</span>
+                                <div onClick={() => handleSetWinner(setIndex, 'team2')} style={{...styles.button, flex: 1, textAlign: 'center', background: isTeam2Winner ? ACCENT_COLOR : '#333', color: isTeam2Winner ? '#000' : '#fff'}}>{team2.name}</div>
+                            </div>
+                        </div>
+                    );
+                })}
+                <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '30px', gap: '10px'}}>
+                    <button style={{...styles.button, flex: 1}} onClick={handleSave}>حفظ</button>
+                    <button style={{...styles.button, background: '#333', color: '#fff', flex: 1}} onClick={onClose}>إلغاء</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const checkTournamentCompletion = (tour, standingsCalculator) => {
+    let updatedTournament = { ...tour };
+    
+    // League Completion
+    if (updatedTournament.type === 'League' && !updatedTournament.isComplete) {
+        const allMatchesPlayed = updatedTournament.rounds.flat().every(m => m.winnerId);
+        if (allMatchesPlayed) {
+            const finalStandings = standingsCalculator(updatedTournament.rounds.flat(), updatedTournament.teams);
+            updatedTournament.isComplete = true;
+            updatedTournament.winnerId = finalStandings[0]?.teamId || null;
+            updatedTournament.lastPlaceIds = finalStandings.length > 1 ? [finalStandings[finalStandings.length-1].teamId] : [];
+        }
+    }
+
+    // Cup/Knockout Completion
+    const roundsToCheck = updatedTournament.type === 'GroupStage' ? updatedTournament.knockoutRounds : updatedTournament.rounds;
+    if ((updatedTournament.type === 'Cup' || updatedTournament.type === 'SingleSetCup' || updatedTournament.currentStage === 'knockout') && !updatedTournament.isComplete) {
+        const finalRound = roundsToCheck[roundsToCheck.length - 1];
+        if (finalRound && finalRound.length === 1 && finalRound[0].winnerId) {
+             updatedTournament.isComplete = true;
+             updatedTournament.winnerId = finalRound[0].winnerId;
+             // Determine last place
+             const allMatches = [...updatedTournament.rounds.flat(), ...updatedTournament.knockoutRounds.flat()];
+             const allLosers = allMatches.map(m => m.winnerId === m.team1Id ? m.team2Id : m.team1Id);
+             updatedTournament.lastPlaceIds = Array.from(new Set(allLosers)).filter(id => !allMatches.some(m => m.winnerId === id));
+        }
+    }
+    
+    return updatedTournament;
+};
+
+const TournamentDetails = ({ tournament, teams, updateTournament, onBack, canEdit }) => {
+    if (!tournament) return null;
+    const [editingMatch, setEditingMatch] = useState(null);
+    const [hoveredMatch, setHoveredMatch] = useState<string | null>(null);
+
+    const getTeam = (id) => teams.find(t => t.id === id);
+
+    const calculateStandings = useCallback((matches, teamIds) => {
+        const standings: { [key: string]: { played: number; wins: number; losses: number; setsWon: number; setsLost: number; setDifference: number; points: number; } } = {};
+        teamIds.forEach(teamId => {
+            standings[teamId] = { played: 0, wins: 0, losses: 0, setsWon: 0, setsLost: 0, setDifference: 0, points: 0 };
+        });
+
+        matches.forEach(match => {
+            if (match.winnerId) {
+                const loserId = match.winnerId === match.team1Id ? match.team2Id : match.team1Id;
+                if (!standings[match.winnerId] || !standings[loserId]) return;
+                
+                standings[match.winnerId].played++;
+                standings[loserId].played++;
+                standings[match.winnerId].wins++;
+                standings[loserId].losses++;
+                standings[match.winnerId].points += 3;
+                
+                const team1Sets = match.sets.filter(s => s === 'team1').length;
+                const team2Sets = match.sets.filter(s => s === 'team2').length;
+                
+                standings[match.team1Id].setsWon += team1Sets;
+                standings[match.team1Id].setsLost += team2Sets;
+                standings[match.team2Id].setsWon += team2Sets;
+                standings[match.team2Id].setsLost += team1Sets;
+            }
+        });
+        
+        return Object.entries(standings)
+            .map(([teamId, stats]) => {
+                stats.setDifference = stats.setsWon - stats.setsLost;
+                return { teamId, ...stats };
+            })
+            .sort((a, b) => b.points - a.points || b.setDifference - a.setDifference);
+    }, []);
+
+    const handleSaveMatch = (updatedMatch) => {
+        let updatedTournament = JSON.parse(JSON.stringify(tournament));
+        const { roundIndex, isKnockout, ...matchData } = updatedMatch;
+        const roundsSource = isKnockout ? updatedTournament.knockoutRounds : updatedTournament.rounds;
+
+        const targetRound = roundsSource.find(round => round.some(m => m.id === matchData.id));
+        if (targetRound) {
+            const matchIndex = targetRound.findIndex(m => m.id === matchData.id);
+            if (matchIndex !== -1) {
+                targetRound[matchIndex] = matchData;
+            }
+        } else {
+             // Fallback for older tournament data structures
+            const matchIndex = roundsSource[roundIndex].findIndex(m => m.id === matchData.id);
+            if (matchIndex !== -1) {
+                 roundsSource[roundIndex][matchIndex] = matchData;
+            }
+        }
+
+
+        // Check for cup progression
+        if ((updatedTournament.type === 'Cup' || updatedTournament.type === 'SingleSetCup' || updatedTournament.currentStage === 'knockout') && !updatedTournament.isComplete) {
+            const currentRound = roundsSource[roundsSource.length - 1];
+            const isRoundComplete = currentRound.every(m => m.winnerId);
+            
+            if (isRoundComplete && currentRound.length > 1) {
+                const winners = currentRound.map(m => m.winnerId);
+                const shuffledWinners = [...winners].sort(() => 0.5 - Math.random());
+                const nextRound: Match[] = [];
+                for (let i = 0; i < shuffledWinners.length; i += 2) {
+                    if (shuffledWinners[i+1]) {
+                         const sets = updatedTournament.type === 'SingleSetCup' ? [null] : [null, null, null];
+                         nextRound.push({ id: generateId(), team1Id: shuffledWinners[i], team2Id: shuffledWinners[i+1], sets, winnerId: null });
+                    }
+                }
+                if (nextRound.length > 0) {
+                    roundsSource.push(nextRound);
+                }
+            }
+        }
+        
+        const finalTournamentState = checkTournamentCompletion(updatedTournament, calculateStandings);
+        updateTournament(finalTournamentState);
+    };
+    
+    const getQualifierCount = (groupSize) => {
+        if (groupSize >= 6) return 3;
+        if (groupSize >= 4) return 2;
+        return 1;
+    };
+
+    const handleAdvanceToKnockout = () => {
+        const groupAMatches = tournament.rounds.flat().filter(m => m.group === 'A');
+        const groupBMatches = tournament.rounds.flat().filter(m => m.group === 'B');
+        const groupAStandings = calculateStandings(groupAMatches, tournament.groups.A);
+        const groupBStandings = calculateStandings(groupBMatches, tournament.groups.B);
+
+        const qualifiersA = groupAStandings.slice(0, getQualifierCount(tournament.groups.A.length)).map(t => t.teamId);
+        const qualifiersB = groupBStandings.slice(0, getQualifierCount(tournament.groups.B.length)).map(t => t.teamId);
+
+        let allQualifiers = [...qualifiersA, ...qualifiersB];
+        
+        if (allQualifiers.length % 2 !== 0 && allQualifiers.length > 1) {
+            const fullGroupStandings = [...groupAStandings, ...groupBStandings];
+            const qualifiersWithStats = fullGroupStandings.filter(t => allQualifiers.includes(t.teamId));
+            
+            qualifiersWithStats.sort((a,b) => a.points - b.points || a.setDifference - b.setDifference);
+
+            const teamToEliminateId = qualifiersWithStats[0].teamId;
+            allQualifiers = allQualifiers.filter(id => id !== teamToEliminateId);
+        }
+
+        const shuffledQualifiers = allQualifiers.sort(() => 0.5 - Math.random());
+
+        const knockoutMatches: Match[] = [];
+        for (let i = 0; i < shuffledQualifiers.length; i += 2) {
+            if (shuffledQualifiers[i+1]) {
+                 knockoutMatches.push({ id: generateId(), team1Id: shuffledQualifiers[i], team2Id: shuffledQualifiers[i+1], sets: [null, null, null], winnerId: null });
+            }
+        }
+        
+        updateTournament({...tournament, knockoutRounds: [knockoutMatches], currentStage: 'knockout'});
+    };
+
+
+    const renderStandingsTable = (standings, qualifierCount) => (
+        <div style={{overflowX: 'auto'}}>
+            <table style={{width: '100%', borderCollapse: 'collapse', minWidth: '400px'}}>
+                <thead >
+                    <tr style={{borderBottom: `2px solid ${BORDER_COLOR}`}}>
+                        {['#', 'الفريق', 'ل', 'ف', 'خ', 'ف.أ', 'ن'].map(header => 
+                            <th key={header} style={{padding: '12px 8px', textAlign: header === 'الفريق' ? 'right' : 'center', color: TEXT_SECONDARY}}>{header}</th>
+                        )}
+                    </tr>
+                </thead>
+                <tbody>
+                {standings.map(({teamId, ...stats}, index) => {
+                    const team = getTeam(teamId);
+                    const isQualifier = index < qualifierCount;
+                    return (
+                    <tr key={teamId} style={{ borderBottom: `1px solid ${BORDER_COLOR}`, background: index % 2 === 0 ? CARD_COLOR : '#242424', borderLeft: isQualifier ? `3px solid ${ACCENT_COLOR}` : 'none' }}>
+                        <td style={{padding: '10px 8px', textAlign: 'center', fontWeight: 'bold'}}>{index+1}</td>
+                        <td style={{padding: '10px 8px', display: 'flex', alignItems: 'center'}}>
+                          <img src={team?.logo || defaultLogo} alt={team?.name} style={{...styles.smallTeamLogo, marginLeft: 0}} />
+                          {team?.name}
+                        </td>
+                        <td style={{padding: '10px 8px', textAlign: 'center'}}>{stats.played}</td>
+                        <td style={{padding: '10px 8px', textAlign: 'center'}}>{stats.wins}</td>
+                        <td style={{padding: '10px 8px', textAlign: 'center'}}>{stats.losses}</td>
+                        <td style={{padding: '10px 8px', textAlign: 'center'}}>{stats.setDifference}</td>
+                        <td style={{padding: '10px 8px', textAlign: 'center', fontWeight: 'bold', color: ACCENT_COLOR}}>{stats.points}</td>
+                    </tr>
+                )})}
+                </tbody>
+            </table>
+        </div>
+    );
+    
+    const renderRounds = (rounds, isKnockout = false) => rounds.map((round, roundIndex) => (
+        <div key={`${isKnockout}-${roundIndex}`} style={styles.card}>
+             <h3 style={{color: ACCENT_COLOR}}>
+                {isKnockout && round.length === 1 ? 'النهائي' : 
+                 isKnockout && round.length === 2 ? 'نصف النهائي' :
+                 isKnockout && round.length === 4 ? 'ربع النهائي' : `الجولة ${roundIndex + 1}`
+                }
+            </h3>
+            {round.map(match => {
+                const team1 = getTeam(match.team1Id);
+                const team2 = getTeam(match.team2Id);
+                if (!team1 || !team2) return null;
+                const team1Sets = match.sets.filter(s => s === 'team1').length;
+                const team2Sets = match.sets.filter(s => s === 'team2').length;
+                const isMatchEditable = canEdit && !match.winnerId && !tournament.isComplete;
+                return (
+                    <div key={match.id} style={{borderBottom: `1px solid ${BORDER_COLOR}`, paddingBottom: '10px', marginBottom: '10px', cursor: isMatchEditable ? 'pointer' : 'default'}} onClick={() => isMatchEditable && setEditingMatch({ ...match, roundIndex, isKnockout })} onMouseEnter={() => isMatchEditable && setHoveredMatch(match.id)} onMouseLeave={() => setHoveredMatch(null)}>
+                        <div style={{...styles.matchContainer, backgroundColor: hoveredMatch === match.id && isMatchEditable ? '#282828' : 'transparent'}}>
+                            <div style={{ ...styles.matchTeam, color: match.winnerId === team1.id ? ACCENT_COLOR : TEXT_PRIMARY }}>
+                                <img src={team1.logo || defaultLogo} alt={team1.name} style={styles.smallTeamLogo}/>
+                                <span>{team1.name}</span>
+                            </div>
+                            <div style={{fontSize: '20px', fontWeight: 'bold'}}>
+                                {match.winnerId ? `${team1Sets} - ${team2Sets}` : 'VS'}
+                            </div>
+                            <div style={{ ...styles.matchTeam, color: match.winnerId === team2.id ? ACCENT_COLOR : TEXT_PRIMARY }}>
+                                <span>{team2.name}</span>
+                                <img src={team2.logo || defaultLogo} alt={team2.name} style={styles.smallTeamLogo}/>
+                            </div>
+                        </div>
+                    </div>
+                )
+            })}
+        </div>
+    ));
+
+    return (
+        <div>
+            <button style={{ ...styles.button, background: '#333', color: '#fff', marginBottom: '20px' }} onClick={onBack}>عودة للبطولات</button>
+            <h1 style={styles.title}>{tournament.name}</h1>
+            
+            {editingMatch && <MatchUpdateModal match={editingMatch} teams={teams} onClose={() => setEditingMatch(null)} onSave={handleSaveMatch} />}
+
+            {tournament.type === 'League' && (
+                <div style={styles.card}>
+                    <h3 style={{color: ACCENT_COLOR}}>الترتيب</h3>
+                    {renderStandingsTable(calculateStandings(tournament.rounds.flat(), tournament.teams), 0)}
+                </div>
+            )}
+             {tournament.type === 'League' && renderRounds(tournament.rounds)}
+
+
+            {(tournament.type === 'Cup' || tournament.type === 'SingleSetCup') && renderRounds(tournament.rounds)}
+
+            {tournament.type === 'GroupStage' && tournament.currentStage === 'groups' && (
+                <>
+                    <div style={styles.card}>
+                        <h3 style={{color: ACCENT_COLOR}}>المجموعة أ</h3>
+                        {renderStandingsTable(calculateStandings(tournament.rounds.flat().filter(m => m.group === 'A'), tournament.groups.A), getQualifierCount(tournament.groups.A.length))}
+                    </div>
+                    <div style={styles.card}>
+                        <h3 style={{color: ACCENT_COLOR}}>المجموعة ب</h3>
+                        {renderStandingsTable(calculateStandings(tournament.rounds.flat().filter(m => m.group === 'B'), tournament.groups.B), getQualifierCount(tournament.groups.B.length))}
+                    </div>
+                    {renderRounds(tournament.rounds)}
+                    {tournament.rounds.flat().every(m => m.winnerId) && !tournament.isComplete && tournament.currentStage === 'groups' && canEdit && (
+                        <button style={{...styles.button, width: '100%', margin: '20px 0'}} onClick={handleAdvanceToKnockout}>
+                            بدء مرحلة خروج المغلوب
+                        </button>
+                    )}
+                </>
+            )}
+
+            {tournament.type === 'GroupStage' && tournament.currentStage === 'knockout' && (
+                 renderRounds(tournament.knockoutRounds, true)
+            )}
+        </div>
+    );
+}
+
+const ClassificationsTab = ({ teams, stats, onTeamSelect }) => {
+    const sortedTeams = useMemo(() => {
+        return [...teams].sort((a, b) => {
+            const statsA = stats[a.id];
+            const statsB = stats[b.id];
+            if (!statsA || !statsB) return 0;
+            return statsB.points - statsA.points;
+        });
+    }, [teams, stats]);
+
+    const getRankStyle = (index) => {
+        switch(index) {
+            case 0: return { color: '#FFD700' };
+            case 1: return { color: '#C0C0C0' };
+            case 2: return { color: '#CD7F32' };
+            default: return { color: TEXT_SECONDARY };
+        }
+    };
+
+    return (
+        <div>
+            <h1 style={styles.title}>التصنيف العام</h1>
+            <div style={styles.card}>
+                <table style={{width: '100%', borderCollapse: 'collapse'}}>
+                    <thead>
+                        <tr style={{borderBottom: `1px solid ${BORDER_COLOR}`}}>
+                           <th style={{padding: '10px', textAlign: 'center', color: TEXT_SECONDARY}}>#</th>
+                           <th style={{padding: '10px', textAlign: 'right', color: TEXT_SECONDARY}}>الفريق</th>
+                           <th style={{padding: '10px', textAlign: 'left', color: TEXT_SECONDARY}}>النقاط</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {sortedTeams.map((team, index) => {
+                            const teamStats = stats[team.id];
+                            if (!teamStats) return null;
+                             return (
+                                <tr key={team.id} onClick={() => onTeamSelect(team.id)} style={{cursor: 'pointer'}} className="team-row" onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2a2a2a'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
+                                    <td style={{padding: '12px 10px', textAlign: 'center', fontWeight: 'bold', ...getRankStyle(index)}}>{index + 1}</td>
+                                    <td style={{padding: '12px 10px', display: 'flex', alignItems: 'center', gap: '10px'}}>
+                                        <img src={team.logo || defaultLogo} alt={team.name} style={{...styles.smallTeamLogo, margin: 0}}/>
+                                        <span style={{fontWeight: 'bold'}}>{team.name}</span>
+                                    </td>
+                                    <td style={{padding: '12px 10px', textAlign: 'left', fontWeight: 'bold', color: ACCENT_COLOR}}>{teamStats.points}</td>
+                                </tr>
+                             )
+                        })}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    );
+};
+
+const ControlTab = ({ isAdmin, onLogin, onShare, isReadOnly }) => {
+    const [password, setPassword] = useState('');
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        onLogin(password);
+    };
+
+    if (isReadOnly) {
+        return (
+            <div>
+                <h1 style={styles.title}>وضع المشاهدة</h1>
+                <div style={styles.card}>
+                    <p>أنت تشاهد النتائج عبر رابط مشاركة. لا يمكنك إجراء أي تعديلات.</p>
+                </div>
+            </div>
+        );
+    }
+    
+    if (isAdmin) {
+        return (
+            <div>
+                <h1 style={styles.title}>لوحة التحكم</h1>
+                <div style={styles.card}>
+                    <p>أنت الآن في وضع التحكم. يمكنك إدارة الفرق والبطولات.</p>
+                    <button onClick={onShare} style={{...styles.button, width: '100%'}}>
+                        مشاركة رابط للمشاهدة فقط
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            <h1 style={styles.title}>التحكم</h1>
+            <div style={styles.card}>
+                <p>أدخل كلمة المرور للوصول إلى وضع التحكم وتعديل البيانات.</p>
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        placeholder="كلمة المرور"
+                        style={styles.input}
+                    />
+                    <button type="submit" style={{...styles.button, width: '100%'}}>
+                        دخول
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+
+// --- MAIN APP ---
+const App = () => {
+    const [activeTab, setActiveTab] = useState('teams');
+    const [teams, setTeams] = useLocalStorage('teams', []);
+    const [tournaments, setTournaments] = useLocalStorage('tournaments', []);
+    const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+    const [selectedTournamentId, setSelectedTournamentId] = useState<string | null>(null);
+
+    const [isReadOnly, setIsReadOnly] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [dataLoaded, setDataLoaded] = useState(false);
+
+    useEffect(() => {
+        const hash = window.location.hash.substring(1);
+        if (hash) {
+            try {
+                const decoded = atob(decodeURIComponent(hash));
+                const data = JSON.parse(decoded);
+                if (data.teams && data.tournaments) {
+                    // Use a function for setting state to avoid stale closure issues
+                    // even though we're not using localStorage hook's setter
+                    setTeams(() => data.teams);
+                    setTournaments(() => data.tournaments);
+                    setIsReadOnly(true);
+                }
+            } catch (e) {
+                console.error("Failed to load data from URL", e);
+                // Fallback to local data if URL is corrupt
+            }
+        } else {
+             if (sessionStorage.getItem('isAdmin') === 'true') {
+                 setIsAdmin(true);
+             }
+        }
+        setDataLoaded(true);
+    }, []);
+
+    const canEdit = isAdmin && !isReadOnly;
+
+    const teamStats = useMemo(() => {
+        const stats: { [key: string]: TeamStats } = {};
+        teams.forEach(team => {
+            stats[team.id] = { played: 0, wins: 0, losses: 0, tournamentsWon: 0, setsWon: 0, setsLost: 0, points: STARTING_POINTS };
+        });
+
+        tournaments.forEach(tournament => {
+            const allMatches = [...tournament.rounds.flat(), ...tournament.knockoutRounds.flat()];
+            allMatches.forEach(match => {
+                if (match.winnerId) {
+                    const loserId = match.winnerId === match.team1Id ? match.team2Id : match.team1Id;
+                    if (!stats[match.team1Id] || !stats[match.team2Id]) return;
+
+                    stats[match.winnerId].played++;
+                    stats[loserId].played++;
+                    stats[match.winnerId].wins++;
+                    stats[loserId].losses++;
+
+                    stats[match.winnerId].points += POINTS_MATCH_WIN;
+                    stats[loserId].points += POINTS_MATCH_LOSS;
+                    
+                    const team1Sets = match.sets.filter(s => s === 'team1').length;
+                    const team2Sets = match.sets.filter(s => s === 'team2').length;
+                    
+                    stats[match.team1Id].setsWon += team1Sets;
+                    stats[match.team1Id].setsLost += team2Sets;
+                    stats[match.team2Id].setsWon += team2Sets;
+                    stats[match.team2Id].setsLost += team1Sets;
+                    
+                    stats[match.team1Id].points += (team1Sets * POINTS_SET_WIN) + (team2Sets * POINTS_SET_LOSS);
+                    stats[match.team2Id].points += (team2Sets * POINTS_SET_WIN) + (team1Sets * POINTS_SET_LOSS);
+                }
+            });
+
+            // Apply tournament completion points
+            if(tournament.isComplete) {
+                if(tournament.winnerId && stats[tournament.winnerId]) {
+                    stats[tournament.winnerId].tournamentsWon++;
+                    stats[tournament.winnerId].points += POINTS_TOURNAMENT_WIN;
+                }
+                if(tournament.lastPlaceIds) {
+                    tournament.lastPlaceIds.forEach(id => {
+                        if (stats[id]) stats[id].points += POINTS_TOURNAMENT_LAST;
+                    });
+                }
+            }
+        });
+        return stats;
+    }, [teams, tournaments]);
+
+    const sortedTeamIdsByPoints = useMemo(() => {
+        return Object.entries(teamStats)
+            .sort(([, a]: [string, TeamStats], [, b]: [string, TeamStats]) => b.points - a.points)
+            .map(([id]) => id);
+    }, [teamStats]);
+
+
+    const handleAddTeam = (name: string) => {
+        if (!canEdit) return;
+        const newTeam: Team = { id: generateId(), name, logo: null };
+        setTeams(prev => [...prev, newTeam]);
+    };
+
+    const handleLogoChange = (teamId: string, logoData: string) => {
+        if (!canEdit) return;
+        setTeams(prev => prev.map(t => t.id === teamId ? { ...t, logo: logoData } : t));
+    };
+    
+    const generateRoundRobin = (teamIds, groupName = null) => {
+        const localTeams = [...teamIds];
+        if (localTeams.length % 2 !== 0) {
+            localTeams.push('dummy'); // Add a dummy for byes
+        }
+        const numRounds = localTeams.length - 1;
+        const half = localTeams.length / 2;
+        const rounds: Match[][] = Array.from({ length: numRounds }, () => []);
+
+        for (let i = 0; i < numRounds; i++) {
+            for (let j = 0; j < half; j++) {
+                const team1 = localTeams[j];
+                const team2 = localTeams[localTeams.length - 1 - j];
+                if (team1 !== 'dummy' && team2 !== 'dummy') {
+                    const match: Match = {
+                        id: generateId(),
+                        team1Id: team1,
+                        team2Id: team2,
+                        sets: [null, null, null],
+                        winnerId: null,
+                    };
+                    if (groupName) match.group = groupName;
+                    rounds[i].push(match);
+                }
+            }
+            // Rotate teams, keeping the first one fixed
+            localTeams.splice(1, 0, localTeams.pop());
+        }
+        return rounds;
+    };
+
+
+    const createTournament = (name: string, type: 'League' | 'Cup' | 'GroupStage' | 'SingleSetCup', teamIds: string[]) => {
+        if (!canEdit) return;
+        const shuffledTeams = [...teamIds].sort(() => 0.5 - Math.random());
+        let newTournament: Omit<Tournament, 'id'>;
+
+        if (type === 'League') {
+             const rounds = generateRoundRobin(shuffledTeams);
+             newTournament = { name, type, teams: teamIds, rounds, isComplete: false, winnerId: null, lastPlaceIds: [], knockoutRounds: [], groups: null, currentStage: 'finished' };
+        } else if (type === 'Cup' || type === 'SingleSetCup') {
+            const firstRound: Match[] = [];
+            for (let i = 0; i < shuffledTeams.length; i += 2) {
+                 const sets = type === 'SingleSetCup' ? [null] : [null, null, null];
+                 firstRound.push({ id: generateId(), team1Id: shuffledTeams[i], team2Id: shuffledTeams[i+1], sets, winnerId: null });
+            }
+            newTournament = { name, type, teams: teamIds, rounds: [firstRound], isComplete: false, winnerId: null, lastPlaceIds: [], knockoutRounds: [], groups: null, currentStage: 'knockout' };
+        } else { // GroupStage
+             const midPoint = Math.ceil(shuffledTeams.length / 2);
+             const groupA_Ids = shuffledTeams.slice(0, midPoint);
+             const groupB_Ids = shuffledTeams.slice(midPoint);
+             
+             const roundsA = generateRoundRobin(groupA_Ids, 'A');
+             const roundsB = generateRoundRobin(groupB_Ids, 'B');
+             
+             // Combine rounds from both groups, interleaving them
+             const totalRounds = Math.max(roundsA.length, roundsB.length);
+             const combinedRounds : Match[][] = [];
+             for(let i=0; i < totalRounds; i++) {
+                const roundMatches = [];
+                if (roundsA[i]) roundMatches.push(...roundsA[i]);
+                if (roundsB[i]) roundMatches.push(...roundsB[i]);
+                combinedRounds.push(roundMatches.sort(() => 0.5 - Math.random()));
+             }
+
+             newTournament = { name, type, teams: teamIds, rounds: combinedRounds, knockoutRounds: [], groups: { A: groupA_Ids, B: groupB_Ids }, currentStage: 'groups', isComplete: false, winnerId: null, lastPlaceIds: [] };
+        }
+
+        setTournaments(prev => [...prev, {id: generateId(), ...newTournament}]);
+    };
+    
+    const handleUpdateTournament = (updatedTournament) => {
+        if (!canEdit) return;
+        setTournaments(prev => prev.map(t => t.id === updatedTournament.id ? updatedTournament : t));
+    };
+
+    const handleLogin = (password) => {
+        if (password === ADMIN_PASSWORD) {
+            setIsAdmin(true);
+            sessionStorage.setItem('isAdmin', 'true');
+        } else {
+            alert('كلمة المرور خاطئة');
+        }
+    };
+    
+    const handleShare = () => {
+        const dataToShare = { teams, tournaments };
+        const jsonString = JSON.stringify(dataToShare);
+        const base64String = btoa(jsonString);
+        const shareUrl = `${window.location.origin}${window.location.pathname}#${encodeURIComponent(base64String)}`;
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            alert('تم نسخ رابط المشاركة!');
+        }, () => {
+            alert('فشل نسخ الرابط.');
+        });
+    };
+    
+    const renderContent = () => {
+        if (!dataLoaded) return <div>Loading...</div>
+        
+        if (selectedTournamentId) {
+            const tournament = tournaments.find(t => t.id === selectedTournamentId);
+            return <TournamentDetails tournament={tournament} teams={teams} updateTournament={handleUpdateTournament} onBack={() => setSelectedTournamentId(null)} canEdit={canEdit}/>;
+        }
+        
+        switch (activeTab) {
+            case 'teams':
+                return <TeamsTab teams={teams} onTeamSelect={setSelectedTeamId} />;
+            case 'tournaments':
+                return <TournamentsTab teams={teams} tournaments={tournaments} createTournament={createTournament} selectTournament={setSelectedTournamentId} canEdit={canEdit} />;
+            case 'classifications':
+                return <ClassificationsTab teams={teams} stats={teamStats} onTeamSelect={setSelectedTeamId} />;
+            case 'add_team':
+                return canEdit ? <AddTeamTab onAddTeam={handleAddTeam} /> : null;
+            case 'control':
+                return <ControlTab isAdmin={isAdmin} isReadOnly={isReadOnly} onLogin={handleLogin} onShare={handleShare} />;
+            default:
+                return null;
+        }
+    };
+    
+    const selectedTeam = teams.find(t => t.id === selectedTeamId);
+    const allMatchesForSelectedTeam = tournaments.flatMap(t => [...t.rounds.flat(), ...t.knockoutRounds.flat()]).filter(m => (m.team1Id === selectedTeamId || m.team2Id === selectedTeamId) && m.winnerId).reverse();
+    
+    const navItems = ['teams', 'tournaments', 'classifications'];
+    if (!isReadOnly) {
+        if (isAdmin) navItems.push('add_team');
+        navItems.push('control');
+    }
+    const navLabels = { teams: 'الفرق', tournaments: 'البطولات', classifications: 'التصنيف', add_team: 'إضافة', control: 'التحكم' };
+    
+    return (
+        <div style={styles.appContainer}>
+            <main style={styles.mainContent}>
+                {renderContent()}
+            </main>
+            <nav style={styles.nav}>
+                {navItems.map(tab => (
+                    <button
+                        key={tab}
+                        style={{ ...styles.navButton, ...(activeTab === tab ? styles.navButtonActive : {}) }}
+                        onClick={() => { setActiveTab(tab); setSelectedTournamentId(null); }}
+                    >
+                        {navIcons[tab]}
+                        <span>{navLabels[tab]}</span>
+                    </button>
+                ))}
+            </nav>
+            {selectedTeamId && teamStats[selectedTeamId] && (
+                <TeamDetailsModal
+                    team={selectedTeam}
+                    stats={teamStats[selectedTeamId]}
+                    onClose={() => setSelectedTeamId(null)}
+                    onLogoChange={handleLogoChange}
+                    allMatches={allMatchesForSelectedTeam}
+                    teams={teams}
+                    tournaments={tournaments}
+                    teamRank={sortedTeamIdsByPoints.indexOf(selectedTeamId) + 1}
+                    canEdit={canEdit}
+                />
+            )}
+        </div>
+    );
+};
+
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<App />);
