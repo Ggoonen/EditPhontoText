@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -11,8 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- html2pdf.js Library for Client-side PDF Generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- html2canvas for High Quality Image capture -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -45,14 +45,14 @@
 
         /* Checkbox custom style for preview document */
         .doc-checkbox {
-            width: 13px;
-            height: 13px;
+            width: 14px;
+            height: 14px;
             border: 1.5px solid #000;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            margin-left: 3px;
-            font-size: 10px;
+            margin-left: 4px;
+            font-size: 11px;
             font-weight: bold;
             line-height: 1;
             background-color: #fff;
@@ -65,8 +65,7 @@
             padding-left: 4px;
             padding-right: 4px;
             min-height: 20px;
-            word-break: keep-all;
-            white-space: nowrap;
+            word-break: break-word;
             display: inline-block;
             font-weight: 700;
             color: #0f172a;
@@ -79,29 +78,40 @@
             white-space: nowrap;
         }
 
-        /* Print Media Styles */
+        /* Printable Sheet Layout */
+        #officialFormContainer {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            box-sizing: border-box;
+        }
+
+        /* Print Media Styles - Uses native high quality rendering to prevent Arabic font overlapping */
         @media print {
-            body {
-                background: white !important;
-                color: black !important;
+            body * {
+                visibility: hidden;
             }
             .no-print {
                 display: none !important;
             }
-            .print-only {
-                display: block !important;
+            #officialFormContainer, #officialFormContainer * {
+                visibility: visible;
+            }
+            #officialFormContainer {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 15px !important;
+                border: 2px solid #000 !important;
+                box-shadow: none !important;
             }
             @page {
                 size: A4 portrait;
-                margin: 6mm;
-            }
-            #officialFormContainer {
-                box-shadow: none !important;
-                border: 2px solid #000 !important;
-                margin: 0 !important;
-                padding: 12px !important;
-                width: 100% !important;
-                max-width: 100% !important;
+                margin: 8mm;
             }
         }
     </style>
@@ -532,43 +542,59 @@
         <div id="previewSection" class="hidden space-y-4 mb-12">
             
             <!-- Actions Toolbar -->
-            <div class="no-print bg-white p-3 rounded-2xl shadow-md border border-slate-200 flex flex-wrap justify-between items-center gap-2">
-                <button onclick="togglePreview()" class="px-3 py-2 bg-slate-100 text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-200 transition flex items-center gap-1">
-                    <i class="fa-solid fa-pen-to-square"></i> تعديل
+            <div class="no-print bg-white p-3.5 rounded-2xl shadow-md border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <button onclick="togglePreview()" class="w-full sm:w-auto px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-200 transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-pen-to-square"></i> العودة لتعديل البيانات
                 </button>
-                <div class="flex flex-wrap gap-2">
-                    <button onclick="downloadPDF()" class="px-3.5 py-2 bg-emerald-700 text-white rounded-xl font-bold text-xs hover:bg-emerald-800 transition shadow-sm flex items-center gap-1.5">
-                        <i class="fa-solid fa-file-pdf"></i> حفظ PDF
+                
+                <div class="flex flex-wrap items-center justify-center gap-2 w-full sm:w-auto">
+                    <!-- Image Save Button -->
+                    <button onclick="downloadAsImage()" class="px-3.5 py-2 bg-purple-700 text-white rounded-xl font-bold text-xs hover:bg-purple-800 transition shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-image"></i> حفظ كصورة عالية الدقة
                     </button>
-                    <button onclick="sendToWhatsApp()" class="px-3.5 py-2 bg-green-600 text-white rounded-xl font-bold text-xs hover:bg-green-700 transition shadow-sm flex items-center gap-1.5">
-                        <i class="fa-brands fa-whatsapp text-sm"></i> إرسال إلى مدير المدرسة
+                    <!-- WhatsApp Direct Button -->
+                    <button onclick="sendToWhatsApp()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs hover:bg-emerald-700 transition shadow-sm flex items-center gap-1.5">
+                        <i class="fa-brands fa-whatsapp text-sm"></i> إرسال إلى المدير
                     </button>
+                    <!-- Clean Native Print/PDF Button -->
                     <button onclick="window.print()" class="px-3.5 py-2 bg-blue-700 text-white rounded-xl font-bold text-xs hover:bg-blue-800 transition shadow-sm flex items-center gap-1.5">
-                        <i class="fa-solid fa-print"></i> طباعة
+                        <i class="fa-solid fa-print"></i> طباعة / حفظ PDF
                     </button>
                 </div>
             </div>
 
-            <!-- Printable & Renderable Official Document Sheet -->
-            <div id="officialFormContainer" class="bg-white text-black p-4 sm:p-6 rounded-lg shadow-xl border-2 border-slate-900 text-xs leading-relaxed font-tajawal">
+            <!-- Instruction Banner -->
+            <div class="no-print bg-amber-50 border-r-4 border-amber-500 p-3 rounded-lg text-xs text-amber-900 leading-relaxed shadow-sm">
+                <p class="font-bold flex items-center gap-1.5 mb-0.5">
+                    <i class="fa-solid fa-circle-info text-amber-600 text-sm"></i> توضيح مهم للإرسال والطباعة:
+                </p>
+                <ul class="list-disc list-inside space-y-0.5 text-[11px] text-amber-800">
+                    <li>أعلى الصفحة يحتوي على صورة رسمية موحدة كاملة ومناسبة لأخذ <strong>لقطة شاشة (Screenshot)</strong> مباشرة.</li>
+                    <li>عند إرسال واتساب، يمكنك تنزيل <strong>الصورة الموحدة</strong> إما عبر الزر الأرجواني أو لقطة شاشة، ثم إرفاقها بواتساب بسهولة للمدير.</li>
+                    <li>للطباعة وحفظ PDF بدون أخطاء أحرف، اضغط زر <strong>"طباعة / حفظ PDF"</strong> واختر (الحفظ كـ PDF).</li>
+                </ul>
+            </div>
+
+            <!-- Printable & Renderable Official Document Sheet (Optimized Page Layout for Screenshot) -->
+            <div id="officialFormContainer" class="bg-white text-black p-5 rounded-lg shadow-xl border-2 border-slate-900 text-xs leading-normal font-tajawal relative overflow-hidden">
                 
                 <!-- Document Header -->
                 <div class="border-b-2 border-black pb-2 mb-3 text-center">
-                    <div class="bg-blue-900 text-white font-bold py-1 px-2 text-sm rounded mb-1">
+                    <div class="bg-blue-900 text-white font-bold py-1 px-3 text-sm rounded mb-1 inline-block">
                         جمهورية العراق – وزارة التربية
                     </div>
-                    <div class="font-extrabold text-sm sm:text-base text-slate-900 tracking-wide">
+                    <div class="font-extrabold text-sm sm:text-base text-slate-900 tracking-wide mt-1">
                         استمارة معلومات الموظفين والمعلمين لنظام EMIS
                     </div>
                 </div>
 
                 <!-- SECTION 1: Personal Name & Lineage -->
-                <div class="mb-4">
+                <div class="mb-3.5">
                     <div class="font-bold text-blue-900 border-b border-blue-900 pb-0.5 mb-2">
                         أولاً : معلومات الاسم والنسب
                     </div>
 
-                    <div class="grid grid-cols-3 gap-y-2.5 gap-x-2 text-[11px]">
+                    <div class="grid grid-cols-3 gap-y-2 gap-x-2 text-[11px]">
                         <div class="flex items-baseline">
                             <span class="font-bold whitespace-nowrap ml-1 shrink-0">الاسم *:</span>
                             <span id="doc_firstName" class="doc-field-value flex-1"></span>
@@ -611,12 +637,12 @@
                 </div>
 
                 <!-- SECTION 2: Identity & Personal Data -->
-                <div class="mb-4">
+                <div class="mb-3.5">
                     <div class="font-bold text-blue-900 border-b border-blue-900 pb-0.5 mb-2">
                         ثانياً : وثيقة التعريف والبيانات الشخصية
                     </div>
 
-                    <div class="space-y-2.5 text-[11px]">
+                    <div class="space-y-2 text-[11px]">
                         <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
                             <span class="font-bold shrink-0">نوع الهوية *:</span>
                             <div class="flex items-center"><span id="chk_id_unified" class="doc-checkbox"></span> بطاقة موحدة</div>
@@ -624,7 +650,7 @@
                             <div class="flex items-center"><span id="chk_id_other" class="doc-checkbox"></span> أخرى</div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">رقم الموحدة / الجنسية *:</span>
                                 <span id="doc_idNumber" class="doc-field-value date-number-field flex-1 font-mono"></span>
@@ -650,7 +676,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">الرقم الوظيفي:</span>
                                 <span id="doc_employeeId" class="doc-field-value date-number-field flex-1 font-mono"></span>
@@ -666,7 +692,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">دولة التولد :</span>
                                 <span id="doc_birthCountry" class="doc-field-value flex-1"></span>
@@ -677,7 +703,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">اللغة الأم *:</span>
                                 <span id="doc_motherLanguage" class="doc-field-value flex-1"></span>
@@ -696,7 +722,7 @@
                                 <div class="flex items-center"><span id="chk_marital_divorced" class="doc-checkbox"></span> مطلق /ة</div>
                                 <div class="flex items-center"><span id="chk_marital_widowed" class="doc-checkbox"></span> أرمل /ة</div>
                             </div>
-                            <div class="flex items-baseline min-w-[140px]">
+                            <div class="flex items-baseline min-w-[130px]">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">فئة الدم :</span>
                                 <span id="doc_bloodType" class="doc-field-value flex-1 text-center font-mono"></span>
                             </div>
@@ -705,12 +731,12 @@
                 </div>
 
                 <!-- SECTION 3: Employment and Qualification -->
-                <div class="mb-4">
+                <div class="mb-3.5">
                     <div class="font-bold text-blue-900 border-b border-blue-900 pb-0.5 mb-2">
                         ثالثاً : المعلومات الوظيفية والتحصيل الدراسي
                     </div>
 
-                    <div class="space-y-2.5 text-[11px]">
+                    <div class="space-y-2 text-[11px]">
                         <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
                             <span class="font-bold shrink-0">نوع التوظيف *:</span>
                             <div class="flex items-center"><span id="chk_emp_perm" class="doc-checkbox"></span> ملاك دائم</div>
@@ -737,7 +763,7 @@
                             <div class="flex items-center"><span id="chk_stat_leave" class="doc-checkbox"></span> إجازة دراسية/أمومة</div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">تاريخ سريان الحالة الوظيفية *:</span>
                                 <span id="doc_statusEffectiveDate" class="doc-field-value date-number-field flex-1 font-mono"></span>
@@ -748,7 +774,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">الدرجة الوظيفية :</span>
                                 <span id="doc_jobGrade" class="doc-field-value flex-1"></span>
@@ -774,7 +800,7 @@
                             <span id="doc_schoolName" class="doc-field-value flex-1"></span>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">تاريخ أول تعيين *:</span>
                                 <span id="doc_firstAppointmentDate" class="doc-field-value date-number-field flex-1 font-mono"></span>
@@ -785,7 +811,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-12 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-12 gap-x-3 gap-y-2">
                             <div class="col-span-8 flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">اسم الكلية / المعهد *:</span>
                                 <span id="doc_collegeName" class="doc-field-value flex-1"></span>
@@ -809,7 +835,7 @@
                         رابعاً : ذوي الاحتياجات الخاصة والطوارئ والسكن والاتصال
                     </div>
 
-                    <div class="space-y-2.5 text-[11px]">
+                    <div class="space-y-2 text-[11px]">
                         <div class="flex flex-wrap items-baseline gap-2">
                             <span class="font-bold shrink-0">ذوي الاحتياجات الخاصة :</span>
                             <div class="flex items-center shrink-0"><span id="chk_sp_no" class="doc-checkbox"></span> لايوجد</div>
@@ -820,7 +846,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-3 gap-x-2 gap-y-2.5">
+                        <div class="grid grid-cols-3 gap-x-2 gap-y-2">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">جهة الطوارئ :</span>
                                 <span id="doc_emergencyContact" class="doc-field-value flex-1"></span>
@@ -835,7 +861,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">المدينة/القرية *:</span>
                                 <span id="doc_city" class="doc-field-value flex-1"></span>
@@ -861,7 +887,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">أقرب نقطة دالة *:</span>
                                 <span id="doc_nearestLandmark" class="doc-field-value flex-1"></span>
@@ -881,7 +907,7 @@
 
                 <!-- Footer Note & Signatures -->
                 <div class="mt-4 pt-2 border-t border-slate-300">
-                    <p class="text-[10px] font-bold text-red-700 text-center mb-3">
+                    <p class="text-[10px] font-bold text-red-700 text-center mb-2">
                         ملاحظة : الحقول المصحوبة بنجمة (*) إجبارية لإدخال البيانات في نظام EMIS
                     </p>
 
@@ -896,7 +922,7 @@
                         </div>
                     </div>
 
-                    <div class="mt-5 flex justify-between items-end px-2 text-[11px]">
+                    <div class="mt-4 flex justify-between items-end px-2 text-[11px]">
                         <div class="flex items-baseline">
                             <span class="font-bold shrink-0">اسم الموظف / المعلم والتوقيع : </span>
                             <span id="doc_fullNameSignature" class="font-bold border-b border-dotted border-black px-2 mr-1"></span>
@@ -927,13 +953,9 @@
         }
 
         function updateStepUI() {
-            // Hide all step contents
             document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
-            
-            // Show current step content
             document.getElementById(`step${currentStep}`).classList.remove('hidden');
 
-            // Update Stepper Progress & Badges
             const progressPercent = ((currentStep - 1) / 3) * 100;
             document.getElementById('stepProgress').style.width = `${progressPercent}%`;
 
@@ -947,7 +969,6 @@
             document.getElementById('stepBadge').innerText = `الخطوة ${currentStep} من 4`;
             document.getElementById('stepTitle').innerText = titles[currentStep - 1];
 
-            // Update Step Buttons Style
             for (let i = 1; i <= 4; i++) {
                 const btn = document.getElementById(`stepBtn${i}`);
                 if (i <= currentStep) {
@@ -959,7 +980,6 @@
                 }
             }
 
-            // Navigation Buttons Control
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
             const finishBtn = document.getElementById('finishBtn');
@@ -1013,7 +1033,6 @@
             }
         }
 
-        // Helper function to set checkbox markers in document preview
         function setCheck(id, isChecked) {
             const el = document.getElementById(id);
             if (el) {
@@ -1022,7 +1041,6 @@
         }
 
         function updatePreview() {
-            // Text Inputs Mapping (Complete set of fields)
             const fields = [
                 'firstName', 'fatherName', 'grandfatherName', 'greatGrandfatherName', 'surname',
                 'motherName', 'motherFatherName', 'motherGrandfatherName', 'birthDate',
@@ -1043,33 +1061,26 @@
                 }
             });
 
-            // Full Name Auto Sync for Signature Line
             const fn = document.getElementById('firstName').value || '';
             const fa = document.getElementById('fatherName').value || '';
             const sn = document.getElementById('surname').value || '';
             document.getElementById('doc_fullNameSignature').innerText = `${fn} ${fa} ${sn}`.trim();
 
-            // Radios & Select Checkboxes Sync
-            
-            // ID Type
             const idType = document.querySelector('input[name="idType"]:checked')?.value || 'بطاقة موحدة';
             setCheck('chk_id_unified', idType === 'بطاقة موحدة');
             setCheck('chk_id_iq', idType === 'جنسية عراقية');
             setCheck('chk_id_other', idType === 'أخرى');
 
-            // Gender
             const gender = document.getElementById('gender').value;
             setCheck('chk_gender_male', gender === 'ذكر');
             setCheck('chk_gender_female', gender === 'أنثى');
 
-            // Marital Status
             const marital = document.getElementById('maritalStatus').value;
             setCheck('chk_marital_single', marital.includes('أعزب'));
             setCheck('chk_marital_married', marital.includes('متزوج'));
             setCheck('chk_marital_divorced', marital.includes('مطلق'));
             setCheck('chk_marital_widowed', marital.includes('أرمل'));
 
-            // Employment Type
             const empType = document.getElementById('employmentType').value;
             setCheck('chk_emp_perm', empType === 'ملاك دائم');
             setCheck('chk_emp_contract', empType === 'عقد');
@@ -1077,14 +1088,12 @@
             setCheck('chk_emp_wage', empType === 'أجر');
             setCheck('chk_emp_other', empType === 'أخرى');
 
-            // Staff Type
             const staffType = document.getElementById('staffType').value;
             setCheck('chk_staff_teach', staffType === 'تدريسي');
             setCheck('chk_staff_admin', staffType === 'إداري');
             setCheck('chk_staff_tech', staffType === 'فني');
             setCheck('chk_staff_service', staffType === 'خدمي');
 
-            // Job Status
             const jobStat = document.getElementById('jobStatus').value;
             setCheck('chk_stat_active', jobStat === 'مستمر');
             setCheck('chk_stat_ret', jobStat === 'متقاعد');
@@ -1092,12 +1101,10 @@
             setCheck('chk_stat_dead', jobStat === 'متوفي');
             setCheck('chk_stat_leave', jobStat.includes('إجازة'));
 
-            // Classification
             const classification = document.getElementById('classification').value;
             setCheck('chk_class_teacher', classification === 'معلم');
             setCheck('chk_class_staff', classification === 'موظف');
 
-            // Current Position
             const pos = document.getElementById('currentPosition').value;
             setCheck('chk_pos_dir', pos === 'مدير');
             setCheck('chk_pos_dep', pos === 'معاون');
@@ -1105,33 +1112,30 @@
             setCheck('chk_pos_admin', pos === 'إداري');
             setCheck('chk_pos_serv', pos === 'خدمي');
 
-            // Special Needs
             const spNeeds = document.querySelector('input[name="specialNeeds"]:checked')?.value || 'لا يوجد';
             setCheck('chk_sp_no', spNeeds === 'لا يوجد');
             setCheck('chk_sp_yes', spNeeds === 'يوجد');
         }
 
-        // Save Form as PDF using html2pdf
-        function downloadPDF() {
-            const element = document.getElementById('officialFormContainer');
+        // High Quality Image Generator Function
+        function downloadAsImage() {
+            const container = document.getElementById('officialFormContainer');
             const fullName = `${document.getElementById('firstName').value}_${document.getElementById('fatherName').value}_${document.getElementById('surname').value}`.trim() || 'الموظف';
-            
-            const opt = {
-                margin:       [5, 5, 5, 5],
-                filename:     `استمارة_EMIS_${fullName}.pdf`,
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
 
-            html2pdf().set(opt).from(element).save();
+            html2canvas(container, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `استمارة_EMIS_${fullName}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
         }
 
-        // Send PDF notification and details via WhatsApp to School Principal (+9647705657700)
+        // WhatsApp direct text with attachment prompt
         function sendToWhatsApp() {
-            // First trigger PDF Download so the user has the PDF ready on their device
-            downloadPDF();
-
             const fn = document.getElementById('firstName').value || '---';
             const fa = document.getElementById('fatherName').value || '---';
             const sn = document.getElementById('surname').value || '---';
@@ -1142,17 +1146,18 @@
 
             const principalNumber = "9647705657700";
 
-            const message = `السلام عليكم ورحمة الله وبركاته%0A%0Aحضرة مدير المدرسة المحترم،%0Aمرفق لكم معلومات استمارة EMIS الرسمية الخاصة بي:%0A%0A📌 *الاسم الكامل:* ${fn} ${fa} ${sn}%0A📌 *المسمى الوظيفي:* ${job}%0A📌 *المدرسة/الدائرة:* ${school}%0A📌 *الرقم الوظيفي:* ${empId}%0A📌 *رقم الهاتف:* ${phone}%0A%0A📄 *ملاحظة:* تم تحميل ملف الاستمارة بصيغة (PDF) على جهازي ومرفق مع هذه الرسالة.%0A%0Aشاكراً لكم حسن التعاون.`;
+            // Trigger Image Download automatically so the employee has the unified image ready to attach!
+            downloadAsImage();
+
+            const message = `السلام عليكم ورحمة الله وبركاته%0A%0Aحضرة مدير المدرسة المحترم،%0Aمرفق لكم استمارة معلومات EMIS الخاصة بي:%0A%0A📌 *الاسم الكامل:* ${fn} ${fa} ${sn}%0A📌 *المسمى الوظيفي:* ${job}%0A📌 *المدرسة/الدائرة:* ${school}%0A📌 *الرقم الوظيفي:* ${empId}%0A📌 *رقم الهاتف:* ${phone}%0A%0A📸 *ملاحظة:* تم حفظ صورة الاستمارة الموحدة كـ (صورة HD) في استوديو الجوال لمشاركتها وإرفاقها مع هذه الرسالة.%0A%0Aشاكراً لكم حسن التعاون.`;
 
             const whatsappUrl = `https://wa.me/${principalNumber}?text=${message}`;
 
-            // Delay redirect slightly so download initiates smoothly
             setTimeout(() => {
                 window.open(whatsappUrl, '_blank');
             }, 1000);
         }
 
-        // Initial setup on page load
         window.onload = function() {
             updateStepUI();
             updatePreview();
