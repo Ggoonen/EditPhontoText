@@ -1,4 +1,4 @@
-```html
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -9,9 +9,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts - Cairo & Tajawal -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <!-- html2pdf.js Library for Client-side PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -41,36 +43,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Print Media Styles */
-        @media print {
-            body {
-                background: white !important;
-                color: black !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .print-only {
-                display: block !important;
-            }
-            .page-break {
-                page-break-after: always;
-            }
-            @page {
-                size: A4 portrait;
-                margin: 5mm;
-            }
-            #officialFormContainer {
-                box-shadow: none !important;
-                border: 2px solid #000 !important;
-                margin: 0 !important;
-                padding: 10px !important;
-                width: 100% !important;
-                max-width: 100% !important;
-            }
-        }
-
-        /* Checkbox custom style for document */
+        /* Checkbox custom style for preview document */
         .doc-checkbox {
             width: 13px;
             height: 13px;
@@ -86,17 +59,50 @@
             flex-shrink: 0;
         }
 
-        /* Responsive Dotted Line Display for Full Text Visibility */
+        /* Dotted line field display preserving text structure & preventing wrap break */
         .doc-field-value {
-            border-bottom: 1px dotted #1e293b;
+            border-bottom: 1px dotted #000;
             padding-left: 4px;
             padding-right: 4px;
             min-height: 20px;
-            word-break: break-word;
-            white-space: normal;
+            word-break: keep-all;
+            white-space: nowrap;
             display: inline-block;
-            font-weight: 600;
+            font-weight: 700;
             color: #0f172a;
+        }
+
+        .date-number-field {
+            direction: ltr;
+            unicode-bidi: embed;
+            display: inline-block;
+            white-space: nowrap;
+        }
+
+        /* Print Media Styles */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 6mm;
+            }
+            #officialFormContainer {
+                box-shadow: none !important;
+                border: 2px solid #000 !important;
+                margin: 0 !important;
+                padding: 12px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
         }
     </style>
 </head>
@@ -107,7 +113,7 @@
         <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center space-x-3 space-x-reverse">
                 <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
-                    <i class="fa-solid me-1 fa-file-invoice text-amber-400 text-xl"></i>
+                    <i class="fa-solid fa-file-invoice text-amber-400 text-xl"></i>
                 </div>
                 <div>
                     <h1 class="font-bold text-base leading-tight">جمهورية العراق - وزارة التربية</h1>
@@ -122,7 +128,7 @@
     </header>
 
     <!-- Main Mobile Container -->
-    <main class="max-w-md mx-auto px-3 pt-4">
+    <main class="max-w-xl mx-auto px-3 pt-4">
 
         <!-- Form Section -->
         <div id="formSection" class="no-print bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 mb-6">
@@ -151,50 +157,50 @@
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">الاسم *</label>
-                            <input type="text" id="firstName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                            <input type="text" id="firstName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="مثال: أحمد">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">اسم الأب *</label>
-                            <input type="text" id="fatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                            <input type="text" id="fatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="مثال: محمد">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">اسم والد الأب *</label>
-                            <input type="text" id="grandfatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                            <input type="text" id="grandfatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="مثال: علي">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">اسم جد الأب *</label>
-                            <input type="text" id="greatGrandfatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                            <input type="text" id="greatGrandfatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="مثال: حسين">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">اللقب *</label>
-                            <input type="text" id="surname" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                            <input type="text" id="surname" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="مثال: العبيدي">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">اسم الأم *</label>
-                            <input type="text" id="motherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                            <input type="text" id="motherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="مثال: فاطمة">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">اسم والد الأم *</label>
-                            <input type="text" id="motherFatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                            <input type="text" id="motherFatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="مثال: حسن">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">اسم جد الأم</label>
-                            <input type="text" id="motherGrandfatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                            <input type="text" id="motherGrandfatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="مثال: عبد الله">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">تاريخ التولد (اليوم/الشهر/السنة أو YYYY/MM/DD) *</label>
-                        <input type="text" id="birthDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="مثال: 1990/05/15 أو 15/5/1990">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">تاريخ التولد *</label>
+                        <input type="text" id="birthDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition font-mono" placeholder="1990/05/15">
                     </div>
                 </div>
 
@@ -221,7 +227,7 @@
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">رقم الموحدة / الجنسية *</label>
-                            <input type="text" id="idNumber" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                            <input type="text" id="idNumber" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition font-mono">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">بلد الإصدار *</label>
@@ -232,22 +238,22 @@
                     <div class="grid grid-cols-3 gap-2">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">السجل</label>
-                            <input type="text" id="registerNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <input type="text" id="registerNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">الصحيفة</label>
-                            <input type="text" id="pageNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <input type="text" id="pageNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">الرقم العائلي</label>
-                            <input type="text" id="familyNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <input type="text" id="familyNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">الرقم الوظيفي</label>
-                            <input type="text" id="employeeId" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <input type="text" id="employeeId" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">الجنس *</label>
@@ -349,18 +355,18 @@
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">تاريخ سريان الحالة *</label>
-                            <input type="text" id="statusEffectiveDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="مثال: 2022/01/01">
+                            <input type="text" id="statusEffectiveDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono" placeholder="2022/01/01">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">المسمى الوظيفي</label>
-                            <input type="text" id="jobTitle" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="مثال: معلم جامعي">
+                            <input type="text" id="jobTitle" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="معلم جامعي">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">الدرجة الوظيفية</label>
-                            <input type="text" id="jobGrade" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="مثال: الخامسة">
+                            <input type="text" id="jobGrade" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="الخامسة">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">التصنيف *</label>
@@ -391,7 +397,7 @@
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">تاريخ أول تعيين *</label>
-                            <input type="text" id="firstAppointmentDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="مثال: 2015/09/01">
+                            <input type="text" id="firstAppointmentDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono" placeholder="2015/09/01">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">التحصيل الدراسي *</label>
@@ -412,7 +418,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">سنة التخرج</label>
-                            <input type="text" id="graduationYear" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <input type="text" id="graduationYear" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono" placeholder="2014">
                         </div>
                     </div>
 
@@ -454,7 +460,7 @@
 
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">رقم هاتف الطوارئ</label>
-                        <input type="tel" id="emergencyPhone" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="07xxxxxxxxx">
+                        <input type="tel" id="emergencyPhone" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono" placeholder="07700000000">
                     </div>
 
                     <div class="grid grid-cols-2 gap-2.5">
@@ -471,18 +477,18 @@
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">المحلة</label>
-                            <input type="text" id="mahalla" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <input type="text" id="mahalla" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">الزقاق *</label>
-                            <input type="text" id="alley" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <input type="text" id="alley" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">عنوان حالي *</label>
-                            <input type="text" id="currentAddress" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">عنوان حالي (الدار) *</label>
+                            <input type="text" id="currentAddress" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">أقرب نقطة دالة *</label>
@@ -493,11 +499,11 @@
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">رقم الهاتف *</label>
-                            <input type="tel" id="phoneNumber" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="07xxxxxxxxx">
+                            <input type="tel" id="phoneNumber" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono" placeholder="07700000000">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني</label>
-                            <input type="email" id="email" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <input type="email" id="email" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
                         </div>
                     </div>
 
@@ -526,17 +532,24 @@
         <div id="previewSection" class="hidden space-y-4 mb-12">
             
             <!-- Actions Toolbar -->
-            <div class="no-print bg-white p-3 rounded-2xl shadow-md border border-slate-200 flex justify-between items-center gap-2">
+            <div class="no-print bg-white p-3 rounded-2xl shadow-md border border-slate-200 flex flex-wrap justify-between items-center gap-2">
                 <button onclick="togglePreview()" class="px-3 py-2 bg-slate-100 text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-200 transition flex items-center gap-1">
                     <i class="fa-solid fa-pen-to-square"></i> تعديل
                 </button>
-                <div class="flex gap-2">
-                    <button onclick="window.print()" class="px-4 py-2 bg-blue-700 text-white rounded-xl font-bold text-xs hover:bg-blue-800 transition shadow-sm flex items-center gap-1.5">
-                        <i class="fa-solid fa-print"></i> طباعة / حفظ PDF
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="downloadPDF()" class="px-3.5 py-2 bg-emerald-700 text-white rounded-xl font-bold text-xs hover:bg-emerald-800 transition shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-pdf"></i> حفظ PDF
+                    </button>
+                    <button onclick="sendToWhatsApp()" class="px-3.5 py-2 bg-green-600 text-white rounded-xl font-bold text-xs hover:bg-green-700 transition shadow-sm flex items-center gap-1.5">
+                        <i class="fa-brands fa-whatsapp text-sm"></i> إرسال إلى مدير المدرسة
+                    </button>
+                    <button onclick="window.print()" class="px-3.5 py-2 bg-blue-700 text-white rounded-xl font-bold text-xs hover:bg-blue-800 transition shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-print"></i> طباعة
                     </button>
                 </div>
             </div>
 
+            <!-- Printable & Renderable Official Document Sheet -->
             <div id="officialFormContainer" class="bg-white text-black p-4 sm:p-6 rounded-lg shadow-xl border-2 border-slate-900 text-xs leading-relaxed font-tajawal">
                 
                 <!-- Document Header -->
@@ -555,7 +568,7 @@
                         أولاً : معلومات الاسم والنسب
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-y-2.5 gap-x-3 text-[11px]">
+                    <div class="grid grid-cols-3 gap-y-2.5 gap-x-2 text-[11px]">
                         <div class="flex items-baseline">
                             <span class="font-bold whitespace-nowrap ml-1 shrink-0">الاسم *:</span>
                             <span id="doc_firstName" class="doc-field-value flex-1"></span>
@@ -592,7 +605,7 @@
                         </div>
                         <div class="flex items-baseline">
                             <span class="font-bold whitespace-nowrap ml-1 shrink-0">تاريخ التولد *:</span>
-                            <span id="doc_birthDate" class="doc-field-value flex-1 font-mono"></span>
+                            <span id="doc_birthDate" class="doc-field-value date-number-field flex-1 font-mono"></span>
                         </div>
                     </div>
                 </div>
@@ -611,10 +624,10 @@
                             <div class="flex items-center"><span id="chk_id_other" class="doc-checkbox"></span> أخرى</div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">رقم الموحدة / الجنسية *:</span>
-                                <span id="doc_idNumber" class="doc-field-value flex-1 font-mono"></span>
+                                <span id="doc_idNumber" class="doc-field-value date-number-field flex-1 font-mono"></span>
                             </div>
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">بلد الإصدار *:</span>
@@ -625,22 +638,22 @@
                         <div class="grid grid-cols-3 gap-2">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">السجل :</span>
-                                <span id="doc_registerNum" class="doc-field-value flex-1"></span>
+                                <span id="doc_registerNum" class="doc-field-value date-number-field flex-1 font-mono"></span>
                             </div>
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">الصحيفة :</span>
-                                <span id="doc_pageNum" class="doc-field-value flex-1"></span>
+                                <span id="doc_pageNum" class="doc-field-value date-number-field flex-1 font-mono"></span>
                             </div>
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">الرقم العائلي :</span>
-                                <span id="doc_familyNum" class="doc-field-value flex-1"></span>
+                                <span id="doc_familyNum" class="doc-field-value date-number-field flex-1 font-mono"></span>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">الرقم الوظيفي:</span>
-                                <span id="doc_employeeId" class="doc-field-value flex-1 font-mono"></span>
+                                <span id="doc_employeeId" class="doc-field-value date-number-field flex-1 font-mono"></span>
                             </div>
                             <div class="flex flex-wrap items-center gap-3">
                                 <span class="font-bold shrink-0">الجنس *:</span>
@@ -653,7 +666,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">دولة التولد :</span>
                                 <span id="doc_birthCountry" class="doc-field-value flex-1"></span>
@@ -664,7 +677,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">اللغة الأم *:</span>
                                 <span id="doc_motherLanguage" class="doc-field-value flex-1"></span>
@@ -680,10 +693,12 @@
                                 <span class="font-bold shrink-0">الحالة الاجتماعية:</span>
                                 <div class="flex items-center"><span id="chk_marital_single" class="doc-checkbox"></span> أعزب /ة</div>
                                 <div class="flex items-center"><span id="chk_marital_married" class="doc-checkbox"></span> متزوج /ة</div>
+                                <div class="flex items-center"><span id="chk_marital_divorced" class="doc-checkbox"></span> مطلق /ة</div>
+                                <div class="flex items-center"><span id="chk_marital_widowed" class="doc-checkbox"></span> أرمل /ة</div>
                             </div>
                             <div class="flex items-baseline min-w-[140px]">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">فئة الدم :</span>
-                                <span id="doc_bloodType" class="doc-field-value flex-1 text-center"></span>
+                                <span id="doc_bloodType" class="doc-field-value flex-1 text-center font-mono"></span>
                             </div>
                         </div>
                     </div>
@@ -722,10 +737,10 @@
                             <div class="flex items-center"><span id="chk_stat_leave" class="doc-checkbox"></span> إجازة دراسية/أمومة</div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">تاريخ سريان الحالة الوظيفية *:</span>
-                                <span id="doc_statusEffectiveDate" class="doc-field-value flex-1 font-mono"></span>
+                                <span id="doc_statusEffectiveDate" class="doc-field-value date-number-field flex-1 font-mono"></span>
                             </div>
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">المسمى الوظيفي :</span>
@@ -733,7 +748,7 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">الدرجة الوظيفية :</span>
                                 <span id="doc_jobGrade" class="doc-field-value flex-1"></span>
@@ -759,10 +774,10 @@
                             <span id="doc_schoolName" class="doc-field-value flex-1"></span>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">تاريخ أول تعيين *:</span>
-                                <span id="doc_firstAppointmentDate" class="doc-field-value flex-1 font-mono"></span>
+                                <span id="doc_firstAppointmentDate" class="doc-field-value date-number-field flex-1 font-mono"></span>
                             </div>
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">التحصيل الدراسي *:</span>
@@ -770,14 +785,14 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-x-3 gap-y-2.5">
-                            <div class="sm:col-span-8 flex items-baseline">
+                        <div class="grid grid-cols-12 gap-x-3 gap-y-2.5">
+                            <div class="col-span-8 flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">اسم الكلية / المعهد *:</span>
                                 <span id="doc_collegeName" class="doc-field-value flex-1"></span>
                             </div>
-                            <div class="sm:col-span-4 flex items-baseline">
+                            <div class="col-span-4 flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">سنة التخرج :</span>
-                                <span id="doc_graduationYear" class="doc-field-value flex-1 font-mono"></span>
+                                <span id="doc_graduationYear" class="doc-field-value date-number-field flex-1 font-mono"></span>
                             </div>
                         </div>
 
@@ -805,22 +820,22 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-3 gap-x-2 gap-y-2.5">
                             <div class="flex items-baseline">
-                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">جهة الاتصال الطوارئ :</span>
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">جهة الطوارئ :</span>
                                 <span id="doc_emergencyContact" class="doc-field-value flex-1"></span>
                             </div>
                             <div class="flex items-baseline">
-                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">صلة جهة الطوارئ :</span>
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">صلة القرابة :</span>
                                 <span id="doc_emergencyRelation" class="doc-field-value flex-1"></span>
                             </div>
                             <div class="flex items-baseline">
-                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">رقم هاتف الطوارئ :</span>
-                                <span id="doc_emergencyPhone" class="doc-field-value flex-1 font-mono"></span>
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">هاتف الطوارئ :</span>
+                                <span id="doc_emergencyPhone" class="doc-field-value date-number-field flex-1 font-mono"></span>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">المدينة/القرية *:</span>
                                 <span id="doc_city" class="doc-field-value flex-1"></span>
@@ -834,26 +849,26 @@
                         <div class="grid grid-cols-3 gap-2">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">المحلة :</span>
-                                <span id="doc_mahalla" class="doc-field-value flex-1"></span>
+                                <span id="doc_mahalla" class="doc-field-value date-number-field flex-1 font-mono"></span>
                             </div>
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">الزقاق *:</span>
-                                <span id="doc_alley" class="doc-field-value flex-1"></span>
+                                <span id="doc_alley" class="doc-field-value date-number-field flex-1 font-mono"></span>
                             </div>
                             <div class="flex items-baseline">
-                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">الدار :</span>
-                                <span id="doc_currentAddress" class="doc-field-value flex-1"></span>
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">الدار *:</span>
+                                <span id="doc_currentAddress" class="doc-field-value date-number-field flex-1 font-mono"></span>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                        <div class="grid grid-cols-2 gap-x-3 gap-y-2.5">
                             <div class="flex items-baseline">
                                 <span class="font-bold whitespace-nowrap ml-1 shrink-0">أقرب نقطة دالة *:</span>
                                 <span id="doc_nearestLandmark" class="doc-field-value flex-1"></span>
                             </div>
                             <div class="flex items-baseline">
-                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">رقم هاتف *:</span>
-                                <span id="doc_phoneNumber" class="doc-field-value flex-1 font-mono"></span>
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">رقم الهاتف *:</span>
+                                <span id="doc_phoneNumber" class="doc-field-value date-number-field flex-1 font-mono"></span>
                             </div>
                         </div>
 
@@ -1007,7 +1022,7 @@
         }
 
         function updatePreview() {
-            // Text Inputs Mapping (Full list)
+            // Text Inputs Mapping (Complete set of fields)
             const fields = [
                 'firstName', 'fatherName', 'grandfatherName', 'greatGrandfatherName', 'surname',
                 'motherName', 'motherFatherName', 'motherGrandfatherName', 'birthDate',
@@ -1051,6 +1066,8 @@
             const marital = document.getElementById('maritalStatus').value;
             setCheck('chk_marital_single', marital.includes('أعزب'));
             setCheck('chk_marital_married', marital.includes('متزوج'));
+            setCheck('chk_marital_divorced', marital.includes('مطلق'));
+            setCheck('chk_marital_widowed', marital.includes('أرمل'));
 
             // Employment Type
             const empType = document.getElementById('employmentType').value;
@@ -1092,6 +1109,47 @@
             const spNeeds = document.querySelector('input[name="specialNeeds"]:checked')?.value || 'لا يوجد';
             setCheck('chk_sp_no', spNeeds === 'لا يوجد');
             setCheck('chk_sp_yes', spNeeds === 'يوجد');
+        }
+
+        // Save Form as PDF using html2pdf
+        function downloadPDF() {
+            const element = document.getElementById('officialFormContainer');
+            const fullName = `${document.getElementById('firstName').value}_${document.getElementById('fatherName').value}_${document.getElementById('surname').value}`.trim() || 'الموظف';
+            
+            const opt = {
+                margin:       [5, 5, 5, 5],
+                filename:     `استمارة_EMIS_${fullName}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // Send PDF notification and details via WhatsApp to School Principal (+9647705657700)
+        function sendToWhatsApp() {
+            // First trigger PDF Download so the user has the PDF ready on their device
+            downloadPDF();
+
+            const fn = document.getElementById('firstName').value || '---';
+            const fa = document.getElementById('fatherName').value || '---';
+            const sn = document.getElementById('surname').value || '---';
+            const job = document.getElementById('jobTitle').value || 'معلم/مدرس';
+            const school = document.getElementById('schoolName').value || 'المدرسة';
+            const phone = document.getElementById('phoneNumber').value || '---';
+            const empId = document.getElementById('employeeId').value || '---';
+
+            const principalNumber = "9647705657700";
+
+            const message = `السلام عليكم ورحمة الله وبركاته%0A%0Aحضرة مدير المدرسة المحترم،%0Aمرفق لكم معلومات استمارة EMIS الرسمية الخاصة بي:%0A%0A📌 *الاسم الكامل:* ${fn} ${fa} ${sn}%0A📌 *المسمى الوظيفي:* ${job}%0A📌 *المدرسة/الدائرة:* ${school}%0A📌 *الرقم الوظيفي:* ${empId}%0A📌 *رقم الهاتف:* ${phone}%0A%0A📄 *ملاحظة:* تم تحميل ملف الاستمارة بصيغة (PDF) على جهازي ومرفق مع هذه الرسالة.%0A%0Aشاكراً لكم حسن التعاون.`;
+
+            const whatsappUrl = `https://wa.me/${principalNumber}?text=${message}`;
+
+            // Delay redirect slightly so download initiates smoothly
+            setTimeout(() => {
+                window.open(whatsappUrl, '_blank');
+            }, 1000);
         }
 
         // Initial setup on page load
