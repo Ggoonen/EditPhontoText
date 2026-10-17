@@ -1,328 +1,1105 @@
+```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>توقعات كأس العرب 2025</title>
-    
-    <!-- خط تجوال -->
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- مكتبة Tailwind CSS للتنسيق -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استمارة معلومات الموظفين والمعلمين - EMIS</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Cairo & Tajawal -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- مكتبات React -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#1e3a8a',
+                            gold: '#b45309',
+                            light: '#f8fafc',
+                            dark: '#0f172a'
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif'],
+                        tajawal: ['Tajawal', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
         body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: #0f172a;
-            overflow: hidden; /* منع السكرول */
-            touch-action: manipulation;
+            font-family: 'Cairo', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        /* أنيميشن الخلفية (سلاش) */
-        .slash-bg {
-            position: absolute;
-            inset: -50%;
-            background: 
-                linear-gradient(-45deg, transparent 40%, rgba(59, 130, 246, 0.1) 45%, rgba(59, 130, 246, 0.3) 50%, rgba(59, 130, 246, 0.1) 55%, transparent 60%),
-                linear-gradient(-45deg, transparent 20%, rgba(37, 99, 235, 0.05) 25%, rgba(37, 99, 235, 0.2) 30%, rgba(37, 99, 235, 0.05) 35%, transparent 40%);
-            background-size: 200% 200%;
-            animation: slashMove 15s linear infinite;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .slash-bg-2 {
-             background: linear-gradient(-45deg, transparent 60%, rgba(96, 165, 250, 0.05) 65%, rgba(96, 165, 250, 0.15) 70%, rgba(96, 165, 250, 0.05) 75%, transparent 80%);
-             background-size: 200% 200%;
-             animation: slashMove 20s linear infinite reverse;
-             opacity: 0.7;
-        }
-        @keyframes slashMove {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 200% 200%; }
+        /* Print Media Styles */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .page-break {
+                page-break-after: always;
+            }
+            @page {
+                size: A4 portrait;
+                margin: 5mm;
+            }
+            #officialFormContainer {
+                box-shadow: none !important;
+                border: 2px solid #000 !important;
+                margin: 0 !important;
+                padding: 10px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+            }
         }
 
-        .card-glass {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        /* Checkbox custom style for document */
+        .doc-checkbox {
+            width: 13px;
+            height: 13px;
+            border: 1.5px solid #000;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 3px;
+            font-size: 10px;
+            font-weight: bold;
+            line-height: 1;
+            background-color: #fff;
+            flex-shrink: 0;
         }
 
-        .ring-selected { box-shadow: 0 0 0 2px #3b82f6, 0 0 15px rgba(59, 130, 246, 0.5); }
-        
-        /* تأثيرات الظلال للنصوص */
-        .drop-shadow-glow { filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.6)); }
+        /* Responsive Dotted Line Display for Full Text Visibility */
+        .doc-field-value {
+            border-bottom: 1px dotted #1e293b;
+            padding-left: 4px;
+            padding-right: 4px;
+            min-height: 20px;
+            word-break: break-word;
+            white-space: normal;
+            display: inline-block;
+            font-weight: 600;
+            color: #0f172a;
+        }
     </style>
 </head>
-<body>
-    <div id="root"></div>
+<body class="min-h-screen pb-12">
 
-    <script type="text/babel">
-        const { useState } = React;
-
-        // --- أيقونات SVG ---
-        const TrophyIcon = ({size=20, className=""}) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 1 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-        );
-        const CameraIcon = ({size=18}) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-        );
-        const RefreshIcon = ({size=20, className=""}) => (
-            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-        );
-
-        // --- البيانات ---
-        const TEAMS_DB = {
-            qa: { id: 'qa', name: 'قطر' }, tn: { id: 'tn', name: 'تونس' }, sy: { id: 'sy', name: 'سوريا' }, ps: { id: 'ps', name: 'فلسطين' },
-            ma: { id: 'ma', name: 'المغرب' }, sa: { id: 'sa', name: 'السعودية' }, om: { id: 'om', name: 'عمان' }, km: { id: 'km', name: 'جزر القمر' },
-            eg: { id: 'eg', name: 'مصر' }, jo: { id: 'jo', name: 'الأردن' }, ae: { id: 'ae', name: 'الإمارات' }, kw: { id: 'kw', name: 'الكويت' },
-            dz: { id: 'dz', name: 'الجزائر' }, iq: { id: 'iq', name: 'العراق' }, bh: { id: 'bh', name: 'البحرين' }, sd: { id: 'sd', name: 'السودان' }
-        };
-
-        const GROUPS_INFO = [
-            { id: 'A', title: 'المجموعة A', teams: ['qa', 'tn', 'sy', 'ps'] },
-            { id: 'B', title: 'المجموعة B', teams: ['ma', 'sa', 'om', 'km'] },
-            { id: 'C', title: 'المجموعة C', teams: ['eg', 'jo', 'ae', 'kw'] },
-            { id: 'D', title: 'المجموعة D', teams: ['dz', 'iq', 'bh', 'sd'] }
-        ];
-
-        // --- المكونات ---
-        const FullRectFlag = ({ teamId, className }) => {
-            if (!teamId) return <div className={`bg-white/5 border border-white/10 ${className}`} />;
-            return (
-                <img 
-                    src={`https://flagcdn.com/${teamId}.svg`} 
-                    alt={teamId}
-                    className={`object-cover border border-white/20 select-none rounded-sm shadow-sm ${className}`}
-                    draggable="false"
-                />
-            );
-        };
-
-        const MiniTeam = ({ tId, isSelected, onClick }) => (
-            <button onClick={onClick} className={`relative w-10 h-7 rounded-sm overflow-hidden transition-all ${isSelected ? 'ring-selected opacity-100 z-10' : 'opacity-70 hover:opacity-100 hover:ring-1 hover:ring-white/30'}`}>
-                <FullRectFlag teamId={tId} className="w-full h-full" />
+    <!-- Header Section -->
+    <header class="no-print bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
+                    <i class="fa-solid me-1 fa-file-invoice text-amber-400 text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-base leading-tight">جمهورية العراق - وزارة التربية</h1>
+                    <p class="text-xs text-blue-200">نظام معلومات الموظفين والمعلمين EMIS</p>
+                </div>
+            </div>
+            <button onclick="togglePreview()" id="previewToggleBtn" class="bg-amber-500 hover:bg-amber-600 active:scale-95 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5 shadow-md">
+                <i class="fa-solid fa-eye"></i>
+                <span>معاينة</span>
             </button>
-        );
+        </div>
+    </header>
 
-        const StripTeam = ({ tId, isSelected, onClick }) => {
-            const team = tId ? TEAMS_DB[tId] : null;
-            return (
-                <button onClick={onClick} className={`flex items-center gap-3 px-2 py-1.5 rounded-md w-full transition-all ${isSelected ? 'bg-blue-600 text-white shadow-md' : 'hover:bg-white/5 text-white/70 border border-transparent hover:border-white/10'}`}>
-                    <FullRectFlag teamId={tId} className="w-8 h-5 rounded-sm" />
-                    <span className="text-[11px] font-bold truncate">{team ? team.name : '-'}</span>
-                </button>
-            );
-        };
+    <!-- Main Mobile Container -->
+    <main class="max-w-md mx-auto px-3 pt-4">
 
-        const VerticalTeam = ({ tId, onClick }) => {
-            const team = tId ? TEAMS_DB[tId] : null;
-            return (
-                <button onClick={onClick} className="flex-1 flex flex-col items-center gap-2 group">
-                    <FullRectFlag teamId={tId} className="w-14 h-9 rounded-sm group-hover:scale-105 transition-transform group-hover:ring-1 group-hover:ring-white/30" />
-                    <span className="text-[11px] font-bold">{team ? team.name : '???'}</span>
-                </button>
-            );
-        };
+        <!-- Form Section -->
+        <div id="formSection" class="no-print bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 mb-6">
+            
+            <!-- Progress Steps Header -->
+            <div class="flex justify-between items-center mb-6 relative px-2">
+                <div class="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 -translate-y-1/2 z-0"></div>
+                <div id="stepProgress" class="absolute top-1/2 right-0 h-0.5 bg-blue-700 -translate-y-1/2 z-0 transition-all duration-300" style="width: 0%;"></div>
 
-        // --- التطبيق الرئيسي ---
-        const App = () => {
-            const [picks, setPicks] = useState({ A: {}, B: {}, C: {}, D: {} });
-            const [ko, setKo] = useState({});
-            const [mode, setMode] = useState('edit');
+                <button onclick="goToStep(1)" id="stepBtn1" class="relative z-10 w-9 h-9 rounded-full bg-blue-700 text-white text-sm font-bold flex items-center justify-center shadow-md transition-all">1</button>
+                <button onclick="goToStep(2)" id="stepBtn2" class="relative z-10 w-9 h-9 rounded-full bg-slate-200 text-slate-600 text-sm font-bold flex items-center justify-center transition-all">2</button>
+                <button onclick="goToStep(3)" id="stepBtn3" class="relative z-10 w-9 h-9 rounded-full bg-slate-200 text-slate-600 text-sm font-bold flex items-center justify-center transition-all">3</button>
+                <button onclick="goToStep(4)" id="stepBtn4" class="relative z-10 w-9 h-9 rounded-full bg-slate-200 text-slate-600 text-sm font-bold flex items-center justify-center transition-all">4</button>
+            </div>
 
-            const handleGroupSelect = (groupId, teamId) => {
-                if (mode === 'capture') return;
-                setPicks(prev => {
-                    const groupPicks = { ...prev[groupId] };
-                    if (groupPicks[1] === teamId) groupPicks[1] = null;
-                    else if (groupPicks[2] === teamId) groupPicks[2] = null;
-                    else if (!groupPicks[1]) groupPicks[1] = teamId;
-                    else if (!groupPicks[2]) groupPicks[2] = teamId;
-                    else { groupPicks[1] = teamId; groupPicks[2] = null; }
-                    return { ...prev, [groupId]: groupPicks };
-                });
-                setKo({});
-            };
+            <div class="text-center mb-5">
+                <span id="stepBadge" class="text-[11px] font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full uppercase tracking-wider">الخطوة 1 من 4</span>
+                <h2 id="stepTitle" class="text-lg font-extrabold text-slate-800 mt-1">أولاً: معلومات الاسم والنسب</h2>
+            </div>
 
-            const handleKnockoutSelect = (matchId, winnerId) => {
-                if (mode === 'capture' || !winnerId) return;
-                setKo(prev => ({ ...prev, [matchId]: winnerId }));
-            };
+            <!-- Dynamic Input Form -->
+            <form id="emisInputForm" onsubmit="event.preventDefault();">
 
-            const getTeam = (id) => id ? TEAMS_DB[id] : null;
-
-            const matches = {
-                qf: [
-                    { id: 'qf1', t1: picks.A[1], t2: picks.B[2] },
-                    { id: 'qf2', t1: picks.B[1], t2: picks.A[2] },
-                    { id: 'qf3', t1: picks.C[1], t2: picks.D[2] },
-                    { id: 'qf4', t1: picks.D[1], t2: picks.C[2] }
-                ],
-                sf: [
-                    { id: 'sf1', t1: ko.qf1, t2: ko.qf3 },
-                    { id: 'sf2', t1: ko.qf2, t2: ko.qf4 }
-                ],
-                final: { id: 'final', t1: ko.sf1, t2: ko.sf2 }
-            };
-
-            return (
-                <div className="min-h-screen h-screen bg-[#0f172a] text-white font-tajawal relative overflow-hidden flex flex-col items-center" dir="rtl">
-                    {/* الخلفيات المتحركة */}
-                    <div className="slash-bg"></div>
-                    <div className="slash-bg slash-bg-2"></div>
-                    
-                    {/* أزرار التحكم */}
-                    {mode === 'edit' && (
-                        <div className="absolute top-4 left-4 z-50 flex gap-2">
-                            <button 
-                                onClick={() => { setPicks({A:{},B:{},C:{},D:{}}); setKo({}); }}
-                                className="p-2 bg-slate-800/80 rounded-full hover:bg-slate-700 backdrop-blur transition-colors border border-white/10"
-                            >
-                                <RefreshIcon className="text-blue-300" />
-                            </button>
-                            <button 
-                                onClick={() => setMode('capture')}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-full font-bold shadow-lg active:scale-95 transition-all"
-                            >
-                                <CameraIcon /> تصوير
-                            </button>
+                <!-- STEP 1: Name and Lineage -->
+                <div id="step1" class="step-content space-y-3">
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الاسم *</label>
+                            <input type="text" id="firstName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
                         </div>
-                    )}
-
-                    {mode === 'capture' && (
-                        <button 
-                            onClick={() => setMode('edit')}
-                            className="absolute top-4 left-4 z-50 px-4 py-2 bg-black/50 rounded-full text-xs font-bold backdrop-blur border border-white/10"
-                        >
-                            خروج
-                        </button>
-                    )}
-
-                    {/* المحتوى الرئيسي */}
-                    <div className="relative z-10 w-full max-w-md h-full flex flex-col p-4 pb-8 space-y-4">
-                        
-                        {/* الرأس */}
-                        <header className="text-center pt-6 shrink-0">
-                            <div className="inline-flex items-center gap-2 border-b-2 border-blue-500/50 pb-2 mb-2">
-                                <TrophyIcon className="text-blue-400" />
-                                <span className="text-sm font-black tracking-[0.2em] uppercase text-blue-200">Arab Cup 2025</span>
-                            </div>
-                            <h1 className="text-3xl font-black drop-shadow-md bg-clip-text text-transparent bg-gradient-to-b from-white to-blue-200">
-                                توقعات الطريق للذهب
-                            </h1>
-                        </header>
-
-                        {/* المجموعات */}
-                        <div className="grid grid-cols-2 gap-2 shrink-0">
-                            {GROUPS_INFO.map(group => (
-                                <div key={group.id} className="card-glass rounded-xl p-2.5">
-                                    <div className="flex justify-between items-center mb-2 px-1">
-                                        <span className="text-[11px] font-bold text-blue-300">{group.title}</span>
-                                        <div className="flex gap-1">
-                                            <div className={`w-1.5 h-1.5 rounded-sm ${picks[group.id][1] ? 'bg-blue-500 shadow-blue-500/50 shadow-sm' : 'bg-white/10'}`}></div>
-                                            <div className={`w-1.5 h-1.5 rounded-sm ${picks[group.id][2] ? 'bg-sky-400 shadow-sky-400/50 shadow-sm' : 'bg-white/10'}`}></div>
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-4 gap-1.5">
-                                        {group.teams.map(teamId => {
-                                            const rank = picks[group.id][1] === teamId ? 1 : picks[group.id][2] === teamId ? 2 : null;
-                                            return (
-                                                <button 
-                                                    key={teamId} 
-                                                    onClick={() => handleGroupSelect(group.id, teamId)}
-                                                    className={`relative aspect-[3/2] rounded-sm overflow-hidden transition-all ${rank ? 'ring-selected z-10 opacity-100' : 'opacity-70 hover:opacity-100 hover:ring-1 hover:ring-white/30'}`}
-                                                >
-                                                    <FullRectFlag teamId={teamId} className="w-full h-full" />
-                                                    {rank && <div className={`absolute inset-0 flex items-center justify-center bg-black/50 text-white font-black text-xs`}>{rank}</div>}
-                                                </button>
-                                            )
-                                        })}
-                                    </div>
-                                </div>
-                            ))}
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اسم الأب *</label>
+                            <input type="text" id="fatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
                         </div>
+                    </div>
 
-                        {/* المسار */}
-                        <div className="flex-1 flex flex-col justify-between py-2 relative space-y-4">
-                            
-                            {/* ربع النهائي */}
-                            <div className="grid grid-cols-2 gap-x-6 gap-y-3">
-                                {matches.qf.map((m, idx) => (
-                                    <div key={m.id} className={`flex items-center gap-2 card-glass rounded-lg p-1.5 ${idx % 2 !== 0 ? 'flex-row-reverse' : ''}`}>
-                                        <MiniTeam tId={m.t1} isSelected={ko[m.id] === m.t1} onClick={() => handleKnockoutSelect(m.id, m.t1)} />
-                                        <span className="text-[10px] font-bold text-blue-300/50">VS</span>
-                                        <MiniTeam tId={m.t2} isSelected={ko[m.id] === m.t2} onClick={() => handleKnockoutSelect(m.id, m.t2)} />
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* خطوط بصرية */}
-                            <div className="h-8 relative opacity-50">
-                                <div className="absolute top-0 left-[25%] w-px h-full bg-gradient-to-b from-blue-500/50 to-blue-500/20"></div>
-                                <div className="absolute top-0 right-[25%] w-px h-full bg-gradient-to-b from-blue-500/50 to-blue-500/20"></div>
-                            </div>
-
-                            {/* نصف النهائي */}
-                            <div className="flex justify-center gap-6">
-                                {matches.sf.map(m => (
-                                    <div key={m.id} className="w-36 flex flex-col gap-1.5 card-glass rounded-lg p-2">
-                                        <StripTeam tId={m.t1} isSelected={ko[m.id] === m.t1} onClick={() => handleKnockoutSelect(m.id, m.t1)} />
-                                        <StripTeam tId={m.t2} isSelected={ko[m.id] === m.t2} onClick={() => handleKnockoutSelect(m.id, m.t2)} />
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* خطوط بصرية */}
-                            <div className="h-8 relative opacity-50">
-                                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-px h-full bg-gradient-to-t from-blue-500/50 to-blue-500/20"></div>
-                                <div className="absolute bottom-0 left-[35%] right-[35%] h-full border-t border-l border-r border-blue-500/30 rounded-t-xl"></div>
-                            </div>
-
-                            {/* النهائي */}
-                            <div className="flex-1 flex flex-col items-center justify-center min-h-[150px]">
-                                {!ko.final ? (
-                                    <div className="bg-gradient-to-b from-slate-800/80 to-slate-900/80 p-4 rounded-2xl border border-blue-400/30 text-center w-52 shadow-lg shadow-blue-900/20">
-                                        <div className="text-blue-300 text-xs font-bold uppercase tracking-widest mb-3">Final Match</div>
-                                        <div className="flex justify-between items-center">
-                                            <VerticalTeam tId={matches.final.t1} onClick={() => handleKnockoutSelect('final', matches.final.t1)} />
-                                            <div className="w-px h-10 bg-white/10 mx-3"></div>
-                                            <VerticalTeam tId={matches.final.t2} onClick={() => handleKnockoutSelect('final', matches.final.t2)} />
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="relative w-full max-w-[280px] aspect-[16/10] bg-gradient-to-b from-blue-900 to-slate-950 rounded-2xl overflow-hidden shadow-2xl border-2 border-blue-400/50 animate-in zoom-in duration-500">
-                                        <div className="absolute top-0 right-0 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl"></div>
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center p-5 text-center z-10">
-                                            <TrophyIcon size={36} className="text-blue-300 mb-3 drop-shadow-glow" />
-                                            <div className="text-blue-200 text-[10px] font-black uppercase tracking-[0.2em] mb-3">The Champion</div>
-                                            <FullRectFlag teamId={ko.final} className="w-28 h-20 rounded-md shadow-lg z-10 relative border-blue-300/30" />
-                                            <h2 className="text-3xl font-black text-white mt-4 drop-shadow-md">{getTeam(ko.final)?.name}</h2>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اسم والد الأب *</label>
+                            <input type="text" id="grandfatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
                         </div>
-
-                        <div className="text-center mt-auto py-2 opacity-40 text-[8px] font-mono tracking-widest">
-                            ARAB CUP 2025 • DARK BLUE EDITION
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اسم جد الأب *</label>
+                            <input type="text" id="greatGrandfatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
                         </div>
+                    </div>
 
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اللقب *</label>
+                            <input type="text" id="surname" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اسم الأم *</label>
+                            <input type="text" id="motherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اسم والد الأم *</label>
+                            <input type="text" id="motherFatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اسم جد الأم</label>
+                            <input type="text" id="motherGrandfatherName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">تاريخ التولد (اليوم/الشهر/السنة أو YYYY/MM/DD) *</label>
+                        <input type="text" id="birthDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="مثال: 1990/05/15 أو 15/5/1990">
                     </div>
                 </div>
-            );
-        };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+                <!-- STEP 2: ID and Personal Details -->
+                <div id="step2" class="step-content space-y-3 hidden">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">نوع الهوية *</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <label class="flex items-center p-2 text-xs bg-slate-50 border border-slate-300 rounded-lg cursor-pointer">
+                                <input type="radio" name="idType" value="بطاقة موحدة" checked onchange="updatePreview()" class="text-blue-600 focus:ring-blue-500">
+                                <span class="mr-1.5 font-medium">بطاقة موحدة</span>
+                            </label>
+                            <label class="flex items-center p-2 text-xs bg-slate-50 border border-slate-300 rounded-lg cursor-pointer">
+                                <input type="radio" name="idType" value="جنسية عراقية" onchange="updatePreview()" class="text-blue-600 focus:ring-blue-500">
+                                <span class="mr-1.5 font-medium">جنسية عراقية</span>
+                            </label>
+                            <label class="flex items-center p-2 text-xs bg-slate-50 border border-slate-300 rounded-lg cursor-pointer">
+                                <input type="radio" name="idType" value="أخرى" onchange="updatePreview()" class="text-blue-600 focus:ring-blue-500">
+                                <span class="mr-1.5 font-medium">أخرى</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">رقم الموحدة / الجنسية *</label>
+                            <input type="text" id="idNumber" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">بلد الإصدار *</label>
+                            <input type="text" id="issueCountry" value="العراق" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">السجل</label>
+                            <input type="text" id="registerNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الصحيفة</label>
+                            <input type="text" id="pageNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الرقم العائلي</label>
+                            <input type="text" id="familyNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الرقم الوظيفي</label>
+                            <input type="text" id="employeeId" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الجنس *</label>
+                            <select id="gender" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                                <option value="ذكر">ذكر</option>
+                                <option value="أنثى">أنثى</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">دولة التولد</label>
+                            <input type="text" id="birthCountry" value="العراق" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">مسقط الرأس</label>
+                            <input type="text" id="birthPlace" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="المحافظة/المدينة">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الجنسية *</label>
+                            <input type="text" id="nationality" value="عراقية" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اللغة الأم *</label>
+                            <input type="text" id="motherLanguage" value="العربية" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الحالة الاجتماعية</label>
+                            <select id="maritalStatus" onchange="updatePreview()" class="w-full px-2 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg">
+                                <option value="أعزب/ة">أعزب/ة</option>
+                                <option value="متزوج/ة">متزوج/ة</option>
+                                <option value="مطلق/ة">مطلق/ة</option>
+                                <option value="أرمل/ة">أرمل/ة</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">فئة الدم</label>
+                            <select id="bloodType" onchange="updatePreview()" class="w-full px-2 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg">
+                                <option value="">اختر</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الديانة</label>
+                            <input type="text" id="religion" value="مسلم" oninput="updatePreview()" class="w-full px-2 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3: Job and Qualification Info -->
+                <div id="step3" class="step-content space-y-3 hidden">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">نوع التوظيف *</label>
+                        <select id="employmentType" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <option value="ملاك دائم">ملاك دائم</option>
+                            <option value="عقد">عقد</option>
+                            <option value="محاضر">محاضر</option>
+                            <option value="أجر">أجر</option>
+                            <option value="أخرى">أخرى</option>
+                        </select>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">نوع الموظف *</label>
+                            <select id="staffType" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                                <option value="تدريسي">تدريسي</option>
+                                <option value="إداري">إداري</option>
+                                <option value="فني">فني</option>
+                                <option value="خدمي">خدمي</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الحالة الوظيفية *</label>
+                            <select id="jobStatus" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                                <option value="مستمر">مستمر</option>
+                                <option value="متقاعد">متقاعد</option>
+                                <option value="مفصول">مفصول</option>
+                                <option value="متوفي">متوفي</option>
+                                <option value="إجازة دراسية/أمومة">إجازة دراسية/أمومة</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">تاريخ سريان الحالة *</label>
+                            <input type="text" id="statusEffectiveDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="مثال: 2022/01/01">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">المسمى الوظيفي</label>
+                            <input type="text" id="jobTitle" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="مثال: معلم جامعي">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الدرجة الوظيفية</label>
+                            <input type="text" id="jobGrade" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="مثال: الخامسة">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">التصنيف *</label>
+                            <select id="classification" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                                <option value="معلم">معلم</option>
+                                <option value="موظف">موظف</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">المنصب الحالي *</label>
+                            <select id="currentPosition" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                                <option value="مدرس">مدرس / معلم</option>
+                                <option value="مدير">مدير</option>
+                                <option value="معاون">معاون</option>
+                                <option value="إداري">إداري</option>
+                                <option value="خدمي">خدمي</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اسم المدرسة / الدائرة</label>
+                            <input type="text" id="schoolName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">تاريخ أول تعيين *</label>
+                            <input type="text" id="firstAppointmentDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="مثال: 2015/09/01">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">التحصيل الدراسي *</label>
+                            <select id="qualification" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                                <option value="بكالوريوس">بكالوريوس</option>
+                                <option value="دبلوم">دبلوم</option>
+                                <option value="إعدادية">إعدادية</option>
+                                <option value="ماجستير">ماجستير</option>
+                                <option value="دكتوراه">دكتوراه</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اسم الكلية / المعهد *</label>
+                            <input type="text" id="collegeName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">سنة التخرج</label>
+                            <input type="text" id="graduationYear" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">الاختصاص *</label>
+                        <input type="text" id="specialization" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                    </div>
+                </div>
+
+                <!-- STEP 4: Special Needs, Address, and Emergency -->
+                <div id="step4" class="step-content space-y-3 hidden">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-2">ذوي الاحتياجات الخاصة</label>
+                        <div class="flex items-center gap-4">
+                            <label class="flex items-center text-xs font-medium">
+                                <input type="radio" name="specialNeeds" value="لا يوجد" checked onchange="updatePreview(); toggleSpecialNeedsDetails();" class="text-blue-600">
+                                <span class="mr-1">لا يوجد</span>
+                            </label>
+                            <label class="flex items-center text-xs font-medium">
+                                <input type="radio" name="specialNeeds" value="يوجد" onchange="updatePreview(); toggleSpecialNeedsDetails();" class="text-blue-600">
+                                <span class="mr-1">يوجد</span>
+                            </label>
+                        </div>
+                        <div id="specialNeedsDetailContainer" class="mt-2 hidden">
+                            <input type="text" id="specialNeedsDetails" oninput="updatePreview()" placeholder="اذكر التفاصيل..." class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">جهة الاتصال للطوارئ</label>
+                            <input type="text" id="emergencyContact" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">صلة جهة الطوارئ</label>
+                            <input type="text" id="emergencyRelation" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">رقم هاتف الطوارئ</label>
+                        <input type="tel" id="emergencyPhone" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="07xxxxxxxxx">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">المدينة / القرية *</label>
+                            <input type="text" id="city" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الحي *</label>
+                            <input type="text" id="district" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">المحلة</label>
+                            <input type="text" id="mahalla" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الزقاق *</label>
+                            <input type="text" id="alley" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">عنوان حالي *</label>
+                            <input type="text" id="currentAddress" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">أقرب نقطة دالة *</label>
+                            <input type="text" id="nearestLandmark" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">رقم الهاتف *</label>
+                            <input type="tel" id="phoneNumber" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="07xxxxxxxxx">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني</label>
+                            <input type="email" id="email" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">اسم المنظم</label>
+                        <input type="text" id="organizerName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                    </div>
+                </div>
+
+                <!-- Navigation Control Buttons -->
+                <div class="flex justify-between items-center gap-3 mt-6 pt-4 border-t border-slate-100">
+                    <button type="button" id="prevBtn" onclick="changeStep(-1)" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition hidden">
+                        <i class="fa-solid fa-arrow-right ml-1"></i> السابق
+                    </button>
+                    <button type="button" id="nextBtn" onclick="changeStep(1)" class="w-full py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-bold text-sm transition shadow-md shadow-blue-200">
+                        التالي <i class="fa-solid fa-arrow-left mr-1"></i>
+                    </button>
+                    <button type="button" id="finishBtn" onclick="togglePreview()" class="w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition shadow-md shadow-emerald-200 hidden">
+                        عرض الاستمارة <i class="fa-solid fa-file-check mr-1"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Preview Section (EMIS Official Document Structure) -->
+        <div id="previewSection" class="hidden space-y-4 mb-12">
+            
+            <!-- Actions Toolbar -->
+            <div class="no-print bg-white p-3 rounded-2xl shadow-md border border-slate-200 flex justify-between items-center gap-2">
+                <button onclick="togglePreview()" class="px-3 py-2 bg-slate-100 text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-200 transition flex items-center gap-1">
+                    <i class="fa-solid fa-pen-to-square"></i> تعديل
+                </button>
+                <div class="flex gap-2">
+                    <button onclick="window.print()" class="px-4 py-2 bg-blue-700 text-white rounded-xl font-bold text-xs hover:bg-blue-800 transition shadow-sm flex items-center gap-1.5">
+                        <i class="fa-solid fa-print"></i> طباعة / حفظ PDF
+                    </button>
+                </div>
+            </div>
+
+            <div id="officialFormContainer" class="bg-white text-black p-4 sm:p-6 rounded-lg shadow-xl border-2 border-slate-900 text-xs leading-relaxed font-tajawal">
+                
+                <!-- Document Header -->
+                <div class="border-b-2 border-black pb-2 mb-3 text-center">
+                    <div class="bg-blue-900 text-white font-bold py-1 px-2 text-sm rounded mb-1">
+                        جمهورية العراق – وزارة التربية
+                    </div>
+                    <div class="font-extrabold text-sm sm:text-base text-slate-900 tracking-wide">
+                        استمارة معلومات الموظفين والمعلمين لنظام EMIS
+                    </div>
+                </div>
+
+                <!-- SECTION 1: Personal Name & Lineage -->
+                <div class="mb-4">
+                    <div class="font-bold text-blue-900 border-b border-blue-900 pb-0.5 mb-2">
+                        أولاً : معلومات الاسم والنسب
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-y-2.5 gap-x-3 text-[11px]">
+                        <div class="flex items-baseline">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">الاسم *:</span>
+                            <span id="doc_firstName" class="doc-field-value flex-1"></span>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">اسم الاب *:</span>
+                            <span id="doc_fatherName" class="doc-field-value flex-1"></span>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">اسم والد الاب *:</span>
+                            <span id="doc_grandfatherName" class="doc-field-value flex-1"></span>
+                        </div>
+
+                        <div class="flex items-baseline">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">اسم جد الاب *:</span>
+                            <span id="doc_greatGrandfatherName" class="doc-field-value flex-1"></span>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">اللقب *:</span>
+                            <span id="doc_surname" class="doc-field-value flex-1"></span>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">اسم الام *:</span>
+                            <span id="doc_motherName" class="doc-field-value flex-1"></span>
+                        </div>
+
+                        <div class="flex items-baseline">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">اسم والد الام *:</span>
+                            <span id="doc_motherFatherName" class="doc-field-value flex-1"></span>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">اسم جد الام :</span>
+                            <span id="doc_motherGrandfatherName" class="doc-field-value flex-1"></span>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">تاريخ التولد *:</span>
+                            <span id="doc_birthDate" class="doc-field-value flex-1 font-mono"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Identity & Personal Data -->
+                <div class="mb-4">
+                    <div class="font-bold text-blue-900 border-b border-blue-900 pb-0.5 mb-2">
+                        ثانياً : وثيقة التعريف والبيانات الشخصية
+                    </div>
+
+                    <div class="space-y-2.5 text-[11px]">
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
+                            <span class="font-bold shrink-0">نوع الهوية *:</span>
+                            <div class="flex items-center"><span id="chk_id_unified" class="doc-checkbox"></span> بطاقة موحدة</div>
+                            <div class="flex items-center"><span id="chk_id_iq" class="doc-checkbox"></span> جنسية عراقية</div>
+                            <div class="flex items-center"><span id="chk_id_other" class="doc-checkbox"></span> أخرى</div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">رقم الموحدة / الجنسية *:</span>
+                                <span id="doc_idNumber" class="doc-field-value flex-1 font-mono"></span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">بلد الإصدار *:</span>
+                                <span id="doc_issueCountry" class="doc-field-value flex-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">السجل :</span>
+                                <span id="doc_registerNum" class="doc-field-value flex-1"></span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">الصحيفة :</span>
+                                <span id="doc_pageNum" class="doc-field-value flex-1"></span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">الرقم العائلي :</span>
+                                <span id="doc_familyNum" class="doc-field-value flex-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">الرقم الوظيفي:</span>
+                                <span id="doc_employeeId" class="doc-field-value flex-1 font-mono"></span>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <span class="font-bold shrink-0">الجنس *:</span>
+                                <div class="flex items-center"><span id="chk_gender_male" class="doc-checkbox"></span> ذكر</div>
+                                <div class="flex items-center"><span id="chk_gender_female" class="doc-checkbox"></span> أنثى</div>
+                                <div class="flex items-baseline flex-1 min-w-[120px]">
+                                    <span class="font-bold whitespace-nowrap ml-1 shrink-0">الجنسية *:</span>
+                                    <span id="doc_nationality" class="doc-field-value flex-1"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">دولة التولد :</span>
+                                <span id="doc_birthCountry" class="doc-field-value flex-1"></span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">مسقط الرأس :</span>
+                                <span id="doc_birthPlace" class="doc-field-value flex-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">اللغة الأم *:</span>
+                                <span id="doc_motherLanguage" class="doc-field-value flex-1"></span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">الديانة :</span>
+                                <span id="doc_religion" class="doc-field-value flex-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold shrink-0">الحالة الاجتماعية:</span>
+                                <div class="flex items-center"><span id="chk_marital_single" class="doc-checkbox"></span> أعزب /ة</div>
+                                <div class="flex items-center"><span id="chk_marital_married" class="doc-checkbox"></span> متزوج /ة</div>
+                            </div>
+                            <div class="flex items-baseline min-w-[140px]">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">فئة الدم :</span>
+                                <span id="doc_bloodType" class="doc-field-value flex-1 text-center"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: Employment and Qualification -->
+                <div class="mb-4">
+                    <div class="font-bold text-blue-900 border-b border-blue-900 pb-0.5 mb-2">
+                        ثالثاً : المعلومات الوظيفية والتحصيل الدراسي
+                    </div>
+
+                    <div class="space-y-2.5 text-[11px]">
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <span class="font-bold shrink-0">نوع التوظيف *:</span>
+                            <div class="flex items-center"><span id="chk_emp_perm" class="doc-checkbox"></span> ملاك دائم</div>
+                            <div class="flex items-center"><span id="chk_emp_contract" class="doc-checkbox"></span> عقد</div>
+                            <div class="flex items-center"><span id="chk_emp_lecturer" class="doc-checkbox"></span> محاضر</div>
+                            <div class="flex items-center"><span id="chk_emp_wage" class="doc-checkbox"></span> أجر</div>
+                            <div class="flex items-center"><span id="chk_emp_other" class="doc-checkbox"></span> أخرى</div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <span class="font-bold shrink-0">نوع الموظف *:</span>
+                            <div class="flex items-center"><span id="chk_staff_teach" class="doc-checkbox"></span> تدريسي</div>
+                            <div class="flex items-center"><span id="chk_staff_admin" class="doc-checkbox"></span> إداري</div>
+                            <div class="flex items-center"><span id="chk_staff_tech" class="doc-checkbox"></span> فني</div>
+                            <div class="flex items-center"><span id="chk_staff_service" class="doc-checkbox"></span> خدمي</div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                            <span class="font-bold shrink-0">الحالة الوظيفية *:</span>
+                            <div class="flex items-center"><span id="chk_stat_active" class="doc-checkbox"></span> مستمر</div>
+                            <div class="flex items-center"><span id="chk_stat_ret" class="doc-checkbox"></span> متقاعد</div>
+                            <div class="flex items-center"><span id="chk_stat_dis" class="doc-checkbox"></span> مفصول</div>
+                            <div class="flex items-center"><span id="chk_stat_dead" class="doc-checkbox"></span> متوفي</div>
+                            <div class="flex items-center"><span id="chk_stat_leave" class="doc-checkbox"></span> إجازة دراسية/أمومة</div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">تاريخ سريان الحالة الوظيفية *:</span>
+                                <span id="doc_statusEffectiveDate" class="doc-field-value flex-1 font-mono"></span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">المسمى الوظيفي :</span>
+                                <span id="doc_jobTitle" class="doc-field-value flex-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">الدرجة الوظيفية :</span>
+                                <span id="doc_jobGrade" class="doc-field-value flex-1"></span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold shrink-0">التصنيف *:</span>
+                                <div class="flex items-center"><span id="chk_class_teacher" class="doc-checkbox"></span> معلم</div>
+                                <div class="flex items-center"><span id="chk_class_staff" class="doc-checkbox"></span> موظف</div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            <span class="font-bold shrink-0">المنصب الحالي *:</span>
+                            <div class="flex items-center"><span id="chk_pos_dir" class="doc-checkbox"></span> مدير</div>
+                            <div class="flex items-center"><span id="chk_pos_dep" class="doc-checkbox"></span> معاون</div>
+                            <div class="flex items-center"><span id="chk_pos_teach" class="doc-checkbox"></span> مدرس</div>
+                            <div class="flex items-center"><span id="chk_pos_admin" class="doc-checkbox"></span> إداري</div>
+                            <div class="flex items-center"><span id="chk_pos_serv" class="doc-checkbox"></span> خدمي</div>
+                        </div>
+
+                        <div class="flex items-baseline">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">اسم المدرسة / الدائرة :</span>
+                            <span id="doc_schoolName" class="doc-field-value flex-1"></span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">تاريخ أول تعيين *:</span>
+                                <span id="doc_firstAppointmentDate" class="doc-field-value flex-1 font-mono"></span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">التحصيل الدراسي *:</span>
+                                <span id="doc_qualification" class="doc-field-value flex-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-x-3 gap-y-2.5">
+                            <div class="sm:col-span-8 flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">اسم الكلية / المعهد *:</span>
+                                <span id="doc_collegeName" class="doc-field-value flex-1"></span>
+                            </div>
+                            <div class="sm:col-span-4 flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">سنة التخرج :</span>
+                                <span id="doc_graduationYear" class="doc-field-value flex-1 font-mono"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-baseline">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">الاختصاص *:</span>
+                            <span id="doc_specialization" class="doc-field-value flex-1"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: Special Needs, Emergency, Address & Contact -->
+                <div class="mb-3">
+                    <div class="font-bold text-blue-900 border-b border-blue-900 pb-0.5 mb-2">
+                        رابعاً : ذوي الاحتياجات الخاصة والطوارئ والسكن والاتصال
+                    </div>
+
+                    <div class="space-y-2.5 text-[11px]">
+                        <div class="flex flex-wrap items-baseline gap-2">
+                            <span class="font-bold shrink-0">ذوي الاحتياجات الخاصة :</span>
+                            <div class="flex items-center shrink-0"><span id="chk_sp_no" class="doc-checkbox"></span> لايوجد</div>
+                            <div class="flex items-center shrink-0"><span id="chk_sp_yes" class="doc-checkbox"></span> يوجد</div>
+                            <div class="flex items-baseline flex-1 min-w-[150px]">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">التفاصيل :</span>
+                                <span id="doc_specialNeedsDetails" class="doc-field-value flex-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-3 gap-y-2.5">
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">جهة الاتصال الطوارئ :</span>
+                                <span id="doc_emergencyContact" class="doc-field-value flex-1"></span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">صلة جهة الطوارئ :</span>
+                                <span id="doc_emergencyRelation" class="doc-field-value flex-1"></span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">رقم هاتف الطوارئ :</span>
+                                <span id="doc_emergencyPhone" class="doc-field-value flex-1 font-mono"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">المدينة/القرية *:</span>
+                                <span id="doc_city" class="doc-field-value flex-1"></span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">الحي *:</span>
+                                <span id="doc_district" class="doc-field-value flex-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">المحلة :</span>
+                                <span id="doc_mahalla" class="doc-field-value flex-1"></span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">الزقاق *:</span>
+                                <span id="doc_alley" class="doc-field-value flex-1"></span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">الدار :</span>
+                                <span id="doc_currentAddress" class="doc-field-value flex-1"></span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-2.5">
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">أقرب نقطة دالة *:</span>
+                                <span id="doc_nearestLandmark" class="doc-field-value flex-1"></span>
+                            </div>
+                            <div class="flex items-baseline">
+                                <span class="font-bold whitespace-nowrap ml-1 shrink-0">رقم هاتف *:</span>
+                                <span id="doc_phoneNumber" class="doc-field-value flex-1 font-mono"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-baseline">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">البريد الالكتروني :</span>
+                            <span id="doc_email" class="doc-field-value flex-1 font-mono"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Note & Signatures -->
+                <div class="mt-4 pt-2 border-t border-slate-300">
+                    <p class="text-[10px] font-bold text-red-700 text-center mb-3">
+                        ملاحظة : الحقول المصحوبة بنجمة (*) إجبارية لإدخال البيانات في نظام EMIS
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-4 text-[11px] pt-1">
+                        <div class="flex items-baseline">
+                            <span class="font-bold ml-1 shrink-0">تم تسجيله [ ] :</span>
+                            <span class="border-b border-slate-800 flex-1"></span>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="font-bold ml-1 shrink-0">اسم المنظم :</span>
+                            <span id="doc_organizerName" class="border-b border-slate-800 flex-1 font-bold"></span>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 flex justify-between items-end px-2 text-[11px]">
+                        <div class="flex items-baseline">
+                            <span class="font-bold shrink-0">اسم الموظف / المعلم والتوقيع : </span>
+                            <span id="doc_fullNameSignature" class="font-bold border-b border-dotted border-black px-2 mr-1"></span>
+                        </div>
+                        <div class="text-left text-[9px] text-slate-500 font-sans">
+                            نظام EMIS الالكتروني
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let currentStep = 1;
+
+        function goToStep(step) {
+            currentStep = step;
+            updateStepUI();
+        }
+
+        function changeStep(delta) {
+            currentStep += delta;
+            if (currentStep < 1) currentStep = 1;
+            if (currentStep > 4) currentStep = 4;
+            updateStepUI();
+        }
+
+        function updateStepUI() {
+            // Hide all step contents
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+            
+            // Show current step content
+            document.getElementById(`step${currentStep}`).classList.remove('hidden');
+
+            // Update Stepper Progress & Badges
+            const progressPercent = ((currentStep - 1) / 3) * 100;
+            document.getElementById('stepProgress').style.width = `${progressPercent}%`;
+
+            const titles = [
+                "أولاً: معلومات الاسم والنسب",
+                "ثانياً: وثيقة التعريف والبيانات الشخصية",
+                "ثالثاً: المعلومات الوظيفية والتحصيل الدراسي",
+                "رابعاً: ذوي الاحتياجات الخاصة والسكن والاتصال"
+            ];
+
+            document.getElementById('stepBadge').innerText = `الخطوة ${currentStep} من 4`;
+            document.getElementById('stepTitle').innerText = titles[currentStep - 1];
+
+            // Update Step Buttons Style
+            for (let i = 1; i <= 4; i++) {
+                const btn = document.getElementById(`stepBtn${i}`);
+                if (i <= currentStep) {
+                    btn.classList.remove('bg-slate-200', 'text-slate-600');
+                    btn.classList.add('bg-blue-700', 'text-white');
+                } else {
+                    btn.classList.remove('bg-blue-700', 'text-white');
+                    btn.classList.add('bg-slate-200', 'text-slate-600');
+                }
+            }
+
+            // Navigation Buttons Control
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const finishBtn = document.getElementById('finishBtn');
+
+            if (currentStep === 1) {
+                prevBtn.classList.add('hidden');
+                nextBtn.classList.remove('w-1/2');
+                nextBtn.classList.add('w-full');
+            } else {
+                prevBtn.classList.remove('hidden');
+                nextBtn.classList.remove('w-full');
+                nextBtn.classList.add('w-1/2');
+            }
+
+            if (currentStep === 4) {
+                nextBtn.classList.add('hidden');
+                finishBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                finishBtn.classList.add('hidden');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function togglePreview() {
+            const formSection = document.getElementById('formSection');
+            const previewSection = document.getElementById('previewSection');
+            const toggleBtn = document.getElementById('previewToggleBtn');
+
+            if (previewSection.classList.contains('hidden')) {
+                updatePreview();
+                formSection.classList.add('hidden');
+                previewSection.classList.remove('hidden');
+                toggleBtn.innerHTML = `<i class="fa-solid fa-pen-to-square"></i> <span>تعديل</span>`;
+            } else {
+                previewSection.classList.add('hidden');
+                formSection.classList.remove('hidden');
+                toggleBtn.innerHTML = `<i class="fa-solid fa-eye"></i> <span>معاينة</span>`;
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleSpecialNeedsDetails() {
+            const selected = document.querySelector('input[name="specialNeeds"]:checked')?.value || 'لا يوجد';
+            const container = document.getElementById('specialNeedsDetailContainer');
+            if (selected === 'يوجد') {
+                container.classList.remove('hidden');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        // Helper function to set checkbox markers in document preview
+        function setCheck(id, isChecked) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.innerText = isChecked ? '✓' : '';
+            }
+        }
+
+        function updatePreview() {
+            // Text Inputs Mapping (Full list)
+            const fields = [
+                'firstName', 'fatherName', 'grandfatherName', 'greatGrandfatherName', 'surname',
+                'motherName', 'motherFatherName', 'motherGrandfatherName', 'birthDate',
+                'idNumber', 'issueCountry', 'registerNum', 'pageNum', 'familyNum', 'employeeId',
+                'nationality', 'birthCountry', 'birthPlace', 'motherLanguage', 'religion',
+                'bloodType', 'statusEffectiveDate', 'jobTitle', 'jobGrade', 'schoolName',
+                'firstAppointmentDate', 'qualification', 'collegeName', 'graduationYear', 'specialization',
+                'specialNeedsDetails', 'emergencyContact', 'emergencyRelation', 'emergencyPhone',
+                'city', 'district', 'mahalla', 'alley', 'currentAddress', 'nearestLandmark',
+                'phoneNumber', 'email', 'organizerName'
+            ];
+
+            fields.forEach(field => {
+                const input = document.getElementById(field);
+                const docEl = document.getElementById(`doc_${field}`);
+                if (input && docEl) {
+                    docEl.innerText = input.value || '';
+                }
+            });
+
+            // Full Name Auto Sync for Signature Line
+            const fn = document.getElementById('firstName').value || '';
+            const fa = document.getElementById('fatherName').value || '';
+            const sn = document.getElementById('surname').value || '';
+            document.getElementById('doc_fullNameSignature').innerText = `${fn} ${fa} ${sn}`.trim();
+
+            // Radios & Select Checkboxes Sync
+            
+            // ID Type
+            const idType = document.querySelector('input[name="idType"]:checked')?.value || 'بطاقة موحدة';
+            setCheck('chk_id_unified', idType === 'بطاقة موحدة');
+            setCheck('chk_id_iq', idType === 'جنسية عراقية');
+            setCheck('chk_id_other', idType === 'أخرى');
+
+            // Gender
+            const gender = document.getElementById('gender').value;
+            setCheck('chk_gender_male', gender === 'ذكر');
+            setCheck('chk_gender_female', gender === 'أنثى');
+
+            // Marital Status
+            const marital = document.getElementById('maritalStatus').value;
+            setCheck('chk_marital_single', marital.includes('أعزب'));
+            setCheck('chk_marital_married', marital.includes('متزوج'));
+
+            // Employment Type
+            const empType = document.getElementById('employmentType').value;
+            setCheck('chk_emp_perm', empType === 'ملاك دائم');
+            setCheck('chk_emp_contract', empType === 'عقد');
+            setCheck('chk_emp_lecturer', empType === 'محاضر');
+            setCheck('chk_emp_wage', empType === 'أجر');
+            setCheck('chk_emp_other', empType === 'أخرى');
+
+            // Staff Type
+            const staffType = document.getElementById('staffType').value;
+            setCheck('chk_staff_teach', staffType === 'تدريسي');
+            setCheck('chk_staff_admin', staffType === 'إداري');
+            setCheck('chk_staff_tech', staffType === 'فني');
+            setCheck('chk_staff_service', staffType === 'خدمي');
+
+            // Job Status
+            const jobStat = document.getElementById('jobStatus').value;
+            setCheck('chk_stat_active', jobStat === 'مستمر');
+            setCheck('chk_stat_ret', jobStat === 'متقاعد');
+            setCheck('chk_stat_dis', jobStat === 'مفصول');
+            setCheck('chk_stat_dead', jobStat === 'متوفي');
+            setCheck('chk_stat_leave', jobStat.includes('إجازة'));
+
+            // Classification
+            const classification = document.getElementById('classification').value;
+            setCheck('chk_class_teacher', classification === 'معلم');
+            setCheck('chk_class_staff', classification === 'موظف');
+
+            // Current Position
+            const pos = document.getElementById('currentPosition').value;
+            setCheck('chk_pos_dir', pos === 'مدير');
+            setCheck('chk_pos_dep', pos === 'معاون');
+            setCheck('chk_pos_teach', pos === 'مدرس');
+            setCheck('chk_pos_admin', pos === 'إداري');
+            setCheck('chk_pos_serv', pos === 'خدمي');
+
+            // Special Needs
+            const spNeeds = document.querySelector('input[name="specialNeeds"]:checked')?.value || 'لا يوجد';
+            setCheck('chk_sp_no', spNeeds === 'لا يوجد');
+            setCheck('chk_sp_yes', spNeeds === 'يوجد');
+        }
+
+        // Initial setup on page load
+        window.onload = function() {
+            updateStepUI();
+            updatePreview();
+        };
     </script>
 </body>
 </html>
-
+```
