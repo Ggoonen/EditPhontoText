@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -118,38 +117,6 @@
 </head>
 <body class="min-h-screen pb-12">
 
-    <!-- Notification Startup / Pop-up Modal -->
-    <div id="startupNotificationModal" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 hidden no-print">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 animate-fadeIn">
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
-                <div class="flex items-center gap-2.5">
-                    <span class="relative flex h-4 w-4 shrink-0">
-                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
-                      <span class="relative inline-flex rounded-full h-4 w-4 bg-orange-500"></span>
-                    </span>
-                    <h3 class="font-extrabold text-sm sm:text-base text-slate-900">إشعار عاجل وهام</h3>
-                </div>
-                <button onclick="dismissNotificationModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-            
-            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-5 text-xs sm:text-sm text-amber-950">
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span>
-                    <span class="font-bold text-xs text-amber-800">التحديث الأخير</span>
-                </div>
-                <p class="font-medium leading-relaxed">
-                    ديوان محافظة البصرة يناقش تعطيل الدوام يوم الاحد 25/10/2026 بانتظار الرسمي.
-                </p>
-            </div>
-
-            <button onclick="dismissNotificationModal()" class="w-full py-3 bg-blue-900 hover:bg-blue-950 text-white rounded-xl font-bold text-xs sm:text-sm transition shadow-md flex items-center justify-center gap-2">
-                <i class="fa-solid fa-check"></i> فهمت، متابعة الاستمارة
-            </button>
-        </div>
-    </div>
-
     <!-- Navbar Navigation & App Header -->
     <header class="no-print bg-gradient-to-r from-blue-950 via-blue-900 to-indigo-950 text-white shadow-xl sticky top-0 z-40 border-b border-amber-500/30">
         <div class="max-w-xl mx-auto px-4 py-3">
@@ -163,18 +130,14 @@
                         <p class="text-[11px] text-blue-200/90 font-medium">الاستمارة الرسمية الالكترونية الموحدة لنظام EMIS</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <!-- Notification Bell Icon -->
-                    <button onclick="openNotificationModal()" title="الإشعارات العاجلة" class="relative bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold w-9 h-9 rounded-lg text-xs transition flex items-center justify-center">
-                        <i class="fa-solid fa-bell"></i>
-                        <span id="bellBadge" class="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full border-2 border-blue-950"></span>
-                    </button>
+                <div class="flex items-center gap-2">
                     <!-- Reset Saved Data Button -->
-                    <button onclick="resetSavedData()" title="مسح البيانات المحفوظة" class="bg-red-500/20 hover:bg-red-500/30 text-red-200 border border-red-500/40 font-bold px-2.5 py-1.5 rounded-lg text-xs transition flex items-center gap-1">
+                    <button onclick="resetSavedData()" title="مسح البيانات المحفوظة" class="bg-red-500/20 hover:bg-red-500/30 text-red-200 border border-red-500/40 font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5">
                         <i class="fa-solid fa-trash-can"></i>
+                        <span>مسح</span>
                     </button>
                     <!-- Preview Toggle Button -->
-                    <button onclick="togglePreview()" id="previewToggleBtn" class="bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold px-3 py-1.5 rounded-lg text-xs transition flex items-center gap-1 shadow-md">
+                    <button onclick="togglePreview()" id="previewToggleBtn" class="bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold px-3.5 py-1.5 rounded-lg text-xs transition flex items-center gap-1.5 shadow-md">
                         <i class="fa-solid fa-eye"></i>
                         <span>معاينة</span>
                     </button>
@@ -186,161 +149,163 @@
     <!-- Main Container -->
     <main class="max-w-xl mx-auto px-3 pt-4">
 
-        <!-- ==================== EMIS FORM SECTION ==================== -->
-        <div id="formSection" class="no-print bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 mb-6">
+        <!-- ==================== EMIS FORM SECTION (Fast & Clean UI) ==================== -->
+        <div id="formSection" class="no-print bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 mb-6">
             
             <!-- Progress Bar -->
             <div class="flex justify-between items-center mb-6 relative px-2">
-                <div class="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-200 -translate-y-1/2 z-0"></div>
-                <div id="stepProgress" class="absolute top-1/2 right-0 h-0.5 bg-blue-700 -translate-y-1/2 z-0 transition-all duration-300" style="width: 0%;"></div>
+                <div class="absolute top-1/2 left-0 right-0 h-1 bg-slate-100 -translate-y-1/2 z-0"></div>
+                <div id="stepProgress" class="absolute top-1/2 right-0 h-1 bg-blue-700 -translate-y-1/2 z-0 transition-all duration-300" style="width: 0%;"></div>
 
-                <button type="button" onclick="goToStep(1)" id="stepBtn1" class="relative z-10 w-9 h-9 rounded-full bg-blue-700 text-white text-sm font-bold flex items-center justify-center shadow-md transition-all">1</button>
-                <button type="button" onclick="goToStep(2)" id="stepBtn2" class="relative z-10 w-9 h-9 rounded-full bg-slate-200 text-slate-600 text-sm font-bold flex items-center justify-center transition-all">2</button>
-                <button type="button" onclick="goToStep(3)" id="stepBtn3" class="relative z-10 w-9 h-9 rounded-full bg-slate-200 text-slate-600 text-sm font-bold flex items-center justify-center transition-all">3</button>
-                <button type="button" onclick="goToStep(4)" id="stepBtn4" class="relative z-10 w-9 h-9 rounded-full bg-slate-200 text-slate-600 text-sm font-bold flex items-center justify-center transition-all">4</button>
+                <button type="button" onclick="goToStep(1)" id="stepBtn1" class="relative z-10 w-9 h-9 rounded-xl bg-blue-700 text-white text-xs font-black flex items-center justify-center shadow-md transition-all">١</button>
+                <button type="button" onclick="goToStep(2)" id="stepBtn2" class="relative z-10 w-9 h-9 rounded-xl bg-slate-200 text-slate-600 text-xs font-black flex items-center justify-center transition-all">٢</button>
+                <button type="button" onclick="goToStep(3)" id="stepBtn3" class="relative z-10 w-9 h-9 rounded-xl bg-slate-200 text-slate-600 text-xs font-black flex items-center justify-center transition-all">٣</button>
+                <button type="button" onclick="goToStep(4)" id="stepBtn4" class="relative z-10 w-9 h-9 rounded-xl bg-slate-200 text-slate-600 text-xs font-black flex items-center justify-center transition-all">٤</button>
             </div>
 
-            <div class="text-center mb-5">
-                <span id="stepBadge" class="text-[11px] font-bold bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full uppercase tracking-wider">الخطوة 1 من 4</span>
-                <h2 id="stepTitle" class="text-base font-extrabold text-slate-800 mt-1">أولاً: معلومات الاسم والنسب</h2>
+            <div class="bg-blue-50/70 border border-blue-100 rounded-xl p-3 mb-5 flex items-center justify-between">
+                <div>
+                    <span id="stepBadge" class="text-[10px] font-bold bg-blue-700 text-white px-2 py-0.5 rounded-md uppercase tracking-wider">الخطوة 1 من 4</span>
+                    <h2 id="stepTitle" class="text-sm sm:text-base font-extrabold text-slate-900 mt-1">الاسم والنسب العائلي الكريم</h2>
+                </div>
+                <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center">
+                    <i id="stepIcon" class="fa-solid fa-user-pen text-base"></i>
+                </div>
             </div>
 
-            <form id="emisInputForm" onsubmit="event.preventDefault();">
+            <form id="emisInputForm" onsubmit="event.preventDefault();" class="space-y-4">
 
-                <!-- STEP 1: Personal Lineage (Exact Sequence: Name, Father, Grandfather's Father, Grandfather, Surname, Mother, Mother's Father, Mother's Grandfather, Birth Date) -->
-                <div id="step1" class="step-content space-y-3">
-                    <div class="grid grid-cols-3 gap-2">
+                <!-- STEP 1: Personal Lineage (Exact Sequence: Name, Father, Grandfather, Surname, Mother, Mother's Father, Mother's Grandfather, Birth Date) -->
+                <div id="step1" class="step-content space-y-3.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">1. الاسم *</label>
-                            <input type="text" id="firstName" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="أحمد">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">1. الاسم الصريح *</label>
+                            <input type="text" id="firstName" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition shadow-sm" placeholder="مثال: أحمد">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-slate-700 mb-1">2. اسم الأب *</label>
-                            <input type="text" id="fatherName" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="محمد">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">3. والد الأب *</label>
-                            <input type="text" id="grandfatherName" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="علي">
+                            <input type="text" id="fatherName" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition shadow-sm" placeholder="مثال: محمد">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">4. جد الأب *</label>
-                            <input type="text" id="greatGrandfatherName" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="حسين">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">3. والد الأب (الجد) *</label>
+                            <input type="text" id="grandfatherName" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition shadow-sm" placeholder="مثال: علي">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">5. اللقب *</label>
-                            <input type="text" id="surname" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="العبيدي">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">6. اسم الأم *</label>
-                            <input type="text" id="motherName" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="فاطمة">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">4. اللقب العائلي *</label>
+                            <input type="text" id="surname" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition shadow-sm" placeholder="مثال: العبيدي">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">7. والد الأم *</label>
-                            <input type="text" id="motherFatherName" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="حسن">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">5. اسم الأم *</label>
+                            <input type="text" id="motherName" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition shadow-sm" placeholder="اسم الأم">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">8. جد الأم</label>
-                            <input type="text" id="motherGrandfatherName" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition" placeholder="عبد الله">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">6. والد الأم *</label>
+                            <input type="text" id="motherFatherName" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition shadow-sm" placeholder="والد الأم">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">9. تاريخ التولد *</label>
-                            <input type="text" id="birthDate" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:bg-white transition font-mono" placeholder="1990/05/15">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">7. جد الأم</label>
+                            <input type="text" id="motherGrandfatherName" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition shadow-sm" placeholder="جد الأم">
                         </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">8. تاريخ التولد *</label>
+                        <input type="text" id="birthDate" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-600 focus:bg-white transition font-mono shadow-sm" placeholder="1990/05/15">
                     </div>
                 </div>
 
                 <!-- STEP 2: Identity & Personal Information -->
-                <div id="step2" class="step-content space-y-3 hidden">
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                        <label class="block text-xs font-bold text-slate-700 mb-2">1. نوع الهوية *</label>
-                        <div class="flex items-center gap-4">
-                            <label class="flex items-center text-xs font-medium cursor-pointer">
-                                <input type="radio" name="idType" value="بطاقة موحدة" checked onchange="updatePreview()" class="text-blue-600">
-                                <span class="mr-1.5">بطاقة موحدة</span>
+                <div id="step2" class="step-content space-y-3.5 hidden">
+                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-2">نوع وثيقة التعريف *</label>
+                        <div class="flex flex-wrap items-center gap-4">
+                            <label class="flex items-center text-xs font-bold cursor-pointer bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm flex-1">
+                                <input type="radio" name="idType" value="بطاقة موحدة" checked onchange="updatePreview()" class="text-blue-600 ml-1.5">
+                                <span>بطاقة موحدة</span>
                             </label>
-                            <label class="flex items-center text-xs font-medium cursor-pointer">
-                                <input type="radio" name="idType" value="جنسية عراقية" onchange="updatePreview()" class="text-blue-600">
-                                <span class="mr-1.5">جنسية عراقية</span>
+                            <label class="flex items-center text-xs font-bold cursor-pointer bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm flex-1">
+                                <input type="radio" name="idType" value="جنسية عراقية" onchange="updatePreview()" class="text-blue-600 ml-1.5">
+                                <span>جنسية عراقية</span>
                             </label>
-                            <label class="flex items-center text-xs font-medium cursor-pointer">
-                                <input type="radio" name="idType" value="أخرى" onchange="updatePreview()" class="text-blue-600">
-                                <span class="mr-1.5">أخرى</span>
+                            <label class="flex items-center text-xs font-bold cursor-pointer bg-white px-3 py-2 rounded-lg border border-slate-200 shadow-sm">
+                                <input type="radio" name="idType" value="أخرى" onchange="updatePreview()" class="text-blue-600 ml-1.5">
+                                <span>أخرى</span>
                             </label>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">2. بلد الإصدار</label>
-                            <input type="text" id="issueCountry" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="العراق">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">بلد الإصدار</label>
+                            <input type="text" id="issueCountry" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl shadow-sm" value="العراق">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">3. رقم الهوية / الموحدة *</label>
-                            <input type="text" id="idNumber" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-2">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">4. السجل</label>
-                            <input type="text" id="registerNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">5. الصحيفة</label>
-                            <input type="text" id="pageNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">6. الرقم العائلي</label>
-                            <input type="text" id="familyNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">رقم الهوية / الموحدة *</label>
+                            <input type="text" id="idNumber" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-mono shadow-sm">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-3 gap-2.5">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">7. الرقم الوظيفي</label>
-                            <input type="text" id="employeeId" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">السجل</label>
+                            <input type="text" id="registerNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl font-mono">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">8. الجنس *</label>
-                            <select id="gender" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الصحيفة</label>
+                            <input type="text" id="pageNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الرقم العائلي</label>
+                            <input type="text" id="familyNum" oninput="updatePreview()" class="w-full px-2.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl font-mono">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الرقم الوظيفي</label>
+                            <input type="text" id="employeeId" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-mono shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الجنس *</label>
+                            <select id="gender" onchange="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl shadow-sm font-bold">
                                 <option value="ذكر">ذكر</option>
                                 <option value="أنثى">أنثى</option>
                             </select>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-3 gap-2.5">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">9. الجنسية *</label>
-                            <input type="text" id="nationality" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" value="عراقية">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الجنسية *</label>
+                            <input type="text" id="nationality" oninput="updatePreview()" class="w-full px-2 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl" value="عراقية">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">10. دولة التوالد</label>
-                            <input type="text" id="birthCountry" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" value="العراق">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">دولة التوالد</label>
+                            <input type="text" id="birthCountry" oninput="updatePreview()" class="w-full px-2 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl" value="العراق">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">11. مسقط الرأس</label>
-                            <input type="text" id="birthPlace" oninput="updatePreview()" class="w-full px-2.5 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">مسقط الرأس</label>
+                            <input type="text" id="birthPlace" oninput="updatePreview()" class="w-full px-2 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">12. الحالة الاجتماعية *</label>
-                            <select id="maritalStatus" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الحالة الاجتماعية *</label>
+                            <select id="maritalStatus" onchange="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
                                 <option value="أعزب/ة">أعزب/ة</option>
                                 <option value="متزوج/ة">متزوج/ة</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">13. فئة الدم</label>
-                            <select id="bloodType" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">فئة الدم</label>
+                            <select id="bloodType" onchange="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-mono">
                                 <option value="">اختر...</option>
                                 <option value="O+">O+</option>
                                 <option value="O-">O-</option>
@@ -354,24 +319,24 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">14. اللغة الأم *</label>
-                            <input type="text" id="motherLanguage" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" value="العربية">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اللغة الأم *</label>
+                            <input type="text" id="motherLanguage" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl" value="العربية">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">15. الديانة</label>
-                            <input type="text" id="religion" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" value="مسلم">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الديانة</label>
+                            <input type="text" id="religion" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl" value="مسلم">
                         </div>
                     </div>
                 </div>
 
                 <!-- STEP 3: Job and Qualification Info -->
-                <div id="step3" class="step-content space-y-3 hidden">
-                    <div class="grid grid-cols-2 gap-2.5">
+                <div id="step3" class="step-content space-y-3.5 hidden">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">1. نوع التوظيف *</label>
-                            <select id="employmentType" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">نوع التوظيف *</label>
+                            <select id="employmentType" onchange="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-bold">
                                 <option value="ملاك دائم">ملاك دائم</option>
                                 <option value="عقد">عقد</option>
                                 <option value="محاضر">محاضر</option>
@@ -380,8 +345,8 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">2. نوع الموظف *</label>
-                            <select id="staffType" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">نوع الموظف *</label>
+                            <select id="staffType" onchange="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-bold">
                                 <option value="تدريسي">تدريسي</option>
                                 <option value="إداري">إداري</option>
                                 <option value="فني">فني</option>
@@ -390,10 +355,10 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">3. الحالة الوظيفية *</label>
-                            <select id="jobStatus" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الحالة الوظيفية *</label>
+                            <select id="jobStatus" onchange="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
                                 <option value="مستمر">مستمر</option>
                                 <option value="متقاعد">متقاعد</option>
                                 <option value="منقطع">منقطع</option>
@@ -403,33 +368,33 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">4. المسمى الوظيفي</label>
-                            <input type="text" id="jobTitle" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg" placeholder="معلم جامعي / مدرس">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">المسمى الوظيفي</label>
+                            <input type="text" id="jobTitle" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl" placeholder="معلم جامعي / مدرس">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-2">
+                    <div class="grid grid-cols-3 gap-2.5">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">5. الدرجة الوظيفية</label>
-                            <input type="text" id="jobGrade" oninput="updatePreview()" class="w-full px-2.5 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg" placeholder="الخامسة">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الدرجة الوظيفية</label>
+                            <input type="text" id="jobGrade" oninput="updatePreview()" class="w-full px-2 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl" placeholder="الخامسة">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">6. التصنيف *</label>
-                            <select id="classification" onchange="updatePreview()" class="w-full px-2 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">التصنيف *</label>
+                            <select id="classification" onchange="updatePreview()" class="w-full px-2 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl font-bold">
                                 <option value="معلم">معلم</option>
                                 <option value="موظف">موظف</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">7. العنوان الوظيفي *</label>
-                            <input type="text" id="officialTitle" oninput="updatePreview()" class="w-full px-2 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg" placeholder="معلم أول / مدرس">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">العنوان الوظيفي *</label>
+                            <input type="text" id="officialTitle" oninput="updatePreview()" class="w-full px-2 py-2 text-xs bg-slate-50 border border-slate-300 rounded-xl" placeholder="معلم أول">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">8. المنصب الحالي *</label>
-                            <select id="currentPosition" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">المنصب الحالي *</label>
+                            <select id="currentPosition" onchange="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
                                 <option value="مدرس">مدرس / معلم</option>
                                 <option value="مدير">مدير</option>
                                 <option value="معاون">معاون</option>
@@ -438,15 +403,15 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">9. تاريخ أول تعيين *</label>
-                            <input type="text" id="firstAppointmentDate" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono" placeholder="2015/09/01">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">تاريخ أول تعيين *</label>
+                            <input type="text" id="firstAppointmentDate" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-mono" placeholder="2015/09/01">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">10. التحصيل الدراسي *</label>
-                            <select id="qualification" onchange="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">التحصيل الدراسي *</label>
+                            <select id="qualification" onchange="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-bold">
                                 <option value="بكالوريوس">بكالوريوس</option>
                                 <option value="دبلوم">دبلوم</option>
                                 <option value="إعدادية">إعدادية</option>
@@ -455,139 +420,140 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">11. اسم المدرسة / الدائرة</label>
-                            <input type="text" id="schoolName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اسم المدرسة / الدائرة</label>
+                            <input type="text" id="schoolName" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">12. اسم الكلية / المعهد *</label>
-                            <input type="text" id="collegeName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">اسم الكلية / المعهد *</label>
+                            <input type="text" id="collegeName" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">13. سنة التخرج</label>
-                            <input type="text" id="graduationYear" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono" placeholder="2014">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">سنة التخرج</label>
+                            <input type="text" id="graduationYear" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-mono" placeholder="2014">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">14. الاختصاص *</label>
-                        <input type="text" id="specialization" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">الاختصاص *</label>
+                        <input type="text" id="specialization" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
                     </div>
                 </div>
 
-                <!-- STEP 4: Special Needs, Emergency, Address & Contact (Manager phone removed) -->
-                <div id="step4" class="step-content space-y-3 hidden">
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                        <label class="block text-xs font-bold text-slate-700 mb-2">1. ذوو الاحتياجات الخاصة</label>
+                <!-- STEP 4: Special Needs, Emergency, Address & Contact -->
+                <div id="step4" class="step-content space-y-3.5 hidden">
+                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                        <label class="block text-xs font-bold text-slate-700 mb-2">ذوو الاحتياجات الخاصة</label>
                         <div class="flex items-center gap-4">
-                            <label class="flex items-center text-xs font-medium cursor-pointer">
-                                <input type="radio" name="specialNeeds" value="لا يوجد" checked onchange="updatePreview(); toggleSpecialNeedsDetails();" class="text-blue-600">
-                                <span class="mr-1">لا يوجد</span>
+                            <label class="flex items-center text-xs font-bold cursor-pointer">
+                                <input type="radio" name="specialNeeds" value="لا يوجد" checked onchange="updatePreview(); toggleSpecialNeedsDetails();" class="text-blue-600 ml-1">
+                                <span>لا يوجد</span>
                             </label>
-                            <label class="flex items-center text-xs font-medium cursor-pointer">
-                                <input type="radio" name="specialNeeds" value="يوجد" onchange="updatePreview(); toggleSpecialNeedsDetails();" class="text-blue-600">
-                                <span class="mr-1">يوجد</span>
+                            <label class="flex items-center text-xs font-bold cursor-pointer">
+                                <input type="radio" name="specialNeeds" value="يوجد" onchange="updatePreview(); toggleSpecialNeedsDetails();" class="text-blue-600 ml-1">
+                                <span>يوجد</span>
                             </label>
                         </div>
-                        <div id="specialNeedsDetailContainer" class="mt-2 hidden">
-                            <input type="text" id="specialNeedsDetails" oninput="updatePreview()" placeholder="اذكر التفاصيل..." class="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 rounded-lg">
+                        <div id="specialNeedsDetailContainer" class="mt-2.5 hidden">
+                            <input type="text" id="specialNeedsDetails" oninput="updatePreview()" placeholder="اذكر التفاصيل..." class="w-full px-3 py-2 text-xs bg-white border border-slate-300 rounded-xl shadow-sm">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">2. جهة الاتصال الطارئ</label>
-                            <input type="text" id="emergencyContact" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">جهة الاتصال الطارئ</label>
+                            <input type="text" id="emergencyContact" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">3. صلة جهة الطوارئ</label>
-                            <input type="text" id="emergencyRelation" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">صلة جهة الطوارئ</label>
+                            <input type="text" id="emergencyRelation" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-slate-700 mb-1">4. رقم هاتف الطوارئ</label>
-                        <input type="tel" id="emergencyPhone" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono" placeholder="07700000000">
+                        <label class="block text-xs font-bold text-slate-700 mb-1">رقم هاتف الطوارئ</label>
+                        <input type="tel" id="emergencyPhone" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-mono shadow-sm" placeholder="07700000000">
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">5. المدينة / القرية *</label>
-                            <input type="text" id="city" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">المدينة / القرية *</label>
+                            <input type="text" id="city" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">6. الحي *</label>
-                            <input type="text" id="district" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2.5">
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">7. المحلة</label>
-                            <input type="text" id="mahalla" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">8. الزقاق *</label>
-                            <input type="text" id="alley" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الحي *</label>
+                            <input type="text" id="district" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">9. عنوان حالي *</label>
-                            <input type="text" id="currentAddress" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">المحلة</label>
+                            <input type="text" id="mahalla" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-mono">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">10. أقرب نقطة دالة *</label>
-                            <input type="text" id="nearestLandmark" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">الزقاق *</label>
+                            <input type="text" id="alley" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-mono">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">11. رقم هاتف *</label>
-                            <input type="tel" id="phoneNumber" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono" placeholder="07700000000">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">عنوان حالي *</label>
+                            <input type="text" id="currentAddress" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-mono">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 mb-1">12. البريد الإلكتروني</label>
-                            <input type="email" id="email" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg font-mono">
+                            <label class="block text-xs font-bold text-slate-700 mb-1">أقرب نقطة دالة *</label>
+                            <input type="text" id="nearestLandmark" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">رقم الهاتف *</label>
+                            <input type="tel" id="phoneNumber" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-mono shadow-sm" placeholder="07700000000">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">البريد الإلكتروني</label>
+                            <input type="email" id="email" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl font-mono shadow-sm">
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-xs font-bold text-slate-700 mb-1">اسم المنظم</label>
-                        <input type="text" id="organizerName" oninput="updatePreview()" class="w-full px-3 py-2 text-sm bg-slate-50 border border-slate-300 rounded-lg">
+                        <input type="text" id="organizerName" oninput="updatePreview()" class="w-full px-3 py-2.5 text-sm bg-slate-50 border border-slate-300 rounded-xl">
                     </div>
                 </div>
 
                 <!-- Control Buttons -->
-                <div class="flex justify-between items-center gap-3 mt-6 pt-4 border-t border-slate-100">
-                    <button type="button" id="prevBtn" onclick="changeStep(-1)" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition hidden">
-                        <i class="fa-solid fa-arrow-right ml-1"></i> السابق
+                <div class="flex justify-between items-center gap-3 pt-4 border-t border-slate-100 mt-6">
+                    <button type="button" id="prevBtn" onclick="changeStep(-1)" class="w-1/2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition hidden flex items-center justify-center gap-1.5 shadow-sm">
+                        <i class="fa-solid fa-arrow-right"></i> السابق
                     </button>
-                    <button type="button" id="nextBtn" onclick="changeStep(1)" class="w-full py-2.5 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-bold text-sm transition shadow-md shadow-blue-200">
-                        التالي <i class="fa-solid fa-arrow-left mr-1"></i>
+                    <button type="button" id="nextBtn" onclick="changeStep(1)" class="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white rounded-xl font-bold text-sm transition shadow-lg shadow-blue-200 flex items-center justify-center gap-2">
+                        <span>التالي</span> <i class="fa-solid fa-arrow-left"></i>
                     </button>
-                    <button type="button" id="finishBtn" onclick="togglePreview()" class="w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition shadow-md shadow-emerald-200 hidden">
-                        معاينة الاستمارة <i class="fa-solid fa-file-check mr-1"></i>
+                    <button type="button" id="finishBtn" onclick="togglePreview()" class="w-1/2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-sm transition shadow-lg shadow-emerald-200 hidden flex items-center justify-center gap-1.5">
+                        <span>معاينة الاستمارة</span> <i class="fa-solid fa-file-check"></i>
                     </button>
                 </div>
             </form>
         </div>
 
+        <!-- ==================== OFFICIAL PREVIEW SECTION (100% Intact Design) ==================== -->
         <div id="previewSection" class="hidden space-y-4 mb-12">
             
             <!-- Actions Bar -->
             <div class="no-print bg-white p-3.5 rounded-2xl shadow-md border border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-3">
-                <button onclick="togglePreview()" class="w-full sm:w-auto px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-200 transition flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-pen-to-square"></i> العودة للتعديل
+                <button onclick="togglePreview()" class="w-full sm:w-auto px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-bold text-xs hover:bg-slate-200 transition flex items-center justify-center gap-1.5 shadow-sm">
+                    <i class="fa-solid fa-pen-to-square"></i> العودة للتعديل السريع
                 </button>
                 
                 <div class="flex flex-wrap items-center justify-center gap-2 w-full sm:w-auto">
                     <button onclick="sendToWhatsApp()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs hover:bg-emerald-700 transition shadow-sm flex items-center gap-1.5">
-                        <i class="fa-brands fa-whatsapp text-sm"></i> إرسال إلى المدير (واتساب)
+                        <i class="fa-brands fa-whatsapp text-sm"></i> إرسال عبر الواتساب
                     </button>
                     <button onclick="window.print()" class="px-3.5 py-2 bg-blue-700 text-white rounded-xl font-bold text-xs hover:bg-blue-800 transition shadow-sm flex items-center gap-1.5">
                         <i class="fa-solid fa-print"></i> طباعة / حفظ PDF
@@ -606,7 +572,7 @@
                 </ul>
             </div>
 
-            <!-- Printable & Renderable Official Document Container (Exact sequence: Name, Father, Grandfather's Father, Grandfather, Surname, etc.) -->
+            <!-- Printable & Renderable Official Document Container (Exact sequence: Name, Father, Grandfather, Surname, Mother, Mother's Father, Mother's Grandfather, Birth Date) -->
             <div id="officialFormContainer" class="compact-doc bg-white text-black p-4 rounded-lg shadow-xl border-2 border-slate-900 font-tajawal relative overflow-hidden">
                 
                 <!-- Document Header -->
@@ -640,28 +606,24 @@
                         </div>
 
                         <div class="flex items-baseline">
-                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">4. جد الأب *:</span>
-                            <span id="doc_greatGrandfatherName" class="doc-field-value flex-1"></span>
-                        </div>
-                        <div class="flex items-baseline">
-                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">5. اللقب *:</span>
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">4. اللقب *:</span>
                             <span id="doc_surname" class="doc-field-value flex-1"></span>
                         </div>
                         <div class="flex items-baseline">
-                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">6. اسم الأم *:</span>
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">5. اسم الأم *:</span>
                             <span id="doc_motherName" class="doc-field-value flex-1"></span>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">6. والد الأم *:</span>
+                            <span id="doc_motherFatherName" class="doc-field-value flex-1"></span>
                         </div>
 
                         <div class="flex items-baseline">
-                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">7. والد الأم *:</span>
-                            <span id="doc_motherFatherName" class="doc-field-value flex-1"></span>
-                        </div>
-                        <div class="flex items-baseline">
-                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">8. جد الأم :</span>
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">7. جد الأم :</span>
                             <span id="doc_motherGrandfatherName" class="doc-field-value flex-1"></span>
                         </div>
-                        <div class="flex items-baseline">
-                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">9. تاريخ التولد *:</span>
+                        <div class="flex items-baseline col-span-2">
+                            <span class="font-bold whitespace-nowrap ml-1 shrink-0">8. تاريخ التولد *:</span>
                             <span id="doc_birthDate" class="doc-field-value date-number-field flex-1 font-mono"></span>
                         </div>
                     </div>
@@ -973,39 +935,21 @@
 
     <script>
         let currentStep = 1;
-        const STORAGE_KEY = 'emis_form_saved_data';
-        const NOTIFICATION_SEEN_KEY = 'emis_notification_seen_v1';
+        const STORAGE_KEY = 'emis_form_saved_data_v2';
 
-        function checkStartupNotification() {
-            try {
-                const seen = localStorage.getItem(NOTIFICATION_SEEN_KEY);
-                const modal = document.getElementById('startupNotificationModal');
-                if (!seen && modal) {
-                    modal.classList.remove('hidden');
-                }
-            } catch (e) {
-                console.warn('LocalStorage error:', e);
-            }
-        }
+        const stepTitles = [
+            "الاسم والنسب العائلي الكريم",
+            "وثيقة التعريف والبيانات الشخصية",
+            "المعلومات الوظيفية والتحصيل الدراسي",
+            "ذوو الاحتياجات الخاصة والطوارئ والسكن"
+        ];
 
-        function dismissNotificationModal() {
-            const modal = document.getElementById('startupNotificationModal');
-            if (modal) {
-                modal.classList.add('hidden');
-            }
-            try {
-                localStorage.setItem(NOTIFICATION_SEEN_KEY, 'true');
-            } catch (e) {
-                console.warn('LocalStorage error:', e);
-            }
-        }
-
-        function openNotificationModal() {
-            const modal = document.getElementById('startupNotificationModal');
-            if (modal) {
-                modal.classList.remove('hidden');
-            }
-        }
+        const stepIcons = [
+            "fa-user-pen",
+            "fa-id-card",
+            "fa-briefcase",
+            "fa-house-user"
+        ];
 
         function goToStep(step) {
             currentStep = step;
@@ -1035,24 +979,18 @@
             const progressPercent = ((currentStep - 1) / 3) * 100;
             document.getElementById('stepProgress').style.width = `${progressPercent}%`;
 
-            const titles = [
-                "أولاً: معلومات الاسم والنسب",
-                "ثانياً: وثيقة التعريف والبيانات الشخصية",
-                "ثالثاً: المعلومات الوظيفية والتحصيل الدراسي",
-                "رابعاً: ذوي الاحتياجات الخاصة والطوارئ والسكن والاتصال"
-            ];
-
             document.getElementById('stepBadge').innerText = `الخطوة ${currentStep} من 4`;
-            document.getElementById('stepTitle').innerText = titles[currentStep - 1];
+            document.getElementById('stepTitle').innerText = stepTitles[currentStep - 1];
+            document.getElementById('stepIcon').className = `fa-solid ${stepIcons[currentStep - 1]} text-base`;
 
             for (let i = 1; i <= 4; i++) {
                 const btn = document.getElementById(`stepBtn${i}`);
                 if (btn) {
                     if (i <= currentStep) {
                         btn.classList.remove('bg-slate-200', 'text-slate-600');
-                        btn.classList.add('bg-blue-700', 'text-white');
+                        btn.classList.add('bg-blue-700', 'text-white', 'shadow-md');
                     } else {
-                        btn.classList.remove('bg-blue-700', 'text-white');
+                        btn.classList.remove('bg-blue-700', 'text-white', 'shadow-md');
                         btn.classList.add('bg-slate-200', 'text-slate-600');
                     }
                 }
@@ -1129,7 +1067,6 @@
                     motherName: document.getElementById('motherName')?.value || '',
                     grandfatherName: document.getElementById('grandfatherName')?.value || '',
                     motherFatherName: document.getElementById('motherFatherName')?.value || '',
-                    greatGrandfatherName: document.getElementById('greatGrandfatherName')?.value || '',
                     motherGrandfatherName: document.getElementById('motherGrandfatherName')?.value || '',
                     birthDate: document.getElementById('birthDate')?.value || '',
                     issueCountry: document.getElementById('issueCountry')?.value || '',
@@ -1180,7 +1117,7 @@
 
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
             } catch (e) {
-                console.warn('LocalStorage error or unavailable:', e);
+                console.warn('LocalStorage error:', e);
             }
         }
 
@@ -1218,11 +1155,9 @@
             if (window.confirm('هل أنت متاكد من مسح جميع البيانات المدخلة؟')) {
                 try {
                     localStorage.removeItem(STORAGE_KEY);
-                    localStorage.removeItem(NOTIFICATION_SEEN_KEY);
                     document.getElementById('emisInputForm').reset();
                     toggleSpecialNeedsDetails();
                     updatePreview();
-                    checkStartupNotification();
                 } catch (e) {
                     console.error(e);
                 }
@@ -1234,7 +1169,7 @@
 
             const fields = [
                 'firstName', 'surname', 'fatherName', 'motherName', 'grandfatherName', 'motherFatherName', 
-                'greatGrandfatherName', 'motherGrandfatherName', 'birthDate',
+                'motherGrandfatherName', 'birthDate',
                 'issueCountry', 'idNumber', 'registerNum', 'pageNum', 'familyNum', 'employeeId',
                 'nationality', 'birthCountry', 'birthPlace', 'motherLanguage', 'religion',
                 'bloodType', 'jobTitle', 'jobGrade', 'officialTitle', 'schoolName',
@@ -1328,7 +1263,6 @@
             loadDataFromLocalStorage();
             updateStepUI();
             updatePreview();
-            checkStartupNotification();
         };
     </script>
 </body>
